@@ -11,6 +11,7 @@ namespace AdventOfCode2019
 			Day1();
 			Day2();
 			Day3();
+			Day4();
 			Console.Write("Done - press any key");
 			Console.ReadKey();
         }
@@ -133,6 +134,69 @@ namespace AdventOfCode2019
 			int MakeXy(int x, int y) => x * XyFactor + y;
 			int MakeX(int xy) => xy / XyFactor;
 			int MakeY(int xy) => xy % XyFactor;
+		}
+
+		private static void Day4()
+		{
+			var matches1 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
+			Console.WriteLine($"Day4: Puzzle1: {matches1}");
+
+			var matches2 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq == 2));
+			Console.WriteLine($"Day4: Puzzle2: {matches2}");
+
+			IEnumerable<int> SequenceLengths(IReadOnlyList<int> value)
+			{
+				var digit = value[0]; // Assume at least 1-digit values
+				var seqlen = 1;
+				for (var pos = 1; pos < value.Count; pos++)
+				{
+					if (value[pos] == digit)
+					{
+						seqlen++;
+					}
+					else
+					{
+						yield return seqlen;
+						digit = value[pos];
+						seqlen = 1;
+					}
+				}
+				yield return seqlen;
+			}
+
+			IEnumerable<int[]> CalcMatches(int begin, int end)
+			{
+				var digits = $"0{begin.ToString()}".ToCharArray().Select(x => int.Parse($"{x}")).ToArray();
+				while (true)
+				{
+					// Ensure that number consist only of increasing digits
+					for (var pos = 1; pos < digits.Length; pos++)
+					{
+						if (digits[pos] < digits[pos - 1])
+						{
+							digits[pos] = digits[pos - 1];
+						}
+					}
+
+					// Stop if we've moved beyond the end
+					var digitValue = digits.Aggregate(0, (sum, digit) => sum * 10 + digit);
+					if (digitValue > end)
+					{
+						break;
+					}
+
+					// This is a candidate
+					yield return digits;
+
+					// Increment the number one digit at a time, starting from the least significant digit
+					// Example: 456789 -> 456790
+					// Example: 678999 -> 679000
+					for (var pos = digits.Length - 1; pos >= 0 && ++digits[pos] > 9; pos--)
+					{
+						digits[pos] = 0;
+					}
+				}
+			}
 		}
 
 	}
