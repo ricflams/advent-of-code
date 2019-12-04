@@ -4,17 +4,17 @@ using System.Linq;
 
 namespace AdventOfCode2019
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-			Day1();
-			Day2();
-			Day3();
+	internal class Program
+	{
+		private static void Main()
+		{
+			//Day1();
+			//Day2();
+			//Day3();
 			Day4();
 			Console.Write("Done - press any key");
 			Console.ReadKey();
-        }
+		}
 
 		private static void Day1()
 		{
@@ -130,10 +130,10 @@ namespace AdventOfCode2019
 				}
 			}
 
-			const int XyFactor = 100000;
-			int MakeXy(int x, int y) => x * XyFactor + y;
-			int MakeX(int xy) => xy / XyFactor;
-			int MakeY(int xy) => xy % XyFactor;
+			const int xyFactor = 100000;
+			int MakeXy(int x, int y) => x * xyFactor + y;
+			int MakeX(int xy) => xy / xyFactor;
+			int MakeY(int xy) => xy % xyFactor;
 		}
 
 		private static void Day4()
