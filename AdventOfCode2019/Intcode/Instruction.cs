@@ -1,12 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AdventOfCode2019.Intcode
 {
     internal class Instruction
     {
 		public string Name { get; set; }
-		public Func<Mem, Data, Mode, int, int> Execute;
+
+		public class WithNoOp : Instruction
+		{
+			public Action<Engine> Execute { get; set; }
+		}
+
+		public class WithOp1 : Instruction
+		{
+			public Action<Engine, int> Execute { get; set; }
+		}
+
+		public class WithOp1Op2 : Instruction
+		{
+			public Action<Engine, int, int> Execute { get; set; }
+		}
+
+		public class WithDest : Instruction
+		{
+			public Action<Engine, int> Execute { get; set; }
+		}
+
+		public class WithOp1Op2Dest : Instruction
+		{
+			public Action<Engine, int, int, int> Execute { get; set; }
+		}
 	}
 }

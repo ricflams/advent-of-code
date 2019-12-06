@@ -1,40 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace AdventOfCode2019.Intcode
 {
 	internal class Engine
 	{
-		private readonly Mem _memory = new Mem();
-
-		private IDictionary<int, Instruction> _instructions = new Dictionary<int, Instruction>
+		private static readonly IDictionary<int, Instruction> Instructions = new Dictionary<int, Instruction>
 		{
 			{
-				1,
-				new Instruction { Name = "ADD", Execute = (mem, _, mode, pc) =>
+				1, new Instruction.WithOp1Op2Dest { Name = "add", Execute = (engine, op1, op2, dest) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						var dst = mem[pc++];
-						mem[dst] =
-							(mode.Param1IsImmediate ? op1 : mem[op1]) +
-							(mode.Param2IsImmediate ? op2 : mem[op2]);
-						return pc;
+						engine.Memory[dest] = op1 + op2;
 					}
 				}
 			},
 			{
-				2,
-				new Instruction { Name = "MUL", Execute = (mem, _, mode, pc) =>
+				2, new Instruction.WithOp1Op2Dest { Name = "multiply", Execute = (engine, op1, op2, dest) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						var dst = mem[pc++];
-						mem[dst] =
-							(mode.Param1IsImmediate ? op1 : mem[op1]) *
-							(mode.Param2IsImmediate ? op2 : mem[op2]);
-						return pc;
+						engine.Memory[dest] = op1 * op2;
 					}
 				}
 			},
@@ -113,33 +95,63 @@ namespace AdventOfCode2019.Intcode
 			},
 			{
 				99,
-				new Instruction { Name = "HALT", Execute = (_, __, ___, ____) => -1 }
+				new Instruction.WithNoOp { Name = "halt", Execute = engine =>
+					{
+						engine.Halt = true;
+					}
+				}
 			}
 		};
 
-		public void Initialize(int[] raw)
+		public int[] Memory = new int[] { 99 };
+
+		public Engine WithMemory(int[] memory)
 		{
-			Memory.Initialize(raw);
+			Memory = (int[])memory.Clone();
+			return this;
 		}
 
-		public readonly Mem Memory = new Mem();
-		public readonly Data Data = new Data();
+		{
+		}
+
+
+		public bool Halt;
+		public int Pc;
 
 		public void Execute()
 		{
-			for (var pc = 0; pc >= 0; )
+			// Start from scratch
+			Output.Clear();
+			Halt = false;
+			Pc = 0;
+
+			while (!Halt)
 			{
-				var opcode = Memory[pc++];
-				var instruction = _instructions[opcode % 100];
-				var mode = new Mode
+				var opcode = Memory[Pc++];
+				var instruction = Instructions[opcode % 100];
+				switch (instruction)
 				{
-					Param1IsImmediate = opcode / 100 % 10 == 1,
-					Param2IsImmediate = opcode / 1000 % 10 == 1,
-					Param3IsImmediate = opcode / 10000 % 10 == 1
-				};
-				pc = instruction.Execute(Memory, Data, mode, pc);
-				Console.WriteLine("pc: " + pc);
+					case Instruction.WithNoOp op:
+						op.Execute(this);
+						break;
+					case Instruction.WithOp1 op:
+						op.Execute(this, GetOperand1(opcode));
+						break;
+					case Instruction.WithOp1Op2 op:
+						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode));
+						break;
+					case Instruction.WithDest op:
+						op.Execute(this, GetPosOperand());
+						break;
+					case Instruction.WithOp1Op2Dest op:
+						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand());
+						break;
+				}
 			}
 		}
-    }
+
+		private int GetOperand1(int opcode) => opcode / 100 % 10 == 1 ? Memory[Pc++] : Memory[Memory[Pc++]];
+		private int GetOperand2(int opcode) => opcode / 1000 % 10 == 1 ? Memory[Pc++] : Memory[Memory[Pc++]];
+		private int GetPosOperand() => Memory[Pc++];
+	}
 }
