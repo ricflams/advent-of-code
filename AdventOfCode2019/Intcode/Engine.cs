@@ -21,75 +21,51 @@ namespace AdventOfCode2019.Intcode
 				}
 			},
 			{
-				3,
-				new Instruction { Name = "get", Execute = (mem, data, _, pc) =>
+				3, new Instruction.WithDest { Name = "get", Execute = (engine, dest) =>
 					{
-						var op = mem[pc++];
-						mem[op] = data.Input[0];
-						data.Input.RemoveAt(0);
-						return pc;
+						engine.Memory[dest] = engine.Input[0];
+						engine.Input.RemoveAt(0);
 					}
 				}
 			},
 			{
-				4,
-				new Instruction { Name = "put", Execute = (mem, data, mode, pc) =>
+				4, new Instruction.WithOp1 { Name = "put", Execute = (engine, op) =>
 					{
-						var op = mem[pc++];
-						data.Output.Add(mode.Param1IsImmediate ? op : mem[op]);
-						return pc;
+						engine.Output.Add(op);
 					}
 				}
 			},
 			{
-				5,
-				new Instruction { Name = "jump-if-true", Execute = (mem, data, mode, pc) =>
+				5, new Instruction.WithOp1Op2 { Name = "jump-if-true", Execute = (engine, op1, op2) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						if ((mode.Param1IsImmediate ? op1 : mem[op1]) != 0)
+						if (op1 != 0)
 						{
-							return mode.Param2IsImmediate ? op2 : mem[op2];
+							engine.Pc = op2;
 						}
-						return pc;
 					}
 				}
 			},
 			{
-				6,
-				new Instruction { Name = "jump-if-false", Execute = (mem, data, mode, pc) =>
+				6, new Instruction.WithOp1Op2 { Name = "jump-if-false", Execute = (engine, op1, op2) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						if ((mode.Param1IsImmediate ? op1 : mem[op1]) == 0)
+						if (op1 == 0)
 						{
-							return mode.Param2IsImmediate ? op2 : mem[op2];
+							engine.Pc = op2;
 						}
-						return pc;
 					}
 				}
 			},
 			{
-				7,
-				new Instruction { Name = "less-than", Execute = (mem, data, mode, pc) =>
+				7, new Instruction.WithOp1Op2Dest { Name = "less-than", Execute = (engine, op1, op2, dest) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						var dst = mem[pc++];
-						mem[dst] = (mode.Param1IsImmediate ? op1 : mem[op1]) < (mode.Param2IsImmediate ? op2 : mem[op2]) ? 1 : 0;
-						return pc;
+						engine.Memory[dest] = op1 < op2 ? 1 : 0;
 					}
 				}
 			},
 			{
-				8,
-				new Instruction { Name = "equals", Execute = (mem, data, mode, pc) =>
+				8, new Instruction.WithOp1Op2Dest { Name = "equals", Execute = (engine, op1, op2, dest) =>
 					{
-						var op1 = mem[pc++];
-						var op2 = mem[pc++];
-						var dst = mem[pc++];
-						mem[dst] = (mode.Param1IsImmediate ? op1 : mem[op1]) == (mode.Param2IsImmediate ? op2 : mem[op2]) ? 1 : 0;
-						return pc;
+						engine.Memory[dest] = op1 == op2 ? 1 : 0;
 					}
 				}
 			},
@@ -103,6 +79,8 @@ namespace AdventOfCode2019.Intcode
 			}
 		};
 
+		public List<int> Input { get; } = new List<int>();
+		public List<int> Output { get; } = new List<int>();
 		public int[] Memory = new int[] { 99 };
 
 		public Engine WithMemory(int[] memory)
@@ -111,9 +89,13 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
+		public Engine WithInput(params int[] input)
 		{
+			Input.AddRange(input);
+			return this;
 		}
 
+		public string OutputAsString => string.Join(" ", Output);
 
 		public bool Halt;
 		public int Pc;
