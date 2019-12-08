@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode2019
@@ -242,8 +243,58 @@ namespace AdventOfCode2019
 
 		private static void Day6()
 		{
-			Console.WriteLine($"Day6: Puzzle1: ");
-			Console.WriteLine($"Day6: Puzzle2: ");
+			var orbitdefs = File.ReadLines("inputs/day6.txt")
+				.Where(x => !string.IsNullOrWhiteSpace(x))
+				.Select(x => x.Split(')'))
+				.ToList();
+			var nodes = new Dictionary<string, List<string>>();
+			foreach (var o in orbitdefs)
+			{
+				if (!nodes.ContainsKey(o[0]))
+				{
+					nodes[o[0]] = new List<string> { o[1] };
+				}
+				else
+				{
+					nodes[o[0]].Add(o[1]);
+				}
+			}
+			var root = nodes.Keys.Except(nodes.SelectMany(x => x.Value)).First();
+			var orbitCount = CountOrbits(0, root);
+			Console.WriteLine($"Day6: Puzzle1: {orbitCount}");
+
+			int CountOrbits(int orbitlevel, string name) => 
+				nodes.TryGetValue(name, out var o)
+					? orbitlevel + o.Select(x => CountOrbits(orbitlevel + 1, x)).Sum()
+					: orbitlevel;
+
+			var you = FindPathTo("YOU").ToList();
+			var san = FindPathTo("SAN").ToList();
+			var dist = you.Count + san.Count - 2;
+			for (var i = 0; you[i] == san[i]; i++)
+			{
+				dist -= 2;
+			}
+			Console.WriteLine($"Day6: Puzzle2: {dist}");
+
+			IEnumerable<string> FindPathTo(string name)
+			{
+				if (name == root)
+				{
+					yield return name;
+				}
+				else
+				{
+					var obj = orbitdefs.First(o => o[1] == name);
+					foreach (var o in FindPathTo(obj[0]))
+					{
+						yield return o;
+					}
+					yield return obj[1];
+				}
+			}
+		}
+
 		}
 
 

@@ -7,4 +7,10 @@
     <AssemblyName>AdventOfCode2019</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Update="inputs\day6.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
