@@ -350,7 +350,9 @@ namespace AdventOfCode2019
 						.AsParallel()
 						.Select(e => e.Execute())
 						.AsSequential()
-						.First(e => e == engines.Last()).Output.Take();
+						.First(e => e == engines.Last())
+						.Output
+						.Take();
 				});
 			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
 		}
@@ -361,41 +363,46 @@ namespace AdventOfCode2019
 
 			const int width = 25;
 			const int height = 6;
-			const int layerlen = width * height;
+			const int size = width * height;
 
-			var layers = Enumerable.Range(0, imagedata.Length / layerlen)
-				//.Select(i => imagedata.AsSpan(i * layerlen, layerlen))
-				.Select(i => imagedata.Substring(i * layerlen, layerlen))
+			// Divide raw imagedata into the individual layers
+			var layers = Enumerable.Range(0, imagedata.Length / size)
+				.Select(i => imagedata.Substring(i * size, size))
 				.ToList();
 
-			var layer0 = layers
+			// FInd the layer with most 0's and multiply its 1's and 2's
+			var layerWithMostZeros = layers
 				.Select(l => new
 				{
 					Count0 = l.Count(x => x == '0'),
 					Layer = l
 				})
 				.OrderBy(x => x.Count0)
+				.Select(x => x.Layer)
 				.First();
-			var sum = layer0.Layer.Count(x => x == '1') * layer0.Layer.Count(x => x == '2');
+			var sum = layerWithMostZeros.Count(x => x == '1') * layerWithMostZeros.Count(x => x == '2');
 			Console.WriteLine($"Day8: Puzzle1: {sum}");
 
-			var rendering = Enumerable.Range(0, layerlen)
+			// Render all "pixels" by looping through each layer's similar positions and
+			// pick the first non-transparent value, turning '1' into black and '2' into blank.
+			const char blackBoxChar = '\u2588';
+			var rendering = Enumerable.Range(0, size)
 				.Select(pos => layers.Select(x => x[pos]))
 				.Select(x =>
 				{
 					var value = x.First(pixel => pixel != '2');
-					return value == '0' ? 'O' : ' ';
+					return value == '1' ? blackBoxChar : ' ';
 				})
 				.ToArray();
 			var image = new string(rendering);
 
+			// Split rendering into <height> individual lines and print them
 			var lines = Enumerable.Range(0, height)
 				.Select(x => image.Substring(x * width, width));
 			foreach (var line in lines)
 			{
 				Console.WriteLine($"Day8: Puzzle2: {line}");
 			}
-
 		}
 
 
