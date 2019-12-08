@@ -11,13 +11,14 @@ namespace AdventOfCode2019
 		{
 			Exercise(() =>
 			{
-				Day1();
-				Day2();
-				Day3();
-				Day4();
-				Day5();
-				Day6();
-				Day7();
+				//Day1();
+				//Day2();
+				//Day3();
+				//Day4();
+				//Day5();
+				//Day6();
+				//Day7();
+				Day8();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
@@ -354,6 +355,48 @@ namespace AdventOfCode2019
 			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
 		}
 
+		private static void Day8()
+		{
+			var imagedata = File.ReadAllText("inputs/day8.txt");
+
+			const int width = 25;
+			const int height = 6;
+			const int layerlen = width * height;
+
+			var layers = Enumerable.Range(0, imagedata.Length / layerlen)
+				//.Select(i => imagedata.AsSpan(i * layerlen, layerlen))
+				.Select(i => imagedata.Substring(i * layerlen, layerlen))
+				.ToList();
+
+			var layer0 = layers
+				.Select(l => new
+				{
+					Count0 = l.Count(x => x == '0'),
+					Layer = l
+				})
+				.OrderBy(x => x.Count0)
+				.First();
+			var sum = layer0.Layer.Count(x => x == '1') * layer0.Layer.Count(x => x == '2');
+			Console.WriteLine($"Day8: Puzzle1: {sum}");
+
+			var rendering = Enumerable.Range(0, layerlen)
+				.Select(pos => layers.Select(x => x[pos]))
+				.Select(x =>
+				{
+					var value = x.First(pixel => pixel != '2');
+					return value == '0' ? 'O' : ' ';
+				})
+				.ToArray();
+			var image = new string(rendering);
+
+			var lines = Enumerable.Range(0, height)
+				.Select(x => image.Substring(x * width, width));
+			foreach (var line in lines)
+			{
+				Console.WriteLine($"Day8: Puzzle2: {line}");
+			}
+
+		}
 
 
 		private static void Day()
