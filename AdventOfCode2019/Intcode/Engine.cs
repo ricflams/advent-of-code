@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace AdventOfCode2019.Intcode
 {
@@ -23,8 +24,7 @@ namespace AdventOfCode2019.Intcode
 			{
 				3, new Instruction.WithDest { Name = "get", Execute = (engine, dest) =>
 					{
-						engine.Memory[dest] = engine.Input[0];
-						engine.Input.RemoveAt(0);
+						engine.Memory[dest] = engine.Input.Take();
 					}
 				}
 			},
@@ -79,8 +79,9 @@ namespace AdventOfCode2019.Intcode
 			}
 		};
 
-		public List<int> Input { get; } = new List<int>();
-		public List<int> Output { get; } = new List<int>();
+		public BlockingCollection<int> Input { get; set; } = new BlockingCollection<int>();
+		public BlockingCollection<int> Output { get; set; } = new BlockingCollection<int>();
+
 		public int[] Memory = new int[] { 99 };
 
 		public Engine WithMemory(int[] memory)
@@ -91,19 +92,28 @@ namespace AdventOfCode2019.Intcode
 
 		public Engine WithInput(params int[] input)
 		{
-			Input.AddRange(input);
+			foreach (var value in input)
+			{
+				Input.Add(value);
+			}
 			return this;
 		}
 
-		public string OutputAsString => string.Join(" ", Output);
+		public string TakeOutput()
+		{
+			var output = new List<int>();
+			while (Output.TryTake(out var value))
+			{
+				output.Add(value);
+			}
+			return string.Join(" ", output);
+		}
 
 		public bool Halt;
 		public int Pc;
 
 		public void Execute()
 		{
-			// Start from scratch
-			Output.Clear();
 			Halt = false;
 			Pc = 0;
 

@@ -17,6 +17,7 @@ namespace AdventOfCode2019
 				//Day4();
 				Day5();
 				Day6();
+				Day7();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
@@ -232,13 +233,13 @@ namespace AdventOfCode2019
 				.WithMemory(mem)
 				.WithInput(1)
 				.Execute();
-			Console.WriteLine($"Day5: Puzzle1: {engine.OutputAsString}");
+			Console.WriteLine($"Day5: Puzzle1: {engine.TakeOutput()}");
 
 			engine
 				.WithMemory(mem)
 				.WithInput(5)
 				.Execute();
-			Console.WriteLine($"Day5: Puzzle2: {engine.OutputAsString}");
+			Console.WriteLine($"Day5: Puzzle2: {engine.TakeOutput()}");
 		}
 
 		private static void Day6()
@@ -295,6 +296,64 @@ namespace AdventOfCode2019
 			}
 		}
 
+		private static void Day7()
+		{
+			var mem = new int[] { 3, 8, 1001, 8, 10, 8, 105, 1, 0, 0, 21, 46, 59, 84, 93, 110, 191, 272, 353, 434, 99999, 3, 9, 101, 2, 9, 9, 102, 3, 9, 9, 1001, 9, 5, 9, 102, 4, 9, 9, 1001, 9, 4, 9, 4, 9, 99, 3, 9, 101, 3, 9, 9, 102, 5, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 4, 9, 1002, 9, 2, 9, 101, 2, 9, 9, 102, 2, 9, 9, 1001, 9, 3, 9, 4, 9, 99, 3, 9, 1002, 9, 2, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 1001, 9, 5, 9, 1002, 9, 3, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 99, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 99 };
+
+			IEnumerable<IEnumerable<int>> Permute(IEnumerable<int> x)
+			{
+				if (x.Count() == 1)
+				{
+					yield return x;
+				}
+				else
+				{
+					foreach (var head in x)
+					{
+						foreach (var perm in Permute(x.Where(y => y != head)))
+						{
+							yield return new[] { head }.Concat(perm);
+						}
+					}
+				}
+			}
+
+			var maxSignal1 = Permute(Enumerable.Range(0, 5))
+				.Max(amps =>
+				{
+					var signal = 0;
+					foreach (var a in amps)
+					{
+						var engine = new Intcode.Engine();
+						engine
+							.WithMemory(mem)
+							.WithInput(a, signal)
+							.Execute();
+						signal = engine.Output.Take();
+					}
+					return signal;
+				});
+			Console.WriteLine($"Day7: Puzzle1: {maxSignal1}");
+
+			var maxSignal2 = Permute(Enumerable.Range(5, 5))
+				.Max(amps =>
+				{
+					var engines = amps.Select(a => new Intcode.Engine().WithMemory(mem).WithInput(a)).ToList();
+					var n = engines.Count;
+					for (var i = 0; i < n; i++)
+					{
+						engines[(i + n - 1) % n].Output = engines[i].Input;
+					}
+					engines[0].WithInput(0);
+					return engines.AsParallel().Select(e =>
+					{
+						e.Execute();
+						return e == engines.Last() ? e.Output.Take() : 0;
+					})
+					.AsSequential()
+					.Sum();
+				});
+			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
 		}
 
 
