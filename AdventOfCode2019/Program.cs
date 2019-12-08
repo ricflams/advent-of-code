@@ -345,13 +345,11 @@ namespace AdventOfCode2019
 						engines[(i + n - 1) % n].Output = engines[i].Input;
 					}
 					engines[0].WithInput(0);
-					return engines.AsParallel().Select(e =>
-					{
-						e.Execute();
-						return e == engines.Last() ? e.Output.Take() : 0;
-					})
-					.AsSequential()
-					.Sum();
+					return engines
+						.AsParallel()
+						.Select(e => e.Execute())
+						.AsSequential()
+						.First(e => e == engines.Last()).Output.Take();
 				});
 			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
 		}

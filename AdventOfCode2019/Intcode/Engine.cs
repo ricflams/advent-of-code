@@ -112,7 +112,7 @@ namespace AdventOfCode2019.Intcode
 		public bool Halt;
 		public int Pc;
 
-		public void Execute()
+		public Engine Execute()
 		{
 			Halt = false;
 			Pc = 0;
@@ -140,6 +140,7 @@ namespace AdventOfCode2019.Intcode
 						break;
 				}
 			}
+			return this;
 		}
 
 		private int GetOperand1(int opcode) => opcode / 100 % 10 == 1 ? Memory[Pc++] : Memory[Memory[Pc++]];
