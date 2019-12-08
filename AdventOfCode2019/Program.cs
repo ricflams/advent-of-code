@@ -11,10 +11,10 @@ namespace AdventOfCode2019
 		{
 			Exercise(() =>
 			{
-				//Day1();
-				//Day2();
-				//Day3();
-				//Day4();
+				Day1();
+				Day2();
+				Day3();
+				Day4();
 				Day5();
 				Day6();
 				Day7();
@@ -355,6 +355,7 @@ namespace AdventOfCode2019
 				});
 			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
 		}
+
 
 
 		private static void Day()
