@@ -90,7 +90,7 @@ namespace AdventOfCode2019.Intcode
 		public BlockingCollection<BigInteger> Input { get; set; } = new BlockingCollection<BigInteger>();
 		public BlockingCollection<BigInteger> Output { get; set; } = new BlockingCollection<BigInteger>();
 
-		public Dictionary<BigInteger, BigInteger> Memory = new Dictionary<BigInteger,BigInteger> { { 0, 99 } };
+		public Dictionary<BigInteger, BigInteger> Memory = new Dictionary<BigInteger, BigInteger> { { 0, 99 } };
 
 		public Engine WithMemory(int[] memory)
 		{
@@ -143,8 +143,8 @@ namespace AdventOfCode2019.Intcode
 
 			while (!Halt)
 			{
-				var opcode = (int)Memory[Pc++];
-				var instruction = Instructions[(int)(opcode % 100)];
+				var opcode = (int)ReadMemory(Pc++);
+				var instruction = Instructions[opcode % 100];
 				switch (instruction)
 				{
 					case Instruction.WithNoOp op:
@@ -157,10 +157,10 @@ namespace AdventOfCode2019.Intcode
 						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode));
 						break;
 					case Instruction.WithDest op:
-						op.Execute(this, GetPosOperand(opcode / 100 % 10 == 2));
+						op.Execute(this, GetPosOperand1(opcode));
 						break;
 					case Instruction.WithOp1Op2Dest op:
-						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand(opcode / 10000 % 10 == 2));
+						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand3(opcode));
 						break;
 				}
 			}
@@ -171,9 +171,9 @@ namespace AdventOfCode2019.Intcode
 		{
 			switch (opcode / 100 % 10)
 			{
-				case 1: return ReadMemory(Pc++);
-				case 2: return ReadMemory(RelativeBase + Pc++);
 				default: return ReadMemory(ReadMemory(Pc++));
+				case 1: return ReadMemory(Pc++);
+				case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
 			}
 		}
 
@@ -181,10 +181,20 @@ namespace AdventOfCode2019.Intcode
 		{
 			switch (opcode / 1000 % 10)
 			{
-				case 1: return ReadMemory(Pc++);
-				case 2: return ReadMemory(RelativeBase + Pc++);
 				default: return ReadMemory(ReadMemory(Pc++));
+				case 1: return ReadMemory(Pc++);
+				case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
 			}
+		}
+
+		private BigInteger GetPosOperand1(int opcode)
+		{
+			return opcode / 100 % 10 == 2 ? RelativeBase + ReadMemory(Pc++) : ReadMemory(Pc++);
+		}
+
+		private BigInteger GetPosOperand3(int opcode)
+		{
+			return opcode / 10000 % 10 == 2 ? RelativeBase + ReadMemory(Pc++) : ReadMemory(Pc++);
 		}
 
 		private BigInteger ReadMemory(BigInteger address)
@@ -198,21 +208,8 @@ namespace AdventOfCode2019.Intcode
 
 		private void WriteMemory(BigInteger address, BigInteger value)
 		{
-			if (!Memory.ContainsKey(address))
-			{
-				Memory[address] = 0;
-			}
 			Memory[address] = value;
 		}
 
-		private BigInteger GetPosOperand(bool isRelative)
-		{
-			var pos = isRelative ? ReadMemory(RelativeBase + Pc++) : ReadMemory(Pc++);
-			if (!Memory.ContainsKey(pos))
-			{
-				Memory[pos] = 0;
-			}
-			return pos;
-		}
 	}
 }
