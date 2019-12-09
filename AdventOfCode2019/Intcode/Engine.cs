@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace AdventOfCode2019.Intcode
 {
@@ -10,21 +11,21 @@ namespace AdventOfCode2019.Intcode
 			{
 				1, new Instruction.WithOp1Op2Dest { Name = "add", Execute = (engine, op1, op2, dest) =>
 					{
-						engine.Memory[dest] = op1 + op2;
+						engine.WriteMemory(dest, op1 + op2);
 					}
 				}
 			},
 			{
 				2, new Instruction.WithOp1Op2Dest { Name = "multiply", Execute = (engine, op1, op2, dest) =>
 					{
-						engine.Memory[dest] = op1 * op2;
+						engine.WriteMemory(dest, op1 * op2);
 					}
 				}
 			},
 			{
 				3, new Instruction.WithDest { Name = "get", Execute = (engine, dest) =>
 					{
-						engine.Memory[dest] = engine.Input.Take();
+						engine.WriteMemory(dest, engine.Input.Take());
 					}
 				}
 			},
@@ -58,14 +59,21 @@ namespace AdventOfCode2019.Intcode
 			{
 				7, new Instruction.WithOp1Op2Dest { Name = "less-than", Execute = (engine, op1, op2, dest) =>
 					{
-						engine.Memory[dest] = op1 < op2 ? 1 : 0;
+						engine.WriteMemory(dest, op1 < op2 ? 1 : 0);
 					}
 				}
 			},
 			{
 				8, new Instruction.WithOp1Op2Dest { Name = "equals", Execute = (engine, op1, op2, dest) =>
 					{
-						engine.Memory[dest] = op1 == op2 ? 1 : 0;
+						engine.WriteMemory(dest, op1 == op2 ? 1 : 0);
+					}
+				}
+			},
+			{
+				9, new Instruction.WithOp1 { Name = "set rel base", Execute = (engine, op1) =>
+					{
+						engine.RelativeBase += op1;
 					}
 				}
 			},
@@ -79,14 +87,28 @@ namespace AdventOfCode2019.Intcode
 			}
 		};
 
-		public BlockingCollection<int> Input { get; set; } = new BlockingCollection<int>();
-		public BlockingCollection<int> Output { get; set; } = new BlockingCollection<int>();
+		public BlockingCollection<BigInteger> Input { get; set; } = new BlockingCollection<BigInteger>();
+		public BlockingCollection<BigInteger> Output { get; set; } = new BlockingCollection<BigInteger>();
 
-		public int[] Memory = new int[] { 99 };
+		public Dictionary<BigInteger, BigInteger> Memory = new Dictionary<BigInteger,BigInteger> { { 0, 99 } };
 
 		public Engine WithMemory(int[] memory)
 		{
-			Memory = (int[])memory.Clone();
+			Memory.Clear();
+			for (var i = 0; i < memory.Length; i++)
+			{
+				Memory[i] = memory[i];
+			}
+			return this;
+		}
+
+		public Engine WithMemory(BigInteger[] memory)
+		{
+			Memory.Clear();
+			for (var i = 0; i < memory.Length; i++)
+			{
+				Memory[i] = memory[i];
+			}
 			return this;
 		}
 
@@ -101,7 +123,7 @@ namespace AdventOfCode2019.Intcode
 
 		public string TakeOutput()
 		{
-			var output = new List<int>();
+			var output = new List<BigInteger>();
 			while (Output.TryTake(out var value))
 			{
 				output.Add(value);
@@ -110,17 +132,19 @@ namespace AdventOfCode2019.Intcode
 		}
 
 		public bool Halt;
-		public int Pc;
+		public BigInteger Pc;
+		public BigInteger RelativeBase;
 
 		public Engine Execute()
 		{
 			Halt = false;
+			RelativeBase = 0;
 			Pc = 0;
 
 			while (!Halt)
 			{
-				var opcode = Memory[Pc++];
-				var instruction = Instructions[opcode % 100];
+				var opcode = (int)Memory[Pc++];
+				var instruction = Instructions[(int)(opcode % 100)];
 				switch (instruction)
 				{
 					case Instruction.WithNoOp op:
@@ -133,18 +157,62 @@ namespace AdventOfCode2019.Intcode
 						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode));
 						break;
 					case Instruction.WithDest op:
-						op.Execute(this, GetPosOperand());
+						op.Execute(this, GetPosOperand(opcode / 100 % 10 == 2));
 						break;
 					case Instruction.WithOp1Op2Dest op:
-						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand());
+						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand(opcode / 10000 % 10 == 2));
 						break;
 				}
 			}
 			return this;
 		}
 
-		private int GetOperand1(int opcode) => opcode / 100 % 10 == 1 ? Memory[Pc++] : Memory[Memory[Pc++]];
-		private int GetOperand2(int opcode) => opcode / 1000 % 10 == 1 ? Memory[Pc++] : Memory[Memory[Pc++]];
-		private int GetPosOperand() => Memory[Pc++];
+		private BigInteger GetOperand1(int opcode)
+		{
+			switch (opcode / 100 % 10)
+			{
+				case 1: return ReadMemory(Pc++);
+				case 2: return ReadMemory(RelativeBase + Pc++);
+				default: return ReadMemory(ReadMemory(Pc++));
+			}
+		}
+
+		private BigInteger GetOperand2(int opcode)
+		{
+			switch (opcode / 1000 % 10)
+			{
+				case 1: return ReadMemory(Pc++);
+				case 2: return ReadMemory(RelativeBase + Pc++);
+				default: return ReadMemory(ReadMemory(Pc++));
+			}
+		}
+
+		private BigInteger ReadMemory(BigInteger address)
+		{
+			if (!Memory.ContainsKey(address))
+			{
+				Memory[address] = 0;
+			}
+			return Memory[address];
+		}
+
+		private void WriteMemory(BigInteger address, BigInteger value)
+		{
+			if (!Memory.ContainsKey(address))
+			{
+				Memory[address] = 0;
+			}
+			Memory[address] = value;
+		}
+
+		private BigInteger GetPosOperand(bool isRelative)
+		{
+			var pos = isRelative ? ReadMemory(RelativeBase + Pc++) : ReadMemory(Pc++);
+			if (!Memory.ContainsKey(pos))
+			{
+				Memory[pos] = 0;
+			}
+			return pos;
+		}
 	}
 }

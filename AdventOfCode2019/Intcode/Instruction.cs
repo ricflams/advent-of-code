@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace AdventOfCode2019.Intcode
 {
@@ -13,22 +14,22 @@ namespace AdventOfCode2019.Intcode
 
 		public class WithOp1 : Instruction
 		{
-			public Action<Engine, int> Execute { get; set; }
+			public Action<Engine, BigInteger> Execute { get; set; }
 		}
 
 		public class WithOp1Op2 : Instruction
 		{
-			public Action<Engine, int, int> Execute { get; set; }
+			public Action<Engine, BigInteger, BigInteger> Execute { get; set; }
 		}
 
 		public class WithDest : Instruction
 		{
-			public Action<Engine, int> Execute { get; set; }
+			public Action<Engine, BigInteger> Execute { get; set; }
 		}
 
 		public class WithOp1Op2Dest : Instruction
 		{
-			public Action<Engine, int, int, int> Execute { get; set; }
+			public Action<Engine, BigInteger, BigInteger, BigInteger> Execute { get; set; }
 		}
 	}
 }
