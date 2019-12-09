@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace AdventOfCode2019.Intcode
 {
@@ -9,35 +8,35 @@ namespace AdventOfCode2019.Intcode
 		private static readonly IDictionary<int, Instruction> Instructions = new Dictionary<int, Instruction>
 		{
 			{
-				1, new Instruction.WithOp1Op2Dest { Name = "add", Execute = (engine, op1, op2, dest) =>
+				1, new Instruction.WithOpOpPos { Name = "add", Execute = (engine, op1, op2, dest) =>
 					{
 						engine.WriteMemory(dest, op1 + op2);
 					}
 				}
 			},
 			{
-				2, new Instruction.WithOp1Op2Dest { Name = "multiply", Execute = (engine, op1, op2, dest) =>
+				2, new Instruction.WithOpOpPos { Name = "multiply", Execute = (engine, op1, op2, dest) =>
 					{
 						engine.WriteMemory(dest, op1 * op2);
 					}
 				}
 			},
 			{
-				3, new Instruction.WithDest { Name = "get", Execute = (engine, dest) =>
+				3, new Instruction.WithPos { Name = "get", Execute = (engine, dest) =>
 					{
 						engine.WriteMemory(dest, engine.Input.Take());
 					}
 				}
 			},
 			{
-				4, new Instruction.WithOp1 { Name = "put", Execute = (engine, op) =>
+				4, new Instruction.WithOp { Name = "put", Execute = (engine, op) =>
 					{
 						engine.Output.Add(op);
 					}
 				}
 			},
 			{
-				5, new Instruction.WithOp1Op2 { Name = "jump-if-true", Execute = (engine, op1, op2) =>
+				5, new Instruction.WithOpOp { Name = "jump-if-true", Execute = (engine, op1, op2) =>
 					{
 						if (op1 != 0)
 						{
@@ -47,7 +46,7 @@ namespace AdventOfCode2019.Intcode
 				}
 			},
 			{
-				6, new Instruction.WithOp1Op2 { Name = "jump-if-false", Execute = (engine, op1, op2) =>
+				6, new Instruction.WithOpOp { Name = "jump-if-false", Execute = (engine, op1, op2) =>
 					{
 						if (op1 == 0)
 						{
@@ -57,21 +56,21 @@ namespace AdventOfCode2019.Intcode
 				}
 			},
 			{
-				7, new Instruction.WithOp1Op2Dest { Name = "less-than", Execute = (engine, op1, op2, dest) =>
+				7, new Instruction.WithOpOpPos { Name = "less-than", Execute = (engine, op1, op2, dest) =>
 					{
 						engine.WriteMemory(dest, op1 < op2 ? 1 : 0);
 					}
 				}
 			},
 			{
-				8, new Instruction.WithOp1Op2Dest { Name = "equals", Execute = (engine, op1, op2, dest) =>
+				8, new Instruction.WithOpOpPos { Name = "equals", Execute = (engine, op1, op2, dest) =>
 					{
 						engine.WriteMemory(dest, op1 == op2 ? 1 : 0);
 					}
 				}
 			},
 			{
-				9, new Instruction.WithOp1 { Name = "set rel base", Execute = (engine, op1) =>
+				9, new Instruction.WithOp { Name = "set-relbase", Execute = (engine, op1) =>
 					{
 						engine.RelativeBase += op1;
 					}
@@ -87,10 +86,9 @@ namespace AdventOfCode2019.Intcode
 			}
 		};
 
-		public BlockingCollection<BigInteger> Input { get; set; } = new BlockingCollection<BigInteger>();
-		public BlockingCollection<BigInteger> Output { get; set; } = new BlockingCollection<BigInteger>();
-
-		public Dictionary<BigInteger, BigInteger> Memory = new Dictionary<BigInteger, BigInteger> { { 0, 99 } };
+		public BlockingCollection<long> Input { get; set; } = new BlockingCollection<long>();
+		public BlockingCollection<long> Output { get; set; } = new BlockingCollection<long>();
+		public Dictionary<long, long> Memory = new Dictionary<long, long> { { 0, 99 } };
 
 		public Engine WithMemory(int[] memory)
 		{
@@ -102,17 +100,7 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
-		public Engine WithMemory(BigInteger[] memory)
-		{
-			Memory.Clear();
-			for (var i = 0; i < memory.Length; i++)
-			{
-				Memory[i] = memory[i];
-			}
-			return this;
-		}
-
-		public Engine WithInput(params int[] input)
+		public Engine WithInput(params long[] input)
 		{
 			foreach (var value in input)
 			{
@@ -121,19 +109,9 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
-		public string TakeOutput()
-		{
-			var output = new List<BigInteger>();
-			while (Output.TryTake(out var value))
-			{
-				output.Add(value);
-			}
-			return string.Join(" ", output);
-		}
-
 		public bool Halt;
-		public BigInteger Pc;
-		public BigInteger RelativeBase;
+		public long RelativeBase;
+		public long Pc;
 
 		public Engine Execute()
 		{
@@ -141,63 +119,56 @@ namespace AdventOfCode2019.Intcode
 			RelativeBase = 0;
 			Pc = 0;
 
+			int mode;
 			while (!Halt)
 			{
 				var opcode = (int)ReadMemory(Pc++);
 				var instruction = Instructions[opcode % 100];
+				mode = opcode / 10;
 				switch (instruction)
 				{
 					case Instruction.WithNoOp op:
 						op.Execute(this);
 						break;
-					case Instruction.WithOp1 op:
-						op.Execute(this, GetOperand1(opcode));
+					case Instruction.WithOp op:
+						op.Execute(this, GetOperand());
 						break;
-					case Instruction.WithOp1Op2 op:
-						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode));
+					case Instruction.WithOpOp op:
+						op.Execute(this, GetOperand(), GetOperand());
 						break;
-					case Instruction.WithDest op:
-						op.Execute(this, GetPosOperand1(opcode));
+					case Instruction.WithPos op:
+						op.Execute(this, GetPosition());
 						break;
-					case Instruction.WithOp1Op2Dest op:
-						op.Execute(this, GetOperand1(opcode), GetOperand2(opcode), GetPosOperand3(opcode));
+					case Instruction.WithOpOpPos op:
+						op.Execute(this, GetOperand(), GetOperand(), GetPosition());
 						break;
 				}
 			}
 			return this;
-		}
 
-		private BigInteger GetOperand1(int opcode)
-		{
-			switch (opcode / 100 % 10)
+			int GetOpMode() => (mode /= 10) % 10;
+
+			long GetOperand()
 			{
-				default: return ReadMemory(ReadMemory(Pc++));
-				case 1: return ReadMemory(Pc++);
-				case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
+				switch (GetOpMode())
+				{
+					case 1: return ReadMemory(Pc++);
+					case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
+					default: return ReadMemory(ReadMemory(Pc++));
+				}
+			}
+
+			long GetPosition()
+			{
+				switch (GetOpMode())
+				{
+					case 2: return RelativeBase + ReadMemory(Pc++);
+					default: return ReadMemory(Pc++);
+				}
 			}
 		}
 
-		private BigInteger GetOperand2(int opcode)
-		{
-			switch (opcode / 1000 % 10)
-			{
-				default: return ReadMemory(ReadMemory(Pc++));
-				case 1: return ReadMemory(Pc++);
-				case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
-			}
-		}
-
-		private BigInteger GetPosOperand1(int opcode)
-		{
-			return opcode / 100 % 10 == 2 ? RelativeBase + ReadMemory(Pc++) : ReadMemory(Pc++);
-		}
-
-		private BigInteger GetPosOperand3(int opcode)
-		{
-			return opcode / 10000 % 10 == 2 ? RelativeBase + ReadMemory(Pc++) : ReadMemory(Pc++);
-		}
-
-		private BigInteger ReadMemory(BigInteger address)
+		private long ReadMemory(long address)
 		{
 			if (!Memory.ContainsKey(address))
 			{
@@ -206,7 +177,7 @@ namespace AdventOfCode2019.Intcode
 			return Memory[address];
 		}
 
-		private void WriteMemory(BigInteger address, BigInteger value)
+		private void WriteMemory(long address, long value)
 		{
 			Memory[address] = value;
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -11,15 +12,16 @@ namespace AdventOfCode2019
 		{
 			Exercise(() =>
 			{
-				//Day1();
-				//Day2();
-				//Day3();
-				//Day4();
-				//Day5();
-				//Day6();
-				//Day7();
-				//Day8();
+				Day1();
+				Day2();
+				Day3();
+				Day4();
+				Day5();
+				Day6();
+				Day7();
+				Day8();
 				Day9();
+				Day10();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
@@ -44,7 +46,8 @@ namespace AdventOfCode2019
 			var masses = new[] { 116115, 58728, 102094, 104856, 86377, 97920, 101639, 95328, 103730, 57027, 83080, 57748, 101606, 54629, 90901, 59983, 109795, 123270, 141948, 92969, 149805, 143555, 141387, 136357, 90236, 63577, 127108, 130012, 88223, 51426, 117663, 63924, 56251, 108505, 89625, 126994, 120237, 99351, 136948, 123702, 129849, 93541, 110900, 63759, 58537, 132943, 118213, 104274, 84606, 125256, 76355, 116711, 79344, 66355, 117654, 116026, 80244, 129786, 73054, 119806, 90941, 53877, 96707, 58226, 101666, 53819, 54558, 77342, 149653, 87843, 54388, 128862, 55752, 89962, 147224, 118486, 56910, 124854, 57052, 55495, 62530, 128104, 68788, 60915, 62155, 123614, 115522, 116920, 101263, 92339, 92234, 81542, 78062, 137207, 92082, 120032, 136537, 109035, 115819, 75955 };
 
 			var mass1 = masses.Sum(FuelForMass);
-			Console.WriteLine($"Day1: Puzzle1: {mass1}");
+			Console.WriteLine($"Day  1 Puzzle 1: {mass1}");
+			Debug.Assert(mass1 == 3228475);
 
 			var mass2 = masses.Sum(x =>
 			{
@@ -60,7 +63,8 @@ namespace AdventOfCode2019
 				}
 				return totalFuel;
 			});
-			Console.WriteLine($"Day1: Puzzle2: {mass2}");
+			Console.WriteLine($"Day  1 Puzzle 2: {mass2}");
+			Debug.Assert(mass2 == 4839845);
 
 			int FuelForMass(int mass) => mass / 3 - 2;
 		}
@@ -72,10 +76,12 @@ namespace AdventOfCode2019
 			mem[2] = 2;
 
 			var engine = new Intcode.Engine();
-			engine
+			var result1 = engine
 				.WithMemory(mem)
-				.Execute();
-			Console.WriteLine($"Day2: Puzzle1: mem[0] = {engine.Memory[0]}");
+				.Execute()
+				.Memory[0];
+			Console.WriteLine($"Day  2 Puzzle 1: mem[0] = {result1}");
+			Debug.Assert(result1 == 5866714);
 
 			for (var op1 = 0; op1 < 100; op1++)
 			{
@@ -83,12 +89,15 @@ namespace AdventOfCode2019
 				{
 					mem[1] = op1;
 					mem[2] = op2;
-					engine
+					var output = engine
 						.WithMemory(mem)
-						.Execute();
-					if (engine.Memory[0] == 19690720)
+						.Execute()
+						.Memory[0];
+					if (output == 19690720)
 					{
-						Console.WriteLine($"Day2: Puzzle2: {op1 * 100 + op2}");
+						var result2 = op1 * 100 + op2;
+						Console.WriteLine($"Day  2 Puzzle 2: {result2}");
+						Debug.Assert(result2 == 5208);
 						break;
 					}
 				}
@@ -119,10 +128,12 @@ namespace AdventOfCode2019
 				.ToList();
 
 			var nearest = crossings.Min(x => Math.Abs(x.X) + Math.Abs(x.Y));
-			Console.WriteLine($"Day3: Puzzle1: {nearest}");
+			Console.WriteLine($"Day  3 Puzzle 1: {nearest}");
+			Debug.Assert(nearest == 860);
 
 			var fewestSteps = crossings.Min(x => x.Steps);
-			Console.WriteLine($"Day3: Puzzle2: {fewestSteps}");
+			Console.WriteLine($"Day  3 Puzzle 2: {fewestSteps}");
+			Debug.Assert(fewestSteps == 9238);
 
 			void MapWire(int wireIndex, int wireCount, string wiredef)
 			{
@@ -165,10 +176,12 @@ namespace AdventOfCode2019
 		private static void Day4()
 		{
 			var matches1 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
-			Console.WriteLine($"Day4: Puzzle1: {matches1}");
+			Console.WriteLine($"Day  4 Puzzle 1: {matches1}");
+			Debug.Assert(matches1 == 460);
 
 			var matches2 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq == 2));
-			Console.WriteLine($"Day4: Puzzle2: {matches2}");
+			Console.WriteLine($"Day  4 Puzzle 2: {matches2}");
+			Debug.Assert(matches2 == 290);
 
 			IEnumerable<int> SequenceLengths(IReadOnlyList<int> value)
 			{
@@ -231,17 +244,23 @@ namespace AdventOfCode2019
 			var mem = new[] { 3, 225, 1, 225, 6, 6, 1100, 1, 238, 225, 104, 0, 1002, 148, 28, 224, 1001, 224, -672, 224, 4, 224, 1002, 223, 8, 223, 101, 3, 224, 224, 1, 224, 223, 223, 1102, 8, 21, 225, 1102, 13, 10, 225, 1102, 21, 10, 225, 1102, 6, 14, 225, 1102, 94, 17, 225, 1, 40, 173, 224, 1001, 224, -90, 224, 4, 224, 102, 8, 223, 223, 1001, 224, 4, 224, 1, 224, 223, 223, 2, 35, 44, 224, 101, -80, 224, 224, 4, 224, 102, 8, 223, 223, 101, 6, 224, 224, 1, 223, 224, 223, 1101, 26, 94, 224, 101, -120, 224, 224, 4, 224, 102, 8, 223, 223, 1001, 224, 7, 224, 1, 224, 223, 223, 1001, 52, 70, 224, 101, -87, 224, 224, 4, 224, 1002, 223, 8, 223, 1001, 224, 2, 224, 1, 223, 224, 223, 1101, 16, 92, 225, 1101, 59, 24, 225, 102, 83, 48, 224, 101, -1162, 224, 224, 4, 224, 102, 8, 223, 223, 101, 4, 224, 224, 1, 223, 224, 223, 1101, 80, 10, 225, 101, 5, 143, 224, 1001, 224, -21, 224, 4, 224, 1002, 223, 8, 223, 1001, 224, 6, 224, 1, 223, 224, 223, 1102, 94, 67, 224, 101, -6298, 224, 224, 4, 224, 102, 8, 223, 223, 1001, 224, 3, 224, 1, 224, 223, 223, 4, 223, 99, 0, 0, 0, 677, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1105, 0, 99999, 1105, 227, 247, 1105, 1, 99999, 1005, 227, 99999, 1005, 0, 256, 1105, 1, 99999, 1106, 227, 99999, 1106, 0, 265, 1105, 1, 99999, 1006, 0, 99999, 1006, 227, 274, 1105, 1, 99999, 1105, 1, 280, 1105, 1, 99999, 1, 225, 225, 225, 1101, 294, 0, 0, 105, 1, 0, 1105, 1, 99999, 1106, 0, 300, 1105, 1, 99999, 1, 225, 225, 225, 1101, 314, 0, 0, 106, 0, 0, 1105, 1, 99999, 108, 677, 677, 224, 102, 2, 223, 223, 1005, 224, 329, 101, 1, 223, 223, 1107, 677, 226, 224, 102, 2, 223, 223, 1006, 224, 344, 101, 1, 223, 223, 1107, 226, 226, 224, 102, 2, 223, 223, 1006, 224, 359, 101, 1, 223, 223, 1108, 677, 677, 224, 102, 2, 223, 223, 1005, 224, 374, 101, 1, 223, 223, 8, 677, 226, 224, 1002, 223, 2, 223, 1005, 224, 389, 101, 1, 223, 223, 108, 226, 677, 224, 1002, 223, 2, 223, 1006, 224, 404, 1001, 223, 1, 223, 107, 677, 677, 224, 102, 2, 223, 223, 1006, 224, 419, 101, 1, 223, 223, 1007, 226, 226, 224, 102, 2, 223, 223, 1005, 224, 434, 101, 1, 223, 223, 1007, 677, 677, 224, 102, 2, 223, 223, 1005, 224, 449, 1001, 223, 1, 223, 8, 677, 677, 224, 1002, 223, 2, 223, 1006, 224, 464, 101, 1, 223, 223, 1108, 677, 226, 224, 1002, 223, 2, 223, 1005, 224, 479, 101, 1, 223, 223, 7, 677, 226, 224, 1002, 223, 2, 223, 1005, 224, 494, 101, 1, 223, 223, 1008, 677, 677, 224, 1002, 223, 2, 223, 1006, 224, 509, 1001, 223, 1, 223, 1007, 226, 677, 224, 1002, 223, 2, 223, 1006, 224, 524, 1001, 223, 1, 223, 107, 226, 226, 224, 1002, 223, 2, 223, 1006, 224, 539, 1001, 223, 1, 223, 1107, 226, 677, 224, 102, 2, 223, 223, 1005, 224, 554, 101, 1, 223, 223, 1108, 226, 677, 224, 102, 2, 223, 223, 1006, 224, 569, 101, 1, 223, 223, 108, 226, 226, 224, 1002, 223, 2, 223, 1006, 224, 584, 1001, 223, 1, 223, 7, 226, 226, 224, 1002, 223, 2, 223, 1006, 224, 599, 101, 1, 223, 223, 8, 226, 677, 224, 102, 2, 223, 223, 1005, 224, 614, 101, 1, 223, 223, 7, 226, 677, 224, 1002, 223, 2, 223, 1005, 224, 629, 101, 1, 223, 223, 1008, 226, 677, 224, 1002, 223, 2, 223, 1006, 224, 644, 101, 1, 223, 223, 107, 226, 677, 224, 1002, 223, 2, 223, 1005, 224, 659, 1001, 223, 1, 223, 1008, 226, 226, 224, 1002, 223, 2, 223, 1006, 224, 674, 1001, 223, 1, 223, 4, 223, 99, 226 };
 			var engine = new Intcode.Engine();
 
-			engine
+			var result1 = engine
 				.WithMemory(mem)
 				.WithInput(1)
-				.Execute();
-			Console.WriteLine($"Day5: Puzzle1: {engine.TakeOutput()}");
+				.Execute()
+				.Output.TakeAll()
+				.SkipWhile(x => x == 0)
+				.First();
+			Console.WriteLine($"Day  5 Puzzle 1: {result1}");
+			Debug.Assert(result1 == 7566643);
 
-			engine
+			var result2 = engine
 				.WithMemory(mem)
 				.WithInput(5)
-				.Execute();
-			Console.WriteLine($"Day5: Puzzle2: {engine.TakeOutput()}");
+				.Execute()
+				.Output.Take();
+			Console.WriteLine($"Day  5 Puzzle 2: {result2}");
+			Debug.Assert(result2 == 9265694);
 		}
 
 		private static void Day6()
@@ -264,7 +283,8 @@ namespace AdventOfCode2019
 			}
 			var root = nodes.Keys.Except(nodes.SelectMany(x => x.Value)).First();
 			var orbitCount = CountOrbits(0, root);
-			Console.WriteLine($"Day6: Puzzle1: {orbitCount}");
+			Console.WriteLine($"Day  6 Puzzle 1: {orbitCount}");
+			Debug.Assert(orbitCount == 387356);
 
 			int CountOrbits(int orbitlevel, string name) => 
 				nodes.TryGetValue(name, out var o)
@@ -278,7 +298,8 @@ namespace AdventOfCode2019
 			{
 				dist -= 2;
 			}
-			Console.WriteLine($"Day6: Puzzle2: {dist}");
+			Console.WriteLine($"Day  6 Puzzle 2: {dist}");
+			Debug.Assert(dist == 532);
 
 			IEnumerable<string> FindPathTo(string name)
 			{
@@ -321,26 +342,27 @@ namespace AdventOfCode2019
 			}
 
 			var maxSignal1 = Permute(Enumerable.Range(0, 5))
-				.Max(amps =>
+				.Max(phases =>
 				{
-					var signal = 0;
-					foreach (var a in amps)
+					var signal = 0L;
+					foreach (var phase in phases)
 					{
 						var engine = new Intcode.Engine();
 						engine
 							.WithMemory(mem)
-							.WithInput(a, signal)
+							.WithInput(phase, signal)
 							.Execute();
-						signal = (int)engine.Output.Take(); // todo
+						signal = engine.Output.Take();
 					}
 					return signal;
 				});
-			Console.WriteLine($"Day7: Puzzle1: {maxSignal1}");
+			Console.WriteLine($"Day  7 Puzzle 1: {maxSignal1}");
+			Debug.Assert(maxSignal1 == 19650);
 
 			var maxSignal2 = Permute(Enumerable.Range(5, 5))
-				.Max(amps =>
+				.Max(phases =>
 				{
-					var engines = amps.Select(a => new Intcode.Engine().WithMemory(mem).WithInput(a)).ToList();
+					var engines = phases.Select(phase => new Intcode.Engine().WithMemory(mem).WithInput(phase)).ToList();
 					var n = engines.Count;
 					for (var i = 0; i < n; i++)
 					{
@@ -349,13 +371,15 @@ namespace AdventOfCode2019
 					engines[0].WithInput(0);
 					return engines
 						.AsParallel()
+						.WithDegreeOfParallelism(n)
 						.Select(e => e.Execute())
 						.AsSequential()
 						.First(e => e == engines.Last())
 						.Output
 						.Take();
 				});
-			Console.WriteLine($"Day7: Puzzle2: {maxSignal2}");
+			Console.WriteLine($"Day  7 Puzzle 2: {maxSignal2}");
+			Debug.Assert(maxSignal2 == 35961106);
 		}
 
 		private static void Day8()
@@ -382,7 +406,8 @@ namespace AdventOfCode2019
 				.Select(x => x.Layer)
 				.First();
 			var sum = layerWithMostZeros.Count(x => x == '1') * layerWithMostZeros.Count(x => x == '2');
-			Console.WriteLine($"Day8: Puzzle1: {sum}");
+			Console.WriteLine($"Day  8 Puzzle 1: {sum}");
+			Debug.Assert(sum == 2356);
 
 			// Render all "pixels" by looping through each layer's similar positions and
 			// pick the first non-transparent value, turning '1' into black and '2' into blank.
@@ -402,7 +427,7 @@ namespace AdventOfCode2019
 				.Select(x => image.Substring(x * width, width));
 			foreach (var line in lines)
 			{
-				Console.WriteLine($"Day8: Puzzle2: {line}");
+				Console.WriteLine($"Day  8 Puzzle 2: {line}");
 			}
 		}
 
@@ -411,24 +436,44 @@ namespace AdventOfCode2019
 			var mem = new [] { 1102, 34463338, 34463338, 63, 1007, 63, 34463338, 63, 1005, 63, 53, 1102, 3, 1, 1000, 109, 988, 209, 12, 9, 1000, 209, 6, 209, 3, 203, 0, 1008, 1000, 1, 63, 1005, 63, 65, 1008, 1000, 2, 63, 1005, 63, 904, 1008, 1000, 0, 63, 1005, 63, 58, 4, 25, 104, 0, 99, 4, 0, 104, 0, 99, 4, 17, 104, 0, 99, 0, 0, 1101, 20, 0, 1007, 1101, 0, 197, 1022, 1102, 475, 1, 1028, 1102, 30, 1, 1008, 1101, 25, 0, 1010, 1102, 1, 23, 1009, 1101, 0, 22, 1013, 1101, 470, 0, 1029, 1102, 24, 1, 1014, 1102, 1, 39, 1005, 1101, 31, 0, 1003, 1101, 807, 0, 1026, 1101, 0, 26, 1018, 1102, 1, 804, 1027, 1101, 0, 0, 1020, 1102, 1, 38, 1017, 1101, 0, 27, 1016, 1102, 443, 1, 1024, 1101, 0, 36, 1006, 1102, 21, 1, 1015, 1101, 28, 0, 1001, 1102, 33, 1, 1019, 1102, 1, 37, 1011, 1102, 1, 190, 1023, 1101, 0, 434, 1025, 1101, 34, 0, 1004, 1102, 1, 1, 1021, 1101, 0, 29, 1012, 1102, 1, 32, 1002, 1101, 35, 0, 1000, 109, 30, 2105, 1, -7, 1001, 64, 1, 64, 1105, 1, 199, 4, 187, 1002, 64, 2, 64, 109, -23, 2101, 0, -5, 63, 1008, 63, 32, 63, 1005, 63, 225, 4, 205, 1001, 64, 1, 64, 1105, 1, 225, 1002, 64, 2, 64, 109, 7, 2102, 1, -5, 63, 1008, 63, 23, 63, 1005, 63, 251, 4, 231, 1001, 64, 1, 64, 1106, 0, 251, 1002, 64, 2, 64, 109, -16, 2101, 0, 2, 63, 1008, 63, 33, 63, 1005, 63, 275, 1001, 64, 1, 64, 1106, 0, 277, 4, 257, 1002, 64, 2, 64, 109, 10, 21102, 40, 1, 4, 1008, 1012, 40, 63, 1005, 63, 299, 4, 283, 1106, 0, 303, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 7, 2102, 1, -9, 63, 1008, 63, 33, 63, 1005, 63, 327, 1001, 64, 1, 64, 1105, 1, 329, 4, 309, 1002, 64, 2, 64, 109, -17, 2107, 34, 2, 63, 1005, 63, 347, 4, 335, 1105, 1, 351, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 1, 1201, 8, 0, 63, 1008, 63, 23, 63, 1005, 63, 375, 1001, 64, 1, 64, 1106, 0, 377, 4, 357, 1002, 64, 2, 64, 109, -4, 2108, 31, 8, 63, 1005, 63, 395, 4, 383, 1105, 1, 399, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 3, 1201, 8, 0, 63, 1008, 63, 36, 63, 1005, 63, 421, 4, 405, 1105, 1, 425, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 25, 2105, 1, 1, 4, 431, 1001, 64, 1, 64, 1105, 1, 443, 1002, 64, 2, 64, 109, -3, 1205, 0, 459, 1001, 64, 1, 64, 1106, 0, 461, 4, 449, 1002, 64, 2, 64, 109, -2, 2106, 0, 10, 4, 467, 1106, 0, 479, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 12, 1206, -9, 495, 1001, 64, 1, 64, 1106, 0, 497, 4, 485, 1002, 64, 2, 64, 109, -39, 1207, 9, 36, 63, 1005, 63, 519, 4, 503, 1001, 64, 1, 64, 1105, 1, 519, 1002, 64, 2, 64, 109, 11, 1202, -1, 1, 63, 1008, 63, 28, 63, 1005, 63, 541, 4, 525, 1105, 1, 545, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 6, 2107, 24, 1, 63, 1005, 63, 565, 1001, 64, 1, 64, 1106, 0, 567, 4, 551, 1002, 64, 2, 64, 109, 1, 1207, -3, 35, 63, 1005, 63, 583, 1106, 0, 589, 4, 573, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 1, 21102, 41, 1, 5, 1008, 1015, 40, 63, 1005, 63, 613, 1001, 64, 1, 64, 1105, 1, 615, 4, 595, 1002, 64, 2, 64, 109, -2, 2108, 22, 1, 63, 1005, 63, 635, 1001, 64, 1, 64, 1105, 1, 637, 4, 621, 1002, 64, 2, 64, 109, -10, 1208, 4, 33, 63, 1005, 63, 653, 1106, 0, 659, 4, 643, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 16, 1206, 6, 673, 4, 665, 1106, 0, 677, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, -4, 1202, -8, 1, 63, 1008, 63, 35, 63, 1005, 63, 701, 1001, 64, 1, 64, 1105, 1, 703, 4, 683, 1002, 64, 2, 64, 109, 13, 21108, 42, 42, -8, 1005, 1015, 721, 4, 709, 1105, 1, 725, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, -18, 21107, 43, 44, 5, 1005, 1010, 743, 4, 731, 1106, 0, 747, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, -11, 1208, 8, 32, 63, 1005, 63, 765, 4, 753, 1106, 0, 769, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 15, 21101, 44, 0, 5, 1008, 1014, 47, 63, 1005, 63, 789, 1105, 1, 795, 4, 775, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, 13, 2106, 0, 5, 1106, 0, 813, 4, 801, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, -12, 21108, 45, 43, 0, 1005, 1010, 829, 1106, 0, 835, 4, 819, 1001, 64, 1, 64, 1002, 64, 2, 64, 109, -4, 21107, 46, 45, 10, 1005, 1016, 855, 1001, 64, 1, 64, 1106, 0, 857, 4, 841, 1002, 64, 2, 64, 109, 3, 21101, 47, 0, 5, 1008, 1014, 47, 63, 1005, 63, 883, 4, 863, 1001, 64, 1, 64, 1106, 0, 883, 1002, 64, 2, 64, 109, 10, 1205, 2, 901, 4, 889, 1001, 64, 1, 64, 1105, 1, 901, 4, 64, 99, 21102, 27, 1, 1, 21102, 915, 1, 0, 1106, 0, 922, 21201, 1, 13433, 1, 204, 1, 99, 109, 3, 1207, -2, 3, 63, 1005, 63, 964, 21201, -2, -1, 1, 21101, 0, 942, 0, 1106, 0, 922, 22102, 1, 1, -1, 21201, -2, -3, 1, 21102, 1, 957, 0, 1105, 1, 922, 22201, 1, -1, -2, 1106, 0, 968, 21202, -2, 1, -2, 109, -3, 2106, 0, 0 };
 			var engine = new Intcode.Engine();
 
-			engine
+			var result1 = engine
 				.WithMemory(mem)
 				.WithInput(1)
-				.Execute();
-			Console.WriteLine($"Day9: Puzzle1: {engine.TakeOutput()}");
+				.Execute()
+				.Output.Take();
+			Console.WriteLine($"Day  9 Puzzle 1: {result1}");
+			Debug.Assert(result1 == 2682107844);
 
-			engine
+			var result2 = engine
 				.WithMemory(mem)
 				.WithInput(2)
-				.Execute();
-			Console.WriteLine($"Day9: Puzzle2: {engine.TakeOutput()}");
+				.Execute()
+				.Output.Take();
+			Console.WriteLine($"Day  9 Puzzle 2: {result2}");
+			Debug.Assert(result2 == 34738);
+		}
+
+		private static void Day10()
+		{
+			var result1 = 0;
+			Console.WriteLine($"Day 10 Puzzle 1: {result1}");
+			//Debug.Assert(result1 == ...)
+
+			var result2 = 0;
+			Console.WriteLine($"Day 10 Puzzle 2: {result2}");
+			//Debug.Assert(result2 == ...)
 		}
 
 
 		private static void Day()
 		{
-			Console.WriteLine($"Day: Puzzle1: ");
-			Console.WriteLine($"Day: Puzzle2: ");
+			var result1 = 0;
+			Console.WriteLine($"Day  Puzzle 1: {result1}");
+			//Debug.Assert(result1 == ...)
+
+			var result2 = 0;
+			Console.WriteLine($"Day  Puzzle 2: {result2}");
+			//Debug.Assert(result2 == ...)
 		}
 	}
 }
