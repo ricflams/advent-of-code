@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode2019.Intcode
 {
@@ -32,6 +34,7 @@ namespace AdventOfCode2019.Intcode
 				4, new Instruction.WithOp { Name = "put", Execute = (engine, op) =>
 					{
 						engine.Output.Add(op);
+						engine._outputHandler?.Invoke(engine);
 					}
 				}
 			},
@@ -92,6 +95,11 @@ namespace AdventOfCode2019.Intcode
 
 		public Engine WithMemory(int[] memory)
 		{
+			return WithMemory(memory.Select(x => (long)x).ToArray());
+		}
+
+		public Engine WithMemory(long[] memory)
+		{
 			Memory.Clear();
 			for (var i = 0; i < memory.Length; i++)
 			{
@@ -109,9 +117,16 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
-		public bool Halt;
-		public long RelativeBase;
-		public long Pc;
+		private Action<Engine> _outputHandler;
+		public Engine OnOutput(Action<Engine> outputHandler)
+		{
+			_outputHandler = outputHandler;
+			return this;
+		}
+
+		internal bool Halt;
+		internal long RelativeBase;
+		internal long Pc;
 
 		public Engine Execute()
 		{
