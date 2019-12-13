@@ -24,6 +24,7 @@ namespace AdventOfCode2019
 				//Day9();
 				//Day10();
 				//Day11.Puzzle.Run();
+				//Day12.Puzzle.Run();
 				Day13.Puzzle.Run();
 			});
 			Console.Write("Done - press any key");
