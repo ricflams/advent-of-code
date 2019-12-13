@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode2019.Intcode
@@ -26,6 +27,7 @@ namespace AdventOfCode2019.Intcode
 			{
 				3, new Instruction.WithPos { Name = "get", Execute = (engine, dest) =>
 					{
+						engine.onInput?.Invoke(engine);
 						engine.WriteMemory(dest, engine.Input.Take());
 					}
 				}
@@ -34,7 +36,7 @@ namespace AdventOfCode2019.Intcode
 				4, new Instruction.WithOp { Name = "put", Execute = (engine, op) =>
 					{
 						engine.Output.Add(op);
-						engine._outputHandler?.Invoke(engine);
+						engine.onOutput?.Invoke(engine);
 					}
 				}
 			},
@@ -93,6 +95,15 @@ namespace AdventOfCode2019.Intcode
 		public BlockingCollection<long> Output { get; set; } = new BlockingCollection<long>();
 		public Dictionary<long, long> Memory = new Dictionary<long, long> { { 0, 99 } };
 
+		public Engine WithMemoryFromFile(string filename)
+		{
+			var memory = File.ReadAllText(filename)
+				.Split(',', StringSplitOptions.RemoveEmptyEntries)
+				.Select(long.Parse)
+				.ToArray();
+			return WithMemory(memory);
+		}
+
 		public Engine WithMemory(int[] memory)
 		{
 			return WithMemory(memory.Select(x => (long)x).ToArray());
@@ -108,6 +119,12 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
+		public Engine WithMemoryValueAt(long address, long value)
+		{
+			Memory[address] = value;
+			return this;
+		}
+
 		public Engine WithInput(params long[] input)
 		{
 			foreach (var value in input)
@@ -117,10 +134,17 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
-		private Action<Engine> _outputHandler;
+		private Action<Engine> onOutput;
 		public Engine OnOutput(Action<Engine> outputHandler)
 		{
-			_outputHandler = outputHandler;
+			onOutput = outputHandler;
+			return this;
+		}
+
+		private Action<Engine> onInput;
+		public Engine OnInput(Action<Engine> inputHandler)
+		{
+			onInput = inputHandler;
 			return this;
 		}
 

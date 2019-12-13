@@ -1,42 +1,61 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode2019.Helpers
 {
-    internal class SparseMap<T>
-    {
+	internal class SparseMap
+	{
 		private readonly Dictionary<int, SparseMapColumn> _column = new Dictionary<int, SparseMapColumn>();
-		private readonly T _defaultValue;
+		private readonly char _defaultValue;
 
-		public SparseMap(T defaultValue = default(T))
+		public SparseMap(char defaultValue = default(char))
 		{
 			_defaultValue = defaultValue;
 		}
 
-		public class Point
+		public string[] Render(Func<int, char> rendering = null)
 		{
-			public int X { get; set; }
-			public int Y { get; set; }
-			public T Value { get; set; }
+			var points = AllPoints().ToList();
+			var xMin = points.Min(z => z.X);
+			var xMax = points.Max(z => z.X);
+			var yMin = points.Min(z => z.Y);
+			var yMax = points.Max(z => z.Y);
+			return Enumerable.Range(yMin, yMax - yMin + 1)
+				.Select(y => Enumerable.Range(xMin, xMax - xMin + 1)
+					.Select(x => rendering != null ? rendering(this[x][y]) : this[x][y])
+					.ToArray()
+				)
+				.Select(ch => new string(ch))
+				.ToArray();
 		}
 
-		public IEnumerable<Point> AllPoints
+		public IEnumerable<Point> AllPoints(Func<char, bool> predicate = null)
 		{
-			get
+			foreach (var x in _column.Keys)
 			{
-				foreach (var x in _column.Keys)
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
 				{
-					var column = _column[x];
-					foreach (var y in column.Row.Keys)
+					if (predicate == null || predicate(column.Row[y]))
 					{
-						yield return new Point
-						{
-							X = x,
-							Y = y,
-							Value = column.Row[y]
-						};
+						yield return Point.From(x, y);
 					}
+					//yield return new Point
+					//{
+					//	//Position = new Position { X = x, Y = y},
+					//	X = x,
+					//	Y = y,
+					//	Value = column.Row[y]
+					//};
 				}
 			}
+		}
+
+		public char this[Point pos]
+		{
+			get => this[pos.X][pos.Y];
+			set => this[pos.X][pos.Y] = value;
 		}
 
 		public SparseMapColumn this[int x]
@@ -53,15 +72,15 @@ namespace AdventOfCode2019.Helpers
 
 		public class SparseMapColumn
 		{
-			internal readonly Dictionary<int, T> Row = new Dictionary<int, T>();
-			private readonly T _defaultValue;
+			internal readonly Dictionary<int, char> Row = new Dictionary<int, char>();
+			private readonly char _defaultValue;
 
-			public SparseMapColumn(T defaultValue)
+			public SparseMapColumn(char defaultValue)
 			{
 				_defaultValue = defaultValue;
 			}
 
-			public T this[int y]
+			public char this[int y]
 			{
 				get => Row.ContainsKey(y) ? Row[y] : _defaultValue;
 				set => Row[y] = value;

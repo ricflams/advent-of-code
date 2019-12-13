@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace AdventOfCode2019
+namespace AdventOfCode2019.Helpers
 {
     static class Extensions
     {
