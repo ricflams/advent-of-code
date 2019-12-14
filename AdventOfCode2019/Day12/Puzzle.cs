@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,23 +17,6 @@ namespace AdventOfCode2019.Day12
 		{
 			var mooninfo = File.ReadAllLines("Day12/input.txt").ToArray();
 
-			//var mooninfo = new string[]
-			//{
-			//	"<x=-1, y=0, z=2>",
-			//	"<x=2, y=-10, z=-7>",
-			//	"<x=4, y=-8, z=8>",
-			//	"<x=3, y=5, z=-1>"
-			//};
-
-			//// Big
-			//mooninfo = new string[]
-			//{
-			//	"<x=-8, y=-10, z=0>",
-			//	"<x=5, y=5, z=10>",
-			//	"<x=2, y=-7, z=3>",
-			//	"<x=9, y=-8, z=-3>"
-			//};
-
 			var moons = mooninfo
 				.Select(x => NBody.Moon.ParseFrom(x))
 				.ToArray();
@@ -48,7 +32,28 @@ namespace AdventOfCode2019.Day12
 
 		private static void Puzzle2()
 		{
+			var mooninfo = File.ReadAllLines("Day12/input.txt").ToArray();
 
+			//var moons = mooninfo
+			//	.Select(x => NBody.Moon.ParseFrom(x))
+			//	.ToArray();
+
+			//var mooninfo = new string[]
+			//{
+			//	"<x=-1, y=0, z=2>",
+			//	"<x=2, y=-10, z=-7>",
+			//	"<x=4, y=-8, z=8>",
+			//	"<x=3, y=5, z=-1>"
+			//};
+
+			//// Big
+			//var mooninfo = new string[]
+			//{
+			//	"<x=-8, y=-10, z=0>",
+			//	"<x=5, y=5, z=10>",
+			//	"<x=2, y=-7, z=3>",
+			//	"<x=9, y=-8, z=-3>"
+			//};
 
 
 			////long lasti = 0;
@@ -56,15 +61,43 @@ namespace AdventOfCode2019.Day12
 
 			////Console.WriteLine(planet.TotalEnergy);
 
-			//var moons2 = mooninfo
-			//	.Select(x => NBody.Moon.ParseFrom(x))
-			//	.ToArray();
+			var orig = mooninfo
+				.Select(x => NBody.Moon.ParseFrom(x))
+				.ToArray();
 			//var orig = moons2.Select(mm => mm.PotentialEnergy).ToList();
 
-			//var moons1 = mooninfo
-			//	.Select(x => NBody.Moon.ParseFrom(x))
-			//	.ToArray();
-			//var planet = new NBody.Planet(moons1);
+			var moons = mooninfo
+				.Select(x => NBody.Moon.ParseFrom(x))
+				.ToArray();
+			var planet = new NBody.Planet(moons);
+
+			var o = orig[1];
+			var m = moons[1];
+			var hist = new List<long>();
+			for (long step = 0; ; )
+			{
+				planet.SimulateMotionStep();
+				step++;
+				if (m.IsSamePosition(o))
+				{
+					Console.Write($" {step}");
+					hist.Add(step);
+					step = 0;
+					if (hist.Count > 1)
+					{
+						for (var i = 1; i < hist.Count / 2; i++)
+						{
+							var s1 = hist.GetRange(0, i).ToList();
+							var s2 = hist.GetRange(i, i).ToList();
+							if (s1.SequenceEqual(s2))
+							{
+								Console.WriteLine();
+								Console.WriteLine($"################### {s1.Sum()} from {string.Join("+", s1)}");
+							}
+						}
+					}
+				}
+			}
 
 			//var lasti = 0L;
 			//for (long i = 1; ; i++)
