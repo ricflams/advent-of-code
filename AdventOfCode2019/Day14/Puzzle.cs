@@ -38,8 +38,7 @@ namespace AdventOfCode2019.Day14
 				if (actual > target)
 					return NumberGuesser.GuessIs.TooHigh;
 				return NumberGuesser.GuessIs.Correct;
-			})
-			.First();
+			});
 			Console.WriteLine($"Day 14 Puzzle 2: {maxfuel}");
 			Debug.Assert(maxfuel == 3126714);
 		}

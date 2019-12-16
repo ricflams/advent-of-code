@@ -4,8 +4,6 @@ namespace AdventOfCode2019.Helpers
 {
     internal class NumberGuesser
     {
-		private static readonly int MaxExp = (int)Math.Log10(long.MaxValue);
-
 		public enum GuessIs
 		{
 			TooLow,
@@ -13,37 +11,32 @@ namespace AdventOfCode2019.Helpers
 			Correct
 		};
 
-		public static long[] Find(Func<long, GuessIs> evaluator)
+		public static long Find(Func<long, GuessIs> evaluator)
 		{
-			var guess = 1;
-			for (var i = 0; i < MaxExp; i++)
+			for (var scale = 1L; scale > 0; scale *= 10)
 			{
-				guess *= 10;
-				switch (evaluator(guess))
+				switch (evaluator(scale))
 				{
-					case GuessIs.Correct: return new long[] { guess };
-					case GuessIs.TooHigh: return Find(guess / 10, guess / 10, evaluator);
+					case GuessIs.Correct: return scale; // quite unlikely
+					case GuessIs.TooHigh: return Find(scale / 10, scale);
 				}
 			}
-			throw new Exception("Number is too high");
-		}
+			throw new Exception("Number too high to guess");
 
-		private static long[] Find(long guessbase, long delta, Func<long, GuessIs> evaluator)
-		{
-			if (delta == 0)
+			long Find(long begin, long end)
 			{
-				return new long[] { guessbase, guessbase + 1 };
-			}
-			for (var i = 0; i < 10; i++)
-			{
-				var guess = guessbase + delta * i;
-				switch (evaluator(guess))
+				//Console.WriteLine($"Guess: Find {begin} {end}");
+				var guess = (end + begin) / 2;
+				var hint = evaluator(guess);
+				if (hint == GuessIs.Correct || guess == begin)
 				{
-					case GuessIs.Correct: return new long[] { guess };
-					case GuessIs.TooHigh: return Find(guess - delta, delta / 10, evaluator);
+					// Will return "closest number below" if we can't guess exactly; improve if needed
+					return guess;
 				}
+				return hint == GuessIs.TooHigh
+					? Find(begin, guess)
+					: Find(guess, end);
 			}
-			throw new Exception("Error in guesser");
 		}
 	}
 }
