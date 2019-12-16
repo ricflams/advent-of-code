@@ -14,7 +14,7 @@ namespace AdventOfCode2019.Helpers
 			_defaultValue = defaultValue;
 		}
 
-		public string[] Render(Func<int, char> rendering = null)
+		public string[] Render(Func<int, int, char, char> rendering = null)
 		{
 			var points = AllPoints().ToList();
 			var xMin = points.Min(z => z.X);
@@ -23,11 +23,24 @@ namespace AdventOfCode2019.Helpers
 			var yMax = points.Max(z => z.Y);
 			return Enumerable.Range(yMin, yMax - yMin + 1)
 				.Select(y => Enumerable.Range(xMin, xMax - xMin + 1)
-					.Select(x => rendering != null ? rendering(this[x][y]) : this[x][y])
+					.Select(x => rendering != null ? rendering(x, y, this[x][y]) : this[x][y])
 					.ToArray()
 				)
 				.Select(ch => new string(ch))
 				.ToArray();
+		}
+
+		public void ConsoleWrite(params string[] headers)
+		{
+			Console.Clear();
+			foreach (var header in headers)
+			{
+				Console.WriteLine(header);
+			}
+			foreach (var line in Render())
+			{
+				Console.WriteLine(line);
+			}
 		}
 
 		public IEnumerable<Point> AllPoints(Func<char, bool> predicate = null)

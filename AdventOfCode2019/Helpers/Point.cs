@@ -1,14 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AdventOfCode2019.Helpers
+﻿namespace AdventOfCode2019.Helpers
 {
     internal class Point
     {
-		public int X { get; set; }
-		public int Y { get; set; }
+		public int X { get; private set; }
+		public int Y { get; private set; }
 
-		static public Point From(int x, int y) => new Point { X = x, Y = y };
+		private Point(int x, int y)
+		{
+			X = x;
+			Y = y;
+		}
+
+		static public Point From(int x, int y) => new Point(x, y);
+
+		public bool Is(Point p) => X == p.X && Y == p.Y;
+
+		public Point Up => new Point(X, Y - 1);
+		public Point Right => new Point(X + 1, Y);
+		public Point Down => new Point(X, Y + 1);
+		public Point Left => new Point(X - 1, Y);
 	}
 }

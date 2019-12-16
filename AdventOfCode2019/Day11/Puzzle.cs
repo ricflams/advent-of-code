@@ -27,7 +27,7 @@ namespace AdventOfCode2019.Day11
 		private static void Puzzle2()
 		{
 			var map = PaintHull(ColorWhite);
-			foreach (var line in map.Render(x => x == 'W' ? Graphics.FullBlock : ' '))
+			foreach (var line in map.Render((_,__,val) => val == 'W' ? Graphics.FullBlock : ' '))
 			{
 				Console.WriteLine($"Day 11 Puzzle 2: {line}");
 			}
@@ -55,10 +55,10 @@ namespace AdventOfCode2019.Day11
 						dir = (dir + (engine.Output.Take() == 0 ? -1 : 1) + 4) % 4;
 						switch (dir)
 						{
-							case 0: pos.Y--; break;
-							case 1: pos.X++; break;
-							case 2: pos.Y++; break;
-							case 3: pos.X--; break;
+							case 0: pos = pos.Up; break;
+							case 1: pos = pos.Right; break;
+							case 2: pos = pos.Down; break;
+							case 3: pos = pos.Left; break;
 						}
 						var panelColor = map[pos] == 'W' ? ColorWhite : ColorBlack;
 						engine.Input.Add(panelColor);
