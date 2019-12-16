@@ -10,7 +10,7 @@ namespace AdventOfCode2019.Day12
 		public static void Run()
 		{
 			Puzzle1();
-			Puzzle2();
+			//Puzzle2();
 		}
 
 		private static void Puzzle1()
@@ -27,7 +27,7 @@ namespace AdventOfCode2019.Day12
 			}
 			var totalEnergy = jupiter.TotalEnergy;
 			Console.WriteLine($"Day 12 Puzzle 1: {totalEnergy}");
-			//Debug.Assert(totalEnergy == 10845);
+			System.Diagnostics.Debug.Assert(totalEnergy == 10845);
 		}
 
 		private static void Puzzle2()
