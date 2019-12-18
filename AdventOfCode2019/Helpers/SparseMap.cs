@@ -54,13 +54,6 @@ namespace AdventOfCode2019.Helpers
 					{
 						yield return Point.From(x, y);
 					}
-					//yield return new Point
-					//{
-					//	//Position = new Position { X = x, Y = y},
-					//	X = x,
-					//	Y = y,
-					//	Value = column.Row[y]
-					//};
 				}
 			}
 		}

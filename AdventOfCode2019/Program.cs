@@ -28,71 +28,12 @@ namespace AdventOfCode2019
 				//Day13.Puzzle.Run();
 				//Day14.Puzzle.Run();
 				// Day15.Puzzle.Run();
-
-				//var s = "59717238168580010599012527510943149347930742822899638247083005855483867484356055489419913512721095561655265107745972739464268846374728393507509840854109803718802780543298141398644955506149914796775885246602123746866223528356493012136152974218720542297275145465188153752865061822191530129420866198952553101979463026278788735726652297857883278524565751999458902550203666358043355816162788135488915722989560163456057551268306318085020948544474108340969874943659788076333934419729831896081431886621996610143785624166789772013707177940150230042563041915624525900826097730790562543352690091653041839771125119162154625459654861922989186784414455453132011498";
-				var s = "12345678";
-				var input = s.ToArray().Select(x => x-'0').ToArray();
-				for (var phase = 0; phase < 100; phase++)
-				{
-					input = Enumerable.Range(1, input.Length)
-						.Select(i =>
-						{
-							var fft = new FftYielder(i, new int[] {0, 1, 0, -1});
-							var factors = new List<int>();
-							foreach (var f in fft.Next())
-							{
-								factors.Add(f);
-								if (factors.Count() == input.Length)
-									break;
-							}
-
-							return input.Select((v, idx) => Math.Abs(v * factors[idx]) % 10).Sum();
-						})
-						.ToArray();
-
-					Console.WriteLine(string.Join("", input));
-					//	too low (You guessed 19791895
-					// too low 19891959
-
-
-				}
+				//Day16.Puzzle.Run();
+				Day17.Puzzle.Run();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
 		}
-
-
-		class FftYielder
-		{
-			private readonly int _phase = 0;
-			private readonly int _first;
-			private readonly int[] _pattern;
-
-			public FftYielder(int phase, params int[] pattern)
-			{
-				_phase = phase;
-				_first = pattern[0];
-				_pattern = pattern.Skip(1).ToArray();
-			}
-
-			public IEnumerable<int> Next()
-			{
-				yield return _first;
-				while (true)
-				{
-					foreach (var value in _pattern)
-					{
-						for (var i = 0; i < _phase; i++)
-						{
-							yield return value;
-						}
-					}
-				}
-			}
-
-		}
-
-
 
 		private static void Exercise(Action action)
 		{
