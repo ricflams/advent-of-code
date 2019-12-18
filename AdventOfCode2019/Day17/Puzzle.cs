@@ -111,7 +111,7 @@ namespace AdventOfCode2019.Day17
 				.OnOutput(engine =>
 				{
 					var ch = (char)engine.Output.Take();
-					if (ch == 10)
+					if (ch == '\n')
 					{
 						pos = Point.From(0, pos.Y + 1);
 					}
