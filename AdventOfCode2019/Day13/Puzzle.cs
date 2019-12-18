@@ -101,7 +101,7 @@ namespace AdventOfCode2019.Day13
 					})
 					.OnInput(engine =>
 					{
-						var direction = _paddleControl.Invoke(this);
+						var direction = _paddleControl(this);
 						engine.WithInput(direction);
 					});
 			}
