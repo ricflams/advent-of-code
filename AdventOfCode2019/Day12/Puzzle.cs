@@ -30,6 +30,12 @@ namespace AdventOfCode2019.Day12
 			System.Diagnostics.Debug.Assert(totalEnergy == 10845);
 		}
 
+		class StepInfo
+		{
+			public long Step;
+			public string Velocity;
+		}
+
 		private static void Puzzle2()
 		{
 			var mooninfo = File.ReadAllLines("Day12/input.txt").ToArray();
@@ -38,7 +44,7 @@ namespace AdventOfCode2019.Day12
 			//	.Select(x => NBody.Moon.ParseFrom(x))
 			//	.ToArray();
 
-			//var mooninfo = new string[]
+			//mooninfo = new string[]
 			//{
 			//	"<x=-1, y=0, z=2>",
 			//	"<x=2, y=-10, z=-7>",
@@ -46,14 +52,14 @@ namespace AdventOfCode2019.Day12
 			//	"<x=3, y=5, z=-1>"
 			//};
 
-			//// Big
-			//var mooninfo = new string[]
-			//{
-			//	"<x=-8, y=-10, z=0>",
-			//	"<x=5, y=5, z=10>",
-			//	"<x=2, y=-7, z=3>",
-			//	"<x=9, y=-8, z=-3>"
-			//};
+			// Big
+			mooninfo = new string[]
+			{
+				"<x=-8, y=-10, z=0>",
+				"<x=5, y=5, z=10>",
+				"<x=2, y=-7, z=3>",
+				"<x=9, y=-8, z=-3>"
+			};
 
 
 			////long lasti = 0;
@@ -66,38 +72,85 @@ namespace AdventOfCode2019.Day12
 				.ToArray();
 			//var orig = moons2.Select(mm => mm.PotentialEnergy).ToList();
 
-			var moons = mooninfo
-				.Select(x => NBody.Moon.ParseFrom(x))
-				.ToArray();
-			var planet = new NBody.Planet(moons);
+			//var initialPotentialEnergy = planet.PotentialEnergy;
+			//Console.WriteLine(initialPotentialEnergy);
 
-			var o = orig[1];
-			var m = moons[1];
-			var hist = new List<long>();
-			for (long step = 0; ; )
+			for (var i = 1; i < 4; i++)
 			{
-				planet.SimulateMotionStep();
-				step++;
-				if (m.IsSamePosition(o))
+				var moons = mooninfo
+					.Select(x => NBody.Moon.ParseFrom(x))
+					.ToArray();
+				var planet = new NBody.Planet(moons);
+				var history = new Dictionary<string, List<StepInfo>>();
+				var energyhistory = new Dictionary<int, long>();
+				var m = moons[i];
+				for (long step = 0; ;)
 				{
-					Console.Write($" {step}");
-					hist.Add(step);
-					step = 0;
-					if (hist.Count > 1)
+					planet.SimulateMotionStep();
+					step++;
+					var energy = planet.TotalEnergy;
+					if (energyhistory.ContainsKey(energy))
 					{
-						for (var i = 1; i < hist.Count / 2; i++)
-						{
-							var s1 = hist.GetRange(0, i).ToList();
-							var s2 = hist.GetRange(i, i).ToList();
-							if (s1.SequenceEqual(s2))
-							{
-								Console.WriteLine();
-								Console.WriteLine($"################### {s1.Sum()} from {string.Join("+", s1)}");
-							}
-						}
+						var step0 = energyhistory[energy];
+						Console.WriteLine($"step0={step0} stepN={step} cycle={step - step0}");
 					}
+					energyhistory[planet.TotalEnergy] = step;
+
+					//var pos = $"{m.X}-{m.Y}-{m.Z}";
+					//if (!history.ContainsKey(pos))
+					//{
+					//	history[pos] = new List<StepInfo>();
+					//}
+					//var stepinfo = new StepInfo { Step = step, Velocity = $"{m.Vx}-{m.Vy}-{m.Vz}" };
+					//var match = history[pos].OrderByDescending(x => x.Step).FirstOrDefault(x => x.Velocity == stepinfo.Velocity);
+					//if (match != null)
+					//{
+					//	Console.WriteLine($"step0={match.Step} stepN={stepinfo.Step} cycle={stepinfo.Step - match.Step}");
+					//	//break;
+					//}
+					//history[pos].Add(stepinfo);
 				}
 			}
+			//Console.WriteLine($"steps={hist.Sum()}");
+
+
+			//var moonindex = 3;
+			//var o = orig[moonindex];
+			//var m = moons[moonindex];
+			//var hist = new List<long>();
+			//for (long step = 0; ; )
+			//{
+			//	planet.SimulateMotionStep();
+			//	step++;
+			//	if (m.KineticEnergy == 0)
+			//	{
+			//		Console.Write($" {step}");
+			//		hist.Add(step);
+			//		step = 0;
+			//		if (hist.Count > 0)
+			//		{
+			//			for (var i = 1; i < hist.Count; i++)
+			//			{
+			//				var s1 = hist.GetRange(0, i).Sum();
+			//				for (var j = i; j < hist.Count - i; j++)
+			//				{
+			//					var s2 = hist.GetRange(i, j).Sum();
+			//					if (s1 == s2)
+			//					{
+			//						Console.WriteLine();
+			//						Console.WriteLine($"################### {s1} from 0-{i}-{j}");
+			//					}
+			//				}
+			//			}
+			//		}
+			//		if (Enumerable.Range(0, orig.Length).All(i => moons[i].IsSame(orig[i])))
+			//		{
+			//			Console.WriteLine();
+			//			break;
+			//		}
+			//	}
+			//}
+			//Console.WriteLine($"steps={hist.Sum()}");
 
 			//var lasti = 0L;
 			//for (long i = 1; ; i++)

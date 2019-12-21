@@ -121,7 +121,7 @@ namespace AdventOfCode2019.Day19
 	internal class Beam
 	{
 		private static readonly Engine _engine = new Engine();
-		private readonly SparseMap _cache = new SparseMap();
+		private readonly CharMap _cache = new CharMap();
 
 		public bool InBeam(Point pos)
 		{

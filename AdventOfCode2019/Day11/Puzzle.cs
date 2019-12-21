@@ -27,15 +27,15 @@ namespace AdventOfCode2019.Day11
 		private static void Puzzle2()
 		{
 			var map = PaintHull(ColorWhite);
-			foreach (var line in map.Render((_,__,val) => val == 'W' ? Graphics.FullBlock : ' '))
+			foreach (var line in map.Render((_,val) => val == 'W' ? Graphics.FullBlock : ' '))
 			{
 				Console.WriteLine($"Day 11 Puzzle 2: {line}");
 			}
 		}
 
-		private static SparseMap PaintHull(int color)
+		private static CharMap PaintHull(int color)
 		{
-			var map = new SparseMap('B');
+			var map = new CharMap('B');
 			var pos = Point.From(0, 0);
 			var dir = 0;
 			var step = 0;

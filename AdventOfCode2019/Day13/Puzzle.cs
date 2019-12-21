@@ -64,7 +64,7 @@ namespace AdventOfCode2019.Day13
 			public const char TilePaddle = '_';
 			public const char TileBall = '*';
 
-			public readonly SparseMap Map = new SparseMap();
+			public readonly CharMap Map = new CharMap();
 			private readonly Engine _engine;
 			private Func<Game, int> _paddleControl;
 

@@ -31,7 +31,8 @@ namespace AdventOfCode2019
 				//Day16.Puzzle.Run();
 				//Day17.Puzzle.Run();
 				//Day18.Puzzle.Run();
-				Day19.Puzzle.Run();
+				//Day19.Puzzle.Run();
+				Day20.Puzzle.Run();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();

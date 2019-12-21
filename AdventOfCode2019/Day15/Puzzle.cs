@@ -29,7 +29,7 @@ namespace AdventOfCode2019.Day15
 
 		private static void Puzzle1And2()
 		{
-			var map = new SparseMap();
+			var map = new CharMap();
 
 			var movements = new MoveGenerator();
 			map[movements.Current.Position] = MapSpace;
@@ -101,14 +101,10 @@ namespace AdventOfCode2019.Day15
 			Debug.Assert(minutes == 312);
 
 			// Draw Droid on top of map
-			char MapOverlay(int x, int y, char val)
+			char MapOverlay(Point p, char val)
 			{
 				var droid = movements.Current?.Position;
-				if (droid != null && droid.X == x && droid.Y == y)
-				{
-					return 'D';
-				}
-				return val;
+				return p.Is(droid) ? 'D' : val;
 			}
 		}
 
@@ -163,7 +159,7 @@ namespace AdventOfCode2019.Day15
 				return AllDirections().First(d => MoveFrom(p1, d).Is(p2));
 			}
 
-			public int NextProposal(SparseMap map)
+			public int NextProposal(CharMap map)
 			{
 				while (true)
 				{

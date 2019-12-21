@@ -102,9 +102,9 @@ namespace AdventOfCode2019.Day17
 			return null;
 		}
 
-		private static SparseMap CreateMap()
+		private static CharMap CreateMap()
 		{
-			var map = new SparseMap();
+			var map = new CharMap();
 			var pos = Point.From(0, 0);
 			new Engine()
 				.WithMemoryFromFile("Day17/input.txt")
@@ -125,7 +125,7 @@ namespace AdventOfCode2019.Day17
 			return map;
 		}
 
-		private static string[] CalculatePath(SparseMap map)
+		private static string[] CalculatePath(CharMap map)
 		{
 			var pos = map.AllPoints(ch => "^v<>".Contains(ch)).First();
 			var vc = map[pos];

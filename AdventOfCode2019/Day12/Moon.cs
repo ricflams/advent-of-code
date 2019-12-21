@@ -120,17 +120,19 @@ namespace AdventOfCode2019.NBody
 			Z += Vz;
 		}
 
+		public override string ToString() => $"p=({X},{Y},{Z}) v=({Vx},{Vy},{Vz}) Ep={PotentialEnergy} Ek={KineticEnergy}";
+
 		public int PotentialEnergy => Math.Abs(X) + Math.Abs(Y) + Math.Abs(Z);
 		public int KineticEnergy => Math.Abs(Vx) + Math.Abs(Vy) + Math.Abs(Vz);
 		public int TotalEnergy => PotentialEnergy * KineticEnergy;
 
-		//public bool IsSamePosition(Moon other) =>
-		//	X == other.X &&
-		//	Y == other.Y &&
-		//	Z == other.Z &&
-		//	Vx == other.Vx &&
-		//	Vy == other.Vy &&
-		//	Vz == other.Vz;
+		public bool IsSame(Moon other) =>
+			X == other.X &&
+			Y == other.Y &&
+			Z == other.Z &&
+			Vx == other.Vx &&
+			Vy == other.Vy &&
+			Vz == other.Vz;
 
 		public bool IsSamePosition(Moon other) =>
 			X == other.X &&
