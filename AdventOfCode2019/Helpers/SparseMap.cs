@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode2019.Helpers
 {
@@ -44,6 +45,18 @@ namespace AdventOfCode2019.Helpers
 				}
 				return _column[x];
 			}
+		}
+
+		public (Point, Point) Area()
+		{
+			var points = AllPoints().ToArray();
+			if (points.Length == 0)
+			{
+				return (Point.From(0, 0), Point.From(0, 0));
+			}
+			var min = Point.From(points.Min(z => z.X), points.Min(z => z.Y));
+			var max = Point.From(points.Max(z => z.X), points.Max(z => z.Y));
+			return (min, max);
 		}
 
 		public class SparseMapColumn

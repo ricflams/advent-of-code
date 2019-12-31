@@ -32,7 +32,12 @@ namespace AdventOfCode2019
 				//Day17.Puzzle.Run();
 				//Day18.Puzzle.Run();
 				//Day19.Puzzle.Run();
-				Day20.Puzzle.Run();
+				//Day20.Puzzle.Run();
+				//Day21.Puzzle.Run();
+				Day22.Puzzle.Run();
+				//Day23.Puzzle.Run();
+				//Day24.Puzzle.Run();
+				//Day25.Puzzle.Run();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();

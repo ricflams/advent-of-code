@@ -10,9 +10,12 @@ namespace AdventOfCode2019.Helpers
 		{
 		}
 
-		public void ConsoleWrite(params string[] headers)
+		public void ConsoleWrite(bool clear, params string[] headers)
 		{
-			Console.Clear();
+			if (clear)
+			{
+				Console.Clear();
+			}
 			foreach (var header in headers)
 			{
 				Console.WriteLine(header);
@@ -25,13 +28,9 @@ namespace AdventOfCode2019.Helpers
 
 		public string[] Render(Func<Point, char, char> rendering = null)
 		{
-			var points = AllPoints().ToList();
-			var xMin = points.Min(z => z.X);
-			var xMax = points.Max(z => z.X);
-			var yMin = points.Min(z => z.Y);
-			var yMax = points.Max(z => z.Y);
-			return Enumerable.Range(yMin, yMax - yMin + 1)
-				.Select(y => Enumerable.Range(xMin, xMax - xMin + 1)
+			var (min, max) = Area();
+			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
+				.Select(y => Enumerable.Range(min.X, max.X - min.X + 1)
 					.Select(x => rendering != null ? rendering(Point.From(x, y), this[x][y]) : this[x][y])
 					.ToArray()
 				)
