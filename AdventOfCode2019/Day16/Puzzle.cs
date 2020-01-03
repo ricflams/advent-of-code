@@ -57,11 +57,10 @@ namespace AdventOfCode2019.Day16
 			//Console.WriteLine(string.Join("", phase5.Take(50)));
 
 
-			Console.WriteLine(string.Join("", rawinput.Take(50)));
-			for (var phases = 1; phases < 10; phases++)
+			for (var phase = 1; phase < 33; phase++)
 			{
-				var phase = FftTestDiagonal(phases, rawinput).ToArray();
-				Console.WriteLine(string.Join("", phase.Take(50)));
+				var factors = Factors(phase, rawinput, 10000);
+				Console.WriteLine($"Phase {phase}: {string.Join(" ", factors)}");
 			}
 
 			//var output = Fft(100, rawinput).Take(8);
@@ -84,6 +83,38 @@ namespace AdventOfCode2019.Day16
 			//var rawinput = File.ReadAllText("Day16/input.txt")
 			//	.ToArray().Select(x => x - '0').ToArray();
 
+		}
+
+
+
+		private static int[] Factors(int phase, int[] input, int repeat)
+		{
+			var n = input.Length;
+			var N = n * repeat;
+			var outputFactors = new int[n];
+			var pos = 0;
+			foreach (var factor in FactorGenerator(phase).Skip(1))
+			{
+				outputFactors[pos++ % n] += factor;
+				if (pos == N)
+					break;
+			}
+			return outputFactors;
+		}
+
+		private static IEnumerable<int> FactorGenerator(int phase)
+		{
+			var pattern = new int[] { 0, 1, 0, -1 };
+			while (true)
+			{
+				foreach (var value in pattern)
+				{
+					for (var i = 0; i < phase; i++)
+					{
+						yield return value;
+					}
+				}
+			}
 		}
 
 		private static int[] Fft2(int phases, int[] input)

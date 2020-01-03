@@ -157,7 +157,7 @@ namespace AdventOfCode2019.Day23
 									receiveBuffer.Clear();
 									if (destinationAddr == 255)
 									{
-										Console.WriteLine($"###### {y} to NAT");
+										//Console.WriteLine($"###### {y} to NAT");
 										lastPacket = Point.From((int)x, (int)y);
 										return;
 									}

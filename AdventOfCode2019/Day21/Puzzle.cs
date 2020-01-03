@@ -29,6 +29,7 @@ namespace AdventOfCode2019.Day21
 				walk
 			";
 
+
 			while (true)
 			{
 				var game = new Game()
@@ -45,11 +46,32 @@ namespace AdventOfCode2019.Day21
 			{
 				return Console.ReadLine();
 			}
-
 		}
 
 		private static void Puzzle2()
 		{
+			while (true)
+			{
+				Console.Write("Expr 1: ");
+				var a = Console.ReadLine();
+				if (a == "q")
+					break;
+				Console.Write("Expr 2: ");
+				var b = Console.ReadLine();
+				var diffs = BooleanExprHelper.Compare(a, b).ToArray();
+				if (!diffs.Any())
+				{
+					Console.WriteLine("Similar");
+				}
+				else
+				{
+					foreach (var diff in diffs)
+					{
+						Console.WriteLine($"Mismatch: {diff.Item1}  {diff.Item2}");
+					}
+				}
+			}
+
 			var solution = @"
 				not a t
 				not t t
@@ -61,11 +83,41 @@ namespace AdventOfCode2019.Day21
 				run
 			";
 
+			var ops = new string[] { "not", "and", "or" };
+			var sources = new string[] { "b", "c", "e", "f", "g", "h", "i", "t", "j" };
+			var destinations = new string[] { "t", "j" };
+			var rnd = new Random();
+			var step = 0;
+
 			while (true)
 			{
 				var game = new Game()
-					.WithController(UserPaddleControl)
+					.WithController(RandomProgram)
 					.Run();
+			}
+
+			string RandomProgram(Game g)
+			{
+				var line = NextStep();
+				Console.WriteLine(line);
+				return line;
+
+				string NextStep()
+				{
+					switch (step++ % 16)
+					{
+						default:
+							var op = ops[rnd.Next(0, ops.Length)];
+							var src = sources[rnd.Next(0, sources.Length)];
+							var dst = destinations[rnd.Next(0, destinations.Length)];
+							return $"{op} {src} {dst}";
+						case 11: return "or t j";
+						case 12: return "and d j";
+						case 13: return "not a t";
+						case 14: return "or t j";
+						case 15: return "run";
+					}
+				}
 			}
 
 
