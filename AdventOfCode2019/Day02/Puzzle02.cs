@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace AdventOfCode2019.Day02
 {
-	internal class Puzzle
+	internal class Puzzle02
 	{
 		public static void Run()
 		{

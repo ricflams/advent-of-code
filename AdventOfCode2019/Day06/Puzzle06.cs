@@ -6,7 +6,7 @@ using System.IO;
 
 namespace AdventOfCode2019.Day06
 {
-	internal class Puzzle
+	internal class Puzzle06
 	{
 		public static void Run()
 		{

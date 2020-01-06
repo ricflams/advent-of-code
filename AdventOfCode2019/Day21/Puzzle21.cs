@@ -8,7 +8,7 @@ using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day21
 {
-	internal static class Puzzle
+	internal static class Puzzle21
 	{
 		public static void Run()
 		{

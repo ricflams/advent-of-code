@@ -6,7 +6,7 @@ using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day13
 {
-    internal static class Puzzle
+    internal static class Puzzle13
     {
 		public static void Run()
 		{

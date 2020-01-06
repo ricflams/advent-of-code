@@ -8,7 +8,7 @@ using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day16
 {
-	internal static class Puzzle
+	internal static class Puzzle16
 	{
 		public static void Run()
 		{
@@ -57,7 +57,7 @@ namespace AdventOfCode2019.Day16
 			//Console.WriteLine(string.Join("", phase5.Take(50)));
 
 
-			for (var phase = 1; phase < 33; phase++)
+			for (var phase = 1; phase < 660; phase++)
 			{
 				var factors = Factors(phase, rawinput, 10000);
 				Console.WriteLine($"Phase {phase}: {string.Join(" ", factors)}");

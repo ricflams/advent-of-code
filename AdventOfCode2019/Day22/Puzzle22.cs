@@ -7,7 +7,7 @@ using AdventOfCode2019.Helpers;
 
 namespace AdventOfCode2019.Day22
 {
-	internal static class Puzzle
+	internal static class Puzzle22
 	{
 		public static void Run()
 		{

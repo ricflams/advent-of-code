@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace AdventOfCode2019.Day11
 {
-    internal class Puzzle
+    internal class Puzzle11
     {
 		const int ColorBlack = 0;
 		const int ColorWhite = 1;

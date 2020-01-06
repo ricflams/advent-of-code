@@ -7,7 +7,7 @@ using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day15
 {
-    internal static class Puzzle
+    internal static class Puzzle15
     {
 		private const int MoveNone = 0;
 		private const int MoveNorth = 1;

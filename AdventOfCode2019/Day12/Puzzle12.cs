@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode2019.Day12
 {
-    internal static class Puzzle
+    internal static class Puzzle12
     {
 		public static void Run()
 		{

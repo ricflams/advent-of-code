@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace AdventOfCode2019.Day14
 {
-    internal static class Puzzle
+    internal static class Puzzle14
     {
 		public static void Run()
 		{

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AdventOfCode2019.Day04
 {
-	internal class Puzzle
+	internal class Puzzle04
 	{
 		public static void Run()
 		{
