@@ -42,5 +42,10 @@ namespace AdventOfCode2019.Helpers
 				}
 			}
 		}
+
+		public static IEnumerable<IEnumerable<int>> AllPermutations(int length)
+		{
+			return Permute(Enumerable.Range(0, length));
+		}
 	}
 }
