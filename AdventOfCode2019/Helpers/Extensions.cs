@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace AdventOfCode2019.Helpers
@@ -60,6 +61,11 @@ namespace AdventOfCode2019.Helpers
 				(x, y) = (y, x - q * y);
 			}
 			return x < 0 ? x + m0 : x;
+		}
+
+		public static string MultiLine(this string str)
+		{
+			return string.Concat(str.Trim().Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim() + "\n"));
 		}
 	}
 }

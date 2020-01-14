@@ -25,10 +25,10 @@ namespace AdventOfCode2019
 				//Day15.Puzzle15.Run();
 				//Day16.Puzzle16.Run();
 				//Day17.Puzzle17.Run();
-				Day18.Puzzle18.Run();
+				//Day18.Puzzle18.Run();
 				//Day19.Puzzle19.Run();
 				////Day20.Puzzle20.Run();
-				////Day21.Puzzle21.Run();
+				Day21.Puzzle21.Run();
 				//Day22.Puzzle22.Run();
 				////Day23.Puzzle23.Run();
 				//Day24.Puzzle24.Run();

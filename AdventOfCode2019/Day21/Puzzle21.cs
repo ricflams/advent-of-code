@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Text;
 using AdventOfCode2019.Helpers;
 using AdventOfCode2019.Intcode;
 
@@ -12,338 +12,143 @@ namespace AdventOfCode2019.Day21
 	{
 		public static void Run()
 		{
-			//Puzzle1();
+			Puzzle1();
 			Puzzle2();
 		}
 
 		private static void Puzzle1()
 		{
-			var solution = @"
-				not a t
-				not t t
-				and b t
-				and c t
-				not d j
-				or j t
-				not t j
-				walk
-			";
+			var program = @"
+				NOT A T
+				NOT T T
+				AND B T
+				AND C T
+				NOT D J
+				OR J T
+				NOT T J
+				WALK
+			".MultiLine();
+			// Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
-
-			while (true)
-			{
-				var game = new Game()
-					.WithController(UserPaddleControl)
-					.Run();
-			}
-
-
-			//var shortestPath = 0;// ShortestPath(maze);
-			//Console.WriteLine($"Day 20 Puzzle 1: {shortestPath}");
-//			Debug.Assert(damage = 19354083);
-
-			string UserPaddleControl(Game g)
-			{
-				return Console.ReadLine();
-			}
+			var hullDamage = FindHullDamage(program);
+			Console.WriteLine($"Day 21 Puzzle 1: {hullDamage}");
+			Debug.Assert(hullDamage == 19354083);
 		}
 
 		private static void Puzzle2()
 		{
-			while (true)
-			{
-				Console.Write("Expr 1: ");
-				var a = Console.ReadLine();
-				if (a == "q")
-					break;
-				Console.Write("Expr 2: ");
-				var b = Console.ReadLine();
-				var diffs = BooleanExprHelper.Compare(a, b).ToArray();
-				if (!diffs.Any())
-				{
-					Console.WriteLine("Similar");
-				}
-				else
-				{
-					foreach (var diff in diffs)
-					{
-						Console.WriteLine($"Mismatch: {diff.Item1}  {diff.Item2}");
-					}
-				}
-			}
+			//// Solve by brute force
+			//Console.WriteLine("By brute force: " + FindHullDamageResultByBruteForce());
 
-			var solution = @"
-				not a t
-				not t t
-				and b t
-				and c t
-				not d j
-				or j t
-				not t j
-				run
-			";
+			//// Show last moments
+			//foreach (var moment in LastMoments().Take(10))
+			//{
+			//	Console.WriteLine($"Last moment: {moment}");
+			//}
 
-			var ops = new string[] { "not", "and", "or" };
-			var sources = new string[] { "b", "c", "e", "f", "g", "h", "i", "t", "j" };
-			var destinations = new string[] { "t", "j" };
-			var rnd = new Random();
-			var step = 0;
+			// Randomly picked solution
+			var program = @"
+				AND E J
+				NOT I J
+				OR I T
+				NOT B J
+				OR H T
+				AND B T
+				OR E T
+				NOT C T
+				AND J J
+				AND H T
+				OR T J
+				AND D J
+				NOT A T
+				OR T J
+				RUN
+			".MultiLine();
+			// Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
-			while (true)
-			{
-				var game = new Game()
-					.WithController(RandomProgram)
-					.Run();
-			}
-
-			string RandomProgram(Game g)
-			{
-				var line = NextStep();
-				Console.WriteLine(line);
-				return line;
-
-				string NextStep()
-				{
-					switch (step++ % 16)
-					{
-						default:
-							var op = ops[rnd.Next(0, ops.Length)];
-							var src = sources[rnd.Next(0, sources.Length)];
-							var dst = destinations[rnd.Next(0, destinations.Length)];
-							return $"{op} {src} {dst}";
-						case 11: return "or t j";
-						case 12: return "and d j";
-						case 13: return "not a t";
-						case 14: return "or t j";
-						case 15: return "run";
-					}
-				}
-			}
-
-
-			//var shortestPath = 0;// ShortestPath(maze);
-			//Console.WriteLine($"Day 20 Puzzle 1: {shortestPath}");
-			//			Debug.Assert(damage = 19354083);
-
-			string UserPaddleControl(Game g)
-			{
-				return Console.ReadLine();
-			}
-
-			//			var allowed = new string('?', 9);
-			// Rules:
-			//   ABCDEFGHI
-			//        .
-			//   xxxxx1000
-			//  ???---J--->
-			//            
-			//   aaa1xxxxx, a is not all 1s
-			//  J???>?????         
-			//            
-			//    .   .
-			//   ?1xx01000
-			//  - J   J
-			//
-			//    .   .
-			//   ?1x0?1000
-			//  -J    J
-			//
-			//   0xxxxxxxx
-			//  J
-			//
-			// In summary:
-			//
-			// Jump if A=0 or (D=1 AND ABC!=111 AND EFGHI!=01000)
-			// Jump if ABC!=111 AND D=1 AND EFGHI!=0?000
-			// Jump if ABC!=111 AND D=1 AND EGH!=000 AND GHI!=000
-
-
-			// Jump if ABC!=1111 AND E=1 AND EFGHI!=0?000
-			// Jump if ABC!=111 AND E=1 AND FHI!=000 AND GHI!=000
-
-
-			//  ABCDEFGHI
-			// J0???1????
-			// J?0??10???
-			// J??0?1?0??
-			// J???01??0?
-			// 
-			// J0??11????
-			// J?0?110???
-			// J??011?0??
-			// J???11??0?
-
-			// J0????????
-			// J?0?10????
-			// J??01?0???
-			// J???1?00??
-			//  ABCDEFGHI
-
-			// J0???????? ??
-			// J?0?10????
-			// J??01?0???
-			// J???1?00??
-			//  ABCDEFGHI
-
-
-			// !B AND !F  ==  !(B OR F)
-
-			// J if E=1 AND (A=0 OR BF=00 || CG=00 || DH==0)
-
-			// J if E AND (!A OR (!B && !F) OR (!C && !G) OR (!D && !H))
-
-			// J if E AND (!A OR !(B OR F) OR !(C OR G) OR !(D OR H))
-
-			// J if E AND !(A AND !(!B && !F) AND !(!C && !G) AND !(!D && !H))
-			// J if E AND !(A AND (B OR F) AND (C OR G) AND (D OR H))
-			// J if E AND !(A AND (B OR F) AND (C OR G) AND (D OR H))
-
-			// NOW
-			// J if D AND E AND (!A OR (!B AND !F) OR (!C AND !G) OR !H)
-			// J IF D AND (!A OR (!B AND !E) OR (!C AND !F) OR !G 
-
-
-#if false
-
-(B OR F) AND (C OR G) AND (D OR H)
-			= B AND ((C OR G) AND (D OR H)) OR F AND ((C OR G) AND (D OR H)) 
-			= B AND (!(!C AND !G) AND !(!D AND !H)) OR F AND (!(!C AND !G) AND !(!D AND !H))
-			= B AND !((!C AND !G) OR (!D AND !H)) OR F AND !((!C AND !G) OR (!D AND !H))
-
-			var solution = @"
-
-
-or b t
-or e t
-or h t
-not t j    ---
-not c t
-not t t
-or f t
-not t t
-and t j    ---
-not g t
-or t j   ----
-not a t
-or t j
-and d j
-run
-
-
-
-
-
-
-
-//X\Y 0 1
-//0   1 0
-//1   0 0
-
-//!X && !Y => t=1
-
-//not x t
-//not t t    // t = 0
-//or y t     // t = 0
-//not t t    // t = 1
-
-//!(!(!X) OR Y) = (!X AND !Y)
-
-//not a j
-//not b t
-
-
-
-
-not c t
-not t t
-or g t
-and 
-
-not t j    // t = 1
-not c t
-not t t    // t = 0
-or g t     // t = 0
-not t j    // t = 1
-
-
-
-
-
-				not a t
-				not t t
-				and b t
-				and c t  // 111 = >t=1
-				not t t  // 111 = >t=0
-                and d t
-                not e j // j=e
-				or g j
-				or h j
-				and j t
-                not g j // j=e
-				or h j
-				or i j
-				and t j
-				run
-			";
-
-#endif
+			var hullDamage = FindHullDamage(program);
+			Console.WriteLine($"Day 21 Puzzle 2: {hullDamage}");
+			Debug.Assert(hullDamage == 1143499964);
 		}
 
-		internal class Game
+		private static long FindHullDamage(string program)
 		{
-			private readonly Engine _engine;
-			private Func<Game, string> _controller;
+			return ExecuteSpringdroidProgram(program)
+				.FirstOrDefault(x => x > 255);
+		}
 
-			private Queue<char> _input = new Queue<char>();
-
-			public Game()
+		private static long FindHullDamageResultByBruteForce()
+		{
+			while (true)
 			{
-				_engine = new Engine()
-					.WithMemoryFromFile("Day21/input.txt")
-					.OnOutput(engine =>
-					{
-						var result = engine.Output.TakeAll().ToList();
-						if (result.Count() == 1 && result.First() > 255)
-						{
-							Console.WriteLine("######\n###### " + result.First());
-						}
-						else
-						{
-							foreach (var ch in result)
-							{
-								Console.Write((char)ch);
-							}
-						}
-					})
-					.OnInput(engine =>
-					{
-						if (_input.Count() == 0)
-						{
-							var instruction = _controller(this).Trim().ToUpper() + '\x0a';
-							foreach (var ch in instruction.ToArray())
-							{
-								_input.Enqueue(ch);
-							}
-						}
-						engine.WithInput(_input.Dequeue());
-					});
-			}
-
-			public Game WithController(Func<Game, string> controller)
-			{
-				_controller = controller;
-				return this;
-			}
-
-			public Game Run()
-			{
-				_engine.Execute();
-				return this;
+				var program = RandomProgram.Generate();
+				var damage = FindHullDamage(program);
+				if (damage > 0)
+				{
+					return damage;
+				}
 			}
 		}
 
+		private static IEnumerable<string> LastMoments()
+		{
+			var lastMoments = new HashSet<string>();
+			while (true)
+			{
+				var program = RandomProgram.Generate();
+				var output = ExecuteSpringdroidProgram(program);
+				if (!output.Any(c => c > 255))
+				{
+					var lines = new string(output.Select(v => (char)v).ToArray()).Split('\n');
+					var lastMoment = lines.First(line => "#@".All(line.Contains));
+					if (!lastMoments.Contains(lastMoment))
+					{
+						lastMoments.Add(lastMoment);
+						yield return lastMoment;
+					}
+				}
+			}
+		}
 
+		private static long[] ExecuteSpringdroidProgram(string program)
+		{
+			return new Engine()
+				.WithMemoryFromFile("Day21/input.txt")
+				.WithInput(program.Select(c => (long)c).ToArray())
+				.Execute()
+				.Output.TakeAll().ToArray();
+		}
+
+		private static string ExecuteSpringdroidProgramForDebug(string program)
+		{
+			var output = ExecuteSpringdroidProgram(program);
+			return new string(output.Select(v => (char)v).ToArray());
+		}
+
+		private static class RandomProgram
+		{
+			private static readonly string[] Ops = new string[] { "NOT", "AND", "OR" };
+			private static readonly string[] Src = new string[] { "B", "C", "E", "F", "G", "H", "I", "T", "J" };
+			private static readonly string[] Dst = new string[] { "T", "J" };
+			private static readonly Random Rand = new Random();
+			private static string OneOf(string[] sa) => sa[Rand.Next(0, sa.Length)];
+
+			public static string Generate()
+			{
+				var sb = new StringBuilder();
+				for (var i = 0; i < 10; i++)
+				{
+					sb.Append($"{OneOf(Ops)} {OneOf(Src)} {OneOf(Dst)}\n");
+				}
+				sb.Append("OR T J\n");
+				sb.Append("AND D J\n");
+				sb.Append("NOT A T\n");
+				sb.Append("OR T J\n");
+				sb.Append("RUN\n");
+				var program = sb.ToString();
+				return program;
+			}
+		}
 	}
-
 }
 
