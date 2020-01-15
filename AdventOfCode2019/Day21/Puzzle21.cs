@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using AdventOfCode2019.Helpers;
 using AdventOfCode2019.Intcode;
@@ -37,8 +38,16 @@ namespace AdventOfCode2019.Day21
 
 		private static void Puzzle2()
 		{
-			//// Solve by brute force
-			//Console.WriteLine("By brute force: " + FindHullDamageResultByBruteForce());
+			////// Solve by brute force
+			//for (var i = 15; i > 8; i--)
+			//{
+			//	var sw = Stopwatch.StartNew();
+			//	Console.Write($"Program of length {i} ...");
+			//	var (damage, steps, prog) = FindHullDamageResultByBruteForce(i);
+			//	Debug.Assert(damage == 1143499964);
+			//	Console.WriteLine($"found in {sw.Elapsed} after {steps} programs:");
+			//	Console.WriteLine(prog);
+			//}
 
 			//// Show last moments
 			//foreach (var moment in LastMoments().Take(10))
@@ -46,17 +55,10 @@ namespace AdventOfCode2019.Day21
 			//	Console.WriteLine($"Last moment: {moment}");
 			//}
 
-			// Randomly picked solution
+			// Randomly picked short solution
 			var program = @"
-				AND E J
-				NOT I J
-				OR I T
 				NOT B J
-				OR H T
-				AND B T
-				OR E T
 				NOT C T
-				AND J J
 				AND H T
 				OR T J
 				AND D J
@@ -77,16 +79,26 @@ namespace AdventOfCode2019.Day21
 				.FirstOrDefault(x => x > 255);
 		}
 
-		private static long FindHullDamageResultByBruteForce()
+		private static (long, int, string) FindHullDamageResultByBruteForce(int length)
 		{
+			var md5 = MD5.Create();
+			var memo = new HashSet<ulong>();
+			var step = 0;
 			while (true)
 			{
-				var program = RandomProgram.Generate();
+				var program = RandomProgram.Generate(length);
+				var signature = md5.ComputeHash(Encoding.ASCII.GetBytes(program)).Select(b => (ulong)b).Aggregate((s,v) => 3074457345618258799ul*s+v);
+				if (memo.Contains(signature))
+				{
+					continue;
+				}
+				memo.Add(signature);
 				var damage = FindHullDamage(program);
 				if (damage > 0)
 				{
-					return damage;
+					return (damage, step, program);
 				}
+				step++;
 			}
 		}
 
@@ -127,24 +139,47 @@ namespace AdventOfCode2019.Day21
 
 		private static class RandomProgram
 		{
+			private static readonly Random Rand = new Random();
 			private static readonly string[] Ops = new string[] { "NOT", "AND", "OR" };
 			private static readonly string[] Src = new string[] { "B", "C", "E", "F", "G", "H", "I", "T", "J" };
 			private static readonly string[] Dst = new string[] { "T", "J" };
-			private static readonly Random Rand = new Random();
 			private static string OneOf(string[] sa) => sa[Rand.Next(0, sa.Length)];
 
-			public static string Generate()
+			public static string Generate(int length = 15)
 			{
-				var sb = new StringBuilder();
-				for (var i = 0; i < 10; i++)
+				var lastInstructions = new string[]
 				{
-					sb.Append($"{OneOf(Ops)} {OneOf(Src)} {OneOf(Dst)}\n");
+					"OR T J",
+					"AND D J",
+					"NOT A T",
+					"OR T J",
+					"RUN"
+				};
+				var lastOpForDst = Dst.ToDictionary(x => x, _ => "");
+				var sb = new StringBuilder();
+				for (var step = 0; step < length - lastInstructions.Length; step++)
+				{
+					string op, src, dst;
+					while (true)
+					{
+						op = OneOf(Ops);
+						src = OneOf(Src);
+						dst = OneOf(Dst);
+						if (step == 0 && op == "AND") // AND x y as first step will always produce 0 because J/T are both 0
+							continue;
+						if (op != "NOT" && src == dst) // AND/OR x x will always produce x
+							continue;
+						if (op == "NOT" && lastOpForDst[dst] == "NOT") // Don't do NOT x J/T if last operation to J/T was also a NOT
+							continue;
+						break;
+					}
+					sb.Append($"{op} {src} {dst}\n");
+					lastOpForDst[dst] = op;
 				}
-				sb.Append("OR T J\n");
-				sb.Append("AND D J\n");
-				sb.Append("NOT A T\n");
-				sb.Append("OR T J\n");
-				sb.Append("RUN\n");
+				foreach (var instruction in lastInstructions)
+				{
+					sb.AppendFormat($"{instruction}\n");
+				}
 				var program = sb.ToString();
 				return program;
 			}

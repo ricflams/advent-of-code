@@ -1,0 +1,109 @@
+﻿Program of length 15 ...found in 00:00:46.8192260 after 1926 programs:
+OR G J
+AND I T
+NOT H J
+OR E J
+NOT T T
+AND J T
+AND B T
+NOT C J
+NOT B T
+AND H J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 14 ...found in 00:00:11.8147334 after 592 programs:
+NOT H J
+OR B J
+AND C J
+OR G T
+NOT J T
+OR F J
+AND H T
+AND H J
+AND E J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 13 ...found in 00:01:50.7937537 after 6226 programs:
+NOT C J
+NOT C T
+AND B J
+AND H T
+OR B J
+AND B J
+AND H T
+NOT B J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 12 ...found in 00:11:58.0768795 after 38838 programs:
+OR I J
+OR G J
+OR B T
+NOT C J
+AND B J
+NOT B T
+AND H J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 11 ...found in 00:02:26.3987043 after 9440 programs:
+NOT B J
+NOT C T
+AND C J
+OR E J
+AND H T
+NOT B J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 10 ...found in 00:00:15.1818089 after 1028 programs:
+NOT B J
+AND H T
+NOT C T
+AND H T
+AND C J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 9 ...found in 00:00:23.6435044 after 1698 programs:
+NOT C J
+OR C T
+AND H J
+NOT B T
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 8 ...found in 00:00:59.9068224 after 4428 programs:
+NOT B J
+NOT C T
+AND H T
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 7 ...
