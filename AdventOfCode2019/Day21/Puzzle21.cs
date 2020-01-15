@@ -19,6 +19,7 @@ namespace AdventOfCode2019.Day21
 
 		private static void Puzzle1()
 		{
+			// My first successful attempt
 			var program = @"
 				NOT A T
 				NOT T T
@@ -29,6 +30,16 @@ namespace AdventOfCode2019.Day21
 				NOT T J
 				WALK
 			".MultiLine();
+
+			//// Shortest program found by brute force
+			//program = @"
+			//	NOT A J
+			//	NOT C T
+			//	OR T J
+			//	AND D J
+			//	WALK
+			//".MultiLine();
+
 			// Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
 			var hullDamage = FindHullDamage(program);
@@ -38,8 +49,8 @@ namespace AdventOfCode2019.Day21
 
 		private static void Puzzle2()
 		{
-			////// Solve by brute force
-			//for (var i = 15; i > 8; i--)
+			//// Solve by brute force
+			//for (var i = 10; i > 6; i--)
 			//{
 			//	var sw = Stopwatch.StartNew();
 			//	Console.Write($"Program of length {i} ...");

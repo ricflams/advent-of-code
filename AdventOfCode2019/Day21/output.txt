@@ -107,3 +107,38 @@ OR T J
 RUN
 
 Program of length 7 ...
+-------------------------------------
+Program of length 10 ...found in 00:00:46.7080894 after 2958 programs:
+NOT C J
+AND H J
+AND I T
+AND E T
+NOT B T
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 9 ...found in 00:02:27.0906899 after 10386 programs:
+NOT C J
+AND H J
+OR G T
+NOT B T
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 8 ...found in 00:00:33.8677853 after 1553 programs:
+NOT C J
+NOT B T
+AND H J
+OR T J
+AND D J
+NOT A T
+OR T J
+RUN
+
+Program of length 7 ...
