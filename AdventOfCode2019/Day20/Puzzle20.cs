@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AdventOfCode2019.Helpers;
-using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day20
 {
 	internal static class Puzzle20
 	{
+		const int Infinite = 10000000;
+
 		public static void Run()
 		{
 			Puzzle1();
@@ -22,17 +23,25 @@ namespace AdventOfCode2019.Day20
 
 			var shortestPath = ShortestPath(maze, StepOnto);
 			Console.WriteLine($"Day 20 Puzzle 1: {shortestPath}");
-
+			Debug.Assert(shortestPath == 608);
 		}
 
 		private static void Puzzle2()
 		{
-			var maze = ReadMaze("Day20/input-1.txt");
-			_mazes.Add(maze);
+			var maze = ReadMaze("Day20/input.txt");
+			//maze.Render(maze.Entry);
 
-
-			var shortestPath = ShortestPath(maze, StepOnto);
+			var shortestPath = MaxDepths().Select(d => FindMinimumDistanceBfsPlutonian(maze, d)).First(x => x != Infinite);
 			Console.WriteLine($"Day 20 Puzzle 2: {shortestPath}");
+			Debug.Assert(shortestPath == 6706);
+		}
+
+		private static IEnumerable<int> MaxDepths()
+		{
+			for (var depth = 25; ; depth += 5)
+			{
+				yield return depth;
+			}
 		}
 
 		private static Point StepOnto(Maze maze, Point p)
@@ -46,25 +55,175 @@ namespace AdventOfCode2019.Day20
 		}
 
 		private static List<Maze> _mazes = new List<Maze>();
-		private static int MaxDepth = 20;
 
 		private static Point StepOntoPlutonian(Maze maze, Point p)
 		{
-			var portal = maze.Portals[p];
-			if (portal == null)
-				return p;
+			//var portal = maze.Portals[p];
+			//if (portal == null)
+			//	return p;
 
-			//Console.WriteLine($"Seeing a portal at {maze.Portals[portal]}");
-			
-			if (!portal.Outer)
+			////Console.WriteLine($"Seeing a portal at {maze.Portals[portal]}");
+
+			//if (!portal.IsDownward)
+			//{
+
+			//}
+
+			//return portal?.Pos ?? p;
+			return p;
+		}
+
+		//private static int dummyYpos = 0;
+		//private static void InflateGraph(List<Vertex> vertices)
+		//{
+		//	var dummy = Point.From(1000000, dummyYpos++); // oh dear
+		//	while (true)
+		//	{
+		//		var node = vertices.FirstOrDefault(v => v.Edges.Values.Any(d => d > 1));
+		//		if (node == null)
+		//			break;
+		//		foreach (var edge in node.Edges.Where(e => e.Value > 1).ToList())
+		//		{
+		//			node.Edges.Remove(edge.Key);
+		//			edge.Key.Edges.Remove(node);
+		//			var distance = edge.Value;
+		//			var p = edge.Key;
+		//			for (var i = 0; i < distance - 1; i++)
+		//			{
+		//				var insert = new Vertex(dummy);
+		//				vertices.Add(insert);
+		//				insert.Edges.Add(p, 1);
+		//				p.Edges.Add(insert, 1);
+		//				p = insert;
+		//				dummy = dummy.Right;
+		//			}
+		//			node.Edges.Add(p, 1);
+		//			p.Edges.Add(node, 1);
+		//		}
+		//	}
+		//}
+
+
+		private static void PrintGraph(Graph graph)
+		{
+			Console.WriteLine("digraph {");
+			foreach (var v in graph.Vertices)
 			{
-
+				foreach (var e in v.Edges)
+				{
+					var portalName = v.PortalName ?? e.Key.PortalName;
+					var label = e.Value == 0 ? "" : e.Value == -1 ? $"portal {portalName} down to {e.Key.Pos}" : $"portal {portalName} up to {e.Key.Pos}";
+					Console.WriteLine($"  \"{v.Pos}\" -> \"{e.Key.Pos}\" [label=\"{label}\"]");
+				}
 			}
+			Console.WriteLine("}");
+		}
 
-			return portal?.Pos ?? p;
+		private static int FindMinimumDistanceBfsPlutonian(Maze maze, int maxDepth)
+		{
+			Console.WriteLine($"Find min dist for depth={maxDepth}");
+
+			var topgraph = BuildSimpleGraph(maze, StepOnto);
+			//PrintGraph(topgraph);
+
+			//InflateGraph(topgraph.Vertices);
+
+			topgraph.Outer = null;
+			topgraph.Inner = null;
+
+			var entry = topgraph.Vertices.First(v => v.Pos.Is(maze.Entry));
+			var exit = topgraph.Vertices.First(v => v.Pos.Is(maze.Exit));
+
+
+			var root = topgraph.Vertices.First();
+			root.Visited = true;
+			//root.VisitedBy.Add("");
+
+			var queue = new Queue<(Graph, int, string, Vertex, int)>();
+			queue.Enqueue((topgraph, 0, "", root, 0));
+			while (queue.Any())
+			{
+				var (graph, level, visitedBy, node, distance) = queue.Dequeue();
+
+				//Console.WriteLine($"[{level} {node.Pos} {visitedBy} {distance}]");
+
+				if (node.Pos.Is(exit.Pos) && level == 0)
+				{
+					return distance;
+				}
+
+				var edges = node.Edges
+					//.Where(n => !n.Key.VisitedBy.Contains(visitedBy))
+					//.Where(n => !n.Key.Visited)
+					.ToList();
+				foreach (var e in edges)
+				{
+					var nextnode = e.Key;
+					var nextlevel = level;
+					var nextgraph = graph;
+					//var nextVisitedBy = visitedBy;
+					if (e.Value != 0)
+					{
+						if (e.Value == -1)
+						{
+							if (level > maxDepth)// || nextVisitedBy.Length > 15)
+								continue;
+							if (graph.Inner == null)
+							{
+								graph.Inner = BuildSimpleGraph(maze, StepOnto);
+								graph.Inner.Outer = graph;
+							}
+							nextgraph = graph.Inner;
+							//nextVisitedBy += "-";
+						}
+						else
+						{
+							nextgraph = graph.Outer;
+							if (nextgraph == null)
+								continue;
+							//nextVisitedBy += "+";
+						}
+						nextlevel -= e.Value;
+						nextnode = nextgraph.Vertices.First(v => v.Pos.Is(nextnode.Pos));
+					}
+					if (nextnode.Visited)//By.Contains(nextVisitedBy))
+						continue;
+					nextnode.Visited = true;// By.Add(nextVisitedBy);
+					queue.Enqueue((nextgraph, nextlevel, /*nextVisitedBy*/visitedBy, nextnode, distance + 1));
+				}
+			}
+			return Infinite;
 		}
 
 
+			//entry.Distance = 0;
+			//foreach (var v in graph.Vertices.Skip(1))
+			//{
+			//	v.Distance = int.MaxValue;
+			//}
+
+			//var node = entry;
+			//while (true)
+			//{
+			//	if (node == null)
+			//		break;
+			//	foreach (var edge in node.Edges)
+			//	{
+			//		var neighbour = edge.Key;
+			//		var weight = edge.Value;
+			//		var dist = node.Distance + weight;
+			//		if (dist < neighbour.Distance)
+			//		{
+			//			neighbour.Distance = dist;
+			//		}
+			//	}
+			//	node.Visited = true;
+			//	if (node == exit)
+			//		break;
+			//	node = graph.Vertices.Where(v => !v.Visited).OrderBy(x => x.Distance).FirstOrDefault();
+			//}
+
+			//return exit.Distance;
 
 		private static int ShortestPath(Maze maze, Func<Maze, Point, Point> stepOnto)
 		{
@@ -112,15 +271,20 @@ namespace AdventOfCode2019.Day20
 					Console.WriteLine($"At {v.Pos} with edges {string.Join(" ", v.Edges.Select(e => $"{e.Value}->{e.Key.Pos}"))}");
 				}
 			}
+			public Graph Inner { get; set; }
+			public Graph Outer { get; set; }
 		}
 
+		[DebuggerDisplay("{ToString()}")]
 		internal class Vertex
 		{
 			public Vertex(Point pos) { Pos = pos; }
 			public Point Pos { get; private set; }
 			public bool Visited { get; set; }
+			public string PortalName { get; set; }
 			public int Distance { get; set; }
 			public Dictionary<Vertex,int> Edges { get; set;  } = new Dictionary<Vertex, int>();
+			public override string ToString() => $"{Pos} visited={Visited} edges={string.Join(" ", Edges.Keys.Select(e => $"{e.Pos}/{e.Visited}"))}";
 		}
 
 		////internal class Edge
@@ -151,14 +315,14 @@ namespace AdventOfCode2019.Day20
 			BuildGraph(start, maze.Entry.LookAround().First(p => map[p] == '.'));
 			//BuildGraph(graph.Vertices.First(), maze.Entry);
 
-			maze.Render(null, p =>
-			{
-				return
-					graph.Vertices.Any(v => v.Pos.Is(p)) ? 'X' :
-					walked[p] ? 'o' :
-					(char?)null;
-			});
-			graph.Render();
+			//maze.Render(null, p =>
+			//{
+			//	return
+			//		graph.Vertices.Any(v => v.Pos.Is(p)) ? 'X' :
+			//		walked[p] ? 'o' :
+			//		(char?)null;
+			//});
+			// graph.Render();
 			//Console.ReadKey();
 
 			return graph;
@@ -253,6 +417,82 @@ namespace AdventOfCode2019.Day20
 			}
 		}
 
+		private static Graph BuildSimpleGraph(Maze maze, Func<Maze, Point, Point> stepOnto)
+		{
+			var walked = new SparseMap<Vertex>();
+			var map = maze.Map;
+
+			var graph = new Graph();
+			graph.Vertices.Add(new Vertex(maze.Entry));
+			//graph.Vertices.Add(new Vertex(maze.Exit));
+
+			BuildSimpleGraph(graph.Vertices.First());
+
+			return graph;
+
+			void BuildSimpleGraph(Vertex node)
+			{
+				while (walked[node.Pos] == null)
+				{
+					walked[node.Pos] = node;
+					var positions = node.Pos
+						.LookAround()
+						.Select(p => new { Pos = p, Dest = stepOnto(maze, p)})
+						.Where(x => map[x.Dest] == '.')
+						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Edges.ContainsKey(node))
+						.ToList();
+
+					foreach (var p in positions.Where(x => walked[x.Dest] != null).ToList())
+					{
+						var existing = walked[p.Dest];
+						var portal = maze.Portals[p.Pos];
+						var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
+						var portalName = portal == null ? null : portal.Name;
+						node.PortalName = portalName;
+						existing.PortalName = portalName;
+						node.Edges[existing] = portalValue;
+						existing.Edges[node] = -portalValue;
+						positions.Remove(p);
+					}
+
+					switch (positions.Count())
+					{
+						case 0:
+							return;
+						case 1:
+							var p = positions.First();
+							var next = new Vertex(p.Dest);
+							graph.Vertices.Add(next);
+							var portal = maze.Portals[p.Pos];
+							var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
+							var portalName = portal == null ? null : portal.Name;
+							node.PortalName = portalName;
+							next.PortalName = portalName;
+							node.Edges[next] = portalValue;
+							next.Edges[node] = -portalValue;
+							node = next;
+							break;
+						default:
+							var forks = positions.Select(x =>
+							{
+								var fork = new Vertex(x.Dest);
+								graph.Vertices.Add(fork);
+
+								//node.Edges[fork] = 1;
+								//fork.Edges[node] = 1;
+								return fork;
+							}).ToList();
+							foreach (var fork in forks)
+							{
+								BuildSimpleGraph(fork);
+							}
+							return;
+					}
+				}
+			}
+		}
+
+
 		//internal class PlutonianMaze : Maze
 		//{
 
@@ -276,7 +516,7 @@ namespace AdventOfCode2019.Day20
 						p.Is(position) ? '@' :
 						p.Is(Entry) ?  '>' :
 						p.Is(Exit) ? '<' :
-						Portals[p] != null ? 'x' :
+						//Portals[p] != null ? 'x' :
 						overlay?.Invoke(p) ?? ch;
 				});
 				for (var i = 0; i < lines.Length; i++)
@@ -289,8 +529,9 @@ namespace AdventOfCode2019.Day20
 
 		internal class Portal
 		{
+			public string Name { get; set; }
 			public Point Pos { get; set; }
-			public bool Outer { get; set; }
+			public bool IsDownward { get; set; }
 		}
 
 		private static Maze ReadMaze(string filename)
@@ -360,15 +601,20 @@ namespace AdventOfCode2019.Day20
 				var p2 = pair.Value[1];
 				portals[p1.Item1] = new Portal
 				{
+					Name = pair.Key,
 					Pos = p2.Item2,
-					Outer = IsOuterPortal(p2.Item2)
+					IsDownward = !IsOuterPortal(p1.Item1)
 				};
 				portals[p2.Item1] = new Portal
 				{
+					Name = pair.Key,
 					Pos = p1.Item2,
-					Outer = IsOuterPortal(p1.Item2)
+					IsDownward = !IsOuterPortal(p2.Item1)
 				};
 			}
+
+			map[portalsByName["AA"].First().Item1] = '#';
+			map[portalsByName["ZZ"].First().Item1] = '#';
 
 			return new Maze
 			{
