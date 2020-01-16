@@ -16,9 +16,9 @@ namespace AdventOfCode2019.Day08
 		private static void Puzzle1And2()
 		{
 			var imagedata = File.ReadAllText("Day08/input.txt");
-
 			const int width = 25;
 			const int height = 6;
+
 			const int size = width * height;
 
 			// Divide raw imagedata into the individual layers

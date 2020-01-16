@@ -17,8 +17,8 @@ namespace AdventOfCode2019.Day10
 		private static void Puzzle1()
 		{
 			var asteroidmap = File.ReadAllLines("Day10/input.txt");
-			var (stationX, stationY, detectableAsteroids) = MaxDetectable(asteroidmap);
-			Console.WriteLine($"Day 10 Puzzle 1: {detectableAsteroids} at {stationX},{stationY}");
+			var (_, _, detectableAsteroids) = MaxDetectable(asteroidmap);
+			Console.WriteLine($"Day 10 Puzzle 1: {detectableAsteroids}");
 			Debug.Assert(detectableAsteroids == 299);
 		}
 

@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using AdventOfCode2019.Helpers;
 using AdventOfCode2019.Intcode;
@@ -13,7 +12,7 @@ namespace AdventOfCode2019.Day23
 	{
 		public static void Run()
 		{
-			//Puzzle1();
+			Puzzle1();
 			Puzzle2();
 		}
 
@@ -30,6 +29,7 @@ namespace AdventOfCode2019.Day23
 				})
 				.ToDictionary(x => x.Address, x => x.Engine);
 
+			var result = 0L;
 			engines
 				.AsParallel()
 				.WithDegreeOfParallelism(N)
@@ -43,12 +43,12 @@ namespace AdventOfCode2019.Day23
 							{
 								engine.Input.Add(-1);
 								//Console.WriteLine($"Engine {e.Key}: no awaiting input");
-								System.Threading.Thread.Sleep(100);
+								System.Threading.Thread.Sleep(10);
 							}
 							else
 							{
 								var val = engine.Input.ToList().Last();
-								Console.WriteLine($"Engine {e.Key}: input {val}");
+								//Console.WriteLine($"Engine {e.Key}: input {val}");
 							}
 						})
 						.OnOutput(engine =>
@@ -59,11 +59,16 @@ namespace AdventOfCode2019.Day23
 								var addr = receiveBuffer[0];
 								var x = receiveBuffer[1];
 								var y = receiveBuffer[2];
-								Console.WriteLine($"Engine {e.Key}: send packet {x},{y} to {addr}");
+								//Console.WriteLine($"Engine {e.Key}: send packet {x},{y} to {addr}");
 								if (addr == 255)
 								{
-									Console.WriteLine($"Engine {e.Key}: send packet {x},{y} to {addr}");
-									Console.ReadLine();
+									//Console.WriteLine($"Engine {e.Key}: send packet {x},{y} to {addr}");
+									result = y;
+									foreach (var ee in engines.Values)
+									{
+										ee.Halt = true;
+									}
+									return;
 								}
 								receiveBuffer.Clear();
 								engines[(int)addr].WithInput(x, y);
@@ -74,6 +79,9 @@ namespace AdventOfCode2019.Day23
 				})
 				.AsSequential()
 				.ToList();
+
+			Console.WriteLine($"Day 23 Puzzle 1: {result}");
+			Debug.Assert(result == 22151);
 		}
 
 		private static void Puzzle2()
@@ -96,6 +104,7 @@ namespace AdventOfCode2019.Day23
 			Point lastPacket = null;
 			//var nat = new BlockingCollection();
 
+			var result = 0;
 			engines
 				.AsParallel()
 				.WithDegreeOfParallelism(engines.Count)
@@ -114,7 +123,11 @@ namespace AdventOfCode2019.Day23
 //								Console.WriteLine($"All is idle: send {lastPacket} to 0");
 								if (last?.Y == lastPacket.Y)
 								{
-									Console.WriteLine($"######################## puazle 2: {last.Y}");
+									result = last.Y;
+									foreach (var ee in engines.Values.Where(e => e != null))
+									{
+										ee.Halt = true;
+									}
 									break;
 								}
 								var x = lastPacket.X;
@@ -171,9 +184,10 @@ namespace AdventOfCode2019.Day23
 				})
 				.AsSequential()
 				.ToList();
+
+			Console.WriteLine($"Day 23 Puzzle 2: {result}");
+			Debug.Assert(result == 17001);
 		}
-
 	}
-
 }
 

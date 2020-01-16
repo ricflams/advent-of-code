@@ -20,12 +20,13 @@ namespace AdventOfCode2019.Day02
 				.WithMemoryValueAt(2, 2)
 				.Execute()
 				.Memory[0];
-			Console.WriteLine($"Day  2 Puzzle 1: mem[0] = {result}");
+			Console.WriteLine($"Day  2 Puzzle 1: {result}");
 			Debug.Assert(result == 5866714);
 		}
 
 		private static void Puzzle2()
 		{
+			var desiredOutput = 19690720;
 			var engine = new Intcode.Engine()
 				.WithMemoryFromFile("Day02/input.txt");
 
@@ -43,7 +44,7 @@ namespace AdventOfCode2019.Day02
 						.WithMemoryValueAt(2, op2)
 						.Execute()
 						.Memory[0];
-					if (output == 19690720)
+					if (desiredOutput == 19690720)
 					{
 						result = op1 * 100 + op2;
 						break;

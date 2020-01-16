@@ -62,7 +62,7 @@ namespace AdventOfCode2019.Day18
 
 			//PrintGraph(vertices);
 
-			Console.WriteLine($"Day 17 Puzzle 2: {distance}");
+			Console.WriteLine($"Day 18 Puzzle 2: {distance}");
 			Debug.Assert(distance == 1538);
 		}
 
