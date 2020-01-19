@@ -19,7 +19,7 @@ namespace AdventOfCode2019.Day21
 
 		private static void Puzzle1()
 		{
-			// My first successful attempt
+			// My first successful attempt, so let's keep that
 			var program = @"
 				NOT A T
 				NOT T T
@@ -39,8 +39,7 @@ namespace AdventOfCode2019.Day21
 			//	AND D J
 			//	WALK
 			//".MultiLine();
-
-			// Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
+			//Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
 			var hullDamage = FindHullDamage(program);
 			Console.WriteLine($"Day 21 Puzzle 1: {hullDamage}");
@@ -50,7 +49,7 @@ namespace AdventOfCode2019.Day21
 		private static void Puzzle2()
 		{
 			//// Solve by brute force
-			//for (var i = 10; i > 6; i--)
+			//for (var i = 12; i > 6; i--)
 			//{
 			//	var sw = Stopwatch.StartNew();
 			//	Console.Write($"Program of length {i} ...");
@@ -133,10 +132,11 @@ namespace AdventOfCode2019.Day21
 			}
 		}
 
+		private static long[] _springdroidMemory = Engine.ReadMemoryFromFile("Day21/input.txt");
 		private static long[] ExecuteSpringdroidProgram(string program)
 		{
 			return new Engine()
-				.WithMemoryFromFile("Day21/input.txt")
+				.WithMemory(_springdroidMemory)
 				.WithInput(program.Select(c => (long)c).ToArray())
 				.Execute()
 				.Output.TakeAll().ToArray();

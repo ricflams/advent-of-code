@@ -18,13 +18,14 @@ namespace AdventOfCode2019.Day23
 
 		private static void Puzzle1()
 		{
+			var memory = Engine.ReadMemoryFromFile("Day23/input.txt");
 			const int N = 50;
 			var engines = Enumerable.Range(0, N)
 				.Select(i => new
 				{
 					Address = i,
 					Engine = new Engine()
-						.WithMemoryFromFile("Day23/input.txt")
+						.WithMemory(memory)
 						.WithInput(i)
 				})
 				.ToDictionary(x => x.Address, x => x.Engine);
@@ -86,13 +87,14 @@ namespace AdventOfCode2019.Day23
 
 		private static void Puzzle2()
 		{
+			var memory = Engine.ReadMemoryFromFile("Day23/input.txt");
 			const int N = 50;
 			var engines = Enumerable.Range(0, N)
 				.Select(i => new
 				{
 					Address = i,
 					Engine = new Engine()
-						.WithMemoryFromFile("Day23/input.txt")
+						.WithMemory(memory)
 						.WithInput(i)
 				})
 				.ToDictionary(x => x.Address, x => x.Engine);

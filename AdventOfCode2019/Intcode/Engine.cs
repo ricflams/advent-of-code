@@ -8,100 +8,28 @@ namespace AdventOfCode2019.Intcode
 {
 	internal class Engine
 	{
-		private static readonly IDictionary<int, Instruction> Instructions = new Dictionary<int, Instruction>
-		{
-			{
-				1, new Instruction.WithOpOpPos { Name = "add", Execute = (engine, op1, op2, dest) =>
-					{
-						engine.WriteMemory(dest, op1 + op2);
-					}
-				}
-			},
-			{
-				2, new Instruction.WithOpOpPos { Name = "multiply", Execute = (engine, op1, op2, dest) =>
-					{
-						engine.WriteMemory(dest, op1 * op2);
-					}
-				}
-			},
-			{
-				3, new Instruction.WithPos { Name = "get", Execute = (engine, dest) =>
-					{
-						engine.onInput?.Invoke(engine);
-						engine.WriteMemory(dest, engine.Input.Take());
-					}
-				}
-			},
-			{
-				4, new Instruction.WithOp { Name = "put", Execute = (engine, op) =>
-					{
-						engine.Output.Add(op);
-						engine.onOutput?.Invoke(engine);
-					}
-				}
-			},
-			{
-				5, new Instruction.WithOpOp { Name = "jump-if-true", Execute = (engine, op1, op2) =>
-					{
-						if (op1 != 0)
-						{
-							engine.Pc = op2;
-						}
-					}
-				}
-			},
-			{
-				6, new Instruction.WithOpOp { Name = "jump-if-false", Execute = (engine, op1, op2) =>
-					{
-						if (op1 == 0)
-						{
-							engine.Pc = op2;
-						}
-					}
-				}
-			},
-			{
-				7, new Instruction.WithOpOpPos { Name = "less-than", Execute = (engine, op1, op2, dest) =>
-					{
-						engine.WriteMemory(dest, op1 < op2 ? 1 : 0);
-					}
-				}
-			},
-			{
-				8, new Instruction.WithOpOpPos { Name = "equals", Execute = (engine, op1, op2, dest) =>
-					{
-						engine.WriteMemory(dest, op1 == op2 ? 1 : 0);
-					}
-				}
-			},
-			{
-				9, new Instruction.WithOp { Name = "set-relbase", Execute = (engine, op1) =>
-					{
-						engine.RelativeBase += op1;
-					}
-				}
-			},
-			{
-				99,
-				new Instruction.WithNoOp { Name = "halt", Execute = engine =>
-					{
-						engine.Halt = true;
-					}
-				}
-			}
-		};
+		private long[] _staticMemory = new long[] { 99 };
+		private readonly Dictionary<long, long> _dynamicMemory = new Dictionary<long, long>();
+		private long _relativeBase;
+		private long _pc;
 
 		public BlockingCollection<long> Input { get; set; } = new BlockingCollection<long>();
 		public BlockingCollection<long> Output { get; set; } = new BlockingCollection<long>();
-		public Dictionary<long, long> Memory = new Dictionary<long, long> { { 0, 99 } };
+		public bool Halt { get; set; }
 
 		public Engine WithMemoryFromFile(string filename)
+		{
+			var memory = ReadMemoryFromFile(filename);
+			return WithMemory(memory);
+		}
+
+		public static long[] ReadMemoryFromFile(string filename)
 		{
 			var memory = File.ReadAllText(filename)
 				.Split(',', StringSplitOptions.RemoveEmptyEntries)
 				.Select(long.Parse)
 				.ToArray();
-			return WithMemory(memory);
+			return memory;
 		}
 
 		public Engine WithMemory(int[] memory)
@@ -111,17 +39,14 @@ namespace AdventOfCode2019.Intcode
 
 		public Engine WithMemory(long[] memory)
 		{
-			Memory.Clear();
-			for (var i = 0; i < memory.Length; i++)
-			{
-				Memory[i] = memory[i];
-			}
+			_staticMemory = memory.ToArray();
+			_dynamicMemory.Clear();
 			return this;
 		}
 
 		public Engine WithMemoryValueAt(long address, long value)
 		{
-			Memory[address] = value;
+			WriteMemory(address, value);
 			return this;
 		}
 
@@ -148,78 +73,128 @@ namespace AdventOfCode2019.Intcode
 			return this;
 		}
 
-		internal bool Halt;
-		internal long RelativeBase;
-		internal long Pc;
+		public long ReadMemory(long address)
+		{
+			if (address < _staticMemory.Length)
+			{
+				return _staticMemory[address];
+			}
+			return _dynamicMemory.TryGetValue(address, out var value) ? value : 0;
+		}
+
+		private void WriteMemory(long address, long value)
+		{
+			if (address < _staticMemory.Length)
+			{
+				_staticMemory[address] = value;
+				return;
+			}
+			_dynamicMemory[address] = value;
+		}
 
 		public Engine Execute()
 		{
 			Halt = false;
-			RelativeBase = 0;
-			Pc = 0;
+			_relativeBase = 0;
+			_pc = 0;
 
-			int mode;
 			while (!Halt)
 			{
-				var opcode = (int)ReadMemory(Pc++);
-				var instruction = Instructions[opcode % 100];
-				mode = opcode / 10;
-				switch (instruction)
+				var opcode = (int)ReadMemory(_pc++);
+				var mode1 = (opcode / 100) % 10;
+				var mode2 = (opcode / 1000) % 10;
+				var mode3 = (opcode / 10000) % 10;
+				switch (opcode % 100)
 				{
-					case Instruction.WithNoOp op:
-						op.Execute(this);
+					case 1:
+						{
+							var (op1, op2, dest) = (Operand(mode1), Operand(mode2), Position(mode3));
+							WriteMemory(dest, op1 + op2);
+						}
 						break;
-					case Instruction.WithOp op:
-						op.Execute(this, GetOperand());
+					case 2:
+						{
+							var (op1, op2, dest) = (Operand(mode1), Operand(mode2), Position(mode3));
+							WriteMemory(dest, op1 * op2);
+						}
 						break;
-					case Instruction.WithOpOp op:
-						op.Execute(this, GetOperand(), GetOperand());
+					case 3:
+						{
+							var dest = Position(mode1);
+							onInput?.Invoke(this);
+							WriteMemory(dest, Input.Take());
+						}
 						break;
-					case Instruction.WithPos op:
-						op.Execute(this, GetPosition());
+					case 4:
+						{
+							var op = Operand(mode1);
+							Output.Add(op);
+							onOutput?.Invoke(this);
+						}
 						break;
-					case Instruction.WithOpOpPos op:
-						op.Execute(this, GetOperand(), GetOperand(), GetPosition());
+					case 5:
+						{
+							var (op1, op2) = (Operand(mode1), Operand(mode2));
+							if (op1 != 0)
+							{
+								_pc = op2;
+							}
+						}
+						break;
+					case 6:
+						{
+							var (op1, op2) = (Operand(mode1), Operand(mode2));
+							if (op1 == 0)
+							{
+								_pc = op2;
+							}
+						}
+						break;
+					case 7:
+						{
+							var (op1, op2, dest) = (Operand(mode1), Operand(mode2), Position(mode3));
+							WriteMemory(dest, op1 < op2 ? 1 : 0);
+						}
+						break;
+					case 8:
+						{
+							var (op1, op2, dest) = (Operand(mode1), Operand(mode2), Position(mode3));
+							WriteMemory(dest, op1 == op2 ? 1 : 0);
+						}
+						break;
+					case 9:
+						{
+							var op1 = Operand(mode1);
+							_relativeBase += op1;
+						}
+						break;
+					case 99:
+						{
+							Halt = true;
+						}
 						break;
 				}
 			}
 			return this;
 
-			int GetOpMode() => (mode /= 10) % 10;
-
-			long GetOperand()
+			long Operand(int mode)
 			{
-				switch (GetOpMode())
+				switch (mode)
 				{
-					case 1: return ReadMemory(Pc++);
-					case 2: return ReadMemory(RelativeBase + ReadMemory(Pc++));
-					default: return ReadMemory(ReadMemory(Pc++));
+					case 1: return ReadMemory(_pc++);
+					case 2: return ReadMemory(_relativeBase + ReadMemory(_pc++));
+					default: return ReadMemory(ReadMemory(_pc++));
 				}
 			}
 
-			long GetPosition()
+			long Position(int mode)
 			{
-				switch (GetOpMode())
+				switch (mode)
 				{
-					case 2: return RelativeBase + ReadMemory(Pc++);
-					default: return ReadMemory(Pc++);
+					case 2: return _relativeBase + ReadMemory(_pc++);
+					default: return ReadMemory(_pc++);
 				}
 			}
 		}
-
-		private long ReadMemory(long address)
-		{
-			if (!Memory.ContainsKey(address))
-			{
-				Memory[address] = 0;
-			}
-			return Memory[address];
-		}
-
-		private void WriteMemory(long address, long value)
-		{
-			Memory[address] = value;
-		}
-
 	}
 }

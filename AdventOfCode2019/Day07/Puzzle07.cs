@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Diagnostics;
+using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day07
 {
@@ -15,15 +16,16 @@ namespace AdventOfCode2019.Day07
 
 		private static void Puzzle1()
 		{
+			var memory = Engine.ReadMemoryFromFile("Day07/input.txt");
 			var maxSignal = MathHelper.Permute(Enumerable.Range(0, 5))
 				.Max(phases =>
 				{
 					var signal = 0L;
 					foreach (var phase in phases)
 					{
-						var engine = new Intcode.Engine();
+						var engine = new Engine();
 						engine
-							.WithMemoryFromFile("Day07/input.txt")
+							.WithMemory(memory)
 							.WithInput(phase, signal)
 							.Execute();
 						signal = engine.Output.Take();
@@ -36,10 +38,11 @@ namespace AdventOfCode2019.Day07
 
 		private static void Puzzle2()
 		{
+			var memory = Engine.ReadMemoryFromFile("Day07/input.txt");
 			var maxSignal = MathHelper.Permute(Enumerable.Range(5, 5))
 				.Max(phases =>
 				{
-					var engines = phases.Select(phase => new Intcode.Engine().WithMemoryFromFile("Day07/input.txt").WithInput(phase)).ToList();
+					var engines = phases.Select(phase => new Engine().WithMemory(memory).WithInput(phase)).ToList();
 					var n = engines.Count;
 					for (var i = 0; i < n; i++)
 					{

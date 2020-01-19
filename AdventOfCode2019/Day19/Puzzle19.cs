@@ -121,6 +121,7 @@ namespace AdventOfCode2019.Day19
 	internal class Beam
 	{
 		private static readonly Engine _engine = new Engine();
+		private static readonly long[] _memory = Engine.ReadMemoryFromFile("Day19/input.txt");
 		private readonly CharMap _cache = new CharMap();
 
 		public bool InBeam(Point pos)
@@ -128,7 +129,7 @@ namespace AdventOfCode2019.Day19
 			if (_cache[pos] == 0)
 			{
 				_cache[pos] = _engine
-					.WithMemoryFromFile("Day19/input.txt")
+					.WithMemory(_memory)
 					.WithInput(pos.X, pos.Y)
 					.Execute()
 					.Output

@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Diagnostics;
+using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day11
 {
@@ -39,7 +40,7 @@ namespace AdventOfCode2019.Day11
 			var pos = Point.From(0, 0);
 			var dir = 0;
 			var step = 0;
-			new Intcode.Engine()
+			new Engine()
 				.WithMemoryFromFile("Day11/input.txt")
 				.WithInput(color)
 				.OnOutput(engine =>

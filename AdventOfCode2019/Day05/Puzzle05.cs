@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Diagnostics;
+using AdventOfCode2019.Intcode;
 
 namespace AdventOfCode2019.Day05
 {
@@ -15,7 +16,7 @@ namespace AdventOfCode2019.Day05
 
 		private static void Puzzle1()
 		{
-			var result = new Intcode.Engine()
+			var result = new Engine()
 				.WithMemoryFromFile("Day05/input.txt")
 				.WithInput(1)
 				.Execute()
@@ -28,7 +29,7 @@ namespace AdventOfCode2019.Day05
 
 		private static void Puzzle2()
 		{
-			var result = new Intcode.Engine()
+			var result = new Engine()
 				.WithMemoryFromFile("Day05/input.txt")
 				.WithInput(5)
 				.Execute()

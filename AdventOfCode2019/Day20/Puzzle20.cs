@@ -121,7 +121,7 @@ namespace AdventOfCode2019.Day20
 
 		private static int FindMinimumDistanceBfsPlutonian(Maze maze, int maxDepth)
 		{
-			Console.WriteLine($"Find min dist for depth={maxDepth}");
+			//Console.WriteLine($"Find min dist for depth={maxDepth}");
 
 			var topgraph = BuildSimpleGraph(maze, StepOnto);
 			//PrintGraph(topgraph);
