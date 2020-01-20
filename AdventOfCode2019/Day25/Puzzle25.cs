@@ -24,7 +24,7 @@ namespace AdventOfCode2019.Day25
 					.WithController(new AutoplayController())
 					.Run()
 					.Password;
-			Console.WriteLine($"Day 24 Puzzle 1: {password}");
+			Console.WriteLine($"Day 25 Puzzle 1: {password}");
 			Debug.Assert(password == 33624080);
 		}
 	}
