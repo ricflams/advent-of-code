@@ -46,12 +46,7 @@ namespace AdventOfCode2019.Day20
 
 		private static Point StepOnto(Maze maze, Point p)
 		{
-			var portal = maze.Portals[p];
-			if (portal != null)
-			{
-				////Console.WriteLine($"Seeing a portal at {maze.Portals[portal]}");
-			}
-			return portal?.Pos ?? p;
+			return maze.Portals[p]?.Pos ?? p;
 		}
 
 		private static List<Maze> _mazes = new List<Maze>();
