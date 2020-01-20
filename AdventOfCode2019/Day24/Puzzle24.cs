@@ -72,13 +72,6 @@ namespace AdventOfCode2019.Day24
 			return val;
 		}
 
-
-		class Level
-		{
-			public Level Outer { get; set; }
-			public CharMap Map;
-		}
-
 		private static void Puzzle2()
 		{
 			var map = new CharMap();
@@ -98,10 +91,8 @@ namespace AdventOfCode2019.Day24
 			{
 				map
 			};
-			//levels.First().ConsoleWrite(false);
 
 			var center = Point.From(2, 2);
-			var lowest = 0;
 			for (var t = 0; t < 200; t++)
 			{
 				if (levels.First().AllPoints(c => c == '#').Any(p => p.X == 0 || p.Y == 0 || p.X == width - 1 || p.Y == height - 1))
@@ -115,7 +106,6 @@ namespace AdventOfCode2019.Day24
 						}
 					}
 					levels.Insert(0, outer);
-					lowest--;
 				}
 				var lowestlevel = levels.Last();
 				if (center.LookAround().Any(p => lowestlevel[p] == '#'))
@@ -138,10 +128,11 @@ namespace AdventOfCode2019.Day24
 					var outer = i > 0 ? levels[i - 1] : null;
 					var level = levels[i];
 					var inner = i < levels.Count() - 1 ? levels[i + 1] : null;
+					var innerBugs = inner?.AllPoints(c => c == '#').ToArray();
 					var nextmap = new CharMap();
-					foreach (var pos in level.AllPoints().ToArray().Where(p => !p.Is(center))) // ToArray should not be needed?
+					foreach (var pos in level.AllPoints().Where(p => !p.Is(center))) // ToArray should not be needed?
 					{
-						var n = Extensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, inner, pos, d)).Sum();
+						var n = Extensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
 						var isOnBug = level[pos] == '#';
 						nextmap[pos] = isOnBug
 							? n == 1 ? '#' : '.'
@@ -170,7 +161,7 @@ namespace AdventOfCode2019.Day24
 			Console.WriteLine($"Day 24 Puzzle 2: {bugs}");
 			Debug.Assert(bugs == 1951);
 
-			int BugsInDirection(CharMap outer, CharMap level, CharMap inner, Point pos0, Direction direction)
+			int BugsInDirection(CharMap outer, CharMap level, Point[] innerBugs, Point pos0, Direction direction)
 			{
 				var pos = pos0.Move(direction);
 				if (pos.X < 0)
@@ -193,10 +184,10 @@ namespace AdventOfCode2019.Day24
 				{
 					switch (direction)
 					{
-						case Direction.Down: return inner?.AllPoints(c => c == '#').Count(p => p.Y == 0) ?? 0;
-						case Direction.Left: return inner?.AllPoints(c => c == '#').Count(p => p.X == width - 1) ?? 0;
-						case Direction.Up: return inner?.AllPoints(c => c == '#').Count(p => p.Y == height - 1) ?? 0;
-						case Direction.Right: return inner?.AllPoints(c => c == '#').Count(p => p.X == 0) ?? 0;
+						case Direction.Down: return innerBugs?.Count(p => p.Y == 0) ?? 0;
+						case Direction.Left: return innerBugs?.Count(p => p.X == width - 1) ?? 0;
+						case Direction.Up: return innerBugs?.Count(p => p.Y == height - 1) ?? 0;
+						case Direction.Right: return innerBugs?.Count(p => p.X == 0) ?? 0;
 					}
 				}
 				return level[pos] == '#' ? 1 : 0;
