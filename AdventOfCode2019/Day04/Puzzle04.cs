@@ -9,18 +9,22 @@ namespace AdventOfCode2019.Day04
 	{
 		public static void Run()
 		{
-			Puzzle1And2();
+			Puzzle1();
+			Puzzle2();
 		}
 
-		private static void Puzzle1And2()
+		private static void Puzzle1()
 		{
-			var matches1 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
-			Console.WriteLine($"Day  4 Puzzle 1: {matches1}");
-			Debug.Assert(matches1 == 460);
+			var matches = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
+			Console.WriteLine($"Day  4 Puzzle 1: {matches}");
+			Debug.Assert(matches == 460);
+		}
 
-			var matches2 = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq == 2));
-			Console.WriteLine($"Day  4 Puzzle 2: {matches2}");
-			Debug.Assert(matches2 == 290);
+		private static void Puzzle2()
+		{
+			var matches = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq == 2));
+			Console.WriteLine($"Day  4 Puzzle 2: {matches}");
+			Debug.Assert(matches == 290);
 		}
 
 		private static IEnumerable<int> SequenceLengths(IReadOnlyList<int> value)
