@@ -92,13 +92,36 @@ namespace AdventOfCode2019.Intcode
 			_dynamicMemory[address] = value;
 		}
 
+		public Engine Suspend()
+		{
+			IsSuspended = true;
+			return this;
+		}
+
+		public Engine Resume()
+		{
+			if (IsSuspended)
+			{
+				IsSuspended = false;
+				return DoExecute();
+			}
+			return this;
+		}
+
+		public bool IsSuspended { get; private set; }
+
 		public Engine Execute()
 		{
 			Halt = false;
+			IsSuspended = false;
 			_relativeBase = 0;
 			_pc = 0;
+			return DoExecute();
+		}
 
-			while (!Halt)
+		private Engine DoExecute()
+		{
+			while (!Halt && !IsSuspended)
 			{
 				var opcode = (int)ReadMemory(_pc++);
 				var mode1 = (opcode / 100) % 10;
