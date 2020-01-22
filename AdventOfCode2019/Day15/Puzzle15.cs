@@ -104,7 +104,7 @@ namespace AdventOfCode2019.Day15
 			char MapOverlay(Point p, char val)
 			{
 				var droid = movements.Current?.Position;
-				return p.Is(droid) ? 'D' : val;
+				return p == droid ? 'D' : val;
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace AdventOfCode2019.Day15
 
 			private int DirectionTo(Point p1, Point p2)
 			{
-				return AllDirections().First(d => MoveFrom(p1, d).Is(p2));
+				return AllDirections().First(d => MoveFrom(p1, d) == p2);
 			}
 
 			public int NextProposal(CharMap map)
@@ -168,7 +168,7 @@ namespace AdventOfCode2019.Day15
 						// Dead end, so backtrack
 						_pendingMove = null;
 						var pos = Current.Position;
-						if (pos.Is(StartPosition))
+						if (pos == StartPosition)
 						{
 							return MoveNone; // We're done
 						}

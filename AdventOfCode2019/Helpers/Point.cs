@@ -17,9 +17,12 @@ namespace AdventOfCode2019.Helpers
 
 		static public Point From(int x, int y) => new Point(x, y);
 
+		public static bool operator ==(Point p1, Point p2) => (object)p1 == null ? (object)p2 == null : p1.Equals(p2);
+		public static bool operator !=(Point p1, Point p2) => !(p1 == p2);
+		public override bool Equals(object p) => Equals(p as Point);
+		public bool Equals(Point p) => X == p?.X && Y == p?.Y;
+		public override int GetHashCode() => X * 397 ^ Y;
 		public override string ToString() => $"({X},{Y})";
-
-		public bool Is(Point p) => X == p?.X && Y == p?.Y;
 
 		public Point Up => new Point(X, Y - 1);
 		public Point Right => new Point(X + 1, Y);

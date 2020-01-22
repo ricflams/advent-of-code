@@ -130,7 +130,7 @@ namespace AdventOfCode2019.Day24
 					var inner = i < levels.Count() - 1 ? levels[i + 1] : null;
 					var innerBugs = inner?.AllPoints(c => c == '#').ToArray();
 					var nextmap = new CharMap();
-					foreach (var pos in level.AllPoints().Where(p => !p.Is(center))) // ToArray should not be needed?
+					foreach (var pos in level.AllPoints().Where(p => p != center)) // ToArray should not be needed?
 					{
 						var n = Extensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
 						var isOnBug = level[pos] == '#';
@@ -180,7 +180,7 @@ namespace AdventOfCode2019.Day24
 				{
 					return outer?[center.Down] == '#' ? 1 : 0;
 				}
-				if (pos.Is(center))
+				if (pos == center)
 				{
 					switch (direction)
 					{
