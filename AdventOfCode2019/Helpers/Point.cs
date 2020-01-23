@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace AdventOfCode2019.Helpers
 {
 	[System.Diagnostics.DebuggerDisplay("{ToString()}")]
-	internal class Point
+	public class Point
     {
 		public int X { get; private set; }
 		public int Y { get; private set; }

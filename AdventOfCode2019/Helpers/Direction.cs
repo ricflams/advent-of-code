@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2019.Helpers
 {
-    internal enum Direction
+    public enum Direction
     {
 		Up,
 		Right,

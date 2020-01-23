@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode2019.Helpers
 {
-	internal class SparseMap<T>
+	public class SparseMap<T>
 	{
 		private readonly Dictionary<int, SparseMapColumn> _column = new Dictionary<int, SparseMapColumn>();
 		private readonly T _defaultValue;
@@ -27,6 +27,11 @@ namespace AdventOfCode2019.Helpers
 					}
 				}
 			}
+		}
+
+		public Point FirstOrDefault(Func<T, bool> predicate)
+		{
+			return AllPoints(predicate).FirstOrDefault();
 		}
 
 		public T this[Point pos]

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AdventOfCode2019.Helpers
 {
-	internal class CharMap : SparseMap<char>
+	public class CharMap : SparseMap<char>
 	{
 		public CharMap(char defaultValue = default(char))
 			: base(defaultValue)
