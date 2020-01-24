@@ -11,8 +11,12 @@ namespace AdventOfCode2019.Day18
 	{
 		public static void Run()
 		{
+			var sw = Stopwatch.StartNew();
 			Puzzle1();
+			Console.WriteLine("Elapsed: " + sw.Elapsed);
+			sw.Restart();
 			Puzzle2();
+			Console.WriteLine("Elapsed: " + sw.Elapsed);
 		}
 
 		private static void Puzzle1()
@@ -39,6 +43,14 @@ namespace AdventOfCode2019.Day18
 			//Debug.Assert(steps5 == 81);
 
 			//Console.WriteLine();
+
+			//var vaultMaze = new VaultMaze("Day18/input.txt");
+			//var graph = VaultGraph.BuildWeightedGraphFromMaze(vaultMaze);
+			////PruneGraph(graph.Vertices);
+			//var distance2 = FindMinimumDistanceDfs(graph);
+			//Debug.Assert(distance2 == 3216);
+
+
 			var steps = ShortestPath(ReadMap("Day18/input.txt"));
 			Console.WriteLine($"Day 18 Puzzle 1: {steps}");
 			Debug.Assert(steps == 3216);
@@ -89,6 +101,36 @@ namespace AdventOfCode2019.Day18
 			public override string ToString() => $"{Pos} '{Value}'";
 		}
 
+		internal class VaultGraph : Graph<VaultVertex>
+		{
+		}
+
+		internal class VaultMaze : Maze
+		{
+			public VaultMaze(string filename)
+			{
+				Map = ReadMapFromFile(filename); // TODO: assigning Map this way is a bit dodgy
+				Entry = Map.FirstOrDefault(ch => ch == '@');
+			}
+		}
+
+		internal class VaultVertex
+		{
+			public VaultVertex(char value)
+			{
+				ChValue = value;
+				IsDoor = char.IsUpper(ChValue);
+				IsKey = char.IsLower(ChValue);
+				Key = 1U << (Convert.ToInt32(char.ToLower(ChValue)) - Convert.ToInt32('a'));
+			}
+			public char ChValue { get; }
+			public bool IsDoor { get; }
+			public bool IsKey { get; }
+			public uint Key { get; }
+			public bool IsPassableWith(uint keys) => !IsDoor || (Key & keys) != 0;
+			public override string ToString() => $"'{ChValue}'";
+		}
+
 		private static int ShortestPath(CharMap map)
 		{
 			var vertices = BuildGraph(map);
@@ -109,11 +151,11 @@ namespace AdventOfCode2019.Day18
 		{
 			const int Infinite = 10000000;
 			const uint NoKey = 1U << 31;
-			var allKeyMask = (1U << vertices.Count(v => v.IsKey)) - 1;
+			var allKeyMask = ((1U << vertices.Count(v => v.IsKey)) - 1) | NoKey;
 
 			var root = vertices.First();
-			var visited = vertices.ToDictionary(x => x, x => new HashSet<uint>());
-			visited[root].Add(NoKey);
+			var visited = vertices.ToDictionary(x => x.Pos, x => new HashSet<uint>());
+			visited[root.Pos].Add(NoKey);
 
 			var queue = new Queue<(Vertex, uint, int)>();
 			queue.Enqueue((root, NoKey, 0));
@@ -122,17 +164,17 @@ namespace AdventOfCode2019.Day18
 				var (node, initialKeys, distance) = queue.Dequeue();
 
 				var keys = initialKeys | (node.IsKey ? node.Key : 0);
-				if (keys == (allKeyMask | NoKey))
+				if (keys == allKeyMask)
 				{
 					return distance;
 				}
 
 				var nodes = node.Edges.Keys
-					.Where(n => !visited[n].Contains(keys) && n.IsPassableWith(keys))
+					.Where(n => !visited[n.Pos].Contains(keys) && n.IsPassableWith(keys))
 					.ToList();
 				foreach (var n in nodes)
 				{
-					visited[n].Add(keys);
+					visited[n.Pos].Add(keys);
 					queue.Enqueue((n, keys, distance + 1));
 				}
 			}
@@ -143,13 +185,13 @@ namespace AdventOfCode2019.Day18
 		{
 			const int Infinite = 10000000;
 			const uint NoKey = 1U << 31;
-			var allKeyMask = (1U << graphs.Sum(g => g.Count(v => v.IsKey))) - 1;
+			var allKeyMask = ((1U << graphs.Sum(g => g.Count(v => v.IsKey))) - 1) | NoKey;
 
 			var roots = graphs.Select(g => g.First()).ToList();
-			var visited = graphs.SelectMany(x => x).ToDictionary(x => x, x => new HashSet<uint>());
+			var visited = graphs.SelectMany(x => x).ToDictionary(x => x.Pos, x => new HashSet<uint>());
 			foreach (var root in roots)
 			{
-				visited[root].Add(NoKey);
+				visited[root.Pos].Add(NoKey);
 			}
 
 			var queue = new Queue<(List<Vertex>, uint, int)>();
@@ -158,8 +200,14 @@ namespace AdventOfCode2019.Day18
 			{
 				var (walks, initialKeys, distance) = queue.Dequeue();
 
-				var keys = initialKeys | (uint)(walks.Where(n => n.IsKey).Sum(n => n.Key)); // why no Sum(uint) ?;
-				if (keys == (allKeyMask | NoKey))
+				var keys = initialKeys;
+				foreach (var w in walks.Where(n => n.IsKey))
+				{
+					keys |= w.Key;
+				}
+				//var keys = initialKeys | (uint)(walks.Where(n => n.IsKey).Sum(n => n.Key)); // why no Sum(uint) ?;
+
+				if (keys == allKeyMask)
 				{
 					return distance;
 				}
@@ -167,11 +215,11 @@ namespace AdventOfCode2019.Day18
 				foreach (var walk in walks)
 				{
 					var nodes = walk.Edges.Keys
-						.Where(n => !visited[n].Contains(keys) && n.IsPassableWith(keys))
+						.Where(n => !visited[n.Pos].Contains(keys) && n.IsPassableWith(keys))
 						.ToList();
 					foreach (var n in nodes)
 					{
-						visited[n].Add(keys);
+						visited[n.Pos].Add(keys);
 						var walks2 = walks.Select(v => v == walk ? n : v).ToList();
 						queue.Enqueue((walks2, keys, distance + 1));
 					}
@@ -302,7 +350,7 @@ namespace AdventOfCode2019.Day18
 				var weight = 1;
 				if (walked[pos])
 				{
-					var node = vertices.FirstOrDefault(v => v != vertex && v.Pos.Is(pos));
+					var node = vertices.FirstOrDefault(v => v != vertex && v.Pos == pos);
 					if (node != null)
 					{
 						vertex.Edges[node] = weight;
@@ -312,11 +360,12 @@ namespace AdventOfCode2019.Day18
 				}
 				while (true)
 				{
+					var oldwalked = walked[pos];
 					walked[pos] = true;
 					var routes = pos.LookAround()
-						.Where(p => vertices.Any(v => v != vertex && v.Pos.Is(p)) || !walked[p] && map[p] != '#')
+						.Where(p => vertices.Any(v => v != vertex && v.Pos == p) || !walked[p] && map[p] != '#')
 						.ToList();
-					var fork = vertices.FirstOrDefault(v => v.Pos.Is(pos));
+					var fork = vertices.FirstOrDefault(v => v.Pos == pos);
 					if (fork != null)
 					{
 						if (vertex.Edges.ContainsKey(fork))
@@ -337,7 +386,7 @@ namespace AdventOfCode2019.Day18
 						return;
 					}
 
-					if (char.IsLetter(map[pos]))
+					if (routes.Count() > 1 || char.IsLetter(map[pos]))
 					{
 						// On key or door - make a node
 						var node = new Vertex(pos, map[pos]);
@@ -350,29 +399,15 @@ namespace AdventOfCode2019.Day18
 						}
 						return;
 					}
-
-					switch (routes.Count())
+					else if (routes.Count() == 0)
 					{
-						case 0: // Dead end - no edge here
-							return;
-						case 1: // Only one way, so move forward
-							pos = routes.First();
-							weight++;
-							break;
-						default: // Forks, so place vertex here and take each road
-							if (fork == null)
-							{
-								fork = new Vertex(pos, map[pos]);
-								vertices.Add(fork);
-							}
-							vertex.Edges.Add(fork, weight);
-							fork.Edges.Add(vertex, weight);
-							foreach (var p in routes)
-							{
-								BuildGraph(fork, p);
-							}
-							return;
+						// Dead end - no edge here
+						return;
 					}
+
+					// Only one way, so move forward
+					pos = routes.First();
+					weight++;
 				}
 			}
 		}
@@ -410,16 +445,17 @@ namespace AdventOfCode2019.Day18
 			const int Infinite = 10000000;
 			var allKeyMask = (1U << vertices.Count(v => v.IsKey)) - 1;
 
-			var _reachableNodes = new Dictionary<string, List<Vertex>>();
+			var minimumDistance = new Dictionary<uint, int>();
+			var reachableNodes = new Dictionary<uint, List<Vertex>>();
 			var shortestPath = new Dictionary<string, int>();
-			var _memo = new Dictionary<string, int>();
 
-			return MinimumDistance(vertices.First(), 0);
+			var distanceDfs = MinimumDistance(vertices.First(), 0);
+			return distanceDfs;
 
 			int MinimumDistance(Vertex node, uint initialKeys)
 			{
-				var id = $"{initialKeys}-{node.Value}";
-				if (_memo.TryGetValue(id, out var distance))
+				var id = initialKeys * 397 ^ node.Value;//  $"{initialKeys}-{node.Value}";
+				if (minimumDistance.TryGetValue(id, out var distance))
 				{
 					return distance;
 				}
@@ -441,14 +477,14 @@ namespace AdventOfCode2019.Day18
 					.Append(Infinite)
 					.Min();
 
-				_memo[id] = remainingDistance;
+				minimumDistance[id] = remainingDistance;
 				return remainingDistance;
 			}
 
 			List<Vertex> ReachableKeyNodes(Vertex from, uint keys)
 			{
-				var id = $"{keys}-{from.Value}";
-				if (_reachableNodes.TryGetValue(id, out var cachedNodes))
+				var id = keys * 397 ^ from.Value;// $"{keys}-{from.Value}";
+				if (reachableNodes.TryGetValue(id, out var cachedNodes))
 				{
 					return cachedNodes;
 				}
@@ -459,7 +495,7 @@ namespace AdventOfCode2019.Day18
 				}
 
 				var nodes = ReachableKeyNodesFrom(from).Where(n => n != from).Distinct().ToList();
-				_reachableNodes[id] = nodes;
+				reachableNodes[id] = nodes;
 				return nodes;
 
 				IEnumerable<Vertex> ReachableKeyNodesFrom(Vertex node)
@@ -520,6 +556,10 @@ namespace AdventOfCode2019.Day18
 						}
 					}
 					node.Visited = true;
+
+					////shortestPath[$"{keys}:{from.Value}{node.Value}"] = node.Distance;
+					////shortestPath[$"{keys}:{node.Value}{from.Value}"] = node.Distance;
+
 					if (node == goal)
 						break;
 					node = vertices.Where(v => !v.Visited).OrderBy(x => x.Distance).FirstOrDefault();
@@ -528,6 +568,152 @@ namespace AdventOfCode2019.Day18
 				var distance = goal.Distance;
 				shortestPath[$"{keys}:{from.Value}{goal.Value}"] = distance;
 				shortestPath[$"{keys}:{goal.Value}{from.Value}"] = distance;
+				return distance;
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		public static int FindMinimumDistanceDfs(Graph<VaultVertex> graph)
+		{
+			const int Infinite = 10000000;
+			var vertices = graph.Vertices.Values;
+			var allKeyMask = (1U << vertices.Count(v => v.Value.IsKey)) - 1;
+
+			var _reachableNodes = new Dictionary<string, List<VaultGraph.Vertex>>();
+			var shortestPath = new Dictionary<string, int>();
+			var _memo = new Dictionary<string, int>();
+
+			return MinimumDistance(graph.Root, 0);
+
+			int MinimumDistance(VaultGraph.Vertex node, uint initialKeys)
+			{
+				var id = $"{initialKeys}-{node.Value}";
+				if (_memo.TryGetValue(id, out var distance))
+				{
+					return distance;
+				}
+
+				var keys = initialKeys | (node.Value.IsKey ? node.Value.Key : 0);
+				if (keys == allKeyMask)
+				{
+					return 0;
+				}
+
+				var remainingDistance = ReachableKeyNodes(node, keys)
+					.Select(n =>
+					{
+						var nextDistance = MinimumDistance(n, keys);
+						return nextDistance == Infinite
+							? Infinite
+							: ShortestPathBetween(node, n, keys) + nextDistance;
+					})
+					.Append(Infinite)
+					.Min();
+
+				_memo[id] = remainingDistance;
+				return remainingDistance;
+			}
+
+			List<VaultGraph.Vertex> ReachableKeyNodes(VaultGraph.Vertex from, uint keys)
+			{
+				var id = $"{keys}-{from.Value.ChValue}";
+				if (_reachableNodes.TryGetValue(id, out var cachedNodes))
+				{
+					return cachedNodes;
+				}
+
+				foreach (var v in vertices)
+				{
+					v.Visited = false;
+				}
+
+				var nodes = ReachableKeyNodesFrom(from).Where(n => n != from).Distinct().ToList();
+				_reachableNodes[id] = nodes;
+				return nodes;
+
+				IEnumerable<VaultGraph.Vertex> ReachableKeyNodesFrom(VaultGraph.Vertex node)
+				{
+					if (!node.Visited)
+					{
+						node.Visited = true;
+						if (node.Value.IsKey && (keys & node.Value.Key) == 0)
+						{
+							yield return node;
+						}
+						else
+						{
+							foreach (var n in node.Edges.Keys.Where(e => !e.Value.IsDoor || (keys & e.Value.Key) != 0))
+							{
+								foreach (var vn in ReachableKeyNodesFrom(n))
+								{
+									yield return vn;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			int ShortestPathBetween(VaultGraph.Vertex from, VaultGraph.Vertex goal, uint keys)
+			{
+				var id1 = $"{keys}:{from.Value}{goal.Value.ChValue}";
+				if (shortestPath.TryGetValue(id1, out var cachedDist))
+				{
+					return cachedDist;
+				}
+
+				foreach (var v in vertices)
+				{
+					v.Distance = int.MaxValue;
+					v.Visited = false;
+				}
+				from.Distance = 0;
+
+				var node = from;
+				while (true)
+				{
+					if (node == null)
+						break;
+					foreach (var edge in node.Edges)
+					{
+						var neighbour = edge.Key;
+						if (neighbour.Value.IsDoor && (keys & neighbour.Value.Key) == 0)
+						{
+							continue;
+						}
+						var weight = edge.Value;
+						var dist = node.Distance + weight;
+						if (dist < neighbour.Distance)
+						{
+							neighbour.Distance = dist;
+						}
+					}
+					node.Visited = true;
+					if (node == goal)
+						break;
+					node = vertices.Where(v => !v.Visited).OrderBy(x => x.Distance).FirstOrDefault();
+				}
+
+				var distance = goal.Distance;
+				shortestPath[$"{keys}:{from.Value}{goal.Value.ChValue}"] = distance;
+				shortestPath[$"{keys}:{goal.Value}{from.Value.ChValue}"] = distance;
 				return distance;
 			}
 		}
