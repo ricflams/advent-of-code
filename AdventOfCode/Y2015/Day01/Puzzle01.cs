@@ -35,7 +35,5 @@ namespace AdventOfCode.Y2015.Day01
 			Console.WriteLine($"Day  1 Puzzle 2: {moves}");
 			Debug.Assert(moves == 1797);
 		}
-
-		//private static int FuelForMass(int mass) => mass / 3 - 2;
 	}
 }
