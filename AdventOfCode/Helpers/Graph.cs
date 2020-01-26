@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace AdventOfCode2019.Helpers
+namespace AdventOfCode.Helpers
 {
     public class Graph<T>
     {

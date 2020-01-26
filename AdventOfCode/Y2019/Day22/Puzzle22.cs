@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using AdventOfCode2019.Helpers;
+using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2019.Day22
 {

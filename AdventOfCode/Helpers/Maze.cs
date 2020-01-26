@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace AdventOfCode2019.Helpers
+namespace AdventOfCode.Helpers
 {
     public class Maze
     {

@@ -1,8 +1,8 @@
-﻿using AdventOfCode2019.Helpers;
+﻿using AdventOfCode.Helpers;
 using System;
 using System.Linq;
 using System.Diagnostics;
-using AdventOfCode2019.Intcode;
+using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day11
 {

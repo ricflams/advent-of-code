@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using AdventOfCode2019.Helpers;
-using AdventOfCode2019.Intcode;
+using AdventOfCode.Helpers;
+using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day21
 {

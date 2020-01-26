@@ -1,4 +1,4 @@
-﻿using AdventOfCode2019.Helpers;
+﻿using AdventOfCode.Helpers;
 using System;
 using System.Linq;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.IO;
 
 namespace AdventOfCode.Y2019.Day08
 {
-	internal class Puzzle08
+	internal class PuzzleXX
 	{
 		public static void Run()
 		{

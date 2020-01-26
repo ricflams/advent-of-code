@@ -1,4 +1,4 @@
-﻿using AdventOfCode2019.Intcode;
+﻿using AdventOfCode.Y2019.Intcode;
 using System;
 using System.Diagnostics;
 

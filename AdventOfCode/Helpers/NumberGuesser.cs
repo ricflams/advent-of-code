@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AdventOfCode2019.Helpers
+namespace AdventOfCode.Helpers
 {
     internal class NumberGuesser
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace AdventOfCode2019.Intcode
+namespace AdventOfCode.Y2019.Intcode
 {
 	internal class Engine
 	{

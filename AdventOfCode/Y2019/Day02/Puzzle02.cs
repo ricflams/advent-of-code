@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using AdventOfCode2019.Intcode;
+using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day02
 {

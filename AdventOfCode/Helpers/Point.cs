@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AdventOfCode2019.Helpers
+namespace AdventOfCode.Helpers
 {
 	[System.Diagnostics.DebuggerDisplay("{ToString()}")]
 	public class Point
