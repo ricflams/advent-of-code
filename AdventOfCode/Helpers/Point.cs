@@ -41,6 +41,18 @@ namespace AdventOfCode.Helpers
 			throw new Exception($"{nameof(Move)}: Unknown direction {direction}");
 		}
 
+		public Point Move(char ch)
+		{
+			switch (ch)
+			{
+				case '^': return Up;
+				case '>': return Right;
+				case 'v': return Down;
+				case '<': return Left;
+			}
+			throw new Exception($"{nameof(Move)}: Unknown direction {ch}");
+		}
+
 		public IEnumerable<Point> LookAround()
 		{
 			yield return Up;
