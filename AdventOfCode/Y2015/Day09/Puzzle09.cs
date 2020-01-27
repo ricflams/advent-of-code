@@ -1,10 +1,8 @@
 using AdventOfCode.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.IO;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2015.Day09
 {
@@ -12,22 +10,35 @@ namespace AdventOfCode.Y2015.Day09
 	{
 		public static void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			Puzzle1And2();
 		}
 
-		private static void Puzzle1()
+		private static void Puzzle1And2()
 		{
+			var input = File.ReadAllLines("Y2015/Day09/input.txt");
 
-			//Console.WriteLine($"Day 09 Puzzle 1: {result}");
-			//Debug.Assert(result == );
-		}
+			var graph = new WeightedGraph<string>();
+			foreach (var line in input)
+			{
+				// Example: Faerun to Tambi = 129
+				var match = Regex.Match(line, @"(\w+) to (\w+) = (\d+)");
+				if (!match.Success)
+					throw new Exception($"Unexpected format at {line}");
+				var city1 = match.Groups[1].Value;
+				var city2 = match.Groups[2].Value;
+				var distance = int.Parse(match.Groups[3].Value);
 
-		private static void Puzzle2()
-		{
+				graph.AddVertices(city1, city2, distance);
+			}
+			// graph.WriteAsGraphwiz();
 
-			//Console.WriteLine($"Day 09 Puzzle 2: {result}");
-			//Debug.Assert(result == );
+			var shortestDistance = graph.TspShortestDistanceBruteForce();
+			Console.WriteLine($"Day  9 Puzzle 1: {shortestDistance}");
+			Debug.Assert(shortestDistance == 117);
+
+			var longestDistance = graph.TspLongestDistanceBruteForce();
+			Console.WriteLine($"Day  9 Puzzle 2: {longestDistance}");
+			Debug.Assert(longestDistance == 909);
 		}
 	}
 }
