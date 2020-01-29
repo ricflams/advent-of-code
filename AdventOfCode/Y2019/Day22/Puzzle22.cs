@@ -38,36 +38,33 @@ namespace AdventOfCode.Y2019.Day22
 
 		private static int[] NaiveShuffle(int[] deck, string[] shuffles)
 		{
-			var Cut = "cut";
-			var DealWithIncrement = "deal with increment";
-
 			var N = deck.Length;
 			foreach (var shuffle in shuffles)
 			{
 				if (shuffle == "deal into new stack")
 				{
 					deck = deck.Reverse().ToArray();
+					continue;
 				}
-				else if (shuffle.StartsWith(DealWithIncrement))
+				if (SimpleRegex.IsMatch(shuffle, "deal with increment %d", out var incval))
 				{
-					var inc = int.Parse(shuffle.Substring(DealWithIncrement.Length));
+					var inc = int.Parse(incval[0]);
 					var newdeck = new int[N];
 					for (var i = 0; i < N; i++)
 					{
 						newdeck[(i * inc) % N] = deck[i];
 					}
 					deck = newdeck;
+					continue;
 				}
-				else if (shuffle.StartsWith(Cut))
+				if (SimpleRegex.IsMatch(shuffle, "cut %d", out var cutval))
 				{
-					var cut = int.Parse(shuffle.Substring(Cut.Length));
+					var cut = int.Parse(cutval[0]);
 					cut = (cut + N) % N;
 					deck = deck.Skip(cut).Concat(deck.Take(cut)).ToArray();
+					continue;
 				}
-				else
-				{
-					throw new Exception($"Unknown shuffle: {shuffle}");
-				}
+				throw new Exception($"Unknown shuffle: {shuffle}");
 			}
 			return deck;
 		}

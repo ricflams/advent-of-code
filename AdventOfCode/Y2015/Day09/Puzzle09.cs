@@ -2,7 +2,6 @@ using AdventOfCode.Helpers;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2015.Day09
 {
@@ -21,12 +20,10 @@ namespace AdventOfCode.Y2015.Day09
 			foreach (var line in input)
 			{
 				// Example: Faerun to Tambi = 129
-				var match = Regex.Match(line, @"(\w+) to (\w+) = (\d+)");
-				if (!match.Success)
-					throw new Exception($"Unexpected format at {line}");
-				var city1 = match.Groups[1].Value;
-				var city2 = match.Groups[2].Value;
-				var distance = int.Parse(match.Groups[3].Value);
+				var val = SimpleRegex.Match(line, "%s to %s = %d");
+				var city1 = val[0];
+				var city2 = val[1];
+				var distance = int.Parse(val[2]);
 
 				graph.AddVertices(city1, city2, distance);
 			}

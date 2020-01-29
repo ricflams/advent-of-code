@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text.RegularExpressions;
+using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2015.Day06
 {
@@ -71,12 +71,9 @@ namespace AdventOfCode.Y2015.Day06
 				// toggle 461,550 through 564,900
 				// turn off 370,39 through 425,839
 				// turn on 599,989 through 806,993
-				var match = Regex.Match(command, @"(.*)\s(\d+),(\d+)\sthrough\s(\d+),(\d+)");
-				if (!match.Success)
-					throw new Exception($"Unexpected input in line {command}");
-
-				var cmd = match.Groups.Skip(1).First().Value;
-				var num = match.Groups.Skip(2).Select(c => int.Parse(c.Value)).Take(4).ToArray();
+				var val = SimpleRegex.Match(command, @"(.*) %d,%d through %d,%d");
+				var cmd = val[0];
+				var num = val.Skip(1).Select(c => int.Parse(c)).ToArray();
 				var (xmin, ymin, xmax, ymax) = (num[0], num[1], num[2], num[3]);
 
 				switch (cmd)

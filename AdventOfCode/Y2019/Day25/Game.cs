@@ -139,11 +139,10 @@ namespace AdventOfCode.Y2019.Day25
 				// You take the boulder.
 				//   
 				// Command?
-				var YouTakeThe = "You take the ";
-				if (PeekLine().StartsWith(YouTakeThe))
+				if (SimpleRegex.IsMatch(PeekLine(), @"You take the (.*)\.", out var takeval))
 				{
-					var message = ReadLine();
-					var item = message.Substring(YouTakeThe.Length).TrimEnd('.');
+					ReadLine();
+					var item = takeval[0];
 					Inventory.Add(item);
 					CurrentRoom.Items.Remove(item);
 				}
@@ -153,11 +152,10 @@ namespace AdventOfCode.Y2019.Day25
 				// You drop the boulder.
 				//   
 				// Command?
-				var YouDropThe = "You drop the ";
-				if (PeekLine().StartsWith(YouDropThe))
+				if (SimpleRegex.IsMatch(PeekLine(), @"You drop the (.*)\.", out var dropval))
 				{
-					var message = ReadLine();
-					var item = message.Substring(YouDropThe.Length).TrimEnd('.');
+					ReadLine();
+					var item = dropval[0];
 					Inventory.Remove(item);
 					CurrentRoom.Items.Add(item);
 				}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text.RegularExpressions;
+using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2015.Day07
 {
@@ -162,18 +162,6 @@ namespace AdventOfCode.Y2015.Day07
 
 			private Gate ParseGate(string operation)
 			{
-				bool TryParse(string pattern, out string[] groups)
-				{
-					var match = Regex.Match(operation, pattern);
-					if (!match.Success)
-					{
-						groups = null;
-						return false;
-					}
-					groups = match.Groups.Skip(1).Select(g => g.Value).ToArray();
-					return true;
-				}
-
 				// Examples:
 				// 123 -> x
 				// z -> p
@@ -183,27 +171,27 @@ namespace AdventOfCode.Y2015.Day07
 				// y RSHIFT 2 -> g
 				// NOT y -> i
 				string[] op;
-				if (TryParse(@"NOT (\w+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "NOT %s -> %s", out op))
 				{
 					return new NotGate { Input1 = op[0], Name = op[1] };
 				}
-				if (TryParse(@"(\w+) AND (\w+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "%s AND %s -> %s", out op))
 				{
 					return new AndGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
 				}
-				if (TryParse(@"(\w+) OR (\w+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "%s OR %s -> %s", out op))
 				{
 					return new OrGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
 				}
-				if (TryParse(@"(\w+) LSHIFT (\d+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "%s LSHIFT %d -> %s", out op))
 				{
 					return new LShiftGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
 				}
-				if (TryParse(@"(\w+) RSHIFT (\d+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "%s RSHIFT %d -> %s", out op))
 				{
 					return new RShiftGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
 				}
-				if (TryParse(@"(\w+) -> (\w+)", out op))
+				if (SimpleRegex.IsMatch(operation, "%s -> %s", out op))
 				{
 					return new ValueGate { Input1 = op[0], Name = op[1] };
 				}
