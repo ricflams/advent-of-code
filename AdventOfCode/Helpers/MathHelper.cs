@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AdventOfCode.Helpers
@@ -46,6 +47,17 @@ namespace AdventOfCode.Helpers
 		public static IEnumerable<IEnumerable<int>> AllPermutations(int length)
 		{
 			return Permute(Enumerable.Range(0, length));
+		}
+
+		public static int[] DivideEvenly(int value, int parts)
+		{
+			var values = new int[parts];
+			Array.Fill(values, value / parts);
+			for (var i = 0; i < value % parts; i++)
+			{
+				values[i]++;
+			}
+			return values;
 		}
 	}
 }
