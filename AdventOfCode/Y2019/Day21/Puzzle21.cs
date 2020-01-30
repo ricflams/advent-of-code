@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Y2019.Intcode;
@@ -91,13 +90,12 @@ namespace AdventOfCode.Y2019.Day21
 
 		private static (long, int, string) FindHullDamageResultByBruteForce(int length)
 		{
-			var md5 = MD5.Create();
-			var memo = new HashSet<ulong>();
+			var memo = new HashSet<uint>();
 			var step = 0;
 			while (true)
 			{
 				var program = RandomProgram.Generate(length);
-				var signature = md5.ComputeHash(Encoding.ASCII.GetBytes(program)).Select(b => (ulong)b).Aggregate((s,v) => 3074457345618258799ul*s+v);
+				var signature = Hashing.Hash(program);
 				if (memo.Contains(signature))
 				{
 					continue;
