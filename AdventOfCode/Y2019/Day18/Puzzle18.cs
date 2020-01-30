@@ -14,9 +14,9 @@ namespace AdventOfCode.Y2019.Day18
 			var sw = Stopwatch.StartNew();
 			Puzzle1();
 			Console.WriteLine("Elapsed: " + sw.Elapsed);
-			sw.Restart();
-			Puzzle2();
-			Console.WriteLine("Elapsed: " + sw.Elapsed);
+			//sw.Restart();
+			//Puzzle2();
+			//Console.WriteLine("Elapsed: " + sw.Elapsed);
 		}
 
 		private static void Puzzle1()
@@ -97,6 +97,8 @@ namespace AdventOfCode.Y2019.Day18
 			public bool IsPassableWith(uint keys) => !IsDoor || (Key & keys) != 0;
 			public bool Visited { get; set; }
 			public int Distance { get; set; }
+			public int ExtraDistance { get; set; }
+			public Vertex Shortest { get; set; }
 			public Dictionary<Vertex, int> Edges { get; set; } = new Dictionary<Vertex, int>();
 			public override string ToString() => $"{Pos} '{Value}'";
 		}
@@ -137,12 +139,11 @@ namespace AdventOfCode.Y2019.Day18
 			//map.ConsoleWrite(false);
 
 			PruneGraph(vertices);
+			//PrintGraph(vertices);
 			var distance = FindMinimumDistanceDfs(vertices);
 
 			//InflateGraph(vertices);
 			//var distance = FindMinimumDistanceBfs(vertices);
-
-			//PrintGraph(vertices);
 
 			return distance;
 		}
@@ -440,22 +441,32 @@ namespace AdventOfCode.Y2019.Day18
 		//		_allKeys = (1U << _vertices.Count(v => v.IsKey)) - 1;
 		//	}
 
+		class DfsMemo
+		{
+			public Dictionary<char, int> MinimumDistance = new Dictionary<char, int>();
+			public Dictionary<uint, List<Vertex>> ReachableNodes = new Dictionary<uint, List<Vertex>>();
+			public Dictionary<uint, int> ShortestPath = new Dictionary<uint, int>();
+		}
+
 		public static int FindMinimumDistanceDfs(List<Vertex> vertices)
 		{
 			const int Infinite = 10000000;
 			var allKeyMask = (1U << vertices.Count(v => v.IsKey)) - 1;
 
-			var minimumDistance = new Dictionary<uint, int>();
-			var reachableNodes = new Dictionary<uint, List<Vertex>>();
-			var shortestPath = new Dictionary<string, int>();
+			var keymemo = new SafeDictionary<uint, DfsMemo>(() => new DfsMemo());
+			//var minimumDistance = new Dictionary<uint, int>();
+			//var reachableNodes = new Dictionary<uint, List<Vertex>>();
+			//var shortestPath = new Dictionary<uint, int>();
 
 			var distanceDfs = MinimumDistance(vertices.First(), 0);
 			return distanceDfs;
 
 			int MinimumDistance(Vertex node, uint initialKeys)
 			{
-				var id = initialKeys * 397 ^ node.Value;//  $"{initialKeys}-{node.Value}";
-				if (minimumDistance.TryGetValue(id, out var distance))
+				var memo = keymemo[initialKeys].MinimumDistance;
+				//var id = initialKeys * 397 ^ node.Value;//  $"{initialKeys}-{node.Value}";
+				//if (minimumDistance.TryGetValue(id, out var distance))
+				if (memo.TryGetValue(node.Value, out var distance))
 				{
 					return distance;
 				}
@@ -467,26 +478,35 @@ namespace AdventOfCode.Y2019.Day18
 				}
 
 				var remainingDistance = ReachableKeyNodes(node, keys)
-					.Select(n =>
+					.Select(n => new
 					{
-						var nextDistance = MinimumDistance(n, keys);
-						return nextDistance == Infinite
+						n,
+						nextDistance = MinimumDistance(n, keys)
+					})
+					.OrderBy(x => x.nextDistance)
+					.Select(x =>
+					{
+						return x.nextDistance == Infinite
 							? Infinite
-							: ShortestPathBetween(node, n, keys) + nextDistance;
+							: ShortestPathBetween(node, x.n, keys) + x.nextDistance;
 					})
 					.Append(Infinite)
 					.Min();
 
-				minimumDistance[id] = remainingDistance;
+				//minimumDistance[id] = remainingDistance;
+				memo[node.Value] = remainingDistance;
+
 				return remainingDistance;
 			}
 
 			List<Vertex> ReachableKeyNodes(Vertex from, uint keys)
 			{
-				var id = keys * 397 ^ from.Value;// $"{keys}-{from.Value}";
-				if (reachableNodes.TryGetValue(id, out var cachedNodes))
+				var memo = keymemo[keys].ReachableNodes;
+				//var id = keys * 397 ^ from.Value;// $"{keys}-{from.Value}";
+				//if (reachableNodes.TryGetValue(id, out var cachedNodes))
+				if (memo.TryGetValue(from.Value, out var reachableNodes))
 				{
-					return cachedNodes;
+					return reachableNodes;
 				}
 
 				foreach (var v in vertices)
@@ -494,8 +514,8 @@ namespace AdventOfCode.Y2019.Day18
 					v.Visited = false;
 				}
 
-				var nodes = ReachableKeyNodesFrom(from).Where(n => n != from).Distinct().ToList();
-				reachableNodes[id] = nodes;
+				var nodes = ReachableKeyNodesFrom(from).Where(n => n != from).ToList();
+				memo[from.Value] = nodes;
 				return nodes;
 
 				IEnumerable<Vertex> ReachableKeyNodesFrom(Vertex node)
@@ -521,53 +541,123 @@ namespace AdventOfCode.Y2019.Day18
 				}
 			}
 
+			//int ShortestPathBetween(Vertex from, Vertex goal, uint keys)
+			//{
+			//	var memo = keymemo[keys].ShortestPath;
+
+			//	//var id = from.Value < goal.Value
+			//	//	? (uint)(from.Value << 16 + goal.Value)
+			//	//	: (uint)(goal.Value << 16 + from.Value);
+			//	var id = (uint)(from.Value * 397 ^ goal.Value);
+
+			//	if (memo.TryGetValue(id, out var shortestPath))
+			//	{
+			//		return shortestPath;
+			//	}
+
+			//	foreach (var v in vertices)
+			//	{
+			//		v.Distance = int.MaxValue;
+			//		v.Visited = false;
+			//	}
+			//	from.Distance = 0;
+
+			//	var node = from;
+			//	while (true)
+			//	{
+			//		if (node == null)
+			//			break;
+			//		foreach (var edge in node.Edges)
+			//		{
+			//			var neighbour = edge.Key;
+			//			if (neighbour.IsDoor && (keys & neighbour.Key) == 0)
+			//			{
+			//				continue;
+			//			}
+			//			var weight = edge.Value;
+			//			var dist = node.Distance + weight;
+			//			if (dist < neighbour.Distance)
+			//			{
+			//				neighbour.Distance = dist;
+			//			}
+			//		}
+			//		node.Visited = true;
+
+			//		if (node == goal)
+			//			break;
+			//		node = vertices.Where(v => !v.Visited).OrderBy(x => x.Distance).FirstOrDefault();
+			//	}
+
+			//	var distance = goal.Distance;
+			//	memo[id] = memo[(uint)(goal.Value * 397 ^ from.Value)] = distance;
+			//	return distance;
+			//}
+
 			int ShortestPathBetween(Vertex from, Vertex goal, uint keys)
 			{
-				var id1 = $"{keys}:{from.Value}{goal.Value}";
-				if (shortestPath.TryGetValue(id1, out var cachedDist))
+				var memo = keymemo[keys].ShortestPath;
+				var id = (uint)(from.Value * 397 ^ goal.Value);
+				if (memo.TryGetValue(id, out var shortestPath))
 				{
-					return cachedDist;
+					return shortestPath;
 				}
 
+				var queue = new List<Vertex>();
+				queue.Add(from);
 				foreach (var v in vertices)
 				{
 					v.Distance = int.MaxValue;
 					v.Visited = false;
+					v.ExtraDistance = v.Pos.ManhattanDistanceTo(goal.Pos);
 				}
 				from.Distance = 0;
 
-				var node = from;
-				while (true)
+				while (queue.Any())
 				{
-					if (node == null)
-						break;
-					foreach (var edge in node.Edges)
+					queue = queue.OrderBy(x => x.Distance + x.ExtraDistance).ToList();
+					var node = queue.First();
+					queue.RemoveAt(0);
+
+					foreach (var edge in node.Edges.OrderBy(x => x.Value))
 					{
 						var neighbour = edge.Key;
-						if (neighbour.IsDoor && (keys & neighbour.Key) == 0)
+						if (neighbour.Visited || neighbour.IsDoor && (keys & neighbour.Key) == 0)
 						{
 							continue;
 						}
-						var weight = edge.Value;
-						var dist = node.Distance + weight;
+						var dist = node.Distance + edge.Value;
 						if (dist < neighbour.Distance)
 						{
 							neighbour.Distance = dist;
+							neighbour.Shortest = node;
+							if (!queue.Contains(neighbour))
+							{
+								queue.Add(neighbour);
+							}
 						}
 					}
 					node.Visited = true;
 
-					////shortestPath[$"{keys}:{from.Value}{node.Value}"] = node.Distance;
-					////shortestPath[$"{keys}:{node.Value}{from.Value}"] = node.Distance;
-
 					if (node == goal)
 						break;
-					node = vertices.Where(v => !v.Visited).OrderBy(x => x.Distance).FirstOrDefault();
+				}
+
+				var foundkeys = new List<Vertex>();
+				for (var visited = goal; visited != null; visited = visited.Shortest)
+				{
+					if (visited.IsKey && visited != from && visited != goal) // todo - is needed?
+					{
+						foundkeys.Add(visited);
+					}
+				}
+				foundkeys.Reverse();
+				if (foundkeys.Any())
+				{
+
 				}
 
 				var distance = goal.Distance;
-				shortestPath[$"{keys}:{from.Value}{goal.Value}"] = distance;
-				shortestPath[$"{keys}:{goal.Value}{from.Value}"] = distance;
+				memo[id] = memo[(uint)(goal.Value * 397 ^ from.Value)] = distance;
 				return distance;
 			}
 		}
