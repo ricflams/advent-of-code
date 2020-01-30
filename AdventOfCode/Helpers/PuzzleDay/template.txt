@@ -18,6 +18,7 @@ namespace AdventOfCode.{YEAR}.Day{DAY}
 
 		private static void Puzzle1()
 		{
+			var input = File.ReadLines("{YEAR}/Day{DAY}/input.txt");
 
 			//Console.WriteLine($"Day {DAY} Puzzle 1: {result}");
 			//Debug.Assert(result == );
@@ -25,6 +26,7 @@ namespace AdventOfCode.{YEAR}.Day{DAY}
 
 		private static void Puzzle2()
 		{
+			var input = File.ReadLines("{YEAR}/Day{DAY}/input.txt");
 
 			//Console.WriteLine($"Day {DAY} Puzzle 2: {result}");
 			//Debug.Assert(result == );

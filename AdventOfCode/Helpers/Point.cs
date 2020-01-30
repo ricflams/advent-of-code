@@ -79,5 +79,10 @@ namespace AdventOfCode.Helpers
 				}
 			}
 		}
+
+		public int ManhattanDistanceTo(Point pos)
+		{
+			return Math.Abs(X - pos.X) + Math.Abs(Y - pos.Y);
+		}
 	}
 }
