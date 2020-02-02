@@ -67,5 +67,7 @@ namespace AdventOfCode.Helpers
 		{
 			return string.Concat(str.Trim().Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim() + "\n"));
 		}
+
+		public static string ToCommaString(this IEnumerable<int> list) => string.Join(',', list);
 	}
 }

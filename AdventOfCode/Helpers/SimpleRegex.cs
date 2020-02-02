@@ -52,7 +52,7 @@ namespace AdventOfCode.Helpers
 				return false;
 			}
 
-			val = match.Groups.Skip(1).Select(g => g.Value).ToArray();
+			val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
 			return true;
 		}
 	}

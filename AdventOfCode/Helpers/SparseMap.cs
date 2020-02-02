@@ -9,7 +9,7 @@ namespace AdventOfCode.Helpers
 		private readonly Dictionary<int, SparseMapColumn> _column = new Dictionary<int, SparseMapColumn>();
 		private readonly T _defaultValue;
 
-		public SparseMap(T defaultValue = default(T))
+		public SparseMap(T defaultValue = default)
 		{
 			_defaultValue = defaultValue;
 		}
@@ -29,6 +29,22 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public IEnumerable<(Point, T)> AllValues(Func<T, bool> predicate = null)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					if (predicate == null || predicate(value))
+					{
+						yield return (Point.From(x, y), value);
+					}
+				}
+			}
+		}
+
 		public Point FirstOrDefault(Func<T, bool> predicate)
 		{
 			return AllPoints(predicate).FirstOrDefault();
@@ -36,7 +52,7 @@ namespace AdventOfCode.Helpers
 
 		public T this[Point pos]
 		{
-			get => this[pos.X][pos.Y];
+			get => _column.TryGetValue(pos.X, out var col) ? col[pos.Y] : _defaultValue;
 			set => this[pos.X][pos.Y] = value;
 		}
 
@@ -62,6 +78,15 @@ namespace AdventOfCode.Helpers
 			var min = Point.From(points.Min(z => z.X), points.Min(z => z.Y));
 			var max = Point.From(points.Max(z => z.X), points.Max(z => z.Y));
 			return (min, max);
+		}
+
+		public IEnumerable<Point> Span()
+		{
+			var (min, max) = Area();
+			yield return min;
+			yield return Point.From(max.X, min.Y);
+			yield return max;
+			yield return Point.From(min.X, max.Y);
 		}
 
 		public class SparseMapColumn

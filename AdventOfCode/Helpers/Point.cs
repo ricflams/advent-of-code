@@ -28,6 +28,10 @@ namespace AdventOfCode.Helpers
 		public Point Right => new Point(X + 1, Y);
 		public Point Down => new Point(X, Y + 1);
 		public Point Left => new Point(X - 1, Y);
+		public Point DiagonalUpRight => new Point(X + 1, Y - 1);
+		public Point DiagonalUpLeft => new Point(X - 1, Y - 1);
+		public Point DiagonalDownRight => new Point(X + 1, Y + 1);
+		public Point DiagonalDownLeft => new Point(X - 1, Y + 1);
 
 		public Point Move(Direction direction)
 		{
@@ -59,6 +63,18 @@ namespace AdventOfCode.Helpers
 			yield return Right;
 			yield return Down;
 			yield return Left;
+		}
+
+		public IEnumerable<Point> LookDiagonallyAround()
+		{
+			yield return Up;
+			yield return DiagonalUpRight;
+			yield return Right;
+			yield return DiagonalDownRight;
+			yield return Down;
+			yield return DiagonalDownLeft;
+			yield return Left;
+			yield return DiagonalUpLeft;
 		}
 
 		public IEnumerable<Point> SpiralFrom()

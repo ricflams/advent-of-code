@@ -12,6 +12,11 @@ namespace AdventOfCode.Helpers
 			_factory = factory ?? (() => default);
 		}
 
+		public SafeDictionary(TV value)
+		{
+			_factory = () => value;
+		}
+
 		public new TV this[TK key]
 		{
 			get

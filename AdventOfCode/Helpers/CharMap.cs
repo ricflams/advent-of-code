@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode.Helpers
@@ -8,6 +9,26 @@ namespace AdventOfCode.Helpers
 		public CharMap(char defaultValue = default(char))
 			: base(defaultValue)
 		{
+		}
+
+		public static CharMap FromFile(string filename)
+		{
+			var input = File.ReadAllLines(filename);
+			return FromArray(input);
+		}
+
+		public static CharMap FromArray(string[] lines)
+		{
+			var map = new CharMap();
+			for (var y = 0; y < lines.Length; y++)
+			{
+				var line = lines[y];
+				for (var x = 0; x < line.Length; x++)
+				{
+					map[x][y] = line[x];
+				}
+			}
+			return map;
 		}
 
 		public void ConsoleWrite(bool clear, params string[] headers)
