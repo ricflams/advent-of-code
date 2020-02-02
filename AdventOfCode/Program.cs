@@ -10,8 +10,8 @@ namespace AdventOfCode
 
 			Exercise(() =>
 			{
-				//Y2015Puzzles();
-				Y2019Puzzles();
+				Y2015Puzzles();
+				//Y2019Puzzles();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
@@ -33,11 +33,11 @@ namespace AdventOfCode
 			//Y2015.Day12.Puzzle12.Run();
 			//Y2015.Day13.Puzzle13.Run();
 			//Y2015.Day14.Puzzle14.Run();
-			Y2015.Day15.Puzzle15.Run();
-			Y2015.Day16.Puzzle16.Run();
+			//Y2015.Day15.Puzzle15.Run();
+			//Y2015.Day16.Puzzle16.Run();
 			Y2015.Day17.Puzzle17.Run();
-			Y2015.Day18.Puzzle18.Run();
-			Y2015.Day19.Puzzle19.Run();
+			//Y2015.Day18.Puzzle18.Run();
+			//Y2015.Day19.Puzzle19.Run();
 			Y2015.Day20.Puzzle20.Run();
 			Y2015.Day21.Puzzle21.Run();
 			Y2015.Day22.Puzzle22.Run();
