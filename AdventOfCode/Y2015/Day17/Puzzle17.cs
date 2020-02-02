@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day17
 {
@@ -12,37 +11,23 @@ namespace AdventOfCode.Y2015.Day17
 	{
 		public static void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			Puzzle1And2();
 		}
 
-		private static void Puzzle1()
+		private static void Puzzle1And2()
 		{
 			var input = File.ReadAllLines("Y2015/Day17/input.txt");
 			var goal = 150;
 
 			var containers = input.Select(int.Parse).ToArray();
-			var combinations = NumberOfCombinations(containers, goal);
 
-			Console.WriteLine($"Day 17 Puzzle 1: {combinations}");
-			Debug.Assert(combinations == 4372);
-		}
+			var all = NumberOfCombinations(containers, goal);
+			Console.WriteLine($"Day 17 Puzzle 1: {all}");
+			Debug.Assert(all == 4372);
 
-		private static void Puzzle2()
-		{
-			var input = File.ReadAllLines("Y2015/Day17/input.txt");
-			var goal = 150;
-
-
-			var containers = input.Select(int.Parse).ToArray();
-
-			containers = new int[] { 20, 15, 10, 5, 5 };
-			goal = 25;
-
-			var combinations = NumberOfCombinations2(containers, goal);
-
-			Console.WriteLine($"Day 17 Puzzle 2: {combinations}");
-			//Debug.Assert(result == );
+			var shortest = NumberOfShortestCombinations(containers, goal);
+			Console.WriteLine($"Day 17 Puzzle 2: {shortest}");
+			Debug.Assert(shortest == 4);
 		}
 
 		private static int NumberOfCombinations(int[] list, int initialGoal)
@@ -69,50 +54,37 @@ namespace AdventOfCode.Y2015.Day17
 			}
 		}
 
-		private static int NumberOfCombinations2(int[] list, int initialGoal)
+		private static int NumberOfShortestCombinations(int[] list, int initialGoal)
 		{
-			var memo = new Dictionary<string, List<int>>();
-			var combos = new List<List<int>>();
-			var Empty = new List<int>();
+			var memo = new SimpleMemo<ulong>();
+			var lengths = new SafeDictionary<int, int>();
 
-			var ss = NumberOfCombinations2(list.Length, new List<int>(), initialGoal);
-			var yy = ss.OrderBy(x => x).ToList();
-			var xx = ss.GroupBy(x => x).ToDictionary(x => x.Key, x => x);
-			var zz = ss.GroupBy(x => x).OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x);
-			var nn = ss.GroupBy(x => x).OrderBy(g => g.Key).First().Count();
-			return nn;
+			Explore(list.Length, 0, initialGoal);
+			var shortestCombinations = lengths.OrderBy(x => x.Key).First().Value;
+			return shortestCombinations;
 
-
-			List<int> NumberOfCombinations2(int size, List<int> combo, int goal)
+			void Explore(int size, uint pickmask, int goal)
 			{
-				Console.WriteLine($"size={size} goal={goal}");
 				if (goal == 0)
 				{
-					Console.WriteLine($"  goal=0: ######## ");
-					combos.Add(combo);
-					return combo;
+					var len = pickmask.NumberOfSetBits();
+					lengths[len]++;
+					return;
 				}
 
 				if (goal < 0 || size == 0)
 				{
-					Console.WriteLine($"  (no match)");
-					return Empty;
+					return;
 				}
 
-				var id = $"{size}:{goal}";
-				if (!memo.TryGetValue(id, out var steps))
+				if (memo.IsSeenBefore((ulong)size << 32 | pickmask))
 				{
-					var s1 = NumberOfCombinations2(size - 1, combo, goal);
-					var s2 = NumberOfCombinations2(size - 1, combo.Append(list[size - 1]).ToList(), goal - list[size - 1]);
-					steps = s1.Concat(s2).ToList();
-					Console.WriteLine($"  calc {id}  steps={steps.ToCommaString()}  - s1={s1.ToCommaString()} s2={s2.ToCommaString()}: ");
-					memo[id] = steps;
+					return;
 				}
-				else
-				{
-					Console.WriteLine($"  memo {id}  steps={steps.ToCommaString()}");
-				}
-				return steps;
+
+				// For skipped item, pass 0 into the bit-mask (ie do nothing); for used item pass 1.
+				Explore(size - 1, pickmask << 1, goal);
+				Explore(size - 1, (pickmask << 1) + 1, goal - list[size - 1]);
 			}
 		}
 	}
