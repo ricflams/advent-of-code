@@ -67,5 +67,16 @@ namespace AdventOfCode.Helpers
 			i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
 			return (int)((((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24);
 		}
+
+		public static IEnumerable<uint> Bits(this uint value)
+		{
+			for (uint bit = 1; value > 0; bit <<= 1, value >>= 1)
+			{
+				if ((value & 1) == 1)
+				{
+					yield return bit;
+				}
+			}
+		}
 	}
 }
