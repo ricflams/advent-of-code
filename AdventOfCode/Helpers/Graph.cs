@@ -5,7 +5,85 @@ using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
-    public class Graph<T>
+	public class BaseUnitGraph<T>
+	{
+		public VertexByValue Vertices { get; } = new VertexByValue();
+		public Vertex Root => Vertices.Values.FirstOrDefault();
+
+		public class VertexByValue : Dictionary<T, Vertex>
+		{
+			public new Vertex this[T p]
+			{
+				get => TryGetValue(p, out var vertex) ? vertex : null;
+				set => base[p] = value;
+			}
+		}
+		[DebuggerDisplay("{ToString()}")]
+		public class Vertex
+		{
+			public Vertex(T value)
+			{
+				Value = value;
+			}
+			public T Value { get; set; }
+			public HashSet<Vertex> Edges { get; } = new HashSet<Vertex>();
+
+			// Always present, for ease-of-use in graph-searches
+			public int Distance { get; set; }
+			public bool Visited { get; set; }
+
+			public override string ToString() => Value?.ToString() ?? "";
+		}
+
+		public void WriteAsGraphwiz()
+		{
+			Console.WriteLine("digraph {");
+			foreach (var v in Vertices.Values)
+			{
+				foreach (var e in v.Edges)
+				{
+					Console.WriteLine($"  \"{v.Value}\" -> \"{e.Value}\"");
+				}
+			}
+			Console.WriteLine("}");
+		}
+
+
+		public void AddEdge(T v1, T v2)
+		{
+			AddEdge(GetOrCreateVertex(v1), GetOrCreateVertex(v2));
+		}
+
+		public void AddEdge(Vertex v1, Vertex v2)
+		{
+			v1.Edges.Add(v2);
+			v2.Edges.Add(v1);
+		}
+
+		public void AddDirectedEdge(T v1, T v2)
+		{
+			AddDirectedEdge(GetOrCreateVertex(v1), GetOrCreateVertex(v2));
+		}
+
+		public void AddDirectedEdge(Vertex v1, Vertex v2)
+		{
+			v1.Edges.Add(v2);
+		}
+
+		private Vertex GetOrCreateVertex(T value)
+		{
+			if (Vertices[value] == null)
+			{
+				Vertices[value] = new Vertex(value);
+			}
+			return Vertices[value];
+		}
+
+
+	}
+
+
+	public class Graph<T>
     {
 		public VertexByPoint Vertices { get; } = new VertexByPoint();
 		public Vertex Root => Vertices.Values.FirstOrDefault();
