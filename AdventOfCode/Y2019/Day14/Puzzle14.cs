@@ -29,16 +29,10 @@ namespace AdventOfCode.Y2019.Day14
 
 		private static void Puzzle2()
 		{
-			var maxfuel = NumberGuesser.Find(fuel =>
-			{
-				var target = 1000000000000;
-				var actual = new NanoFactory("Y2019/Day14/input.txt").ReduceFuelToOre(fuel);
-				if (actual < target)
-					return NumberGuesser.GuessIs.TooLow;
-				if (actual > target)
-					return NumberGuesser.GuessIs.TooHigh;
-				return NumberGuesser.GuessIs.Correct;
-			});
+			var target = 1000000000000;
+			var maxfuel = Guess.Find(Guess.ValueIs.ExactOrLowerThan, target,
+				fuel => new NanoFactory("Y2019/Day14/input.txt").ReduceFuelToOre(fuel));
+
 			Console.WriteLine($"Day 14 Puzzle 2: {maxfuel}");
 			Debug.Assert(maxfuel == 3126714);
 		}
