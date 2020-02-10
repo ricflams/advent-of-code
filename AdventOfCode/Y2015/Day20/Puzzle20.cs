@@ -1,10 +1,5 @@
-using AdventOfCode.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day20
 {
@@ -20,70 +15,147 @@ namespace AdventOfCode.Y2015.Day20
 		{
 			var input = 36000000;
 
-			int PacketsForHouseNumber(int house)
+			var target = input / 10;
+			var houses = new int[target];
+			for (var elf = 1; elf < target; elf++)
 			{
-				var n = Enumerable.Range(1, house).Sum(i => house % i == 0 ? house / i : 0);
-				return n * 10;
+				for (var i = elf; i < target; i += elf)
+				{
+					houses[i] += elf * 10;
+				}
 			}
 
-			var sq = (int)Math.Ceiling(Math.Sqrt(input));
-			var packetsForHouse = Enumerable.Range(1, sq).Select(PacketsForHouseNumber).ToList();
-
-			var house = -1;
-			for (var i = 0; i < input; i++)
-			{
-				var index = i % sq;
-				var p0 = packetsForHouse[index];
-				var fact = i / sq + 1;
-				var presents1 = fact * p0;
-				var presents = PacketsForHouseNumber(i+1);
-				if (presents != presents1)
-					;
-				if (presents >= input)
-				{
-					house = i;// + 1;
-					var n = PacketsForHouseNumber(house);
-					break;
-				}
-			} 
-
-			//Console.WriteLine(PacketsForHouseNumber(2113823));
-			//Console.WriteLine(PacketsForHouseNumber(2113824));
-
-			//var house = Guess.Find(Guess.ValueIs.ExactOrHigherThan, input, PacketsForHouseNumber);
-
-			//var res = 2113824;
-			//var res = (int)Math.Log2(input);
-
-			//var minhouse = int.MaxValue;
-			//for (var i = 0; i < 1000; i++)
-			//{
-			//	var h = res - i;
-			//	var packets = PacketsForHouseNumber(h);
-			//	if (packets > input && h < minhouse)
-			//	{
-			//		Console.WriteLine($"Found {h} => {packets}");
-			//		minhouse = h;
-			//	}
-			//	h = res + i;
-			//	packets = PacketsForHouseNumber(h);
-			//	if (packets > input && h < minhouse)
-			//	{
-			//		Console.WriteLine($"Found {h} => {packets}");
-			//		minhouse = h;
-			//	}
-			//}
-
-
+			var house = Array.FindIndex(houses, v => v >= input);
 			Console.WriteLine($"Day 20 Puzzle 1: {house}");
 			Debug.Assert(house == 831600);
 		}
 
 		private static void Puzzle2()
 		{
+			var input = 36000000;
 
-			//Console.WriteLine($"Day 20 Puzzle 2: {result}");
-			//Debug.Assert(result == );
+			var target = input / 11;
+			var houses = new int[target];
+			var deliveries = new int[target];
+			for (var elf = 1; elf < target; elf++)
+			{
+				for (var i = elf; i < target && deliveries[elf]++ < 50; i += elf)
+				{
+					houses[i] += elf * 11;
+				}
+			}
+
+			var house = Array.FindIndex(houses, v => v >= input);
+			Console.WriteLine($"Day 20 Puzzle 2: {house}");
+			Debug.Assert(house == 884520);
 		}
 	}
 }
+
+
+//static int FindLowestHouseReceivingNPresents(int input)
+//{
+//	//var target = input / 11;
+//	//var start = (int)Math.Pow(2, (input / target - 1) * 2); // lower bound
+//	//var delivered = new SafeDictionary<int, int>();
+//	var delivered = new int[input];
+
+//	for (var i = 1; ; i++)
+//	{
+//		if (CalcPresents(i) >= input)
+//		{
+//			return i;
+//		}
+//	}
+
+//	int CalcPresents(int n)
+//	{
+//		var sum = 0;
+//		var sqrt = (int)Math.Floor(Math.Sqrt(n));
+//		for (var i = 1; i < sqrt; i++)
+//		{
+//			if (n % i == 0)
+//			{
+//				if (delivered[i]++ < 50) sum += i;
+//				if (delivered[n / i]++ < 50) sum += n / i;
+//			}
+//		}
+//		if (sqrt * sqrt == n)
+//		{
+//			sum += sqrt;
+//		}
+//		return sum * 11;
+//	}
+//}
+
+//static int FindLowestHouseReceivingNPresents(int input)
+//{
+//	var target = input / 10;
+//	var start = (int)Math.Pow(2, (input / target - 1) * 2); // lower bound
+//	for (var i = start; ; i++)
+//	{
+//		if (NumberOfPresents(i) >= input)
+//		{
+//			return i;
+//		}
+//	}
+
+//	static int NumberOfPresents(int n)
+//	{
+//		var sum = 0;
+//		var sqrt = (int)Math.Floor(Math.Sqrt(n));
+//		for (var i = 1; i < sqrt; i++)
+//		{
+//			if (n % i == 0)
+//			{
+//				sum += i + n / i;
+//			}
+//		}
+//		if (sqrt * sqrt == n)
+//		{
+//			sum += sqrt;
+//		}
+//		return sum * 10;
+//	}
+//}
+
+
+
+
+//IEnumerable<int> SumOfDivisors()
+//{
+//	var sumOfDivisors = new List<int>();
+//	sumOfDivisors.Add(0);
+//	sumOfDivisors.Add(1);
+//	yield return 1;
+//	for (var n = 2; ; n++)
+//	{
+//		var sum = CalcSumOfDivisorsSmart(n);
+//		sumOfDivisors.Add(sum);
+//		yield return sum;
+//	}
+
+//	int CalcSumOfDivisorsSmart(int n)
+//	{
+//		if (n % 2 == 0)
+//		{
+//			var reused = n / 2;
+//			var sum = n + sumOfDivisors[reused];
+//			if (n >= 6)
+//			{
+//				if (n % 4 != 0)
+//					sum += 2;
+//				for (var i = Math.Max(3, (int)Math.Ceiling(Math.Sqrt(reused))); i < reused; i++)
+//				{
+//					if (n % i == 0 && reused % i != 0)
+//					{
+//						sum += i;
+//					}
+//				}
+//			}
+
+//			return sum;
+//		}
+//		return CalcSumOfDivisors(n);
+//	}
+//}
