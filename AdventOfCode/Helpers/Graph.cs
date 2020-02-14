@@ -130,6 +130,7 @@ namespace AdventOfCode.Helpers
 
 		public int ShortestPathDijkstra(Point startPos, Point destinationPos)
 		{
+			const int Infinite = 10000000;
 			var vertices = Vertices.Values;
 			var start = vertices.First(v => v.Pos == startPos);
 			var destination = vertices.First(v => v.Pos == destinationPos);
@@ -141,8 +142,12 @@ namespace AdventOfCode.Helpers
 			start.Distance = 0;
 
 			var node = start;
-			while (node != null && node != destination)
+			while (node != null)
 			{
+				if (node == destination)
+				{
+					return destination.Distance;
+				}
 				foreach (var edge in node.Edges)
 				{
 					var neighbour = edge.Key;
@@ -160,7 +165,7 @@ namespace AdventOfCode.Helpers
 					.FirstOrDefault();
 			}
 
-			return destination.Distance;
+			return Infinite;
 		}
 
 		public Vertex AddVertex(Point pos)
