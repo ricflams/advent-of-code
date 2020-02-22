@@ -572,6 +572,7 @@ namespace AdventOfCode.Y2019.Day18
 
 			var roots = graphs.Select(g => g.First()).ToList();
 			//var visited = graphs.SelectMany(x => x).ToDictionary(x => x.Pos, x => new HashSet<uint>());
+			var visitCount = 0;
 
 			foreach (var root in roots)
 			{
@@ -585,55 +586,55 @@ namespace AdventOfCode.Y2019.Day18
 			while (queue.Any())
 			{
 				var (nodes, keys) = queue.Dequeue();
+				visitCount++;
 				//Console.WriteLine($"Examine {string.Join(" ", nodes.Select(n => n.ToString()))} with keys {KeysToString(keys)}");
 
-				var initialKeys = keys;
-				foreach (var n in nodes)
-				{
-					keys |= n.IsKeyKey;
+				//var initialKeys = keys;
+				//foreach (var n in nodes)
+				//{
+				//	keys |= n.IsKeyKey;
 
-					if (n.DistanceWithKeys[initialKeys] < n.DistanceWithKeys[keys])
-					{
-						n.DistanceWithKeys[keys] = n.DistanceWithKeys[initialKeys];
-					}
+				//	if (n.DistanceWithKeys[initialKeys] < n.DistanceWithKeys[keys])
+				//	{
+				//		n.DistanceWithKeys[keys] = n.DistanceWithKeys[initialKeys];
+				//	}
 
-				}
-				if (keys == allKeyMask)
-				{
-					//var distance = nodes.Sum(n => n.DistanceWithKeys[keys]);
-					var distance = nodes.Sum(n => n.DistanceWithKeys[keys]);
-					if (distance < minDistance)
-					{
-						minDistance = distance;
+				//}
 
-						Console.WriteLine();
-						foreach (var n in nodes)
-						{
-							Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[initialKeys]}: ");
-							foreach (var e in n.Edges.Keys)
-							{
-								var visited = e.VisitedBy.Contains(keys);
-								var passable = e.IsPassableWith(keys);
-								var deadend = visited || !passable;
-								Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
-							}
-							Console.WriteLine();
-						}
+				//if (keys == allKeyMask)
+				//{
+				//	//var distance = nodes.Sum(n => n.DistanceWithKeys[keys]);
+				//	var distance = nodes.Sum(n => n.DistanceWithKeys[keys]);
+				//	if (distance < minDistance)
+				//	{
+				//		minDistance = distance;
 
-
-					}
-				}
+				//		Console.WriteLine();
+				//		foreach (var n in nodes)
+				//		{
+				//			Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[keys]}: ");
+				//			foreach (var e in n.Edges.Keys)
+				//			{
+				//				var visited = e.VisitedBy.Contains(keys);
+				//				var passable = e.IsPassableWith(keys);
+				//				var deadend = visited || !passable;
+				//				Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
+				//			}
+				//			Console.WriteLine();
+				//		}
+				//	}
+				//}
 
 				//Console.WriteLine();
 				//foreach (var n in nodes)
 				//{
-				//	Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[initialKeys]}: ");
+				//	Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[keys]}: ");
 				//	foreach (var e in n.Edges.Keys)
 				//	{
 				//		var visited = e.VisitedBy.Contains(keys);
 				//		var passable = e.IsPassableWith(keys);
 				//		var deadend = visited || !passable;
-				//		Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend?"--":"OK")}  | ");
+				//		Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
 				//	}
 				//	Console.WriteLine();
 				//}
@@ -650,21 +651,80 @@ namespace AdventOfCode.Y2019.Day18
 
 				foreach (var node in nodes)
 				{
+					var nodeDistance = node.DistanceWithKeys[keys];
 					foreach (var (neighbor, distance) in node.Edges)
 					{
 						if (neighbor.VisitedBy.Contains(keys) || !neighbor.IsPassableWith(keys))
 						{
 							continue;
 						}
-						var newdistance = node.DistanceWithKeys[initialKeys] + distance;
+						var newdistance = nodeDistance + distance;
 						if (newdistance > neighbor.DistanceWithKeys[keys])
 						{
 							continue;
 						}
 						neighbor.DistanceWithKeys[keys] = newdistance;
-						//var newkeys = keys | neighbor.IsKeyKey;
+						var newkeys = keys;
+
+						if (neighbor.IsKey && (keys & neighbor.Key) == 0)
+						{
+							newkeys |= neighbor.IsKeyKey;
+							foreach (var nn in nodes)
+							{
+								if (nn.DistanceWithKeys[newkeys] > nn.DistanceWithKeys[keys])
+								{
+									nn.DistanceWithKeys[newkeys] = nn.DistanceWithKeys[keys];
+								}
+							}
+							if (neighbor.DistanceWithKeys[newkeys] > neighbor.DistanceWithKeys[keys])
+							{
+								neighbor.DistanceWithKeys[newkeys] = neighbor.DistanceWithKeys[keys];
+							}
+
+							if (newkeys == allKeyMask)
+							{
+								//var distance = nodes.Sum(n => n.DistanceWithKeys[keys]);
+								var thisDistance = nodes.Sum(n => n.DistanceWithKeys[keys]);
+								if (thisDistance < minDistance)
+								{
+									minDistance = thisDistance;
+
+									Console.WriteLine();
+									Console.WriteLine($"minDistance={minDistance}");
+									foreach (var n in nodes)
+									{
+										Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[keys]}: ");
+										foreach (var e in n.Edges.Keys)
+										{
+											var visited = e.VisitedBy.Contains(keys);
+											var passable = e.IsPassableWith(keys);
+											var deadend = visited || !passable;
+											Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
+										}
+										Console.WriteLine();
+									}
+								}
+							}
+
+
+						}
+
 						var newnodes = nodes.Select(n => n == node ? neighbor : n).ToList();
-						queue.Enqueue((newnodes, keys));
+
+						//neighbor.DistanceWithKeys[newkeys] = newdistance;
+						//var newkeys = keys | neighbor.IsKeyKey;
+						queue.Enqueue((newnodes, newkeys));
+
+						//Console.Write($"  Explore Node {neighbor} {neighbor.Value} keys={KeysToString(newkeys)} distance={neighbor.DistanceWithKeys[newkeys]}: ");
+						//foreach (var e in neighbor.Edges.Keys)
+						//{
+						//	var visited = e.VisitedBy.Contains(keys);
+						//	var passable = e.IsPassableWith(keys);
+						//	var deadend = visited || !passable;
+						//	Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
+						//}
+						//Console.WriteLine();
+
 						neighbor.VisitedBy.Add(keys);
 					}
 					//if (node.Edges.Keys.All(e => e.IsPassableWith(keys)))
@@ -672,6 +732,9 @@ namespace AdventOfCode.Y2019.Day18
 					//}
 				}
 			}
+
+			Console.WriteLine($"Visits: {visitCount}");
+
 			return minDistance;
 		}
 
