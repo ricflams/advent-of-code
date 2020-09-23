@@ -11,17 +11,17 @@ namespace AdventOfCode.Y2019.Day18
 	{
 		public static void Run()
 		{
-			var sw = Stopwatch.StartNew();
-			//Puzzle1();
+			//var sw = Stopwatch.StartNew();
+			Puzzle1();
 			//Console.WriteLine("Elapsed: " + sw.Elapsed);
 			//sw.Restart();
 			Puzzle2();
-			Console.WriteLine("Elapsed: " + sw.Elapsed);
+			//Console.WriteLine("Elapsed: " + sw.Elapsed);
 		}
 
 		private static void Puzzle1()
 		{
-			var sw = Stopwatch.StartNew();
+			//var sw = Stopwatch.StartNew();
 
 			//var steps1 = ShortestPath(ReadMap("Y2019/Day18/input-1.txt"));
 			//Debug.Assert(steps1 == 8);
@@ -53,7 +53,7 @@ namespace AdventOfCode.Y2019.Day18
 
 			var steps = ShortestPath(ReadMap("Y2019/Day18/input.txt"));
 			Console.WriteLine($"Day 18 Puzzle 1: {steps}");
-			Console.WriteLine($"Elapsed: {sw.Elapsed}");
+			//Console.WriteLine($"Elapsed: {sw.Elapsed}");
 			Debug.Assert(steps == 3216);
 		}
 
@@ -154,7 +154,7 @@ namespace AdventOfCode.Y2019.Day18
 			//PrintGraph(vertices);
 			var sw = Stopwatch.StartNew();
 			var distance = FindMinimumDistanceDfs(vertices);
-			Console.WriteLine($"Elapsed1: {sw.Elapsed}");
+			//Console.WriteLine($"Elapsed1: {sw.Elapsed}");
 
 			//InflateGraph(vertices);
 			//var distance = FindMinimumDistanceBfs(vertices);
@@ -473,12 +473,12 @@ namespace AdventOfCode.Y2019.Day18
 			//var distanceDfs = MinimumDistanceDijkstra(vertices.First());//, 0, 0);
 			var distanceDfs = MinimumDistance(vertices.First(), 0);
 
-			Console.WriteLine("Stats:");
-			Console.WriteLine($"minimumDistanceMemoHits= {minimumDistanceMemoHits}");
-			Console.WriteLine($"minimumDistanceHits= {minimumDistanceHits}");
-			Console.WriteLine($"allKeysFoundHits= {allKeysFoundHits}");
-			//Console.WriteLine($"skipLongerHits= {skipLongerHits}");
-			Console.WriteLine($"shortestPathToKeysHits= {shortestPathToKeysHits}");
+			//Console.WriteLine("Stats:");
+			//Console.WriteLine($"minimumDistanceMemoHits= {minimumDistanceMemoHits}");
+			//Console.WriteLine($"minimumDistanceHits= {minimumDistanceHits}");
+			//Console.WriteLine($"allKeysFoundHits= {allKeysFoundHits}");
+			////Console.WriteLine($"skipLongerHits= {skipLongerHits}");
+			//Console.WriteLine($"shortestPathToKeysHits= {shortestPathToKeysHits}");
 
 			return distanceDfs;
 
@@ -689,20 +689,20 @@ namespace AdventOfCode.Y2019.Day18
 								{
 									minDistance = thisDistance;
 
-									Console.WriteLine();
-									Console.WriteLine($"minDistance={minDistance}");
-									foreach (var n in nodes)
-									{
-										Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[keys]}: ");
-										foreach (var e in n.Edges.Keys)
-										{
-											var visited = e.VisitedBy.Contains(keys);
-											var passable = e.IsPassableWith(keys);
-											var deadend = visited || !passable;
-											Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
-										}
-										Console.WriteLine();
-									}
+									//Console.WriteLine();
+									//Console.WriteLine($"minDistance={minDistance}");
+									//foreach (var n in nodes)
+									//{
+									//	Console.Write($"Node {n} {n.Value} keys={KeysToString(keys)} distance={n.DistanceWithKeys[keys]}: ");
+									//	foreach (var e in n.Edges.Keys)
+									//	{
+									//		var visited = e.VisitedBy.Contains(keys);
+									//		var passable = e.IsPassableWith(keys);
+									//		var deadend = visited || !passable;
+									//		Console.Write($"{e} {e.Value} vis/pas={visited}/{passable}:{(deadend ? "--" : "OK")}  | ");
+									//	}
+									//	Console.WriteLine();
+									//}
 								}
 							}
 
@@ -733,7 +733,7 @@ namespace AdventOfCode.Y2019.Day18
 				}
 			}
 
-			Console.WriteLine($"Visits: {visitCount}");
+			//Console.WriteLine($"Visits: {visitCount}");
 
 			return minDistance;
 		}
