@@ -22,6 +22,16 @@ namespace AdventOfCode.Helpers
 			throw new Exception($"Regex mismatch: pattern '{pattern}' does not match {input}");
 		}
 
+		public static string MatchString(string input, string pattern)
+		{
+			return Match(input, pattern).First();
+		}
+
+		public static int MatchInt(string input, string pattern)
+		{
+			return int.Parse(MatchString(input, pattern));
+		}
+
 		public static bool IsMatch(string input, string pattern, out string[] val)
 		{
 			if (!_regexCache.TryGetValue(pattern, out var regex))
