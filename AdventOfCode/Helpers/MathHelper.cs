@@ -78,5 +78,17 @@ namespace AdventOfCode.Helpers
 				}
 			}
 		}
+
+		public static bool AreDistinct(params int[] values)
+		{
+			for (var i = 0; i < values.Length - 1; i++)
+			{
+				if (values.Skip(i + 1).Contains(values[i]))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 }

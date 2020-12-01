@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2020.Day01
 			foreach (var e1 in expenses)
 			{
 				var e2 = 2020 - e1;
-				if (expenseLookup.Contains(e2))
+				if (expenseLookup.Contains(e2) && MathHelper.AreDistinct(e1, e2))
 				{
 					result = e1 * e2;
 					break;
@@ -44,10 +44,10 @@ namespace AdventOfCode.Y2020.Day01
 			int result = 0;
 			foreach (var e1 in expenses)
 			{
-				foreach (var e2 in expenses.Where(x => x != e1))
+				foreach (var e2 in expenses)
 				{
 					var e3 = 2020 - (e1 + e2);
-					if (expenseLookup.Contains(e3))
+					if (expenseLookup.Contains(e3) && MathHelper.AreDistinct(e1, e2, e3))
 					{
 						result = e1 * e2 * e3;
 						break;
