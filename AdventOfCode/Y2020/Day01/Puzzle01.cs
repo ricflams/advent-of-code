@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2020.Day01
 
 		private static void Puzzle1()
 		{
-			var expenses = File.ReadLines("Y2020/Day01/input.txt").Select(int.Parse);
+			var expenses = File.ReadAllLines("Y2020/Day01/input.txt").Select(int.Parse);
 			var expenseLookup = new HashSet<int>(expenses);
 
 			int result = 0;
@@ -38,7 +38,7 @@ namespace AdventOfCode.Y2020.Day01
 
 		private static void Puzzle2()
 		{
-			var expenses = File.ReadLines("Y2020/Day01/input.txt").Select(int.Parse);
+			var expenses = File.ReadAllLines("Y2020/Day01/input.txt").Select(int.Parse);
 			var expenseLookup = new HashSet<int>(expenses);
 
 			int result = 0;

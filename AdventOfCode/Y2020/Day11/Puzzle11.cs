@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2020.Day11
 
 		private static void Puzzle1()
 		{
-			var input = File.ReadLines("Y2020/Day11/input.txt");
+			var input = File.ReadAllLines("Y2020/Day11/input.txt");
 
 			//Console.WriteLine($"Day 11 Puzzle 1: {result}");
 			//Debug.Assert(result == );
@@ -26,7 +26,7 @@ namespace AdventOfCode.Y2020.Day11
 
 		private static void Puzzle2()
 		{
-			var input = File.ReadLines("Y2020/Day11/input.txt");
+			var input = File.ReadAllLines("Y2020/Day11/input.txt");
 
 			//Console.WriteLine($"Day 11 Puzzle 2: {result}");
 			//Debug.Assert(result == );
