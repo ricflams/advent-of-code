@@ -1,10 +1,8 @@
 using AdventOfCode.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day02
 {
@@ -12,24 +10,39 @@ namespace AdventOfCode.Y2020.Day02
 	{
 		public static void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			Puzzle1And2();
 		}
 
-		private static void Puzzle1()
+		private static void Puzzle1And2()
 		{
-			var input = File.ReadLines("Y2020/Day02/input.txt");
+			var input = File.ReadAllLines("Y2020/Day02/input.txt");
 
-			//Console.WriteLine($"Day 02 Puzzle 1: {result}");
-			//Debug.Assert(result == );
-		}
+			var result1 = 0;
+			var result2 = 0;
+			foreach (var line in input)
+			{
+				SimpleRegex.Capture(line, "%d-%d %c: %s")
+					.Get(out int min)
+					.Get(out int max)
+					.Get(out char c)
+					.Get(out string pwd);
 
-		private static void Puzzle2()
-		{
-			var input = File.ReadLines("Y2020/Day02/input.txt");
+				var n = pwd.Count(x => x == c);
+				if (n >= min && n <= max)
+				{
+					result1++;
+				}
 
-			//Console.WriteLine($"Day 02 Puzzle 2: {result}");
-			//Debug.Assert(result == );
+				if (pwd[min - 1] == c ^ pwd[max - 1] == c)
+				{
+					result2++;
+				}
+			}
+
+			Console.WriteLine($"Day 02 Puzzle 1: {result1}");
+			Console.WriteLine($"Day 02 Puzzle 1: {result2}");
+			Debug.Assert(result1 == 607);
+			Debug.Assert(result2 == 321);
 		}
 	}
 }

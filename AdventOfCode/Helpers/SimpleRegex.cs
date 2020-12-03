@@ -47,6 +47,7 @@ namespace AdventOfCode.Helpers
 						{
 							case '%': sb.Append('%'); break;
 							case 's': sb.Append(@"(\w+)"); break;
+							case 'c': sb.Append(@"(\w)"); break;
 							case 'd': sb.Append(@"(-?\d+)"); break;
 							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
 						}
@@ -64,6 +65,25 @@ namespace AdventOfCode.Helpers
 
 			val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
 			return true;
+		}
+
+		public class Captures
+		{
+			private readonly string[] _matches;
+			private int _index;
+			public Captures(string[] matches) { _matches = matches; }
+			public Captures Get(out int value) { value = int.Parse(_matches[_index++]); return this; }
+			public Captures Get(out string value) { value = _matches[_index++]; return this; }
+			public Captures Get(out char value) { value = _matches[_index++][0]; return this; }
+
+		}
+		public static Captures Capture(string input, string pattern)
+		{
+			if (!IsMatch(input, pattern, out var matches))
+			{
+				throw new Exception($"No match for pattern {pattern} in input {input}");
+			}
+			return new Captures(matches);
 		}
 	}
 }
