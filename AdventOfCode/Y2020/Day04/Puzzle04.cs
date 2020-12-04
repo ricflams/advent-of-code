@@ -1,11 +1,9 @@
 using AdventOfCode.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day04
 {
@@ -13,121 +11,94 @@ namespace AdventOfCode.Y2020.Day04
 	{
 		public static void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			Puzzle1And2();
 		}
 
-		private static void Puzzle1()
+		private static void Puzzle1And2()
 		{
 			var input = File.ReadAllText("Y2020/Day04/input.txt");
-			var xx = input.Split("\r\n\r\n");
-			var passports = xx.Select(p =>
-			{
-				p = p.Replace("\r\n", " ");
-				var fields = p.Split(" ").Select(x => x.Split(":")).ToDictionary(x => x[0], x => x[1]);
-				return new Passport
+			var passports = input
+				.Split("\r\n\r\n")
+				.Select(raw =>
 				{
-					byr = fields.TryGetValue("byr", out var byr) ? byr : null,
-					iyr = fields.TryGetValue("iyr", out var iyr) ? iyr : null,
-					eyr = fields.TryGetValue("eyr", out var eyr) ? eyr : null,
-					hgt = fields.TryGetValue("hgt", out var hgt) ? hgt : null,
-					hcl = fields.TryGetValue("hcl", out var hcl) ? hcl : null,
-					ecl = fields.TryGetValue("ecl", out var ecl) ? ecl : null,
-					pid = fields.TryGetValue("pid", out var pid) ? pid : null,
-					cid = fields.TryGetValue("cid", out var cid) ? cid : null
-				};
-			});
+					var info = raw.Replace("\r\n", " ");
+					var fields = info.Split(" ").Select(x => x.Split(":")).ToDictionary(x => x[0], x => x[1]);
+					return Passport.Create(fields);
+				});
 
-			var result1 = passports.Count(x =>
-				x.byr != null &&
-				x.iyr != null &&
-				x.eyr != null &&
-				x.hgt != null &&
-				x.hcl != null &&
-				x.ecl != null &&
-				x.pid != null);
+			var result1 = passports.Count(x => x.AreAllFieldsPresent);
 
 			var result2 = passports.Count(x =>
-			{
-				if (!(x.byr != null &&
-				x.iyr != null &&
-				x.eyr != null &&
-				x.hgt != null &&
-				x.hcl != null &&
-				x.ecl != null &&
-				x.pid != null))
-					return false;
-
-
-
-				var byr = int.Parse(x.byr);
-				if (byr < 1920 || byr > 2002)
-					return false;
-				var iyr = int.Parse(x.iyr);
-				if (iyr < 2010 || iyr > 2020)
-					return false;
-				var eyr = int.Parse(x.eyr);
-				if (eyr < 2020 || eyr > 2030)
-					return false;
-				SimpleRegex.Capture(x.hgt, "%d%s")
-					.Get(out int heightValue)
-					.Get(out string heightUnit);
-				switch (heightUnit)
-				{
-					case "cm":
-						if (heightValue < 150 || heightValue > 193)
-							return false;
-						break;
-					case "in":
-						if (heightValue < 59 || heightValue > 76)
-							return false;
-						break;
-					default:
-						return false;
-				}
-
-				if (!SimpleRegex.IsMatch(x.hcl, "#%s", out var haircolor))
-					return false;
-				if (haircolor[0].Length != 6)
-					return false;
-				if (!haircolor[0].All(x => char.IsDigit(x) || "abcdef".Contains(x)))
-					return false;
-
-				if (x.ecl != "amb" && x.ecl != "blu" && x.ecl != "brn" && x.ecl != "gry" && x.ecl != "grn" && x.ecl != "hzl" && x.ecl != "oth")
-					return false;
-				if (x.pid.Length != 9)
-					return false;
-				if (!x.pid.All(c => char.IsDigit(c)))
-					return false;
-				return true;
-			});
-
+				x.AreAllFieldsPresent &&
+				x.IsByrValid &&
+				x.IsIyrValid &&
+				x.IsEyrValid &&
+				x.IsHgtValid &&
+				x.IsHclValid &&
+				x.IsEclValid &&
+				x.IsPidValid
+			);
 
 			Console.WriteLine($"Day 04 Puzzle 1: {result1}");
 			Console.WriteLine($"Day 04 Puzzle 1: {result2}");
-			Debug.Assert(result2 == 210);
+			Debug.Assert(result1 == 210);
 			Debug.Assert(result2 == 131);
-		}
-
-		private static void Puzzle2()
-		{
-			var input = File.ReadAllLines("Y2020/Day04/input.txt");
-
-			//Console.WriteLine($"Day 04 Puzzle 2: {result}");
-			//Debug.Assert(result == );
 		}
 
 		private class Passport
 		{
-			public string byr { get; set; }
-			public string iyr { get; set; }
-			public string eyr { get; set; }
-			public string hgt { get; set; }
-			public string hcl { get; set; }
-			public string ecl { get; set; }
-			public string pid { get; set; }
-			public string cid { get; set; }
-		}
+			public static Passport Create(Dictionary<string, string> fields)
+			{
+				return new Passport
+				{
+					Byr = fields.TryGetValue("byr", out var byr) ? byr : null,
+					Iyr = fields.TryGetValue("iyr", out var iyr) ? iyr : null,
+					Eyr = fields.TryGetValue("eyr", out var eyr) ? eyr : null,
+					Hgt = fields.TryGetValue("hgt", out var hgt) ? hgt : null,
+					Hcl = fields.TryGetValue("hcl", out var hcl) ? hcl : null,
+					Ecl = fields.TryGetValue("ecl", out var ecl) ? ecl : null,
+					Pid = fields.TryGetValue("pid", out var pid) ? pid : null,
+					Cid = fields.TryGetValue("cid", out var cid) ? cid : null
+				};
+			}
 
+			public string Byr { get; set; }
+			public string Iyr { get; set; }
+			public string Eyr { get; set; }
+			public string Hgt { get; set; }
+			public string Hcl { get; set; }
+			public string Ecl { get; set; }
+			public string Pid { get; set; }
+			public string Cid { get; set; }
+
+			public bool AreAllFieldsPresent =>
+				Byr != null &&
+				Iyr != null &&
+				Eyr != null &&
+				Hgt != null &&
+				Hcl != null &&
+				Ecl != null &&
+				Pid != null;
+
+			public bool IsByrValid => int.Parse(Byr) >= 1920 && int.Parse(Byr) <= 2002;
+			public bool IsIyrValid => int.Parse(Iyr) >= 2010 && int.Parse(Iyr) <= 2020;
+			public bool IsEyrValid => int.Parse(Eyr) >= 2020 && int.Parse(Eyr) <= 2030;
+			public bool IsHgtValid
+			{
+				get
+				{
+					SimpleRegex.Capture(Hgt, "%d%s")
+						.Get(out int h)
+						.Get(out string unit);
+					return unit == "cm" && h >= 150 && h <= 193 || unit == "in" && h >= 59 && h <= 76;
+				}
+			}
+			public bool IsHclValid =>
+				SimpleRegex.IsMatch(Hcl, "#%s", out var haircolor) &&
+					haircolor[0].Length == 6 &&
+					haircolor[0].All(x => char.IsDigit(x) || "abcdef".Contains(x));
+			public bool IsEclValid => new[] { "amb", "blu", "brn", "gry", "grn", "hzl", "oth" }.Contains(Ecl);
+			public bool IsPidValid => Pid.Length == 9 && Pid.All(c => char.IsDigit(c));
+		}
 	}
 }
