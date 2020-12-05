@@ -278,4 +278,8 @@
 	</None>
 </ItemGroup>
 
+<ItemGroup>
+  <Folder Include="Y2020\Templates\" />
+</ItemGroup>
+
 </Project>
