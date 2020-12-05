@@ -1,10 +1,7 @@
-using AdventOfCode.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day05
 {
@@ -12,24 +9,29 @@ namespace AdventOfCode.Y2020.Day05
 	{
 		public static void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			Puzzle1And2();
 		}
 
-		private static void Puzzle1()
+		private static void Puzzle1And2()
 		{
 			var input = File.ReadAllLines("Y2020/Day05/input.txt");
 
-			//Console.WriteLine($"Day 05 Puzzle 1: {result}");
-			//Debug.Assert(result == );
-		}
+			var ids = input
+				.Select(x => x.Replace("F", "0").Replace("B", "1").Replace("L", "0").Replace("R", "1"))
+				.Select(x => Convert.ToInt32(x, 2))
+				.ToArray();
 
-		private static void Puzzle2()
-		{
-			var input = File.ReadAllLines("Y2020/Day05/input.txt");
+			var result1 = ids.Max();
 
-			//Console.WriteLine($"Day 05 Puzzle 2: {result}");
-			//Debug.Assert(result == );
+			ids = ids.OrderBy(x => x).ToArray();
+			var result2 = ids
+				.SkipWhile((id, i) => id + 1 == ids[i + 1])
+				.First() + 1;
+
+			Console.WriteLine($"Day 05 Puzzle 1: {result1}");
+			Console.WriteLine($"Day 05 Puzzle 2: {result2}");
+			Debug.Assert(result1 == 855);
+			Debug.Assert(result2 == 552);
 		}
 	}
 }
