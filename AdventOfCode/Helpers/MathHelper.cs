@@ -49,6 +49,21 @@ namespace AdventOfCode.Helpers
 			return Permute(Enumerable.Range(0, length));
 		}
 
+		public static IEnumerable<int[]> CountInBaseX(int numberBase, int numberOfDigits)
+		{
+			var n = numberOfDigits;
+			var digits = Enumerable.Repeat(0, n).ToArray();
+			var iterations = (int)Math.Pow(n, numberBase);
+			while (iterations-- > 0)
+			{
+				yield return digits;
+				for (var pos = n - 1; pos >= 0 && ++digits[pos] >= numberBase; pos--)
+				{
+					digits[pos] = 0;
+				}
+			}
+		}
+
 		public static int[] DivideEvenly(int value, int parts)
 		{
 			var values = new int[parts];
