@@ -86,7 +86,7 @@ namespace AdventOfCode.Y2020.Day04
 			{
 				get
 				{
-					SimpleRegex.Capture(Hgt, "%d%s")
+					Hgt.RegexCapture("%d%s")
 						.Get(out int h)
 						.Get(out string unit);
 					return unit == "cm" && h >= 150 && h <= 193 || unit == "in" && h >= 59 && h <= 76;

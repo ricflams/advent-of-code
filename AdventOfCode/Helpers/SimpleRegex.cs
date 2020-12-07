@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Helpers
 {
-	public class SimpleRegex
+	public static class SimpleRegex
 	{
 		private static readonly Dictionary<string, string> _regexCache = new Dictionary<string, string>();
 
@@ -46,6 +46,7 @@ namespace AdventOfCode.Helpers
 					else switch (pattern[++i])
 						{
 							case '%': sb.Append('%'); break;
+							case '*': sb.Append(@"(.+)"); break;
 							case 's': sb.Append(@"(\w+)"); break;
 							case 'c': sb.Append(@"(\w)"); break;
 							case 'd': sb.Append(@"(-?\d+)"); break;
@@ -77,7 +78,8 @@ namespace AdventOfCode.Helpers
 			public Captures Get(out char value) { value = _matches[_index++][0]; return this; }
 
 		}
-		public static Captures Capture(string input, string pattern)
+
+		public static Captures RegexCapture(this string input, string pattern)
 		{
 			if (!IsMatch(input, pattern, out var matches))
 			{

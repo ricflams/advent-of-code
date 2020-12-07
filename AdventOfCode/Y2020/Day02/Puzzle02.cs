@@ -21,7 +21,7 @@ namespace AdventOfCode.Y2020.Day02
 			var result2 = 0;
 			foreach (var line in input)
 			{
-				SimpleRegex.Capture(line, "%d-%d %c: %s")
+				line.RegexCapture("%d-%d %c: %s")
 					.Get(out int min)
 					.Get(out int max)
 					.Get(out char c)
