@@ -48,7 +48,7 @@ namespace AdventOfCode.Helpers
 							case '%': sb.Append('%'); break;
 							case '*': sb.Append(@"(.+)"); break;
 							case 's': sb.Append(@"(\w+)"); break;
-							case 'c': sb.Append(@"(\w)"); break;
+							case 'c': sb.Append(@"(.)"); break;
 							case 'd': sb.Append(@"(-?\d+)"); break;
 							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
 						}
