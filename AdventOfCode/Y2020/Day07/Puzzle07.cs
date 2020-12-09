@@ -19,6 +19,7 @@ namespace AdventOfCode.Y2020.Day07
 			var input = File.ReadAllLines("Y2020/Day07/input.txt");
 
 			var bags = input
+				.AsParallel()
 				.Select(line =>
 				{
 					// clear chartreuse bags contain 3 mirrored olive bags, 1 posh yellow bag, 1 faded salmon bag, 5 drab salmon bags.
@@ -40,6 +41,7 @@ namespace AdventOfCode.Y2020.Day07
 							.ToDictionary(x => x.color, x => x.n)
 					};
 				})
+				.AsEnumerable()
 				.ToDictionary(x => x.Color, x => x);
 
 			// Memo results so we only calculate when needed

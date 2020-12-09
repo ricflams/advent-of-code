@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace AdventOfCode.Helpers
 {
 	public static class SimpleRegex
 	{
-		private static readonly Dictionary<string, string> _regexCache = new Dictionary<string, string>();
+		private static readonly ConcurrentDictionary<string, string> _regexCache = new ConcurrentDictionary<string, string>();
 
 		/// <summary>
 		/// Parse according to simple C-like format-specs, %s and %d
@@ -49,7 +50,7 @@ namespace AdventOfCode.Helpers
 							case '*': sb.Append(@"(.+)"); break;
 							case 's': sb.Append(@"(\w+)"); break;
 							case 'c': sb.Append(@"(.)"); break;
-							case 'd': sb.Append(@"(-?\d+)"); break;
+							case 'd': sb.Append(@"([-+]?\d+)"); break;
 							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
 						}
 				}
