@@ -42,7 +42,7 @@ namespace AdventOfCode.Y2020.Day09
 					for (var j = i; j < data.Length && sum < seek; j++)
 					{
 						sum += data[j];
-						if (sum == result1 && j > i) // Use j>i because set must contain more than 1 number
+						if (sum == seek && j > i) // Use j>i because set must contain more than 1 number
 						{
 							var set = data[i..j];
 							return set.Min() + set.Max();
