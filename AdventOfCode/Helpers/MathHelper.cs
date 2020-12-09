@@ -26,6 +26,22 @@ namespace AdventOfCode.Helpers
 			long Lcm(long a, long b) => (a / GreatestCommonFactor(a, b)) * b;
 		}
 
+		public static IEnumerable<long> Factorize(long n)
+		{
+			var max = (long)Math.Ceiling(Math.Sqrt(n));
+			for (var d = 1; d < max; d++)
+			{
+				if (n % d == 0)
+				{
+					yield return d;
+					if (d != max)
+					{
+						yield return n / d;
+					}
+				}
+			}
+		}
+
 		public static IEnumerable<IEnumerable<int>> Permute(IEnumerable<int> x)
 		{
 			if (x.Count() == 1)
