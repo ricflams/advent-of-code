@@ -69,5 +69,21 @@ namespace AdventOfCode.Helpers
 		}
 
 		public static string ToCommaString(this IEnumerable<int> list) => string.Join(',', list);
+
+		public static IEnumerable<string[]> GroupByEmptyLine(this IEnumerable<string> input)
+		{
+			var group = new List<string>();
+			foreach (var line in input)
+			{
+				if (line.Length == 0)
+				{
+					yield return group.ToArray();
+					group.Clear();
+					continue;
+				}
+				group.Add(line);
+			}
+			yield return group.ToArray();
+		}
 	}
 }

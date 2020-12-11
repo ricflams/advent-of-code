@@ -16,12 +16,11 @@ namespace AdventOfCode.Y2020.Day04
 
 		private static void Puzzle1And2()
 		{
-			var input = File.ReadAllText("Y2020/Day04/input.txt");
-			var passports = input
-				.Split("\r\n\r\n")
+			var passports = File.ReadLines("Y2020/Day04/input.txt")
+				.GroupByEmptyLine()
 				.Select(raw =>
 				{
-					var info = raw.Replace("\r\n", " ");
+					var info = string.Join(" ", raw);
 					var fields = info.Split(" ").Select(x => x.Split(":")).ToDictionary(x => x[0], x => x[1]);
 					return Passport.Create(fields);
 				});
@@ -87,7 +86,7 @@ namespace AdventOfCode.Y2020.Day04
 			{
 				get
 				{
-					SimpleRegex.Capture(Hgt, "%d%s")
+					Hgt.RegexCapture("%d%s")
 						.Get(out int h)
 						.Get(out string unit);
 					return unit == "cm" && h >= 150 && h <= 193 || unit == "in" && h >= 59 && h <= 76;

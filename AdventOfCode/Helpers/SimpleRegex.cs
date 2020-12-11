@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Helpers
 {
-	public class SimpleRegex
+	public static class SimpleRegex
 	{
-		private static readonly Dictionary<string, string> _regexCache = new Dictionary<string, string>();
+		private static readonly ConcurrentDictionary<string, string> _regexCache = new ConcurrentDictionary<string, string>();
 
 		/// <summary>
 		/// Parse according to simple C-like format-specs, %s and %d
@@ -46,9 +47,10 @@ namespace AdventOfCode.Helpers
 					else switch (pattern[++i])
 						{
 							case '%': sb.Append('%'); break;
+							case '*': sb.Append(@"(.+)"); break;
 							case 's': sb.Append(@"(\w+)"); break;
-							case 'c': sb.Append(@"(\w)"); break;
-							case 'd': sb.Append(@"(-?\d+)"); break;
+							case 'c': sb.Append(@"(.)"); break;
+							case 'd': sb.Append(@"([-+]?\d+)"); break;
 							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
 						}
 				}
@@ -77,7 +79,8 @@ namespace AdventOfCode.Helpers
 			public Captures Get(out char value) { value = _matches[_index++][0]; return this; }
 
 		}
-		public static Captures Capture(string input, string pattern)
+
+		public static Captures RegexCapture(this string input, string pattern)
 		{
 			if (!IsMatch(input, pattern, out var matches))
 			{
