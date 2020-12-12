@@ -132,7 +132,7 @@ namespace AdventOfCode.Y2019.Day24
 					var nextmap = new CharMap();
 					foreach (var pos in level.AllPoints().Where(p => p != center)) // ToArray should not be needed?
 					{
-						var n = Extensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
+						var n = DirectionExtensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
 						var isOnBug = level[pos] == '#';
 						nextmap[pos] = isOnBug
 							? n == 1 ? '#' : '.'

@@ -16,38 +16,6 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public static Direction TurnRight(this Direction direction)
-		{
-			switch (direction)
-			{
-				case Direction.Up: return Direction.Right;
-				case Direction.Right: return Direction.Down;
-				case Direction.Down: return Direction.Left;
-				case Direction.Left: return Direction.Up;
-			}
-			throw new Exception($"{nameof(TurnRight)}: Unknown direction {direction}");
-		}
-
-		public static Direction TurnLeft(this Direction direction)
-		{
-			switch (direction)
-			{
-				case Direction.Up: return Direction.Left;
-				case Direction.Right: return Direction.Up;
-				case Direction.Down: return Direction.Right;
-				case Direction.Left: return Direction.Down;
-			}
-			throw new Exception($"{nameof(TurnLeft)}: Unknown direction {direction}");
-		}
-
-		public static IEnumerable<Direction> LookAroundDirection()
-		{
-			yield return Direction.Up;
-			yield return Direction.Right;
-			yield return Direction.Down;
-			yield return Direction.Left;
-		}
-
 		public static BigInteger ModInverse(this BigInteger a, BigInteger m)
 		{
 			if (m == 1) return 0;

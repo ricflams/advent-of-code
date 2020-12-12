@@ -6,6 +6,8 @@ namespace AdventOfCode.Helpers
 	[System.Diagnostics.DebuggerDisplay("{ToString()}")]
 	public class Point
     {
+		public static readonly Point Origin = Point.From(0, 0);
+
 		public int X { get; private set; }
 		public int Y { get; private set; }
 
@@ -17,7 +19,7 @@ namespace AdventOfCode.Helpers
 
 		static public Point From(int x, int y) => new Point(x, y);
 
-		public static bool operator ==(Point p1, Point p2) => (object)p1 == null ? (object)p2 == null : p1.Equals(p2);
+		public static bool operator ==(Point p1, Point p2) => p1 is null ? p2 is null : p1.Equals(p2);
 		public static bool operator !=(Point p1, Point p2) => !(p1 == p2);
 		public override bool Equals(object p) => Equals(p as Point);
 		public bool Equals(Point p) => X == p?.X && Y == p?.Y;
@@ -32,6 +34,15 @@ namespace AdventOfCode.Helpers
 		public Point DiagonalUpLeft => new Point(X - 1, Y - 1);
 		public Point DiagonalDownRight => new Point(X + 1, Y + 1);
 		public Point DiagonalDownLeft => new Point(X - 1, Y + 1);
+
+		public Point MoveUp(int n) => new Point(X, Y - n);
+		public Point MoveRight(int n) => new Point(X + n, Y);
+		public Point MoveDown(int n) => new Point(X, Y + n);
+		public Point MoveLeft(int n) => new Point(X - n, Y);
+		public Point MoveDiagonalUpRight(int n) => new Point(X + n, Y - n);
+		public Point MoveDiagonalUpLeft(int n) => new Point(X - n, Y - n);
+		public Point MoveDiagonalDownRight(int n) => new Point(X + n, Y + n);
+		public Point MoveDiagonalDownLeft(int n) => new Point(X - n, Y + n);
 
 		public static Point MoveUp(Point p) => p.Up;
 		public static Point MoveRight(Point p) => p.Right;
@@ -54,6 +65,18 @@ namespace AdventOfCode.Helpers
 			throw new Exception($"{nameof(Move)}: Unknown direction {direction}");
 		}
 
+		public Point Move(Direction direction, int n)
+		{
+			switch (direction)
+			{
+				case Direction.Up: return MoveUp(n);
+				case Direction.Right: return MoveRight(n);
+				case Direction.Down: return MoveDown(n);
+				case Direction.Left: return MoveLeft(n);
+			}
+			throw new Exception($"{nameof(Move)}: Unknown direction {direction}");
+		}
+
 		public Point Move(char ch)
 		{
 			switch (ch)
@@ -64,6 +87,11 @@ namespace AdventOfCode.Helpers
 				case '<': return Left;
 			}
 			throw new Exception($"{nameof(Move)}: Unknown direction {ch}");
+		}
+
+		public Point Move(Point vector, int factor = 1)
+		{
+			return new Point(X + vector.X * factor, Y + vector.Y * factor);
 		}
 
 		public IEnumerable<Point> LookAround()
@@ -109,5 +137,32 @@ namespace AdventOfCode.Helpers
 		{
 			return Math.Abs(X - pos.X) + Math.Abs(Y - pos.Y);
 		}
+
+		public Point RotateRight(int angle)
+		{
+			switch (angle)
+			{
+				case 0: return this;
+				case 90: return new Point(-Y, X);
+				case 180: return new Point(-X, -Y);
+				case 270: return new Point(Y, -X);
+				default:
+					throw new Exception($"Unsupported angle {angle}");
+			}
+		}
+
+		public Point RotateLeft(int angle)
+		{
+			switch (angle)
+			{
+				case 0: return this;
+				case 90: return new Point(Y, -X);
+				case 180: return new Point(-X, -Y);
+				case 270: return new Point(-Y, X);
+				default:
+					throw new Exception($"Unsupported angle {angle}");
+			}
+		}
+
 	}
 }

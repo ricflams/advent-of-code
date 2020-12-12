@@ -10,9 +10,9 @@ namespace AdventOfCode
 
 			Exercise(() =>
 			{
-				Y2015Puzzles();
+				//Y2015Puzzles();
 				//Y2019Puzzles();
-				//Y2020Puzzles();
+				Y2020Puzzles();
 			});
 			Console.Write("Done - press any key");
 			Console.ReadKey();
@@ -38,9 +38,9 @@ namespace AdventOfCode
 			Y2015.Day16.Puzzle16.Run();
 			Y2015.Day17.Puzzle17.Run();
 			Y2015.Day18.Puzzle18.Run();
-			Y2015.Day19.Puzzle19.Run();
-			//Y2015.Day20.Puzzle20.Run();
-			//Y2015.Day21.Puzzle21.Run();
+			//Y2015.Day19.Puzzle19.Run();
+			Y2015.Day20.Puzzle20.Run();
+			Y2015.Day21.Puzzle21.Run();
 			//Y2015.Day22.Puzzle22.Run();
 			Y2015.Day23.Puzzle23.Run();
 			Y2015.Day24.Puzzle24.Run();
@@ -82,14 +82,14 @@ namespace AdventOfCode
 			//Y2020.Day02.Puzzle02.Run();
 			//Y2020.Day03.Puzzle03.Run();
 			//Y2020.Day04.Puzzle04.Run();
-			Y2020.Day05.Puzzle05.Run();
+			//Y2020.Day05.Puzzle05.Run();
 			//Y2020.Day06.Puzzle06.Run();
 			//Y2020.Day07.Puzzle07.Run();
 			//Y2020.Day08.Puzzle08.Run();
 			//Y2020.Day09.Puzzle09.Run();
 			//Y2020.Day10.Puzzle10.Run();
-			Y2020.Day11.Puzzle11.Run();
-			//Y2020.Day12.Puzzle12.Run();
+			//Y2020.Day11.Puzzle11.Run();
+			Y2020.Day12.Puzzle12.Run();
 			//Y2020.Day13.Puzzle13.Run();
 			//Y2020.Day14.Puzzle14.Run();
 			//Y2020.Day15.Puzzle15.Run();
@@ -114,7 +114,7 @@ namespace AdventOfCode
 #else
 			action();
 			var sw = System.Diagnostics.Stopwatch.StartNew();
-			var iterations = 10000;
+			var iterations = 10;
 			for (var i = 0; i < iterations; i++)
 			{
 				action();
