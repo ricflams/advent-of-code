@@ -6,8 +6,8 @@ namespace AdventOfCode.Helpers
 {
 	public class SparseMap<T>
 	{
-		private readonly Dictionary<int, SparseMapColumn> _column = new Dictionary<int, SparseMapColumn>();
-		private readonly T _defaultValue;
+		protected readonly Dictionary<int, SparseMapColumn> _column = new Dictionary<int, SparseMapColumn>();
+		protected readonly T _defaultValue;
 
 		public SparseMap(T defaultValue = default)
 		{

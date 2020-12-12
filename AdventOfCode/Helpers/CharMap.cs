@@ -58,5 +58,32 @@ namespace AdventOfCode.Helpers
 				.Select(ch => new string(ch))
 				.ToArray();
 		}
+
+		public CharMap Transform(Func<Point, char, char> transform)
+		{
+			var map = new CharMap(_defaultValue);
+			foreach (var p in AllPoints())
+			{
+				map[p] = transform(p, this[p]);
+			}
+			return map;
+		}
+
+		public int Count(char ch)
+		{
+			var sum = 0;
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					if (column.Row[y] == ch)
+					{
+						sum++;
+					}
+				}
+			}
+			return sum;
+		}
 	}
 }

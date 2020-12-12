@@ -33,6 +33,15 @@ namespace AdventOfCode.Helpers
 		public Point DiagonalDownRight => new Point(X + 1, Y + 1);
 		public Point DiagonalDownLeft => new Point(X - 1, Y + 1);
 
+		public static Point MoveUp(Point p) => p.Up;
+		public static Point MoveRight(Point p) => p.Right;
+		public static Point MoveDown(Point p) => p.Down;
+		public static Point MoveLeft(Point p) => p.Left;
+		public static Point MoveDiagonalUpRight(Point p) => p.DiagonalUpRight;
+		public static Point MoveDiagonalUpLeft(Point p) => p.DiagonalUpLeft;
+		public static Point MoveDiagonalDownRight(Point p) => p.DiagonalDownRight;
+		public static Point MoveDiagonalDownLeft(Point p) => p.DiagonalDownLeft;
+
 		public Point Move(Direction direction)
 		{
 			switch (direction)

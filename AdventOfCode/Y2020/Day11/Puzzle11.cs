@@ -1,10 +1,7 @@
 using AdventOfCode.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day11
 {
@@ -12,143 +9,73 @@ namespace AdventOfCode.Y2020.Day11
 	{
 		public static void Run()
 		{
-			//var input = File.ReadAllLines("Y2020/Day11/input.txt");
+			var input = CharMap.FromFile("Y2020/Day11/input.txt");
 
+			var result1 = 0;
+			for (var seats = input; ;)
+			{
+				seats = seats.Transform((p, ch) =>
+					ch == 'L' && p.LookDiagonallyAround().All(c => seats[c] != '#') ? '#' :
+					ch == '#' && p.LookDiagonallyAround().Count(c => seats[c] == '#') >= 4 ? 'L' :
+					ch
+				);
+				var occupied = seats.Count('#');
+				if (occupied == result1)
+				{
+					break;
+				}
+				result1 = occupied;
+			}
 
-			//var result1 = 0;
-
-			//int occupied = 0;
-			//var m1 = CharMap.FromFile("Y2020/Day11/input.txt");
-			//while (true)
-			//{
-			//	var tofill = m1.AllPoints(c => c == 'L').Where(p => p.LookDiagonallyAround().All(c => m1[c] != '#')).ToList();
-			//	var toclear = m1.AllPoints(c => c == '#').Where(p => {
-
-			//		var adj = p.LookDiagonallyAround();
-			//		var nnn = adj.Count(c => m1[c] == '#');
-			//		var gt4 = nnn >= 4;
-			//		return gt4;
-			//	}).ToList();
-
-			//	foreach (var tf in tofill)
-			//	{
-			//		m1[tf] = '#';
-			//	}
-			//	foreach (var x2 in toclear)
-			//	{
-			//		m1[x2] = 'L';
-			//	}
-
-			//	//m1.ConsoleWrite(false);
-			//	//Console.WriteLine();
-
-			//	var nn = m1.AllValues(c => c == '#').Count();
-			//	if (nn == occupied)
-			//	{
-			//		Console.WriteLine($"Day 11 Puzzle 1: {nn}");
-			//		break;
-			//	}
-			//	occupied = nn;
-			//}
-
-
-
-
-
-
-			//Console.WriteLine($"Day 11 Puzzle 1: {result1}");
-			//Debug.Assert(result == );
+			Console.WriteLine($"Day 11 Puzzle 1: {result1}");
+			Debug.Assert(result1 == 2265);
 
 
 			var result2 = 0;
-
-			var result1 = 0;
-
-			int occupied = 0;
-			var m1 = CharMap.FromFile("Y2020/Day11/input.txt");
-			while (true)
+			for (var seats = input; ;)
 			{
-				var info = m1.AllPoints().Select(p =>
+				seats = seats.Transform((p, ch) =>
 				{
-					var n =
-					(FirstOf(m1, p, Direction.Up) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Up, Direction.Right) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Right) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Right, Direction.Down) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Down) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Down, Direction.Left) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Left) == '#' ? 1 : 0) +
-					(FirstOf(m1, p, Direction.Left, Direction.Up) == '#' ? 1 : 0);
-					return new { Pointxx = p, Occupied = n };
-				}
-				).ToList();
-				var tofill = info.Where(x => m1[x.Pointxx] == 'L' && x.Occupied == 0).ToList();
-				var toclear = info.Where(x => m1[x.Pointxx] == '#' && x.Occupied >= 5).ToList();
+					if (ch == '.')
+						return ch;
+					var adjacents =
+						Adjacent(seats, p, Point.MoveUp) +
+						Adjacent(seats, p, Point.MoveDiagonalUpRight) +
+						Adjacent(seats, p, Point.MoveRight) +
+						Adjacent(seats, p, Point.MoveDiagonalDownRight) +
+						Adjacent(seats, p, Point.MoveDown) +
+						Adjacent(seats, p, Point.MoveDiagonalDownLeft) +
+						Adjacent(seats, p, Point.MoveLeft) +
+						Adjacent(seats, p, Point.MoveDiagonalUpLeft);
+					return
+						ch == 'L' && adjacents == 0 ? '#' :
+						ch == '#' && adjacents >= 5 ? 'L' :
+						ch;
+				});
 
-
-				//var tofill = m1.AllPoints(c => c == 'L').Where(p =>
-				//{
-				//	var n =
-				//	(FirstOf(m1, p, Direction.Up) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Up, Direction.Right) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Right) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Right, Direction.Down) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Down) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Down, Direction.Left) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Left) == '#' ? 1 : 0) +
-				//	(FirstOf(m1, p, Direction.Left, Direction.Up) == '#' ? 1 : 0);
-				//	return new bool { Pointxx = p, Occupied = n };
-				//}
-				//).ToList();
-
-
-				//var toclear = m1.AllPoints(c => c == '#').Where(p => {
-
-				//	var adj = p.LookDiagonallyAround();
-				//	var nnn = adj.Count(c => m1[c] == '#');
-				//	var gt4 = nnn >= 4;
-				//	return gt4;
-				//}).ToList();
-
-				foreach (var tf in tofill)
+				var occupied = seats.Count('#');
+				if (occupied == result2)
 				{
-					m1[tf.Pointxx] = '#';
-				}
-				foreach (var x2 in toclear)
-				{
-					m1[x2.Pointxx] = 'L';
-				}
-
-				//m1.ConsoleWrite(false);
-				//Console.WriteLine();
-
-				var nn = m1.AllValues(c => c == '#').Count();
-				if (nn == occupied)
-				{
-					Console.WriteLine($"Day 11 Puzzle 1: {nn}");
 					break;
 				}
-				occupied = nn;
+				result2 = occupied;
 			}
 
-
-
+			static int Adjacent(CharMap map, Point p, Func<Point, Point> move)
+			{
+				while (true)
+				{
+					p = move(p);
+					var ch = map[p];
+					if (ch != '.')
+					{
+						return ch == '#' ? 1 : 0;
+					}
+				}
+			}
 
 			Console.WriteLine($"Day 11 Puzzle 2: {result2}");
-			//Debug.Assert(result == );
-		}
-
-		static char FirstOf(CharMap map, Point p, params Direction[] dir)
-		{
-			while (true)
-			{
-				foreach (var d in dir)
-				{
-					p = p.Move(d);
-				}
-				if (map[p] != '.')
-					return map[p];
-			}
+			Debug.Assert(result2 == 2045);
 		}
 	}
 }
