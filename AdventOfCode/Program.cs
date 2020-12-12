@@ -87,10 +87,10 @@ namespace AdventOfCode
 			//Y2020.Day07.Puzzle07.Run();
 			//Y2020.Day08.Puzzle08.Run();
 			//Y2020.Day09.Puzzle09.Run();
-			//Y2020.Day10.Puzzle10.Run();
-			//Y2020.Day11.Puzzle11.Run();
-			Y2020.Day12.Puzzle12.Run();
-			//Y2020.Day13.Puzzle13.Run();
+			Y2020.Day10.Puzzle.Instance.Run();
+			Y2020.Day11.Puzzle.Instance.Run();
+			Y2020.Day12.Puzzle.Instance.Run();
+			Y2020.Day13.Puzzle.Instance.Run();
 			//Y2020.Day14.Puzzle14.Run();
 			//Y2020.Day15.Puzzle15.Run();
 			//Y2020.Day16.Puzzle16.Run();

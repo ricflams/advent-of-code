@@ -1,38 +1,61 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode.Y2020.Day11
 {
-	internal class Puzzle11
+	internal class Puzzle : PuzzleRunner<int>
 	{
-		public static void Run()
-		{
-			var input = CharMap.FromFile("Y2020/Day11/input.txt");
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 11;
 
-			var result1 = 0;
-			for (var seats = input; ;)
+		public void Run()
+		{
+			RunPuzzles("test1.txt", 37, 26);
+			RunPuzzles("input.txt", 2265, 2045);
+		}
+
+		protected override int Puzzle1(string[] input)
+		{
+			var seats = CharMap.FromArray(input);
+			var occupied = 0;
+			while (true)
 			{
 				seats = seats.Transform((p, ch) =>
 					ch == 'L' && p.LookDiagonallyAround().All(c => seats[c] != '#') ? '#' :
 					ch == '#' && p.LookDiagonallyAround().Count(c => seats[c] == '#') >= 4 ? 'L' :
 					ch
 				);
-				var occupied = seats.Count('#');
-				if (occupied == result1)
+				var n = seats.Count('#');
+				if (occupied == n)
 				{
 					break;
 				}
-				result1 = occupied;
+				occupied = n;
+			}
+			return occupied;
+		}
+
+		protected override int Puzzle2(string[] input)
+		{
+			static int Adjacent(CharMap map, Point p, Func<Point, Point> move)
+			{
+				while (true)
+				{
+					p = move(p);
+					var ch = map[p];
+					if (ch != '.')
+					{
+						return ch == '#' ? 1 : 0;
+					}
+				}
 			}
 
-			Console.WriteLine($"Day 11 Puzzle 1: {result1}");
-			Debug.Assert(result1 == 2265);
-
-
-			var result2 = 0;
-			for (var seats = input; ;)
+			var seats = CharMap.FromArray(input);
+			var occupied = 0;
+			while (true)
 			{
 				seats = seats.Transform((p, ch) =>
 				{
@@ -52,30 +75,15 @@ namespace AdventOfCode.Y2020.Day11
 						ch == '#' && adjacents >= 5 ? 'L' :
 						ch;
 				});
-
-				var occupied = seats.Count('#');
-				if (occupied == result2)
+				var n = seats.Count('#');
+				if (occupied == n)
 				{
 					break;
 				}
-				result2 = occupied;
+				occupied = n;
 			}
-
-			static int Adjacent(CharMap map, Point p, Func<Point, Point> move)
-			{
-				while (true)
-				{
-					p = move(p);
-					var ch = map[p];
-					if (ch != '.')
-					{
-						return ch == '#' ? 1 : 0;
-					}
-				}
-			}
-
-			Console.WriteLine($"Day 11 Puzzle 2: {result2}");
-			Debug.Assert(result2 == 2045);
+			return occupied;
+		
 		}
 	}
 }

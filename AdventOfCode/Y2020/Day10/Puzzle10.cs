@@ -1,17 +1,24 @@
-using System;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2020.Day10
 {
-	internal class Puzzle10
+	internal class Puzzle : PuzzleRunner<long>
 	{
-		public static void Run()
-		{
-			var input = File.ReadAllLines("Y2020/Day10/input.txt");
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 10;
 
+		public void Run()
+		{
+			RunPuzzles("test1.txt", 35, 8);
+			RunPuzzles("test2.txt", 220, 19208);
+			RunPuzzles("input.txt", 2070, 24179327893504);
+		}
+
+		protected override long Puzzle1(string[] input)
+		{
 			var joltages = input
 				.Select(int.Parse)
 				.OrderBy(x => x)
@@ -24,9 +31,15 @@ namespace AdventOfCode.Y2020.Day10
 			var diffs = adapters.Skip(1).Select((x, i) => x - adapters[i]).ToArray();
 			var diff1 = diffs.Count(x => x == 1);
 			var diff3 = diffs.Count(x => x == 3);
-			var result1 = diff1 * diff3;
-			Console.WriteLine($"Day 10 Puzzle 1: {result1}");
-			Debug.Assert(result1 == 2070);
+			return diff1 * diff3;
+		}
+
+		protected override long Puzzle2(string[] input)
+		{
+			var joltages = input
+				.Select(int.Parse)
+				.OrderBy(x => x)
+				.ToArray();
 
 			var memo = new Dictionary<int, long>();
 			long CountCombinations(int joltage, int pos, IEnumerable<int> chain)
@@ -42,9 +55,7 @@ namespace AdventOfCode.Y2020.Day10
 				}
 				return memo[pos];
 			}
-			long result2 = CountCombinations(0, 0, joltages);
-			Console.WriteLine($"Day 10 Puzzle 2: {result2}");
-			Debug.Assert(result2 == 24179327893504);
+			return CountCombinations(0, 0, joltages);
 		}
 	}
 }

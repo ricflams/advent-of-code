@@ -1,22 +1,17 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
-using System.IO;
 
 namespace AdventOfCode.Y2020.Day12
 {
-	internal class Puzzle12
+	internal class Puzzle : PuzzleRunner<int>
 	{
-		public static void Run()
-		{
-			Puzzle1();
-			Puzzle2();
-		}
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 12;
 
-		private static void Puzzle1()
+		public void Run()
 		{
-			var input = File.ReadAllLines("Y2020/Day12/input.txt");
-
 			//Action N means to move north by the given value.
 			//Action S means to move south by the given value.
 			//Action E means to move east by the given value.
@@ -25,6 +20,12 @@ namespace AdventOfCode.Y2020.Day12
 			//Action R means to turn right the given number of degrees.
 			//Action F means to move forward by the given value in the direction the ship is currently facing.
 
+			RunPuzzles("test1.txt", 25, 286);
+			RunPuzzles("input.txt", 2297, 89984);
+		}
+
+		protected override int Puzzle1(string[] input)
+		{
 			var ship = new PointWithDirection(Point.Origin, Direction.Right);
 			foreach (var line in input)
 			{
@@ -42,15 +43,11 @@ namespace AdventOfCode.Y2020.Day12
 						throw new Exception($"Unknown action in {line}");
 				}
 			}
-			var result1 = ship.Point.ManhattanDistanceTo(Point.Origin);
-			Console.WriteLine($"Day 12 Puzzle 1: {result1}");
-			Debug.Assert(result1 == 2297);
+			return ship.Point.ManhattanDistanceTo(Point.Origin);
 		}
 
-		private static void Puzzle2()
+		protected override int Puzzle2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day12/input.txt");
-
 			var ship = Point.Origin;
 			var waypoint = Point.From(10, -1);
 			foreach (var line in input)
@@ -69,9 +66,7 @@ namespace AdventOfCode.Y2020.Day12
 						throw new Exception($"Unknown action in {line}");
 				}
 			}
-			var result2 = ship.ManhattanDistanceTo(Point.Origin);
-			Console.WriteLine($"Day 12 Puzzle 2: {result2}");
-			Debug.Assert(result2 == 89984);
+			return ship.ManhattanDistanceTo(Point.Origin);
 		}
 	}
 }
