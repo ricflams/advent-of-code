@@ -10,7 +10,7 @@ namespace AdventOfCode.Helpers.Puzzles
 		protected abstract int Year { get; }
 		protected abstract int Day { get; }
 
-		protected void RunPuzzles(string filename, T? expectedResult1, T? expectedResult2)
+		protected void RunPuzzles(string filename, T? expectedResult1 = null, T? expectedResult2 = null)
 		{
 			var puzzleFilename = $"Y{Year}/Day{Day:D2}/{filename}";
 			var input = File.ReadAllLines(puzzleFilename);
