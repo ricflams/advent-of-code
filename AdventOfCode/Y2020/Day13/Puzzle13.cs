@@ -41,7 +41,7 @@ namespace AdventOfCode.Y2020.Day13
 
 		protected override long Puzzle2(string[] input)
 		{
-			var cyclus = input[1]
+			var bus = input[1]
 				.Split(",")
 				.Select((x, i) =>
 					x == "x"
@@ -70,11 +70,11 @@ namespace AdventOfCode.Y2020.Day13
 			}
 
 			long timestamp = 0;
-			long cycle = cyclus[0].Id;
-			for (var i = 1; i < cyclus.Length; i++)
+			long cyclus = bus[0].Id;
+			for (var i = 1; i < bus.Length; i++)
 			{
-				timestamp = FindNextTimestamp(cycle, timestamp, cyclus[i].Id, cyclus[i].Position);
-				cycle = MathHelper.LeastCommonMultiple(cycle, cyclus[i].Id);
+				timestamp = FindNextTimestamp(cyclus, timestamp, bus[i].Id, bus[i].Position);
+				cyclus = MathHelper.LeastCommonMultiple(cyclus, bus[i].Id);
 			}
 			return timestamp;
 		}
