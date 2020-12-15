@@ -1,22 +1,26 @@
 using AdventOfCode.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day04
 {
-	internal class Puzzle04
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 4;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 2, null);
+			RunFor("input", 210, 131);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var passports = File.ReadLines("Y2020/Day04/input.txt")
+			var passports = input
 				.GroupByEmptyLine()
 				.Select(raw =>
 				{
@@ -38,10 +42,7 @@ namespace AdventOfCode.Y2020.Day04
 				x.IsPidValid
 			);
 
-			Console.WriteLine($"Day 04 Puzzle 1: {result1}");
-			Console.WriteLine($"Day 04 Puzzle 1: {result2}");
-			Debug.Assert(result1 == 210);
-			Debug.Assert(result2 == 131);
+			return (result1, result2);
 		}
 
 		private class Passport

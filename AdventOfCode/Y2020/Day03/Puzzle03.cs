@@ -1,34 +1,31 @@
-using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day03
 {
-	internal class Puzzle03
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 3;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", 7, 336);
+			RunFor("input", 237, 2106818610);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day03/input.txt");
-
 			var result = input
 				.Select((line, i) => line[i * 3 % line.Length] == '#' ? 1 : 0)
 				.Sum();
 
-			Console.WriteLine($"Day 03 Puzzle 1: {result}");
-			Debug.Assert(result == 237);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day03/input.txt");
-
 			var result =
 				CountTrees(input, 1, 1) *
 				CountTrees(input, 3, 1) *
@@ -36,11 +33,10 @@ namespace AdventOfCode.Y2020.Day03
 				CountTrees(input, 7, 1) *
 				CountTrees(input, 1, 2);
 
-			Console.WriteLine($"Day 03 Puzzle 2: {result}");
-			Debug.Assert(result == 2106818610);
+			return result;
 		}
 
-		private static long CountTrees(string[] input, int right, int down)
+		private static int CountTrees(string[] input, int right, int down)
 		{
 			var trees = 0;
 			for (var (xpos, ypos) = (0, 0); ypos < input.Length; ypos += down, xpos += right)

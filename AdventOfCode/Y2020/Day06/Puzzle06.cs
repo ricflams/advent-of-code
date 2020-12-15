@@ -1,35 +1,41 @@
 using AdventOfCode.Helpers;
-using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day06
 {
-	internal class Puzzle06
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 6;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 11, 6);
+			RunFor("input", 6683, 3122);
 		}
 
-		private static void Puzzle1And2()
+		protected override long Part1(string[] input)
 		{
-			var groups = File.ReadLines("Y2020/Day06/input.txt")
-				.GroupByEmptyLine();
+			var groups = input.GroupByEmptyLine();
 
-			var result1 =
+			var result =
 				groups.Select(g => string.Concat(g).ToCharArray().Distinct().Count())
 				.Sum();
 
-			var result2 =
+			return result;
+		}
+
+		protected override long Part2(string[] input)
+		{
+			var groups = input.GroupByEmptyLine();
+
+			var result =
 				groups.Select(g => string.Concat(g).ToCharArray().GroupBy(x => x).Count(x => x.Count() == g.Length))
 				.Sum();
 
-			Console.WriteLine($"Day 06 Puzzle 1: {result1}");
-			Console.WriteLine($"Day 06 Puzzle 2: {result2}");
-			Debug.Assert(result1 == 6683);
-			Debug.Assert(result2 == 3122);
+			return result;
 		}
 	}
 }

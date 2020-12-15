@@ -1,24 +1,25 @@
 using AdventOfCode.Helpers;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day01
 {
-	internal class Puzzle01
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 1;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", 514579, 241861950);
+			RunFor("input", 542619, 32858450);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var expenses = File.ReadAllLines("Y2020/Day01/input.txt").Select(int.Parse);
+			var expenses = input.Select(int.Parse);
 			var expenseLookup = new HashSet<int>(expenses);
 
 			int result = 0;
@@ -32,13 +33,12 @@ namespace AdventOfCode.Y2020.Day01
 				}
 			}
 
-			Console.WriteLine($"Day 01 Puzzle 1: {result}");
-			Debug.Assert(result == 542619);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var expenses = File.ReadAllLines("Y2020/Day01/input.txt").Select(int.Parse);
+			var expenses = input.Select(int.Parse);
 			var expenseLookup = new HashSet<int>(expenses);
 
 			int result = 0;
@@ -55,8 +55,7 @@ namespace AdventOfCode.Y2020.Day01
 				}
 			}
 
-			Console.WriteLine($"Day 01 Puzzle 2: {result}");
-			Debug.Assert(result == 32858450);
+			return result;
 		}
 	}
 }

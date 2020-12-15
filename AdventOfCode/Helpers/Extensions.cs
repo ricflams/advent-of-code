@@ -53,5 +53,15 @@ namespace AdventOfCode.Helpers
 			}
 			yield return group.ToArray();
 		}
+
+		public static ulong Sum(this IEnumerable<ulong> values)
+		{
+			var sum = 0UL;
+			foreach (var v in values)
+			{
+				sum += v;
+			}
+			return sum;
+		}
 	}
 }

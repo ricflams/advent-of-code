@@ -4,7 +4,7 @@ using System;
 
 namespace AdventOfCode.Y2020.Day12
 {
-	internal class Puzzle : PuzzleRunner<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
@@ -20,11 +20,11 @@ namespace AdventOfCode.Y2020.Day12
 			//Action R means to turn right the given number of degrees.
 			//Action F means to move forward by the given value in the direction the ship is currently facing.
 
-			RunPuzzles("test1.txt", 25, 286);
-			RunPuzzles("input.txt", 2297, 89984);
+			RunFor("test1", 25, 286);
+			RunFor("input", 2297, 89984);
 		}
 
-		protected override int Puzzle1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var ship = new PointWithDirection(Point.Origin, Direction.Right);
 			foreach (var line in input)
@@ -46,7 +46,7 @@ namespace AdventOfCode.Y2020.Day12
 			return ship.Point.ManhattanDistanceTo(Point.Origin);
 		}
 
-		protected override int Puzzle2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			var ship = Point.Origin;
 			var waypoint = Point.From(10, -1);

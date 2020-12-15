@@ -1,23 +1,26 @@
 using AdventOfCode.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day07
 {
-	internal class Puzzle07
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 7;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 4, 32);
+			RunFor("test2", null, 126);
+			RunFor("input", 289, 30055);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day07/input.txt");
-
 			var bags = input
 				.AsParallel()
 				.Select(line =>
@@ -57,8 +60,6 @@ namespace AdventOfCode.Y2020.Day07
 				return memo[color];
 			}
 			var result1 = bags.Keys.Count(ContainsShinyGold) - 1;
-			Console.WriteLine($"Day 07 Puzzle 1: {result1}");
-			Debug.Assert(result1 == 289);
 
 			// Recursive count of bag plus bags inside
 			// Note: Don't count the "shiny gold" bag itself
@@ -67,8 +68,8 @@ namespace AdventOfCode.Y2020.Day07
 				return 1 + bags[color].InnerBags.Sum(kvp => kvp.Value * TotalBagsInside(kvp.Key));
 			}
 			var result2 = TotalBagsInside("shiny gold") - 1;
-			Console.WriteLine($"Day 07 Puzzle 2: {result2}");
-			Debug.Assert(result2 == 30055);
+
+			return (result1, result2);
 		}
 	}
 }

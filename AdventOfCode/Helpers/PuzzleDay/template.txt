@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,30 +7,67 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace AdventOfCode.{YEAR}.Day{DAY}
+namespace AdventOfCode.{YEAR}.Day{DAY2}
 {
-	internal class Puzzle{DAY}
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => {YEAR};
+		protected override int Day => {DAY};
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", null, null);
+			//RunFor("test2", null, null);
+			//RunFor("input", null, null);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("{YEAR}/Day{DAY}/input.txt");
 
-			//Console.WriteLine($"Day {DAY} Puzzle 1: {result}");
-			//Debug.Assert(result == );
+
+
+
+
+			return 0;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("{YEAR}/Day{DAY}/input.txt");
 
-			//Console.WriteLine($"Day {DAY} Puzzle 2: {result}");
-			//Debug.Assert(result == );
+
+
+
+
+			return 0;
 		}
 	}
+
+
+
+
+	//  internal class Puzzle : ComboPart<int>
+	//  {
+	//  	public static Puzzle Instance = new Puzzle();
+	//  	protected override int Year => {YEAR};
+	//  	protected override int Day => {DAY};
+	//  
+	//  	public void Run()
+	//  	{
+	//  		RunFor("test1", null, null);
+	//  		//RunFor("test2", null, null);
+	//  		//RunFor("input", null, null);
+	//  	}
+	//  
+	//  	protected override (int, int) Part1And2(string[] input)
+	//  	{
+	//  
+	//  
+	//  
+	//  
+	//  
+	//  		return (0, 0);
+	//  	}
+	//  }
+
 }

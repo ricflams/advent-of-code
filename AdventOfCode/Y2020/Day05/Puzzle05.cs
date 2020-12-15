@@ -1,21 +1,22 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day05
 {
-	internal class Puzzle05
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 5;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 855, 552);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day05/input.txt");
-
 			var ids = input
 				.Select(x => x.Replace("F", "0").Replace("B", "1").Replace("L", "0").Replace("R", "1"))
 				.Select(x => Convert.ToInt32(x, 2))
@@ -28,10 +29,7 @@ namespace AdventOfCode.Y2020.Day05
 				.SkipWhile((id, i) => id + 1 == ids[i + 1])
 				.First() + 1;
 
-			Console.WriteLine($"Day 05 Puzzle 1: {result1}");
-			Console.WriteLine($"Day 05 Puzzle 2: {result2}");
-			Debug.Assert(result1 == 855);
-			Debug.Assert(result2 == 552);
+			return (result1, result2);
 		}
 	}
 }

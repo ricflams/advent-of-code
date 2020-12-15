@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2020.Day13
 {
-	internal class Puzzle : PuzzleRunner<long>
+	internal class Puzzle : SoloParts<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
@@ -13,16 +13,16 @@ namespace AdventOfCode.Y2020.Day13
 
 		public void Run()
 		{
-			RunPuzzles("test1.txt", 295, 1068781);
-			RunPuzzles("test2.txt", null, 3417);
-			RunPuzzles("test3.txt", null, 754018);
-			RunPuzzles("test4.txt", null, 779210);
-			RunPuzzles("test5.txt", null, 1261476);
-			RunPuzzles("test6.txt", null, 1202161486);
-			RunPuzzles("input.txt", 4135, 640856202464541);
+			RunFor("test1", 295, 1068781);
+			RunFor("test2", null, 3417);
+			RunFor("test3", null, 754018);
+			RunFor("test4", null, 779210);
+			RunFor("test5", null, 1261476);
+			RunFor("test6", null, 1202161486);
+			RunFor("input", 4135, 640856202464541);
 		}
 
-		protected override long Puzzle1(string[] input)
+		protected override long Part1(string[] input)
 		{
 			var departure = int.Parse(input[0]);
 			var id = input[1]
@@ -39,7 +39,7 @@ namespace AdventOfCode.Y2020.Day13
 			return id.Id * id.Time;
 		}
 
-		protected override long Puzzle2(string[] input)
+		protected override long Part2(string[] input)
 		{
 			var bus = input[1]
 				.Split(",")

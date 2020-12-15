@@ -1,22 +1,23 @@
 using AdventOfCode.Helpers;
-using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day02
 {
-	internal class Puzzle02
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2020;
+		protected override int Day => 2;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 2, 1);
+			RunFor("input", 607, 321);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2020/Day02/input.txt");
-
 			var result1 = 0;
 			var result2 = 0;
 			foreach (var line in input)
@@ -39,10 +40,7 @@ namespace AdventOfCode.Y2020.Day02
 				}
 			}
 
-			Console.WriteLine($"Day 02 Puzzle 1: {result1}");
-			Console.WriteLine($"Day 02 Puzzle 1: {result2}");
-			Debug.Assert(result1 == 607);
-			Debug.Assert(result2 == 321);
+			return (result1, result2);
 		}
 	}
 }

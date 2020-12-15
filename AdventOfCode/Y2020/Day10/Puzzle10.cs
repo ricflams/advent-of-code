@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day10
 {
-	internal class Puzzle : PuzzleRunner<long>
+	internal class Puzzle : SoloParts<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
@@ -12,12 +12,12 @@ namespace AdventOfCode.Y2020.Day10
 
 		public void Run()
 		{
-			RunPuzzles("test1.txt", 35, 8);
-			RunPuzzles("test2.txt", 220, 19208);
-			RunPuzzles("input.txt", 2070, 24179327893504);
+			RunFor("test1", 35, 8);
+			RunFor("test2", 220, 19208);
+			RunFor("input", 2070, 24179327893504);
 		}
 
-		protected override long Puzzle1(string[] input)
+		protected override long Part1(string[] input)
 		{
 			var joltages = input
 				.Select(int.Parse)
@@ -34,7 +34,7 @@ namespace AdventOfCode.Y2020.Day10
 			return diff1 * diff3;
 		}
 
-		protected override long Puzzle2(string[] input)
+		protected override long Part2(string[] input)
 		{
 			var joltages = input
 				.Select(int.Parse)

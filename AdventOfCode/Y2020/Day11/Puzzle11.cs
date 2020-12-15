@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day11
 {
-	internal class Puzzle : PuzzleRunner<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
@@ -13,11 +13,11 @@ namespace AdventOfCode.Y2020.Day11
 
 		public void Run()
 		{
-			RunPuzzles("test1.txt", 37, 26);
-			RunPuzzles("input.txt", 2265, 2045);
+			RunFor("test1", 37, 26);
+			RunFor("input", 2265, 2045);
 		}
 
-		protected override int Puzzle1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var seats = CharMap.FromArray(input);
 			var occupied = 0;
@@ -38,7 +38,7 @@ namespace AdventOfCode.Y2020.Day11
 			return occupied;
 		}
 
-		protected override int Puzzle2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			static int Adjacent(CharMap map, Point p, Func<Point, Point> move)
 			{

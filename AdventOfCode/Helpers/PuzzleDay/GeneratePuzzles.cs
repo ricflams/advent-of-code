@@ -16,15 +16,26 @@ namespace AdventOfCode.Helpers.PuzzleDay
 			Console.WriteLine("  <ItemGroup>");
 			for (var day = 1; day <= 25; day++)
 			{
+				var d = $"{day}";
 				var dd = $"{day:D2}";
 				var source = template
 					.Replace("{YEAR}", yyyy)
-					.Replace("{DAY}", dd);
+					.Replace("{DAY}", d)
+					.Replace("{DAY2}", dd)
+					;
 				var folder = $"{yyyy}/Day{dd}";
 				Directory.CreateDirectory(folder);
 				File.WriteAllText($"{folder}/Puzzle{dd}.cs", source);
+				File.Create($"{folder}/test1.txt");
+				File.Create($"{folder}/test2.txt");
 				File.Create($"{folder}/input.txt");
 
+				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\test1.txt\">");
+				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
+				Console.WriteLine($"    </None>");
+				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\test2.txt\">");
+				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
+				Console.WriteLine($"    </None>");
 				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\input.txt\">");
 				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
 				Console.WriteLine($"    </None>");

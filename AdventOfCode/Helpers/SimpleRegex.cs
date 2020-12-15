@@ -69,15 +69,41 @@ namespace AdventOfCode.Helpers
 			return true;
 		}
 
-		public class Captures
+		public interface ICaptures
+		{
+			ICaptures Get(out int value);
+			ICaptures Get(out uint value);
+			ICaptures Get(out long value);
+			ICaptures Get(out ulong value);
+			ICaptures Get(out string value);
+			ICaptures Get(out char value);
+			bool IsMatch { get; }
+		}
+
+		public class Captures : ICaptures
 		{
 			private readonly string[] _matches;
 			private int _index;
 			public Captures(string[] matches) { _matches = matches; }
-			public Captures Get(out int value) { value = int.Parse(_matches[_index++]); return this; }
-			public Captures Get(out string value) { value = _matches[_index++]; return this; }
-			public Captures Get(out char value) { value = _matches[_index++][0]; return this; }
+			public ICaptures Get(out int value) { value = int.Parse(_matches[_index++]); return this; }
+			public ICaptures Get(out uint value) { value = uint.Parse(_matches[_index++]); return this; }
+			public ICaptures Get(out long value) { value = long.Parse(_matches[_index++]); return this; }
+			public ICaptures Get(out ulong value) { value = ulong.Parse(_matches[_index++]); return this; }
+			public ICaptures Get(out string value) { value = _matches[_index++]; return this; }
+			public ICaptures Get(out char value) { value = _matches[_index++][0]; return this; }
+			public bool IsMatch => true;
+		}
 
+		public class NoCaptures : ICaptures
+		{
+			public static readonly ICaptures Instance = new NoCaptures();
+			public ICaptures Get(out int value) { value = 0; return this; }
+			public ICaptures Get(out uint value) { value = 0; return this; }
+			public ICaptures Get(out long value) { value = 0; return this; }
+			public ICaptures Get(out ulong value) { value = 0; return this; }
+			public ICaptures Get(out string value) { value = null; return this; }
+			public ICaptures Get(out char value) { value = '\0'; return this; }
+			public bool IsMatch => false;
 		}
 
 		public static Captures RegexCapture(this string input, string pattern)
@@ -88,5 +114,13 @@ namespace AdventOfCode.Helpers
 			}
 			return new Captures(matches);
 		}
+
+		public static ICaptures MaybeRegexCapture(this string input, string pattern)
+		{
+			return IsMatch(input, pattern, out var matches)
+				? new Captures(matches)
+				: NoCaptures.Instance;
+		}
+
 	}
 }
