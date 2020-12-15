@@ -1,4 +1,4 @@
-﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
@@ -7,13 +7,13 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace AdventOfCode.Y{YEAR}.Day{DAY2}
+namespace AdventOfCode.Y2020.Day24
 {
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override int Year => {YEAR};
-		protected override int Day => {DAY};
+		protected override int Year => 2020;
+		protected override int Day => 24;
 
 		public void Run()
 		{
@@ -49,8 +49,8 @@ namespace AdventOfCode.Y{YEAR}.Day{DAY2}
 	//  internal class Puzzle : ComboPart<int>
 	//  {
 	//  	public static Puzzle Instance = new Puzzle();
-	//  	protected override int Year => {YEAR};
-	//  	protected override int Day => {DAY};
+	//  	protected override int Year => 2020;
+	//  	protected override int Day => 24;
 	//  
 	//  	public void Run()
 	//  	{

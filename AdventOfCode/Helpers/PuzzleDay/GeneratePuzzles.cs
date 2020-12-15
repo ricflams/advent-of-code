@@ -10,10 +10,12 @@ namespace AdventOfCode.Helpers.PuzzleDay
     {
 		public static void Generate(int year)
 		{
-			var yyyy = $"Y{year:D4}";
+			var yyyy = year.ToString();
 			var template = File.ReadAllText("Helpers/PuzzleDay/template.txt");
-			
-			Console.WriteLine("  <ItemGroup>");
+
+			var csproj = File.CreateText($"Y{yyyy}/itemgroup.txt");
+
+			csproj.WriteLine("  <ItemGroup>");
 			for (var day = 1; day <= 25; day++)
 			{
 				var d = $"{day}";
@@ -23,24 +25,25 @@ namespace AdventOfCode.Helpers.PuzzleDay
 					.Replace("{DAY}", d)
 					.Replace("{DAY2}", dd)
 					;
-				var folder = $"{yyyy}/Day{dd}";
+				var folder = $"Y{yyyy}/Day{dd}";
 				Directory.CreateDirectory(folder);
 				File.WriteAllText($"{folder}/Puzzle{dd}.cs", source);
 				File.Create($"{folder}/test1.txt");
 				File.Create($"{folder}/test2.txt");
 				File.Create($"{folder}/input.txt");
 
-				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\test1.txt\">");
-				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
-				Console.WriteLine($"    </None>");
-				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\test2.txt\">");
-				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
-				Console.WriteLine($"    </None>");
-				Console.WriteLine($"    <None Update=\"{yyyy}\\Day{dd}\\input.txt\">");
-				Console.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
-				Console.WriteLine($"    </None>");
+				csproj.WriteLine($"    <None Update=\"Y{yyyy}\\Day{dd}\\test1.txt\">");
+				csproj.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
+				csproj.WriteLine($"    </None>");
+				csproj.WriteLine($"    <None Update=\"Y{yyyy}\\Day{dd}\\test2.txt\">");
+				csproj.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
+				csproj.WriteLine($"    </None>");
+				csproj.WriteLine($"    <None Update=\"Y{yyyy}\\Day{dd}\\input.txt\">");
+				csproj.WriteLine($"      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>");
+				csproj.WriteLine($"    </None>");
 			}
-			Console.WriteLine("  </ItemGroup>");
+			csproj.WriteLine("  </ItemGroup>");
+			csproj.Close();
 
 			//  <ItemGroup>
 			//    <None Update="Y2019\Day22\input.txt">
