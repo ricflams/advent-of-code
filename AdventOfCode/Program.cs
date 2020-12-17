@@ -78,22 +78,22 @@ namespace AdventOfCode
 
 		private static void Y2020Puzzles()
 		{
-			Y2020.Day01.Puzzle.Instance.Run();
-			Y2020.Day02.Puzzle.Instance.Run();
-			Y2020.Day03.Puzzle.Instance.Run();
-			Y2020.Day04.Puzzle.Instance.Run();
-			Y2020.Day05.Puzzle.Instance.Run();
-			Y2020.Day06.Puzzle.Instance.Run();
-			Y2020.Day07.Puzzle.Instance.Run();
-			Y2020.Day08.Puzzle.Instance.Run();
-			Y2020.Day09.Puzzle.Instance.Run();
-			Y2020.Day10.Puzzle.Instance.Run();
-			Y2020.Day11.Puzzle.Instance.Run();
-			Y2020.Day12.Puzzle.Instance.Run();
-			Y2020.Day13.Puzzle.Instance.Run();
-			Y2020.Day14.Puzzle.Instance.Run();
-			Y2020.Day15.Puzzle.Instance.Run();
-			//Y2020.Day16.Puzzle.Instance.Run();
+			//Y2020.Day01.Puzzle.Instance.Run();
+			//Y2020.Day02.Puzzle.Instance.Run();
+			//Y2020.Day03.Puzzle.Instance.Run();
+			//Y2020.Day04.Puzzle.Instance.Run();
+			//Y2020.Day05.Puzzle.Instance.Run();
+			//Y2020.Day06.Puzzle.Instance.Run();
+			//Y2020.Day07.Puzzle.Instance.Run();
+			//Y2020.Day08.Puzzle.Instance.Run();
+			//Y2020.Day09.Puzzle.Instance.Run();
+			//Y2020.Day10.Puzzle.Instance.Run();
+			//Y2020.Day11.Puzzle.Instance.Run();
+			//Y2020.Day12.Puzzle.Instance.Run();
+			//Y2020.Day13.Puzzle.Instance.Run();
+			//Y2020.Day14.Puzzle.Instance.Run();
+			//Y2020.Day15.Puzzle.Instance.Run();
+			Y2020.Day16.Puzzle.Instance.Run();
 			//Y2020.Day17.Puzzle.Instance.Run();
 			//Y2020.Day18.Puzzle.Instance.Run();
 			//Y2020.Day19.Puzzle.Instance.Run();
