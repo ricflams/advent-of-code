@@ -69,13 +69,28 @@ namespace AdventOfCode.Helpers
 		{
 			var n = numberOfDigits;
 			var digits = Enumerable.Repeat(0, n).ToArray();
-			var iterations = (int)Math.Pow(n, numberBase);
+			var iterations = (int)Math.Pow(numberBase, n);
 			while (iterations-- > 0)
 			{
 				yield return digits;
 				for (var pos = n - 1; pos >= 0 && ++digits[pos] >= numberBase; pos--)
 				{
 					digits[pos] = 0;
+				}
+			}
+		}
+
+		public static IEnumerable<int[]> PlusZeroMinusSequence(int numberOfDigits)
+		{
+			var n = numberOfDigits;
+			var digits = Enumerable.Repeat(-1, numberOfDigits).ToArray();
+			var iterations = (int)Math.Pow(3, n);
+			while (iterations-- > 0)
+			{
+				yield return digits;
+				for (var pos = n - 1; pos >= 0 && ++digits[pos] > 1; pos--)
+				{
+					digits[pos] = -1;
 				}
 			}
 		}
