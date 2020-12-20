@@ -11,15 +11,15 @@ namespace AdventOfCode.Helpers
 		{
 		}
 
-		public static CharMap FromFile(string filename)
+		public static CharMap FromFile(string filename, char defaultValue = default(char))
 		{
 			var input = File.ReadAllLines(filename);
-			return FromArray(input);
+			return FromArray(input, defaultValue);
 		}
 
-		public static CharMap FromArray(string[] lines)
+		public static CharMap FromArray(string[] lines, char defaultValue = default(char))
 		{
-			var map = new CharMap();
+			var map = new CharMap(defaultValue);
 			for (var y = 0; y < lines.Length; y++)
 			{
 				var line = lines[y];
