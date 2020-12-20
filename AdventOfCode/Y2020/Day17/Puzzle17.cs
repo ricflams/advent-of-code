@@ -22,7 +22,7 @@ namespace AdventOfCode.Y2020.Day17
 			//   ..#
 			//   ###
 
-			//RunFor("test1", 112, 848);
+			RunFor("test1", 112, 848);
 			//RunFor("test2", null, null);
 			RunFor("input", 240, 1180);
 		}
@@ -110,7 +110,6 @@ namespace AdventOfCode.Y2020.Day17
 			};
 			public void MergeWith(Space other) => Active.UnionWith(other.Active);
 			public bool IsSet(uint p) => Active.Contains(p);
-			public bool IsSet(sbyte[] p) => Active.Contains(IdFrom(p));
 			public bool Set(uint p) => Active.Add(p);
 			public bool Set(sbyte[] p) => Active.Add(IdFrom(p));
 			public Space NeighboursOf(uint p)
