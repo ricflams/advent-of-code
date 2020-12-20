@@ -93,11 +93,11 @@ namespace AdventOfCode
 			//Y2020.Day13.Puzzle.Instance.Run();
 			//Y2020.Day14.Puzzle.Instance.Run();
 			//Y2020.Day15.Puzzle.Instance.Run();
-			Y2020.Day16.Puzzle.Instance.Run();
+			//Y2020.Day16.Puzzle.Instance.Run();
 			//Y2020.Day17.Puzzle.Instance.Run();
 			//Y2020.Day18.Puzzle.Instance.Run();
 			//Y2020.Day19.Puzzle.Instance.Run();
-			//Y2020.Day20.Puzzle.Instance.Run();
+			Y2020.Day20.Puzzle.Instance.Run();
 			//Y2020.Day21.Puzzle.Instance.Run();
 			//Y2020.Day22.Puzzle.Instance.Run();
 			//Y2020.Day23.Puzzle.Instance.Run();

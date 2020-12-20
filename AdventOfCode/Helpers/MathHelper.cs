@@ -125,6 +125,19 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public static uint ReverseBits(this uint value, int len)
+		{
+			uint reversed = 0;
+			for (uint bit = 1U << (len-1); value > 0 && bit > 0; bit >>= 1, value >>= 1)
+			{
+				if ((value & 1) == 1)
+				{
+					reversed |= bit;
+				}
+			}
+			return reversed;
+		}
+
 		public static bool AreDistinct(params int[] values)
 		{
 			for (var i = 0; i < values.Length - 1; i++)
