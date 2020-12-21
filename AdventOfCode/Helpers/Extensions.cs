@@ -161,5 +161,22 @@ namespace AdventOfCode.Helpers
 			}
 			return count;
 		}
+
+		public static IEnumerable<Point> PositionsOf(this char[,] map, char searched)
+		{
+			var w = map.GetLength(0);
+			var h = map.GetLength(1);
+
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					if (map[x, y] == searched)
+					{
+						yield return Point.From(x, y);
+					}
+				}
+			}
+		}
 	}
 }

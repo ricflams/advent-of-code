@@ -2,14 +2,11 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day20
 {
-	internal class Puzzle : SoloParts<long>
+	internal class Puzzle : ComboParts<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
@@ -25,26 +22,29 @@ namespace AdventOfCode.Y2020.Day20
 		{
 			public int Id { get; private set; }
 			public int Dim { get; private set; }
-			public string[] Map { get; private set; }
-			public Variant[] Variants { get; private set; }
 			public HashSet<uint> AllPossibleSides { get; private set; }
+			public Variant[] Variants { get; private set; }
+			public Variant Bounds { get; set; }
+
+			private readonly string[] _map;
+
 			public Tile(string[] line)
 			{
 				line[0].RegexCapture("Tile %d:").Get(out int id);
 				Id = id;
-				Map = line[1..];
+				_map = line[1..];
 
 				uint a = 0, b = 0, c = 0, d = 0;
-				Dim = Map[0].Length;
+				Dim = _map[0].Length;
 				for (var x = 0; x < Dim; x++)
 				{
-					a = (a << 1) + (Map[0][Dim - 1 - x] == '#' ? 1U : 0);
-					c = (c << 1) + (Map[Dim - 1][Dim - 1 - x] == '#' ? 1U : 0);
+					a = (a << 1) + (_map[0][Dim - 1 - x] == '#' ? 1U : 0);
+					c = (c << 1) + (_map[Dim - 1][Dim - 1 - x] == '#' ? 1U : 0);
 				}
 				for (var y = 0; y < Dim; y++)
 				{
-					b = (b << 1) + (Map[y][0] == '#' ? 1U : 0);
-					d = (d << 1) + (Map[y][Dim - 1] == '#' ? 1U : 0);
+					b = (b << 1) + (_map[y][0] == '#' ? 1U : 0);
+					d = (d << 1) + (_map[y][Dim - 1] == '#' ? 1U : 0);
 				}
 				uint inv(ulong x) => (uint)MathHelper.ReverseBits(x, Dim);
 				uint ai = inv(a), bi = inv(b), ci = inv(c), di = inv(d);
@@ -70,7 +70,7 @@ namespace AdventOfCode.Y2020.Day20
 			{
 				get
 				{
-					var map = Map.ToMultiDim();
+					var map = _map.ToMultiDim();
 					if (Bounds.Rotations > 0)
 					{
 						map = map.RotateClockwise(Bounds.Rotations * 90);
@@ -83,149 +83,92 @@ namespace AdventOfCode.Y2020.Day20
 				}
 			}
 
-			public Variant Bounds { get; set; }
-
-			[System.Diagnostics.DebuggerDisplay("{ToString()}")]
 			public class Variant
 			{
 				public uint[] Sides { get; set; }
-				public int Rotations { get; set; }
-				public bool Flip { get; set; }
-				public override string ToString()
-				{
-					return $"[sides:{string.Join(",", Sides.Select(x=>x.ToString()))} rot={Rotations} flip={Flip}]";
-				}
 				public uint Top => Sides[0];
 				public uint Left => Sides[1];
 				public uint Bot => Sides[2];
 				public uint Right => Sides[3];
+
+				public int Rotations { get; set; }
+				public bool Flip { get; set; }
 			}
 		}
 
-		protected override long Part1(string[] input)
+		protected override (long, long) Part1And2(string[] input)
 		{
 			var rawtiles = input.GroupByEmptyLine();
-			var alltiles = rawtiles.Select(x => new Tile(x)).ToList();
+			var tiles = rawtiles.Select(x => new Tile(x)).ToList();
 
-			var allpossiblesides = alltiles.SelectMany(x => x.AllPossibleSides).GroupBy(x => x);
-			var outerIds = new HashSet<uint>(allpossiblesides.Where(g => g.Count() == 1).Select(g => g.Key));
-			var corners = alltiles.Where(t => t.Variants.Any(v => v.Sides.Count(x => outerIds.Contains(x)) == 2)).ToArray();
+			var sides = tiles.SelectMany(x => x.AllPossibleSides).GroupBy(x => x);
+			var border = new HashSet<uint>(sides.Where(g => g.Count() == 1).Select(g => g.Key));
+			var corners = tiles.Where(t => t.Variants.Any(v => v.Sides.Count(x => border.Contains(x)) == 2)).ToArray();
 
-			var result = corners.Aggregate(1L, (sum, t) => sum * t.Id);
-			return result;
-		}
+			// Find product of the four corners
+			var result1 = corners.Aggregate(1L, (sum, t) => sum * t.Id);
 
-		protected override long Part2(string[] input)
-		{
-			var rawtiles = input.GroupByEmptyLine();
-			var alltiles = rawtiles.Select(x => new Tile(x)).ToList();
-
-			var allpossiblesides = alltiles.SelectMany(x => x.AllPossibleSides).GroupBy(x => x);
-			var outerIds = new HashSet<uint>(allpossiblesides.Where(g => g.Count() == 1).Select(g => g.Key));
-			var corners = alltiles.Where(t => t.Variants.Any(v => v.Sides.Count(x => outerIds.Contains(x)) == 2)).ToArray();
-
-			var N = (int)Math.Sqrt(alltiles.Count());
+			// Assemple the map
+			// (This will remove the tiles from the collection, one by one)
+			var N = (int)Math.Sqrt(tiles.Count());
 			var tilemap = new Tile[N, N];
-
 			for (var x = 0; x < N; x++)
 			{
 				if (x == 0)
 				{
-					var corner0 = corners[0];
-					var cornersides = new HashSet<uint>(corner0.AllPossibleSides.Where(x => outerIds.Contains(x)));
-					corner0.Bounds = corner0.Variants.First(v => cornersides.Contains(v.Top) && cornersides.Contains(v.Left));
-					tilemap[x, 0] = corner0;
-					alltiles.Remove(corner0);
+					var tile = corners[0];
+					var tilesides = new HashSet<uint>(tile.AllPossibleSides.Where(side => border.Contains(side)));
+					tile.Bounds = tile.Variants.First(v => tilesides.Contains(v.Top) && tilesides.Contains(v.Left));
+					tilemap[x, 0] = tile;
+					tiles.Remove(tile);
 				}
 				else
 				{
 					var left = tilemap[x - 1, 0].Bounds.Right;
-					var tile = alltiles.First(t => t.AllPossibleSides.Contains(left));
-					tile.Bounds = tile.Variants.Where(v => outerIds.Contains(v.Top)).First(v => v.Left == left);
+					var tile = tiles.First(t => t.AllPossibleSides.Contains(left));
+					tile.Bounds = tile.Variants.Where(v => border.Contains(v.Top)).First(v => v.Left == left);
 					tilemap[x, 0] = tile;
-					alltiles.Remove(tile);
+					tiles.Remove(tile);
 				}
 				for (var y = 1; y < N; y++)
 				{
 					var top = tilemap[x, y - 1].Bounds.Bot;
-					var tile = alltiles.First(t => t.AllPossibleSides.Contains(top));
-
+					var tile = tiles.First(t => t.AllPossibleSides.Contains(top));
 					if (x == 0)
 					{
-						tile.Bounds = tile.Variants.Where(v => outerIds.Contains(v.Left)).First(v => v.Top == top);
+						tile.Bounds = tile.Variants.Where(v => border.Contains(v.Left)).First(v => v.Top == top);
 					}
 					else
 					{
 						var left = tilemap[x - 1, y].Bounds.Right;
 						tile.Bounds = tile.Variants.First(v => v.Left == left && v.Top == top);
 					}
-
 					tilemap[x, y] = tile;
-					alltiles.Remove(tile);
+					tiles.Remove(tile);
 				}
 			}
 
-			//Console.WriteLine();
-			//for (var y = 0; y < N; y++)
-			//{
-			//	for (var x = 0; x < N; x++)
-			//	{
-			//		var tile = map[x, y];
-			//		Console.Write($"{tile.Id} ({tile.Bounds.Rotations} {tile.Bounds.Flip})    ");
-			//	}
-			//	Console.WriteLine();
-			//}
-			//Console.WriteLine();
-
-
-			var dim = corners.First().Dim - 2;
-			var map = new char[N * dim, N * dim];
+			// Build one big map from tiles with borders removed
+			var dim = tilemap[0, 0].Dim - 2;
+			var bigmap = new char[N * dim, N * dim];
 			for (var x = 0; x < N; x++)
 			{
 				for (var y = 0; y < N; y++)
 				{
-					// Console.Write($"{map[x, y].Id}  ");
-					var newmap = tilemap[x, y].TransformedMap;
-					for (var x1 = 0; x1 < dim; x1++)
+					var map = tilemap[x, y].TransformedMap;
+					for (var mapx = 0; mapx < dim; mapx++)
 					{
-						for (var y1 = 0; y1 < dim; y1++)
+						for (var mapy = 0; mapy < dim; mapy++)
 						{
-							map[x * dim + x1, y * dim + y1] = newmap[x1 + 1, y1 + 1];
+							bigmap[x * dim + mapx, y * dim + mapy] = map[mapx + 1, mapy + 1];
 						}
 					}
 				}
 			}
 
-			//for (var y = 0; y < map2.GetLength(1); y++)
-			//{
-			//	for (var x = 0; x < map2.GetLength(0); x++)
-			//	{
-			//		Console.Write(map2[x, y]);
-			//	}
-			//	Console.WriteLine();
-			//}
-
-
-			var monster = new string[]
-			{
-				"                  # ",
-				"#    ##    ##    ###",
-				" #  #  #  #  #  #   ",
-
-			}.ToMultiDim();
-
-			var rough = 0;
-			for (var angle = 0; angle < 360; angle += 90)
-			{
-				var m = monster.RotateClockwise(angle);
-				if (FindMonsterRoughSea(map, m, out rough) || FindMonsterRoughSea(map, m.FlipV(), out rough))
-				{
-					break;
-				}
-			}
-
-
-			static bool FindMonsterRoughSea(char[,] map, char[,] monster, out int rough)
+			// Find monsters by rotating/flipping until some are found
+			// Rotate the monster instead of the map, as it's cheaper
+			static bool FindWaterRoughness(char[,] map, char[,] monster, ref int roughness)
 			{
 				var mapw = map.GetLength(0);
 				var maph = map.GetLength(1);
@@ -234,41 +177,44 @@ namespace AdventOfCode.Y2020.Day20
 				var xscan = mapw - monw;
 				var yscan = maph - monh;
 
-				rough = 0;
-				var monsterDots = monster.CountChar('#');
-				var monstersfound = 0;
+				var monsterspots = monster.PositionsOf('#');
+				var monsters = 0;
+				// Scan map for occurrences of the monster (don't care about overlaps)
 				for (var x = 0; x < xscan; x++)
 				{
 					for (var y = 0; y < yscan; y++)
 					{
-						var match = 0;
-						for (var mx = 0; mx < monw; mx++)
+						if (monsterspots.All(p => map[x + p.X, y + p.Y] == '#'))
 						{
-							for (var my = 0; my < monh; my++)
-							{
-								if (monster[mx, my] == '#' && map[x + mx, y + my] == '#')
-								{
-									match++;
-								}
-							}
-						}
-						if (match == monsterDots)
-						{
-							monstersfound++;
+							monsters++;
 						}
 					}
 				}
-				if (monstersfound > 0)
+				if (monsters == 0)
 				{
-					var mapdots = map.CountChar('#');
-					rough = mapdots - monstersfound * monsterDots;
-					return true;
+					return false;
 				}
-				return false;
+				roughness = map.CountChar('#') - monsters * monsterspots.Count();
+				return true;
 			}
 
-			return rough;
+			var monster = new string[]
+			{
+				"                  # ",
+				"#    ##    ##    ###",
+				" #  #  #  #  #  #   "
+			}.ToMultiDim();
+			var result2 = 0;
+			for (var angle = 0; angle < 360; angle += 90)
+			{
+				var m = monster.RotateClockwise(angle);
+				if (FindWaterRoughness(bigmap, m, ref result2) || FindWaterRoughness(bigmap, m.FlipV(), ref result2))
+				{
+					break;
+				}
+			}
+
+			return (result1, result2);
 		}
 	}
-
 }

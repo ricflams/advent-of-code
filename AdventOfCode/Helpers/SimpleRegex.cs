@@ -54,7 +54,7 @@ namespace AdventOfCode.Helpers
 							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
 						}
 				}
-				regex = $"^{sb.ToString()}$";;
+				regex = sb.ToString();
 				_regexCache[pattern] = regex;
 			}
 
