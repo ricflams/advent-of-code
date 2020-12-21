@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2020.Day19
 {
+	// TODO: Cleanup
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
