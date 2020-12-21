@@ -125,7 +125,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public static uint ReverseBits(this uint value, int len)
+		public static ulong ReverseBits(this ulong value, int len)
 		{
 			uint reversed = 0;
 			for (uint bit = 1U << (len-1); value > 0 && bit > 0; bit >>= 1, value >>= 1)
