@@ -17,9 +17,9 @@ namespace AdventOfCode.Y{YEAR}.Day{DAY2}
 
 		public void Run()
 		{
-			RunFor("test1", null, null);
-			//RunFor("test2", null, null);
-			//RunFor("input", null, null);
+			RunFor("test1", 0, 0);
+			//RunFor("test2", 0, 0);
+			//RunFor("input", 0, 0);
 		}
 
 		protected override int Part1(string[] input)
@@ -46,7 +46,7 @@ namespace AdventOfCode.Y{YEAR}.Day{DAY2}
 
 
 
-	//  internal class Puzzle : ComboPart<int>
+	//  internal class Puzzle : ComboParts<int>
 	//  {
 	//  	public static Puzzle Instance = new Puzzle();
 	//  	protected override int Year => {YEAR};
@@ -54,9 +54,9 @@ namespace AdventOfCode.Y{YEAR}.Day{DAY2}
 	//  
 	//  	public void Run()
 	//  	{
-	//  		RunFor("test1", null, null);
-	//  		//RunFor("test2", null, null);
-	//  		//RunFor("input", null, null);
+	//  		RunFor("test1", 0, 0);
+	//  		//RunFor("test2", 0, 0);
+	//  		//RunFor("input", 0, 0);
 	//  	}
 	//  
 	//  	protected override (int, int) Part1And2(string[] input)

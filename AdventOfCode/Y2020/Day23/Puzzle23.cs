@@ -17,9 +17,9 @@ namespace AdventOfCode.Y2020.Day23
 
 		public void Run()
 		{
-			RunFor("test1", null, null);
-			//RunFor("test2", null, null);
-			//RunFor("input", null, null);
+			RunFor("test1", 0, 0);
+			//RunFor("test2", 0, 0);
+			//RunFor("input", 0, 0);
 		}
 
 		protected override int Part1(string[] input)

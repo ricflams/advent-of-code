@@ -15,7 +15,7 @@ namespace AdventOfCode.Y2020.Day07
 		public void Run()
 		{
 			RunFor("test1", 4, 32);
-			RunFor("test2", null, 126);
+			//RunFor("test2", null, 126);
 			RunFor("input", 289, 30055);
 		}
 

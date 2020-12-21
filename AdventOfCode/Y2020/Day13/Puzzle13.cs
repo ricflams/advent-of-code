@@ -14,11 +14,11 @@ namespace AdventOfCode.Y2020.Day13
 		public void Run()
 		{
 			RunFor("test1", 295, 1068781);
-			RunFor("test2", null, 3417);
-			RunFor("test3", null, 754018);
-			RunFor("test4", null, 779210);
-			RunFor("test5", null, 1261476);
-			RunFor("test6", null, 1202161486);
+			RunPart2For("test2", 3417);
+			RunPart2For("test3", 754018);
+			RunPart2For("test4", 779210);
+			RunPart2For("test5", 1261476);
+			RunPart2For("test6", 1202161486);
 			RunFor("input", 4135, 640856202464541);
 		}
 
