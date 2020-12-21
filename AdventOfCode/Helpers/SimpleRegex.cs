@@ -40,19 +40,29 @@ namespace AdventOfCode.Helpers
 				var sb = new StringBuilder();
 				for (var i = 0; i < pattern.Length; i++)
 				{
-					if (pattern[i] != '%')
+					var ch = pattern[i];
+					if (@"\.|?+()[{".Contains(ch))
 					{
-						sb.Append(pattern[i]);
+						sb.Append('\\');
+						sb.Append(ch);
 					}
-					else switch (pattern[++i])
+					else if (ch != '%')
+					{
+						sb.Append(ch);
+					}
+					else
+					{
+						ch = pattern[++i];
+						switch (ch)
 						{
 							case '%': sb.Append('%'); break;
 							case '*': sb.Append(@"(.+)"); break;
 							case 's': sb.Append(@"(\w+)"); break;
 							case 'c': sb.Append(@"(.)"); break;
 							case 'd': sb.Append(@"([-+]?\d+)"); break;
-							default: throw new Exception($"Regex: invalid sequence '%{pattern[i]}'");
+							default: throw new Exception($"Regex: invalid sequence '%{ch}'");
 						}
+					}
 				}
 				regex = sb.ToString();
 				_regexCache[pattern] = regex;

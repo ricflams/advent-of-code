@@ -34,7 +34,7 @@ namespace AdventOfCode.Y2020.Day14
 				}
 				else
 				{
-					line.RegexCapture(@"mem\[%d\] = %d").Get(out int addr).Get(out ulong val);
+					line.RegexCapture(@"mem[%d] = %d").Get(out int addr).Get(out ulong val);
 					mem[addr] = (val & maskclear) | maskset;
 				}
 			}
@@ -68,7 +68,7 @@ namespace AdventOfCode.Y2020.Day14
 				}
 				else
 				{
-					line.RegexCapture(@"mem\[%d\] = %d").Get(out ulong vaddr).Get(out ulong val);
+					line.RegexCapture(@"mem[%d] = %d").Get(out ulong vaddr).Get(out ulong val);
 					var addr = vaddr | maskset;
 					SetAllFloatingValues(addr, val, floatingbits);
 				}

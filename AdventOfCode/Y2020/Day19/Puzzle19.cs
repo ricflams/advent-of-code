@@ -68,7 +68,7 @@ namespace AdventOfCode.Y2020.Day19
 				{
 					_rulemap[id] = new RuleLiteral(ch);
 				}
-				else if (rule.MaybeRegexCapture(@"%d %d \| %d %d").Get(out int r11).Get(out int r12).Get(out int r21).Get(out int r22).IsMatch)
+				else if (rule.MaybeRegexCapture(@"%d %d | %d %d").Get(out int r11).Get(out int r12).Get(out int r21).Get(out int r22).IsMatch)
 				{
 					_rulemap[id] = new RuleAltSequence(r11, r12, r21, r22);
 				}
@@ -76,7 +76,7 @@ namespace AdventOfCode.Y2020.Day19
 				{
 					_rulemap[id] = new RuleSequence(r1, r2);
 				}
-				else if (rule.MaybeRegexCapture(@"%d \| %d").Get(out int a1).Get(out int a2).IsMatch)
+				else if (rule.MaybeRegexCapture(@"%d | %d").Get(out int a1).Get(out int a2).IsMatch)
 				{
 					_rulemap[id] = new RuleAlt(a1, a2);
 				}

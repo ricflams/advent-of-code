@@ -71,7 +71,7 @@ namespace AdventOfCode.Y2015.Day06
 				// toggle 461,550 through 564,900
 				// turn off 370,39 through 425,839
 				// turn on 599,989 through 806,993
-				var val = SimpleRegex.Match(command, @"(.*) %d,%d through %d,%d");
+				var val = SimpleRegex.Match(command, @"%* %d,%d through %d,%d");
 				var cmd = val[0];
 				var num = val.Skip(1).Select(c => int.Parse(c)).ToArray();
 				var (xmin, ymin, xmax, ymax) = (num[0], num[1], num[2], num[3]);

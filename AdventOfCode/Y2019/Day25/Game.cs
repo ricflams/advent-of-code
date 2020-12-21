@@ -139,7 +139,7 @@ namespace AdventOfCode.Y2019.Day25
 				// You take the boulder.
 				//   
 				// Command?
-				if (SimpleRegex.IsMatch(PeekLine(), @"You take the (.*)\.", out var takeval))
+				if (SimpleRegex.IsMatch(PeekLine(), @"You take the %*.", out var takeval))
 				{
 					ReadLine();
 					var item = takeval[0];
@@ -152,7 +152,7 @@ namespace AdventOfCode.Y2019.Day25
 				// You drop the boulder.
 				//   
 				// Command?
-				if (SimpleRegex.IsMatch(PeekLine(), @"You drop the (.*)\.", out var dropval))
+				if (SimpleRegex.IsMatch(PeekLine(), @"You drop the %*.", out var dropval))
 				{
 					ReadLine();
 					var item = dropval[0];

@@ -33,7 +33,7 @@ namespace AdventOfCode.Y2020.Day21
 			var food = input
 				.Select(line =>
 				{
-					line.RegexCapture(@"%* \(contains %*\)")
+					line.RegexCapture(@"%* (contains %*)")
 						.Get(out string ingredients)
 						.Get(out string allergies);
 					return new Food

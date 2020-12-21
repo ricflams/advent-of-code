@@ -70,7 +70,7 @@ namespace AdventOfCode.Y2015.Day16
 			{
 				// Example:
 				// Sue 16: vizslas: 6, cats: 6, pomeranians: 10
-				var val = SimpleRegex.Match(line, "Sue %d:(.*)");
+				var val = SimpleRegex.Match(line, "Sue %d:%*");
 				Number = int.Parse(val[0]);
 				var posessions = val[1];
 				foreach (var p in posessions.Split(','))
