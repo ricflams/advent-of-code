@@ -7,13 +7,13 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace AdventOfCode.Y2020.Day24
+namespace AdventOfCode.Y2020.Day00
 {
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		protected override int Year => 2020;
-		protected override int Day => 24;
+		protected override int Day => 0;
 
 		public void Run()
 		{
@@ -50,7 +50,7 @@ namespace AdventOfCode.Y2020.Day24
 	//  {
 	//  	public static Puzzle Instance = new Puzzle();
 	//  	protected override int Year => 2020;
-	//  	protected override int Day => 24;
+	//  	protected override int Day => 22;
 	//  
 	//  	public void Run()
 	//  	{
