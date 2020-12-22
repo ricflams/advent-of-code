@@ -1,11 +1,7 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2020.Day22
 {
@@ -49,7 +45,6 @@ namespace AdventOfCode.Y2020.Day22
 			}
 		}
 
-
 		protected override int Part2(string[] input)
 		{
 			var rawdecks = input.GroupByEmptyLine().ToArray();
@@ -92,7 +87,7 @@ namespace AdventOfCode.Y2020.Day22
 
 		internal enum Player { One, Two };
 
-		internal class Deck : List<byte>
+		internal class Deck : Queue<byte>
 		{
 			public static Deck ParseFrom(string[] s)
 			{
@@ -102,45 +97,16 @@ namespace AdventOfCode.Y2020.Day22
 				: base(cards)
 			{
 			}
-			public byte DrawTopCard()
-			{
-				var card = this.First();
-				RemoveAt(0);
-				return card;
-			}
+			public byte DrawTopCard() => Dequeue();
 			public void AddToDeck(byte card1, byte card2)
 			{
-				Add(card1);
-				Add(card2);
+				Enqueue(card1);
+				Enqueue(card2);
 			}
 			public bool HasCards => this.Any();
 			public int Score => this.Select((card, index) => card * (this.Count() - index)).Sum();
 			public uint Hand => Hashing.JenkinsHash(this);
 			public Deck CopyOf(int n) => new Deck(this.Take(n));
 		}
-
-		//internal class Deck : Queue<byte>
-		//{
-		//	public static Deck ParseFrom(string[] s)
-		//	{
-		//		return new Deck(s.Skip(1).Select(byte.Parse));
-		//	}
-		//	private Deck(IEnumerable<byte> cards)
-		//		: base(cards)
-		//	{
-		//	}
-		//	public byte DrawTopCard() => Dequeue();
-		//	public void AddToDeck(byte card1, byte card2)
-		//	{
-		//		Enqueue(card1);
-		//		Enqueue(card2);
-		//	}
-		//	public bool HasCards => this.Any();
-		//	public int Score => this.Select((card, index) => card * (this.Count() - index)).Sum();
-		//	public uint Hand => Hashing.JenkinsHash(this);
-		//	public Deck CopyOf(int n) => new Deck(this.Take(n));
-		//}
-
-
 	}
 }
