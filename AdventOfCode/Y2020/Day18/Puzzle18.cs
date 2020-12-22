@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2020.Day18
 {
+	// TODO: Cleanup
 	internal class Puzzle : SoloParts<ulong>
 	{
 		public static Puzzle Instance = new Puzzle();
@@ -27,16 +28,6 @@ namespace AdventOfCode.Y2020.Day18
 			RunFor("input", 69490582260, 362464596624526);
 		}
 
-		//internal class IExpr
-		//{
-
-		//}
-		//internal class IExpr
-		//{
-		//	public IExpr Left { get; set; }
-		//	public IExpr Right { get; set; }
-		//	public char Op { get; set; }
-		//}
 
 		internal int EvalLine(string line)
 		{
@@ -124,30 +115,6 @@ namespace AdventOfCode.Y2020.Day18
 			}
 			return value.Value;
 
-			//while (true)
-			//{
-			//	var org = line;
-			//	line = Regex.Replace(line, @"(\d+)(.)(\d+)", match =>
-			//	{
-			//		var val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
-			//		var op1 = int.Parse(val[0]);
-			//		var op2 = int.Parse(val[2]);
-			//		var eval = val[1] == "+"
-			//			? op1 + op2
-			//			: op1 * op2;
-			//		return eval.ToString();
-			//	});
-			//	line = Regex.Replace(line, @"\((\d+)\)", match =>
-			//	{
-			//		var val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
-			//		return val[0];
-			//	});
-			//	Console.WriteLine($"  line: {line}");
-			//	if (line == org)
-			//		break;
-			//}
-			//Console.WriteLine($"  done: {line}");
-			//return int.Parse(line);
 		}
 
 
@@ -254,31 +221,5 @@ namespace AdventOfCode.Y2020.Day18
 		}
 	}
 
-
-
-
-	//  internal class Puzzle : ComboPart<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//  	protected override int Year => 2020;
-	//  	protected override int Day => 18;
-	//  
-	//  	public void Run()
-	//  	{
-	//  		RunFor("test1", null, null);
-	//  		//RunFor("test2", null, null);
-	//  		//RunFor("input", null, null);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
 
 }
