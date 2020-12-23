@@ -114,7 +114,7 @@ namespace AdventOfCode
 #else
 			action();
 			var sw = System.Diagnostics.Stopwatch.StartNew();
-			var iterations = 2;
+			var iterations = 10;
 			for (var i = 0; i < iterations; i++)
 			{
 				action();
