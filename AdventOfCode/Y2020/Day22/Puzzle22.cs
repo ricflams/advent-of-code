@@ -34,11 +34,11 @@ namespace AdventOfCode.Y2020.Day22
 					var card2 = d2.DrawTopCard();
 					if (card1 > card2)
 					{
-						d1.AddToDeck(card1, card2);
+						d1.AddToBottom(card1, card2);
 					}
 					else
 					{
-						d2.AddToDeck(card2, card1);
+						d2.AddToBottom(card2, card1);
 					}
 				}
 				return d1.HasCards ? d1 : d2;
@@ -56,15 +56,15 @@ namespace AdventOfCode.Y2020.Day22
 
 			static Player PlayRecursiveCombat(Deck d1, Deck d2)
 			{
-				var seen = new HashSet<ulong>();
+				var seen = new HashSet<uint>();
 				while (d1.HasCards && d2.HasCards)
 				{
-					var hands = (ulong)d1.Hand << 32 | d2.Hand;
-					if (seen.Contains(hands))
+					var hand = d1.Hand; // One hand is unique enough
+					if (seen.Contains(hand))
 					{
 						return Player.One;
 					}
-					seen.Add(hands);
+					seen.Add(hand);
 
 					var card1 = d1.DrawTopCard();
 					var card2 = d2.DrawTopCard();
@@ -74,11 +74,11 @@ namespace AdventOfCode.Y2020.Day22
 
 					if (winner == Player.One)
 					{
-						d1.AddToDeck(card1, card2);
+						d1.AddToBottom(card1, card2);
 					}
 					else
 					{
-						d2.AddToDeck(card2, card1);
+						d2.AddToBottom(card2, card1);
 					}
 				}
 				return d1.HasCards ? Player.One : Player.Two;
@@ -89,20 +89,10 @@ namespace AdventOfCode.Y2020.Day22
 
 		internal class Deck : Queue<byte>
 		{
-			public static Deck ParseFrom(string[] s)
-			{
-				return new Deck(s.Skip(1).Select(byte.Parse));
-			}
-			private Deck(IEnumerable<byte> cards)
-				: base(cards)
-			{
-			}
+			private Deck(IEnumerable<byte> cards) : base(cards) { }
+			public static Deck ParseFrom(string[] s) => new Deck(s.Skip(1).Select(byte.Parse));
 			public byte DrawTopCard() => Dequeue();
-			public void AddToDeck(byte card1, byte card2)
-			{
-				Enqueue(card1);
-				Enqueue(card2);
-			}
+			public void AddToBottom(byte card1, byte card2) { Enqueue(card1); Enqueue(card2); }
 			public bool HasCards => this.Any();
 			public int Score => this.Select((card, index) => card * (this.Count() - index)).Sum();
 			public uint Hand => Hashing.JenkinsHash(this);
