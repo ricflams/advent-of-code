@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -59,6 +60,16 @@ namespace AdventOfCode.Helpers
 				.ToArray();
 		}
 
+		public CharMap Copy()
+		{
+			var map = new CharMap(_defaultValue);
+			foreach (var p in AllPoints())
+			{
+				map[p] = this[p];
+			}
+			return map;
+		}
+
 		public CharMap Transform(Func<Point, char, char> transform)
 		{
 			var map = new CharMap(_defaultValue);
@@ -66,6 +77,34 @@ namespace AdventOfCode.Helpers
 			{
 				map[p] = transform(p, this[p]);
 			}
+			return map;
+		}
+
+		public CharMap TransformAutomata(Func<Point, IEnumerable<Point>> findAdjacents, Func<Point, char, int, char> transform)
+		{
+			// Combine all points' neighbourhoods for the total set of points to transform
+			var neighbourhood = new CharMap();
+			var active = AllPoints(ch => ch != _defaultValue);
+			foreach (var p in active)
+			{
+				neighbourhood[p] = '+';
+				foreach (var adj in findAdjacents(p))
+				{
+					neighbourhood[adj] = '+';
+				}
+			}
+
+			var map = new CharMap(_defaultValue);
+			foreach (var p in neighbourhood.AllPoints())
+			{
+				var adjcount = findAdjacents(p).Count(pos => this[pos] != _defaultValue);
+				var ch = transform(p, this[p], adjcount);
+				if (ch != _defaultValue)
+				{
+					map[p] = ch;
+				}
+			}
+
 			return map;
 		}
 

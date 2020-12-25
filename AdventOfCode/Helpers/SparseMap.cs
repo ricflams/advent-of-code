@@ -56,6 +56,11 @@ namespace AdventOfCode.Helpers
 			set => this[pos.X][pos.Y] = value;
 		}
 
+		public bool Exists(Point pos)
+		{
+			return _column.TryGetValue(pos.X, out var col) && col.Exists(pos.Y);
+		}
+
 		public SparseMapColumn this[int x]
 		{
 			get
@@ -103,6 +108,11 @@ namespace AdventOfCode.Helpers
 			{
 				get => Row.ContainsKey(y) ? Row[y] : _defaultValue;
 				set => Row[y] = value;
+			}
+
+			public bool Exists(int y)
+			{
+				return Row.ContainsKey(y);
 			}
 		}
 	}
