@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
@@ -19,9 +20,25 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		private void RunPart(string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
-			var input = ReadInput(filename);
-			var result = solution(input);
-			VeryfyResult(filename, part, result, expectedResult);
+			if (PuzzleOptions.ShouldRun(filename))
+			{
+				var loops = 1;
+				var sw = Stopwatch.StartNew();
+				var input = ReadInput(filename);
+				var result = solution(input);
+				if (PuzzleOptions.TimingLoops > 0)
+				{
+					sw.Restart();
+					for (var i = 0; i < PuzzleOptions.TimingLoops; i++)
+					{
+						input = ReadInput(filename);
+						result = solution(input);
+					}
+					loops = PuzzleOptions.TimingLoops;
+				}
+				var elapsed = sw.Elapsed / loops;
+				WriteAndVerifyfyResult(elapsed, filename, part, result, expectedResult);
+			}
 		}
 	}
 }
