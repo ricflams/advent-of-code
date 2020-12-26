@@ -74,7 +74,7 @@ namespace AdventOfCode.Y2020.Day13
 			for (var i = 1; i < bus.Length; i++)
 			{
 				timestamp = FindNextTimestamp(cyclus, timestamp, bus[i].Id, bus[i].Position);
-				cyclus = MathHelper.LeastCommonMultiple(cyclus, bus[i].Id);
+				cyclus *= bus[i].Id;
 			}
 			return timestamp;
 		}
