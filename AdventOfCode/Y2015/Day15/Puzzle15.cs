@@ -1,31 +1,30 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day15
 {
-	internal class Puzzle15
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 15;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			// TODO, fails: RunFor("test1", 62842880, 57600000);
+			RunFor("input", 13882464, 11171160);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day15/input.txt");
 			var ingredients = input.Select(Ingredient.ParseFrom).ToArray();
 
 			var score1 = FindMaximumScore(ingredients, _ => true);
-			Console.WriteLine($"Day 15 Puzzle 1: {score1}");
-			Debug.Assert(score1 == 13882464);
-
 			var score2 = FindMaximumScore(ingredients, calories => calories == 500);
-			Console.WriteLine($"Day 15 Puzzle 2: {score2}");
-			Debug.Assert(score2 == 11171160);
+			return (score1, score2);
 		}
 
 		private static int FindMaximumScore(Ingredient[] ingredients, Func<int,bool> calorieCondition)

@@ -1,37 +1,30 @@
-using System;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2015.Day05
 {
-	internal class Puzzle05
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 5;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 236, 51);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day05/input.txt");
-
 			var nice = input.Count(IsNicePuzzle1);
-
-			Console.WriteLine($"Day  5 Puzzle 1: {nice}");
-			Debug.Assert(nice == 236);
+			return nice;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day05/input.txt");
-
 			var nice = input.Count(IsNicePuzzle2);
-
-			Console.WriteLine($"Day  5 Puzzle 2: {nice}");
-			Debug.Assert(nice == 51);
+			return nice;
 		}
 
 		private static bool IsNicePuzzle1(string s)

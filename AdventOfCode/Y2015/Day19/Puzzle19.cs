@@ -1,25 +1,25 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day19
 {
-	internal class Puzzle19
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 19;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", 4, 0);
+			RunFor("input", 535, 0);
 		}
 
-		private static void Puzzle1()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day19/input.txt");
-
 			// Ex: H => HCa
 			var reductions = input
 				.TakeWhile(x => x.Any())
@@ -37,8 +37,6 @@ namespace AdventOfCode.Y2015.Day19
 			}
 
 			var n = molecules.Count();
-			Console.WriteLine($"Day 19 Puzzle 1: {n}");
-			Debug.Assert(n == 535);
 
 			var froms = reductions.Select(x => x.From).Distinct().ToList();
 			var loops = reductions.Where(r => froms.Any(from => r.To.Contains(from))).ToList();
@@ -49,19 +47,18 @@ namespace AdventOfCode.Y2015.Day19
 				Reduced = froms.Aggregate(r.To, (to, from) => to.Replace(from, ""))
 			}).ToList();
 			var unreduxes = unredux.Where(u => u.Reduced != "").Distinct().OrderBy(x => x.Original).Select(x => $"{x.Original} => {x.Reduced}").ToList();
-			foreach (var unr in unreduxes)
-			{
-				Console.WriteLine(unr);
-			}
+			////foreach (var unr in unreduxes)
+			////{
+			////	Console.WriteLine(unr);
+			////}
+			//var graph = new BaseUnitGraph<string>();
+			//foreach (var r in reductions)
+			//{
+			//	graph.AddDirectedEdge(r.From, r.To);
+			//}
+			//graph.WriteAsGraphwiz();
 
-			var graph = new BaseUnitGraph<string>();
-			foreach (var r in reductions)
-			{
-				graph.AddDirectedEdge(r.From, r.To);
-			}
-			graph.WriteAsGraphwiz();
-
-			return;
+			return (n, 1);
 
 
 			molecules.Clear();
@@ -84,19 +81,12 @@ namespace AdventOfCode.Y2015.Day19
 						if (m == molecule)
 						{
 							Console.WriteLine("Found it: " + steps);
-							return;
+							////return;
 						}
 						queue.Enqueue((m, steps + 1));
 					}
 				}
 			}
-		}
-
-		private static void Puzzle2()
-		{
-
-			//Console.WriteLine($"Day 19 Puzzle 2: {result}");
-			//Debug.Assert(result == );
 		}
 	}
 }

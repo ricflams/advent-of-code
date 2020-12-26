@@ -1,30 +1,31 @@
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.IO;
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Linq;
 
 namespace AdventOfCode.Y2015.Day12
 {
-	internal class Puzzle12
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 12;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 156366, 96852);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllText("Y2015/Day12/input.txt");
-
-			var obj = JsonConvert.DeserializeObject<JToken>(input);
+			var alltext = string.Join(Environment.NewLine, input);
+			var obj = JsonConvert.DeserializeObject<JToken>(alltext);
 			var sum = CountValues(obj);
-			Console.WriteLine($"Day 12 Puzzle 1: {sum}");
-			Debug.Assert(sum == 156366);
+			return sum;
 
-			int CountValues(JToken o)
+			static int CountValues(JToken o)
 			{
 				return o.Type == JTokenType.Integer
 					? o.Value<int>()
@@ -32,23 +33,21 @@ namespace AdventOfCode.Y2015.Day12
 			}
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllText("Y2015/Day12/input.txt");
-
-			var obj = JsonConvert.DeserializeObject<JToken>(input);
+			var alltext = string.Join(Environment.NewLine, input);
+			var obj = JsonConvert.DeserializeObject<JToken>(alltext);
 			var sum = CountNonRedValues(obj);
-			Console.WriteLine($"Day 12 Puzzle 2: {sum}");
-			Debug.Assert(sum == 96852);
+			return sum;
 
-			int CountNonRedValues(JToken o)
+			static int CountNonRedValues(JToken o)
 			{
 				return o.Type == JTokenType.Integer
 					? o.Value<int>()
 					: o.Children().Where(Include).Sum(c => CountNonRedValues(c));
 			}
 
-			bool Include(JToken jt)
+			static bool Include(JToken jt)
 			{
 				if (jt.Type != JTokenType.Object)
 				{

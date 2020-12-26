@@ -1,21 +1,24 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day21
 {
-	internal class Puzzle21
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 21;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 111, 188);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var boss = ReadStats("Y2015/Day21/input.txt");
+			var boss = ReadStats(input);
 
 			var minCostForWinning = int.MaxValue;
 			var maxCostForLosing = 0;
@@ -52,10 +55,7 @@ namespace AdventOfCode.Y2015.Day21
 					}
 				}
 			}
-			Console.WriteLine($"Day 21 Puzzle 1: {minCostForWinning}");
-			Console.WriteLine($"Day 21 Puzzle 2: {maxCostForLosing}");
-			Debug.Assert(minCostForWinning == 111);
-			Debug.Assert(maxCostForLosing == 188);
+			return (minCostForWinning, maxCostForLosing);
 		}
 
 		internal static bool YouWinFight(Stats boss, Stats you)
@@ -75,12 +75,12 @@ namespace AdventOfCode.Y2015.Day21
 			}
 		}
 
-		internal static Stats ReadStats(string filename)
+		internal static Stats ReadStats(string[] input)
 		{
 			//Hit Points: 109
 			//Damage: 8
 			//Armor: 2
-			var info = File.ReadAllText(filename);
+			var info = string.Join(Environment.NewLine, input);
 			return new Stats
 			{
 				Hitpoints = SimpleRegex.MatchInt(info, "Hit Points: %d"),

@@ -1,33 +1,40 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using System.Text;
 
 namespace AdventOfCode.Y2015.Day17
 {
-	internal class Puzzle17
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 17;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			// TODO, doesn't work: RunFor("test1", 4, 3);
+			RunFor("input", 4372, 4);
 		}
 
-		private static void Puzzle1And2()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day17/input.txt");
 			var goal = 150;
-
 			var containers = input.Select(int.Parse).ToArray();
-
 			var all = NumberOfCombinations(containers, goal);
-			Console.WriteLine($"Day 17 Puzzle 1: {all}");
-			Debug.Assert(all == 4372);
+			return all;
+		}
 
+		protected override int Part2(string[] input)
+		{
+			var goal = 150;
+			var containers = input.Select(int.Parse).ToArray();
 			var shortest = NumberOfShortestCombinations(containers, goal);
-			Console.WriteLine($"Day 17 Puzzle 2: {shortest}");
-			Debug.Assert(shortest == 4);
+			return shortest;
 		}
 
 		private static int NumberOfCombinations(int[] list, int initialGoal)

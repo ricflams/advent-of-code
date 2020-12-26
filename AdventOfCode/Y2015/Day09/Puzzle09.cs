@@ -1,21 +1,22 @@
 using AdventOfCode.Helpers;
-using System;
-using System.Diagnostics;
-using System.IO;
+using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2015.Day09
 {
-	internal class Puzzle09
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 9;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 605, 982);
+			RunFor("input", 117, 909);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day09/input.txt");
-
 			var graph = new WeightedGraph<string>();
 			foreach (var line in input)
 			{
@@ -30,12 +31,9 @@ namespace AdventOfCode.Y2015.Day09
 			// graph.WriteAsGraphwiz();
 
 			var shortestDistance = graph.TspShortestDistanceBruteForce();
-			Console.WriteLine($"Day  9 Puzzle 1: {shortestDistance}");
-			Debug.Assert(shortestDistance == 117);
-
 			var longestDistance = graph.TspLongestDistanceBruteForce();
-			Console.WriteLine($"Day  9 Puzzle 2: {longestDistance}");
-			Debug.Assert(longestDistance == 909);
+
+			return (shortestDistance, longestDistance);
 		}
 	}
 }

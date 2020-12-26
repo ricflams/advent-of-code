@@ -1,27 +1,26 @@
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode.Y2015.Day11
 {
-	internal class Puzzle11
+	internal class Puzzle : ComboParts<string>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 11;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", "cqjxxyzz", "cqkaabcc");
 		}
 
-		private static void Puzzle1And2()
+		protected override (string, string) Part1And2(string[] _)
 		{
 			var input = "cqjxjnds";
-
 			var password1 = NextPassword(input);
-			Console.WriteLine($"Day 11 Puzzle 1: {password1}");
-			Debug.Assert(password1 == "cqjxxyzz");
-
 			var password2 = NextPassword(password1);
-			Console.WriteLine($"Day 11 Puzzle 2: {password2}");
-			Debug.Assert(password2 == "cqkaabcc");
+			return (password1, password2);
 		}
 
 		private static string NextPassword(string password)
@@ -53,7 +52,7 @@ namespace AdventOfCode.Y2015.Day11
 				}
 			}
 
-			bool HasValidLetters(char[] pwd)
+			static bool HasValidLetters(char[] pwd)
 			{
 				// May not contain the letters i, o, or l
 				foreach (var c in pwd)
@@ -69,7 +68,7 @@ namespace AdventOfCode.Y2015.Day11
 				return true;
 			}
 
-			bool HasThreeIncreasingLetters(char[] pwd)
+			static bool HasThreeIncreasingLetters(char[] pwd)
 			{
 				// Increasing straight of at least three letters
 				var seqlen = 1;
@@ -86,7 +85,7 @@ namespace AdventOfCode.Y2015.Day11
 				return false;
 			}
 
-			bool HasTwoOverlappingPairs(char[] pwd)
+			static bool HasTwoOverlappingPairs(char[] pwd)
 			{
 				// Must contain at least two different, non-overlapping pairs of letters
 				char lastpair = (char)0;

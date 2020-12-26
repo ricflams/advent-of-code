@@ -1,21 +1,24 @@
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day02
 {
-	internal class Puzzle02
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 2;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 1588178, 3783758);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var presents = File.ReadAllLines("Y2015/Day02/input.txt")
+			var presents = input
 				.Select(x => x.Split('x').Select(int.Parse).ToArray());
 
 			// surface area of the box, which is 2*l*w + 2*w*h + 2*h*l
@@ -30,13 +33,12 @@ namespace AdventOfCode.Y2015.Day02
 				})
 				.Sum();
 
-			Console.WriteLine($"Day  2 Puzzle 1: {totalarea}");
-			Debug.Assert(totalarea == 1588178);
+			return totalarea;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var presents = File.ReadAllLines("Y2015/Day02/input.txt")
+			var presents = input
 				.Select(x => x.Split('x').Select(int.Parse).ToArray());
 
 			// Ribbon: shortest distance around + bow equal to the cubic feet of volume
@@ -50,8 +52,7 @@ namespace AdventOfCode.Y2015.Day02
 				})
 				.Sum();
 
-			Console.WriteLine($"Day  2 Puzzle 2: {totalribbon}");
-			Debug.Assert(totalribbon == 3783758);
+			return totalribbon;
 		}
 	}
 }

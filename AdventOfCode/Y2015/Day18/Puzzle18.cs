@@ -1,37 +1,34 @@
 using AdventOfCode.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day18
 {
-	internal class Puzzle18
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 18;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 768, 781);
 		}
 
-		private static void Puzzle1And2()
-		{
-			var input = CharMap.FromFile("Y2015/Day18/input.txt");
 
+		protected override (int, int) Part1And2(string[] input)
+		{
+			var map = CharMap.FromArray(input);
 			var lights = new SparseMap<bool>();
-			foreach (var p in input.AllPoints())
+			foreach (var p in map.AllPoints())
 			{
-				lights[p] = input[p] == '#';
+				lights[p] = map[p] == '#';
 			}
 
 			var n1 = CountLightsOnAfter(lights, 100, false);
-			Console.WriteLine($"Day 18 Puzzle 1: {n1}");
-			Debug.Assert(n1 == 768);
-
 			var n2 = CountLightsOnAfter(lights, 100, true);
-			Console.WriteLine($"Day 18 Puzzle 2: {n2}");
-			Debug.Assert(n2 == 781);
+
+			return (n1, n2);
 		}
 
 		private static int CountLightsOnAfter(SparseMap<bool> lights, int rounds, bool cornersAreStuck)

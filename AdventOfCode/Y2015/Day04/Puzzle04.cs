@@ -1,28 +1,29 @@
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace AdventOfCode.Y2015.Day04
 {
-	internal class Puzzle04
+
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 4;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 254575, 1038736);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
 			var answer1 = FirstZerosAt("bgvyzdsv", 0, hash => hash[0] == 0 && hash[1] == 0 && (hash[2] & 0xf0) == 0);
-			Console.WriteLine($"Day  4 Puzzle 1: {answer1}");
-			Debug.Assert(answer1 == 254575);
-
 			// Puzzle 2 can resume searching where Puzzle 1 ended
 			var answer2 = FirstZerosAt("bgvyzdsv", answer1, hash => hash[0] == 0 && hash[1] == 0 && hash[2] == 0);
-			Console.WriteLine($"Day  4 Puzzle 2: {answer2}");
-			Debug.Assert(answer2 == 1038736);
+			return (answer1, answer2);
 		}
 
 		private static int FirstZerosAt(string input, int start, Func<byte[], bool> condition)

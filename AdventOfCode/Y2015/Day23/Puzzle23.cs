@@ -1,17 +1,23 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using System.Text;
 
 namespace AdventOfCode.Y2015.Day23
 {
-	internal class Puzzle23
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 23;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 184, 231);
 		}
 
 		private class Ins
@@ -21,10 +27,8 @@ namespace AdventOfCode.Y2015.Day23
 			public int Offset { get; set; }
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day23/input.txt");
-
 			var code = input
 				.Select(line =>
 				{
@@ -45,12 +49,9 @@ namespace AdventOfCode.Y2015.Day23
 				.ToArray();
 
 			var result1 = Run(code, 0, 0);
-			Console.WriteLine($"Day 23 Puzzle 1: {result1}");
-			Debug.Assert(result1 == 184);
-
 			var result2 = Run(code, 1, 0);
-			Console.WriteLine($"Day 23 Puzzle 2: {result2}");
-			Debug.Assert(result2 == 231);
+
+			return (result1, result2);
 		}
 
 

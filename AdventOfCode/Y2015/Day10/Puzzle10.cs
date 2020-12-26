@@ -1,34 +1,33 @@
-using System;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
 
 namespace AdventOfCode.Y2015.Day10
 {
-	internal class Puzzle10
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 10;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 329356, 4666278);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] _)
 		{
 			var input = "3113322113";
-
 			var length = LookAndSayLengthAfter(input, 40);
-			Console.WriteLine($"Day 10 Puzzle 1: {length}");
-			Debug.Assert(length == 329356);
+			return length;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] _)
 		{
 			var input = "3113322113";
-
 			var length = LookAndSayLengthAfter(input, 50);
-			Console.WriteLine($"Day 10 Puzzle 2: {length}");
-			Debug.Assert(length == 4666278);
+			return length;
 		}
+
 
 		private static int LookAndSayLengthAfter(string input, int iterations)
 		{

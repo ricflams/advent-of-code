@@ -1,28 +1,26 @@
 using AdventOfCode.Helpers;
-using System;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day13
 {
-	internal class Puzzle13
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 13;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 330, 286);
+			RunFor("input", 618, 601);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day13/input.txt");
-
 			var relations = input.Select(Relation.ParseFrom).ToList();
 			int maxHappiness = CalculateMaxHappiness(relations);
-
-			Console.WriteLine($"Day 13 Puzzle 1: {maxHappiness}");
-			Debug.Assert(maxHappiness == 618);
 
 			var myRelations = relations
 				.Select(r => r.Name)
@@ -46,8 +44,7 @@ namespace AdventOfCode.Y2015.Day13
 			relations.AddRange(myRelations);
 			int maxHappinessWithMe = CalculateMaxHappiness(relations);
 
-			Console.WriteLine($"Day 13 Puzzle 2: {maxHappinessWithMe}");
-			Debug.Assert(maxHappinessWithMe == 601);
+			return (maxHappiness, maxHappinessWithMe);
 		}
 
 		private static int CalculateMaxHappiness(List<Relation> relations)

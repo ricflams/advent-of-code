@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,18 +9,20 @@ using System.Text;
 
 namespace AdventOfCode.Y2015.Day22
 {
-	internal class Puzzle22
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 22;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 0, 0);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllText("Y2015/Day21/input.txt");
-
+			var rawinput = string.Join(Environment.NewLine, input);
 			//Hit Points: 71
 			//Damage: 10
 			//var state = new State
@@ -45,11 +48,13 @@ namespace AdventOfCode.Y2015.Day22
 			};
 			var boss = new Boss
 			{
-				Hitpoints = SimpleRegex.MatchInt(input, "Hit Points: %d"),
-				Damage = SimpleRegex.MatchInt(input, "Damage: %d")
+				Hitpoints = SimpleRegex.MatchInt(rawinput, "Hit Points: %d"),
+				Damage = SimpleRegex.MatchInt(rawinput, "Damage: %d")
 			};
 
 			var leastSpent = Fight(player, boss);
+
+			return 1;
 
 			//var player1 = new Player
 			//{
@@ -104,12 +109,13 @@ namespace AdventOfCode.Y2015.Day22
 			//	}
 			//	Console.ReadLine();
 			//}
-
-
-
-			Console.WriteLine($"Day 22 Puzzle 1: {leastSpent}");
-			//Debug.Assert(result == );
 		}
+
+		protected override int Part2(string[] input)
+		{
+			return 1;
+		}
+
 
 
 		private static int Fight(Player player, Boss boss)

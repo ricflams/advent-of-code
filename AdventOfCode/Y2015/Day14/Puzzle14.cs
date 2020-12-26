@@ -1,23 +1,24 @@
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2015.Day14
 {
-	internal class Puzzle14
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 14;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 2640, 1102);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day14/input.txt");
 			var duration = 2503;
 
 			var reindeers = input.Select(Reindeer.ParseFrom).ToList();
@@ -25,13 +26,11 @@ namespace AdventOfCode.Y2015.Day14
 				.Select(r => r.DistanceAfterDuration(duration))
 				.Max();
 
-			Console.WriteLine($"Day 14 Puzzle 1: {maxDistance}");
-			Debug.Assert(maxDistance == 2640);
+			return maxDistance;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day14/input.txt");
 			var duration = 2503;
 
 			var reindeers = input.Select(Reindeer.ParseFrom).ToList();
@@ -60,8 +59,7 @@ namespace AdventOfCode.Y2015.Day14
 			}
 
 			var winnerPoints = points.Max();
-			Console.WriteLine($"Day 14 Puzzle 2: {winnerPoints}");
-			Debug.Assert(winnerPoints == 1102);
+			return winnerPoints;
 		}
 
 		private class Reindeer

@@ -1,22 +1,23 @@
 using AdventOfCode.Helpers;
-using System;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day16
 {
-	internal class Puzzle16
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 16;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 40, 241);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day16/input.txt");
 			var message = new string[]
 			{
 				"children: 3",
@@ -37,12 +38,8 @@ namespace AdventOfCode.Y2015.Day16
 				.ToDictionary(x => x[0], x => int.Parse(x[1]));
 
 			var sue = posessions.First(AllMustMatch).Number;
-			Console.WriteLine($"Day 16 Puzzle 1: {sue}");
-			Debug.Assert(sue == 40);
-
 			var realSue = posessions.First(MatchOutdatedRetroencabulator).Number;
-			Console.WriteLine($"Day 16 Puzzle 2: {realSue}");
-			Debug.Assert(realSue == 241);
+			return (sue, realSue);
 
 			bool AllMustMatch(Posessions p) => p.All(i => measured.ContainsKey(i.Key) && i.Value == measured[i.Key]);
 

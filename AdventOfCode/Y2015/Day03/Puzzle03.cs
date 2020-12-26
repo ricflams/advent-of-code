@@ -1,22 +1,23 @@
 using AdventOfCode.Helpers;
-using System;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day03
 {
-	internal class Puzzle03
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 3;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 2081, 2341);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var raw = File.ReadAllText("Y2015/Day03/input.txt");
+			var raw = input[0];
 			var map = new SparseMap<int>();
 
 			var pos = Point.From(0, 0);
@@ -28,13 +29,12 @@ namespace AdventOfCode.Y2015.Day03
 			}
 
 			var visited = map.AllPoints().Count();
-			Console.WriteLine($"Day  3 Puzzle 1: {visited}");
-			Debug.Assert(visited == 2081);
+			return visited;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var raw = File.ReadAllText("Y2015/Day03/input.txt");
+			var raw = input[0];
 			var map = new SparseMap<int>();
 
 			var deliveries = new Point[] { Point.From(0, 0), Point.From(0, 0) };
@@ -50,8 +50,7 @@ namespace AdventOfCode.Y2015.Day03
 			}
 
 			var visited = map.AllPoints().Count();
-			Console.WriteLine($"Day  3 Puzzle 2: {visited}");
-			Debug.Assert(visited == 2341);
+			return visited;
 		}
 	}
 }

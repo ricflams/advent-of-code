@@ -1,22 +1,22 @@
-using System;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day08
 {
-	internal class Puzzle08
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 8;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", 12, 19);
+			RunFor("input", 1333, 2046);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day08/input.txt");
-
 			var rawlen = 0;
 			var uescaped = 0;
 			foreach (var line in input)
@@ -26,10 +26,9 @@ namespace AdventOfCode.Y2015.Day08
 			}
 
 			var result = rawlen - uescaped;
-			Console.WriteLine($"Day  8 Puzzle 1: {result}");
-			Debug.Assert(result == 1333);
+			return result;
 
-			int UnescapeLength(string s)
+			static int UnescapeLength(string s)
 			{
 				// \\ represents a single backslash
 				// \" represents a lone double-quote character
@@ -39,7 +38,7 @@ namespace AdventOfCode.Y2015.Day08
 				{
 					if (s[i] == '\\')
 					{
-						switch (s[i+1])
+						switch (s[i + 1])
 						{
 							case '\\': i++; break;
 							case '\"': i++; break;
@@ -52,10 +51,8 @@ namespace AdventOfCode.Y2015.Day08
 			}
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day08/input.txt");
-
 			var rawlen = 0;
 			var escaped = 0;
 			foreach (var line in input)
@@ -65,10 +62,9 @@ namespace AdventOfCode.Y2015.Day08
 			}
 
 			var result = escaped - rawlen;
-			Console.WriteLine($"Day  8 Puzzle 2: {result}");
-			Debug.Assert(result == 2046);
+			return result;
 
-			int EscapeLength(string s)
+			static int EscapeLength(string s)
 			{
 				// \\ represents a single backslash
 				// \" represents a lone double-quote character

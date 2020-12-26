@@ -1,39 +1,34 @@
-﻿using System;
+﻿using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.Diagnostics;
-using System.IO;
 
 namespace AdventOfCode.Y2015.Day01
 {
-	internal class Puzzle01
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 1;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 280, 1797);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day01/input.txt").First();
-
-			var floor = input.Count(c => c == '(') - input.Count(c => c == ')');
-
-			Console.WriteLine($"Day  1 Puzzle 1: {floor}");
-			Debug.Assert(floor == 280);
+			var line = input[0];
+			var floor = line.Count(c => c == '(') - line.Count(c => c == ')');
+			return floor;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day01/input.txt").First();
-
+			var line = input[0];
 			var moves = 0;
-			for (var level = 0; level >= 0; level += input[moves++] == '(' ? 1 : -1)
+			for (var level = 0; level >= 0; level += line[moves++] == '(' ? 1 : -1)
 			{
 			}
-
-			Console.WriteLine($"Day  1 Puzzle 2: {moves}");
-			Debug.Assert(moves == 1797);
+			return moves;
 		}
 	}
 }

@@ -1,22 +1,24 @@
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2015.Day07
 {
-	internal class Puzzle07
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 7;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 46065, 14134);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var input = File.ReadAllLines("Y2015/Day07/input.txt");
 			var gates = new Gates(input);
 
 			while (gates["a"].Output == null)
@@ -24,8 +26,6 @@ namespace AdventOfCode.Y2015.Day07
 				gates.EmulateAllGates();
 			}
 			var signal1 = gates["a"].Output.Value;
-			Console.WriteLine($"Day  7 Puzzle 1: {signal1}");
-			Debug.Assert(signal1 == 46065);
 
 			gates["b"].Input1 = signal1.ToString();
 			gates.ResetAllGates();
@@ -34,7 +34,8 @@ namespace AdventOfCode.Y2015.Day07
 				gates.EmulateAllGates();
 			}
 			var signal2 = gates["a"].Output.Value;
-			Console.WriteLine($"Day  7 Puzzle 2: {signal2}");
+
+			return (signal1, signal2);
 		}
 
 		private class Gates : Dictionary<string, Gates.Gate>

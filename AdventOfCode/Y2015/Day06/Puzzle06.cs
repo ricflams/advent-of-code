@@ -1,27 +1,29 @@
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2015.Day06
 {
-	internal class Puzzle06
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2015;
+		protected override int Day => 6;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 543903, 14687245);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var commands = File.ReadAllLines("Y2015/Day06/input.txt");
+			var commands = input;
 			var N = 1000;
 			var lights = new bool[N, N];
 
-			SetLights<bool>(lights, commands, _ => true, _ => false, x => !x);
+			SetLights(lights, commands, _ => true, _ => false, x => !x);
 
 			var lightsOn = 0;
 			for (var x = 0; x < N; x++)
@@ -35,13 +37,12 @@ namespace AdventOfCode.Y2015.Day06
 				}
 			}
 
-			Console.WriteLine($"Day  6 Puzzle 1: {lightsOn}");
-			Debug.Assert(lightsOn == 543903);
+			return lightsOn;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var commands = File.ReadAllLines("Y2015/Day06/input.txt");
+			var commands = input;
 			var N = 1000;
 			var lights = new int[N, N];
 
@@ -59,8 +60,7 @@ namespace AdventOfCode.Y2015.Day06
 				}
 			}
 
-			Console.WriteLine($"Day  6 Puzzle 2: {brightness}");
-			Debug.Assert(brightness == 14687245);
+			return brightness;
 		}
 
 		private static void SetLights<T>(T[,] lights, IEnumerable<string> commands, Func<T, T> turnOn, Func<T, T> turnOff, Func<T, T> toggle)

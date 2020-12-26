@@ -28,7 +28,7 @@ namespace AdventOfCode.Helpers.Puzzles
 					Console.Write($"^{"",19}^  ");
 				}
 			}
-			Console.Write($"Y{Year} Day {Day:D2} Part {part} for {filename}: {result}");
+			Console.Write($"{Year} Day {Day:D2} Part {part} for {filename}: {result}");
 			if (result.Equals(expectedResult))
 			{
 				Console.WriteLine();
