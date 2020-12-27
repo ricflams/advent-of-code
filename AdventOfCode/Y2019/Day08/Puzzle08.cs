@@ -1,21 +1,23 @@
 ﻿using AdventOfCode.Helpers;
-using System;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.Diagnostics;
-using System.IO;
 
 namespace AdventOfCode.Y2019.Day08
 {
-	internal class Puzzle08
+	internal class Puzzle : ComboParts<string>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 8;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", "2356", "PZEKB");
 		}
 
-		private static void Puzzle1And2()
+		protected override (string, string) Part1And2(string[] input)
 		{
-			var imagedata = File.ReadAllText("Y2019/Day08/input.txt");
+			var imagedata = input[0];
 			const int width = 25;
 			const int height = 6;
 
@@ -37,8 +39,6 @@ namespace AdventOfCode.Y2019.Day08
 				.Select(x => x.Layer)
 				.First();
 			var sum = layerWithMostZeros.Count(x => x == '1') * layerWithMostZeros.Count(x => x == '2');
-			Console.WriteLine($"Day  8 Puzzle 1: {sum}");
-			Debug.Assert(sum == 2356);
 
 			// Render all "pixels" by looping through each layer's similar positions and
 			// pick the first non-transparent value, turning '1' into black and '2' into blank.
@@ -52,13 +52,12 @@ namespace AdventOfCode.Y2019.Day08
 				.ToArray();
 			var image = new string(rendering);
 
-			// Split rendering into <height> individual lines and print them
+			// Split rendering into <height> individual lines and scan them
 			var lines = Enumerable.Range(0, height)
 				.Select(x => image.Substring(x * width, width));
-			foreach (var line in lines)
-			{
-				Console.WriteLine($"Day  8 Puzzle 2: {line}");
-			}
+			var message = LetterScanner.Scan(lines);
+
+			return (sum.ToString(), message);
 		}
 	}
 }

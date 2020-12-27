@@ -1,21 +1,24 @@
-﻿using System;
-using System.Linq;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day06
 {
-	internal class Puzzle06
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 6;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("input", 387356, 532);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var orbitdefs = File.ReadLines("Y2019/Day06/input.txt")
+			var orbitdefs = input
 				.Where(x => !string.IsNullOrWhiteSpace(x))
 				.Select(x => x.Split(')'))
 				.ToList();
@@ -33,9 +36,8 @@ namespace AdventOfCode.Y2019.Day06
 			}
 			var root = nodes.Keys.Except(nodes.SelectMany(x => x.Value)).First();
 			var orbitCount = CountOrbits(0, root);
-			Console.WriteLine($"Day  6 Puzzle 1: {orbitCount}");
-			Debug.Assert(orbitCount == 387356);
 
+			// Part 2
 			int CountOrbits(int orbitlevel, string name) =>
 				nodes.TryGetValue(name, out var o)
 					? orbitlevel + o.Select(x => CountOrbits(orbitlevel + 1, x)).Sum()
@@ -48,8 +50,9 @@ namespace AdventOfCode.Y2019.Day06
 			{
 				dist -= 2;
 			}
-			Console.WriteLine($"Day  6 Puzzle 2: {dist}");
-			Debug.Assert(dist == 532);
+
+			return (orbitCount, dist);
+
 
 			IEnumerable<string> FindPathTo(string name)
 			{

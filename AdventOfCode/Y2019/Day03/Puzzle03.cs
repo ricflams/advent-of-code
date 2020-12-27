@@ -1,27 +1,38 @@
-﻿using System;
-using System.Linq;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day03
 {
-	internal class Puzzle03
+	internal class Puzzle : ComboParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 3;
+
+		public void Run()
 		{
-			Puzzle1And2();
+			RunFor("test1", 159, 610);
+			RunFor("test2", 135, 410);
+			RunFor("input", 860, 9238);
 		}
 
-		private static void Puzzle1And2()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			var wiredefs = File.ReadAllLines("Y2019/Day03/input.txt").ToArray();
+			var wiredefs = input;
 
 			var map = new Dictionary<int, int[]>();
 			for (var i = 0; i < wiredefs.Length; i++)
 			{
 				MapWire(i, wiredefs.Length, wiredefs[i]);
 			}
+
+			const int xyFactor = 100000;
+			static int MakeXy(int x, int y) => x * xyFactor + y;
+			static int MakeX(int xy) => xy / xyFactor;
+			static int MakeY(int xy) => xy % xyFactor;
 
 			var crossings = map
 				.Where(x => x.Value.All(s => s != 0))
@@ -34,12 +45,9 @@ namespace AdventOfCode.Y2019.Day03
 				.ToList();
 
 			var nearest = crossings.Min(x => Math.Abs(x.X) + Math.Abs(x.Y));
-			Console.WriteLine($"Day  3 Puzzle 1: {nearest}");
-			Debug.Assert(nearest == 860);
-
 			var fewestSteps = crossings.Min(x => x.Steps);
-			Console.WriteLine($"Day  3 Puzzle 2: {fewestSteps}");
-			Debug.Assert(fewestSteps == 9238);
+
+			return (nearest, fewestSteps);
 
 			void MapWire(int wireIndex, int wireCount, string wiredef)
 			{
@@ -72,11 +80,6 @@ namespace AdventOfCode.Y2019.Day03
 					}
 				}
 			}
-
-			const int xyFactor = 100000;
-			int MakeXy(int x, int y) => x * xyFactor + y;
-			int MakeX(int xy) => xy / xyFactor;
-			int MakeY(int xy) => xy % xyFactor;
 		}
 	}
 }

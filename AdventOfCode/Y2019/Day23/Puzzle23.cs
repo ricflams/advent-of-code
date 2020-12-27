@@ -1,23 +1,26 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using AdventOfCode.Helpers;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day23
 {
-	internal static class Puzzle23
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 23;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 22151, 17001);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
 			// Create network and run all engines until a NAT-packet is received
-			var network = new Network(50).Start();
+			var intcode = input[0];
+			var network = new Network(intcode, 50).Start();
 			while (network.LastNatPacket == null)
 			{
 				foreach (var e in network.Engines)
@@ -27,15 +30,15 @@ namespace AdventOfCode.Y2019.Day23
 			}
 
 			var result = network.LastNatPacket.Y;
-			Console.WriteLine($"Day 23 Puzzle 1: {result}");
-			Debug.Assert(result == 22151);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
 			// Create network and run all engines until they are all idle and the last
 			// NAT-packet has the same value as the last time the network was idle.
-			var network = new Network(50).Start();
+			var intcode = input[0];
+			var network = new Network(intcode, 50).Start();
 			Point lastNatPacket = null;
 
 			while (true)
@@ -57,17 +60,16 @@ namespace AdventOfCode.Y2019.Day23
 			}
 
 			var result = lastNatPacket.Y;
-			Console.WriteLine($"Day 23 Puzzle 2: {result}");
-			Debug.Assert(result == 17001);
+			return result;
 		}
 
 		private class Network
 		{
 			private readonly bool[] _idle;
 
-			public Network(int size)
+			public Network(string intcode, int size)
 			{
-				var memory = Engine.ReadMemoryFromFile("Y2019/Day23/input.txt");
+				var memory = Engine.ReadAsMemory(intcode);
 
 				_idle = new bool[size];
 				Engines = Enumerable.Range(0, size).Select(i => new Engine()).ToArray();

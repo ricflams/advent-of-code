@@ -1,37 +1,39 @@
-﻿using AdventOfCode.Y2019.Intcode;
-using System;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day09
 {
-	internal class Puzzle09
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 9;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 2682107844, 34738);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
+			var intcode = input[0];
 			var result = new Engine()
-				.WithMemoryFromFile("Y2019/Day09/input.txt")
+				.WithMemory(intcode)
 				.WithInput(1)
 				.Execute()
 				.Output.Take();
-			Console.WriteLine($"Day  9 Puzzle 1: {result}");
-			Debug.Assert(result == 2682107844);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
+			var intcode = input[0];
 			var result = new Engine()
-				.WithMemoryFromFile("Y2019/Day09/input.txt")
+				.WithMemory(intcode)
 				.WithInput(2)
 				.Execute()
 				.Output.Take();
-			Console.WriteLine($"Day  9 Puzzle 2: {result}");
-			Debug.Assert(result == 34738);
+			return result;
 		}
 	}
 }

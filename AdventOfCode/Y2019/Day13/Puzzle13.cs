@@ -1,40 +1,45 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Y2019.Intcode;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdventOfCode.Helpers;
-using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day13
 {
-    internal static class Puzzle13
-    {
-		public static void Run()
+	internal class Puzzle : SoloParts<int>
+	{
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 13;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 291, 14204);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var blocks = new Game()
+			var intcode = input[0];
+			var blocks = new Game(intcode)
 				.Run()
 				.Map.AllPoints(value => value == Game.TileBlock)
 				.Count();
-			Console.WriteLine($"Day 13 Puzzle 1: {blocks}");
-			System.Diagnostics.Debug.Assert(blocks == 291);
+			return blocks;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var score = new Game()
+			var intcode = input[0];
+			var score = new Game(intcode)
 				.WithFreePlay(RobotPaddleControl)
 				//.WithFreePlay(UserPaddleControl)
 				.Run()
 				.Score;
-			Console.WriteLine($"Day 13 Puzzle 2: {score}");
-			System.Diagnostics.Debug.Assert(score == 14204);
 
-			int RobotPaddleControl(Game game)
+			return score;
+
+			static int RobotPaddleControl(Game game)
 			{
 				// The naivest of strategies: just follow the ball
 				if (game.Ball.X < game.Paddle.X)
@@ -44,7 +49,7 @@ namespace AdventOfCode.Y2019.Day13
 				return 0;
 			}
 
-			//int UserPaddleControl(Game game)
+			//static int UserPaddleControl(Game game)
 			//{
 			//	game.Render();
 			//	switch (Console.ReadKey().Key)
@@ -68,11 +73,11 @@ namespace AdventOfCode.Y2019.Day13
 			private readonly Engine _engine;
 			private Func<Game, int> _paddleControl;
 
-			public Game()
+			public Game(string intcode)
 			{
 				var outputBuffer = new List<int>();
 				_engine = new Engine()
-					.WithMemoryFromFile("Y2019/Day13/input.txt")
+					.WithMemory(intcode)
 					.OnOutput(engine =>
 					{
 						outputBuffer.Add((int)engine.Output.Take());

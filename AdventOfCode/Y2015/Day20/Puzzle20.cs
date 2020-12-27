@@ -14,11 +14,11 @@ namespace AdventOfCode.Y2015.Day20
 			RunFor("input", 831600, 884520);
 		}
 
-		protected override int Part1(string[] _)
+		protected override int Part1(string[] input)
 		{
-			var input = 36000000;
+			var number = int.Parse(input[0]);
 
-			var target = input / 10;
+			var target = number / 10;
 			var houses = new int[target];
 			for (var elf = 1; elf < target; elf++)
 			{
@@ -28,15 +28,15 @@ namespace AdventOfCode.Y2015.Day20
 				}
 			}
 
-			var house = Array.FindIndex(houses, v => v >= input);
+			var house = Array.FindIndex(houses, v => v >= number);
 			return house;
 		}
 
-		protected override int Part2(string[] _)
+		protected override int Part2(string[] input)
 		{
-			var input = 36000000;
+			var number = int.Parse(input[0]);
 
-			var target = input / 11;
+			var target = number / 11;
 			var houses = new int[target];
 			var deliveries = new int[target];
 			for (var elf = 1; elf < target; elf++)
@@ -47,7 +47,7 @@ namespace AdventOfCode.Y2015.Day20
 				}
 			}
 
-			var house = Array.FindIndex(houses, v => v >= input);
+			var house = Array.FindIndex(houses, v => v >= number);
 			return house;
 		}
 	}

@@ -15,10 +15,10 @@ namespace AdventOfCode.Y2015.Day11
 			RunFor("input", "cqjxxyzz", "cqkaabcc");
 		}
 
-		protected override (string, string) Part1And2(string[] _)
+		protected override (string, string) Part1And2(string[] input)
 		{
-			var input = "cqjxjnds";
-			var password1 = NextPassword(input);
+			var password0 = input[0];
+			var password1 = NextPassword(password0);
 			var password2 = NextPassword(password1);
 			return (password1, password2);
 		}

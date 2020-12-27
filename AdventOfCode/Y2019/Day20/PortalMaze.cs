@@ -14,8 +14,8 @@ namespace AdventOfCode.Y2019.Day20
 			public bool IsDownward { get; set; }
 		}
 
-		public PortalMaze(string filename)
-			: this(ReadMapFromFile(filename))
+		public PortalMaze(string[] lines)
+			: this(ReadMapFromFile(lines))
 		{
 		}
 

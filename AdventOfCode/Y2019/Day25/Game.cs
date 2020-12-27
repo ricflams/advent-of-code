@@ -21,10 +21,10 @@ namespace AdventOfCode.Y2019.Day25
 
 		public int Password { get; private set; }
 
-		public Game()
+		public Game(string intcode)
 		{
 			_engine = new Engine()
-				.WithMemoryFromFile("Y2019/Day25/input.txt")
+				.WithMemory(intcode)
 				.OnOutput(engine =>
 				{
 					var result = engine.Output.TakeAll().ToList().Select(v => (char)v).ToList();

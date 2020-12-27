@@ -1,87 +1,56 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2019.Day18
 {
-	internal static class Puzzle18
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 18;
+
+		public void Run()
 		{
-			//var sw = Stopwatch.StartNew();
-			Puzzle1();
-			//Console.WriteLine("Elapsed: " + sw.Elapsed);
-			//sw.Restart();
-			Puzzle2();
-			//Console.WriteLine("Elapsed: " + sw.Elapsed);
+			RunPart1For("test1", 8);
+			RunPart1For("test2", 86);
+			RunPart1For("test3", 132);
+			RunPart1For("test4", 136);
+			RunPart1For("test5", 81);
+
+			RunPart1For("input", 3216);
+			// TODO, doesn't work anymore: RunFor("input", 3216, 1538);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			//var sw = Stopwatch.StartNew();
-
-			//var steps1 = ShortestPath(ReadMap("Y2019/Day18/input-1.txt"));
-			//Debug.Assert(steps1 == 8);
-
-			//Console.WriteLine();
-			//var steps2 = ShortestPath(ReadMap("Y2019/Day18/input-2.txt"));
-			//Debug.Assert(steps2 == 86);
-
-			//Console.WriteLine();
-			//var steps3 = ShortestPath(ReadMap("Y2019/Day18/input-3.txt"));
-			//Debug.Assert(steps3 == 132);
-
-			//Console.WriteLine();
-			//var steps4 = ShortestPath(ReadMap("Y2019/Day18/input-4.txt"));
-			//Debug.Assert(steps4 == 136);
-
-			//Console.WriteLine();
-			//var steps5 = ShortestPath(ReadMap("Y2019/Day18/input-5.txt"));
-			//Debug.Assert(steps5 == 81);
-
-			//Console.WriteLine();
-
-			//var vaultMaze = new VaultMaze("Y2019/Day18/input.txt");
-			//var graph = VaultGraph.BuildWeightedGraphFromMaze(vaultMaze);
-			////PruneGraph(graph.Vertices);
-			//var distance2 = FindMinimumDistanceDfs(graph);
-			//Debug.Assert(distance2 == 3216);
-
-
-			var steps = ShortestPath(ReadMap("Y2019/Day18/input.txt"));
-			Console.WriteLine($"Day 18 Puzzle 1: {steps}");
-			//Console.WriteLine($"Elapsed: {sw.Elapsed}");
-			Debug.Assert(steps == 3216);
+			var steps = ShortestPath(ReadMap(input));
+			return steps;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var graphs = BuildFourSplitGraph(ReadMap("Y2019/Day18/input.txt"));
+			var graphs = BuildFourSplitGraph(ReadMap(input));
 
 			//foreach (var g in graphs)
 			//{
 			//	InflateGraph(g);
 			//}
 			//var distance = FindMinimumDistanceBfs(graphs);
-
 			foreach (var g in graphs)
 			{
 				PruneGraph(g);
 			}
 			var distance = FindMinimumDistanceDfs4(graphs);
-
 			//var vertices = graphs.SelectMany(x => x).ToList();
-
 			//var distance = FindMinimumDistanceDfs4(graphs);
-
 			////PrintGraph(vertices);
-
-			Console.WriteLine($"Day 18 Puzzle 2: {distance}");
-			//Debug.Assert(distance == 1538);
+			return distance;
 		}
+
 
 		[DebuggerDisplay("{ToString()}")]
 		internal class Vertex
@@ -121,9 +90,9 @@ namespace AdventOfCode.Y2019.Day18
 
 		internal class VaultMaze : Maze
 		{
-			public VaultMaze(string filename)
+			public VaultMaze(string[] lines)
 			{
-				Map = ReadMapFromFile(filename); // TODO: assigning Map this way is a bit dodgy
+				Map = ReadMapFromFile(lines); // TODO: assigning Map this way is a bit dodgy
 				Entry = Map.FirstOrDefault(ch => ch == '@');
 			}
 		}
@@ -427,9 +396,8 @@ namespace AdventOfCode.Y2019.Day18
 			}
 		}
 
-		private static CharMap ReadMap(string filename)
+		private static CharMap ReadMap(string[] lines)
 		{
-			var lines = File.ReadAllLines(filename);
 			var map = new CharMap();
 			for (var y = 0; y < lines.Length; y++)
 			{

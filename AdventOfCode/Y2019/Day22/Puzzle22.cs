@@ -1,39 +1,39 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Linq;
 using System.Numerics;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2019.Day22
 {
-	internal static class Puzzle22
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 22;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 4096, 78613970589919);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
-			var shuffles = File.ReadAllLines("Y2019/Day22/input.txt");
+			var shuffles = input;
 			var deck = Enumerable.Range(0, 10007).ToArray();
 			deck = NaiveShuffle(deck, shuffles);
 			var indexOfCard2019 = deck.ToList().IndexOf(2019);
-			Console.WriteLine($"Day 22 Puzzle 1: {indexOfCard2019}");
-			Debug.Assert(indexOfCard2019 == 4096);
+			return indexOfCard2019;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
-			var shuffles = File.ReadAllLines("Y2019/Day22/input.txt");
+			var shuffles = input;
 			var N = 119315717514047;
 			var n = 101741582076661;
 			var (a, c) = FormulaForPositionFor(N, 0, shuffles);
 			var card2020 = FindCardAtPositionAfterShuffles(2020, a, c, n, N);
-			Console.WriteLine($"Day 22 Puzzle 2: {card2020}");
-			Debug.Assert(card2020 == 78613970589919);
+			return card2020;
 		}
 
 		private static int[] NaiveShuffle(int[] deck, string[] shuffles)
@@ -86,8 +86,8 @@ namespace AdventOfCode.Y2019.Day22
 				else if (shuffle.StartsWith(DealWithIncrement))
 				{
 					var inc = int.Parse(shuffle.Substring(DealWithIncrement.Length));
-					a = a * inc;
-					b = b * inc;
+					a *= inc;
+					b *= inc;
 				}
 				else if (shuffle.StartsWith(Cut))
 				{

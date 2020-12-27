@@ -6,6 +6,7 @@ namespace AdventOfCode.Helpers.Puzzles
 	internal abstract class Puzzle<T>
 	{
 		private static readonly string TimingBar = new string('#', 10);
+		private static readonly string NoTiming = new string(' ', 22);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
 		protected abstract int Year { get; }
 		protected abstract int Day { get; }
@@ -21,11 +22,11 @@ namespace AdventOfCode.Helpers.Puzzles
 					var units = Math.Round(elapsed.Value / TimingBarUnit, MidpointRounding.AwayFromZero);
 					var bars = (int)Math.Min(units, TimingBar.Length);
 					var t = (int)Math.Ceiling(elapsed.Value.TotalMilliseconds);
-					Console.Write($"[{TimingBar.Substring(0, bars),-10}  {t,4} ms]  ");
+					Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,4} ms: ");
 				}
 				else
 				{
-					Console.Write($"^{"",19}^  ");
+					Console.Write(NoTiming);
 				}
 			}
 			Console.Write($"{Year} Day {Day:D2} Part {part} for {filename}: {result}");

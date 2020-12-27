@@ -1,16 +1,19 @@
-﻿using System;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2019.Day25
 {
-	internal static class Puzzle25
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 25;
+
+		public void Run()
 		{
-			Puzzle1();
+			RunPart1For("input", 33624080);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
 			//while (true)
 			//{
@@ -20,13 +23,15 @@ namespace AdventOfCode.Y2019.Day25
 			//		.Run();
 			//}
 
-			var password = new Game()
+			var intcode = input[0];
+			var password = new Game(intcode)
 					.WithController(new AutoplayController())
 					.Run()
 					.Password;
-			Console.WriteLine($"Day 25 Puzzle 1: {password}");
-			Debug.Assert(password == 33624080);
+			return password;
 		}
+
+		protected override int Part2(string[] _) => 0;
 	}
 }
 

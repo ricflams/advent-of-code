@@ -14,24 +14,24 @@ namespace AdventOfCode.Y2015.Day10
 			RunFor("input", 329356, 4666278);
 		}
 
-		protected override int Part1(string[] _)
+		protected override int Part1(string[] input)
 		{
-			var input = "3113322113";
-			var length = LookAndSayLengthAfter(input, 40);
+			var digits = input[0];
+			var length = LookAndSayLengthAfter(digits, 40);
 			return length;
 		}
 
-		protected override int Part2(string[] _)
+		protected override int Part2(string[] input)
 		{
-			var input = "3113322113";
-			var length = LookAndSayLengthAfter(input, 50);
+			var digits = input[0];
+			var length = LookAndSayLengthAfter(digits, 50);
 			return length;
 		}
 
 
-		private static int LookAndSayLengthAfter(string input, int iterations)
+		private static int LookAndSayLengthAfter(string digits, int iterations)
 		{
-			var sequence = input.Select(ch => (byte)(ch - '0')).ToArray();
+			var sequence = digits.Select(ch => (byte)(ch - '0')).ToArray();
 			var length = sequence.Length;
 			for (var i = 0; i < iterations; i++)
 			{
@@ -40,7 +40,7 @@ namespace AdventOfCode.Y2015.Day10
 			return length;
 		}
 
-		private static (byte[], int) LookAndSay(byte[] input, int inputlen)
+		private static (byte[], int) LookAndSay(byte[] digits, int inputlen)
 		{
 			// 1 becomes 11 (1 copy of digit 1).
 			// 11 becomes 21 (2 copies of digit 1).
@@ -51,9 +51,9 @@ namespace AdventOfCode.Y2015.Day10
 			var outputlen = 0;
 			for (var i = 0; i < inputlen; i++)
 			{
-				var ch = input[i];
+				var ch = digits[i];
 				var n = 1;
-				while (i + 1 < inputlen && input[i + 1] == ch)
+				while (i + 1 < inputlen && digits[i + 1] == ch)
 				{
 					n++;
 					i++;

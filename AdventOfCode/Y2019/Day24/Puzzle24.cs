@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using AdventOfCode.Helpers;
-using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day24
 {
-	internal static class Puzzle24
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 24;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 32573535, 1951);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
 			var map = new CharMap();
 
-			var lines = File.ReadAllLines("Y2019/Day24/input.txt");
+			var lines = input;
 			for (var y = 0; y < lines.Length; y++)
 			{
 				var line = lines[y];
@@ -40,9 +40,7 @@ namespace AdventOfCode.Y2019.Day24
 				var bio = BioDiversity(map);
 				if (seen.Contains(bio))
 				{
-					Console.WriteLine($"Day 24 Puzzle 1: {bio}");
-					Debug.Assert(bio == 32573535);
-					break;
+					return (int)bio;
 				}
 				seen.Add(bio);
 				var nextmap = new CharMap();
@@ -55,27 +53,14 @@ namespace AdventOfCode.Y2019.Day24
 				}
 				map = nextmap;
 			}
-			//Console.WriteLine($"Day 24 Puzzle 1: {}");
-			//Debug.Assert(beampoints == 141);
+
+			throw new Exception("No result found");
 		}
 
-		private static uint BioDiversity(CharMap map)
-		{
-			var (min, max) = map.Area();
-			var width = max.Y - min.Y + 1;
-			uint val = 0;
-			foreach (var pos in map.AllPoints(c => c == '#'))
-			{
-				var position = pos.Y * width + pos.X;
-				val += 1U << position;
-			}
-			return val;
-		}
-
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
 			var map = new CharMap();
-			var lines = File.ReadAllLines("Y2019/Day24/input.txt");
+			var lines = input;
 			for (var y = 0; y < lines.Length; y++)
 			{
 				var line = lines[y];
@@ -158,8 +143,7 @@ namespace AdventOfCode.Y2019.Day24
 
 
 			var bugs = levels.Sum(l => l.AllPoints(c => c == '#').Count());
-			Console.WriteLine($"Day 24 Puzzle 2: {bugs}");
-			Debug.Assert(bugs == 1951);
+			return bugs;
 
 			int BugsInDirection(CharMap outer, CharMap level, Point[] innerBugs, Point pos0, Direction direction)
 			{
@@ -209,8 +193,20 @@ namespace AdventOfCode.Y2019.Day24
 
 			//Console.WriteLine($"Day 24 Puzzle 2: {}");
 			//Debug.Assert(beampoints == 141);
+
 		}
 
+		private static uint BioDiversity(CharMap map)
+		{
+			var (min, max) = map.Area();
+			var width = max.Y - min.Y + 1;
+			uint val = 0;
+			foreach (var pos in map.AllPoints(c => c == '#'))
+			{
+				var position = pos.Y * width + pos.X;
+				val += 1U << position;
+			}
+			return val;
+		}
 	}
-
 }

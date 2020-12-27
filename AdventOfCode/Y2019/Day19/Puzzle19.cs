@@ -1,32 +1,35 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using AdventOfCode.Helpers;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day19
 {
-	internal static class Puzzle19
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 19;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 141, 15641348);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
+			var intcode = input[0];
 			var points = Enumerable.Range(0, 50)
 				.SelectMany(x => Enumerable.Range(0, 50).Select(y => Point.From(x, y)));
-			var beam = new Beam();
+			var beam = new Beam(intcode);
 			var beampoints = points.Count(p => beam.InBeam(p));
-			Console.WriteLine($"Day 19 Puzzle 1: {beampoints}");
-			Debug.Assert(beampoints == 141);
+			return beampoints;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var beam = new Beam();
+			var intcode = input[0];
+			var beam = new Beam(intcode);
 
 			var left = Point.From(0, 10);
 			while (!beam.InBeam(left))
@@ -75,11 +78,10 @@ namespace AdventOfCode.Y2019.Day19
 			var corner = Point.From((int)(y * a1), (int)y - N);
 
 			// Don't bother nudging correctly; just spiral for a radius of 30 points
-			corner = corner.SpiralFrom().Take(30*30).Last(IsWithinBeam);
+			corner = corner.SpiralFrom().Take(30 * 30).Last(IsWithinBeam);
 
 			var position = corner.X * 10000 + corner.Y;
-			Console.WriteLine($"Day 19 Puzzle 2: {position}");
-			Debug.Assert(position == 15641348);
+			return position;
 
 			bool IsWithinBeam(Point p)
 			{
@@ -115,14 +117,18 @@ namespace AdventOfCode.Y2019.Day19
 				return (p1, p2);
 			}
 		}
-
 	}
 
 	internal class Beam
 	{
-		private static readonly Engine _engine = new Engine();
-		private static readonly long[] _memory = Engine.ReadMemoryFromFile("Y2019/Day19/input.txt");
+		private readonly Engine _engine = new Engine();
+		private readonly long[] _memory;
 		private readonly CharMap _cache = new CharMap();
+
+		public Beam(string intcode)
+		{
+			_memory = Engine.ReadAsMemory(intcode);
+		}
 
 		public bool InBeam(Point pos)
 		{

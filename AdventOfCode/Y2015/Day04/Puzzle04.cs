@@ -20,9 +20,10 @@ namespace AdventOfCode.Y2015.Day04
 
 		protected override (int, int) Part1And2(string[] input)
 		{
-			var answer1 = FirstZerosAt("bgvyzdsv", 0, hash => hash[0] == 0 && hash[1] == 0 && (hash[2] & 0xf0) == 0);
+			var secret = input[0];
+			var answer1 = FirstZerosAt(secret, 0, hash => hash[0] == 0 && hash[1] == 0 && (hash[2] & 0xf0) == 0);
 			// Puzzle 2 can resume searching where Puzzle 1 ended
-			var answer2 = FirstZerosAt("bgvyzdsv", answer1, hash => hash[0] == 0 && hash[1] == 0 && hash[2] == 0);
+			var answer2 = FirstZerosAt(secret, answer1, hash => hash[0] == 0 && hash[1] == 0 && hash[2] == 0);
 			return (answer1, answer2);
 		}
 

@@ -1,41 +1,45 @@
 ﻿using AdventOfCode.Helpers;
-using System;
-using System.Linq;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day05
 {
-	internal class Puzzle05
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 5;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 7566643, 9265694);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
+			var intcode = input[0];
 			var result = new Engine()
-				.WithMemoryFromFile("Y2019/Day05/input.txt")
+				.WithMemory(intcode)
 				.WithInput(1)
 				.Execute()
 				.Output.TakeAll()
 				.SkipWhile(x => x == 0)
 				.First();
-			Console.WriteLine($"Day  5 Puzzle 1: {result}");
-			Debug.Assert(result == 7566643);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
+			var intcode = input[0];
 			var result = new Engine()
-				.WithMemoryFromFile("Y2019/Day05/input.txt")
+				.WithMemory(intcode)
 				.WithInput(5)
 				.Execute()
-				.Output.Take();
-			Console.WriteLine($"Day  5 Puzzle 2: {result}");
-			Debug.Assert(result == 9265694);
+				.Output.TakeAll()
+				.SkipWhile(x => x == 0)
+				.First();
+			return result;
 		}
 	}
 }

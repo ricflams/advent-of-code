@@ -1,31 +1,30 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
-using System.Diagnostics;
-using System.IO;
 
 namespace AdventOfCode.Y2019.Day01
 {
-	internal class Puzzle01
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 1;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 3228475, 4839845);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var masses = File.ReadAllLines("Y2019/Day01/input.txt").Select(int.Parse);
-
+			var masses = input.Select(int.Parse);
 			var mass = masses.Sum(FuelForMass);
-			Console.WriteLine($"Day  1 Puzzle 1: {mass}");
-			Debug.Assert(mass == 3228475);
+			return mass;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var masses = File.ReadAllLines("Y2019/Day01/input.txt").Select(int.Parse);
-
+			var masses = input.Select(int.Parse);
 			var mass = masses.Sum(x =>
 			{
 				var totalFuel = FuelForMass(x);
@@ -40,9 +39,7 @@ namespace AdventOfCode.Y2019.Day01
 				}
 				return totalFuel;
 			});
-
-			Console.WriteLine($"Day  1 Puzzle 2: {mass}");
-			Debug.Assert(mass == 4839845);
+			return mass;
 		}
 
 		private static int FuelForMass(int mass) => mass / 3 - 2;

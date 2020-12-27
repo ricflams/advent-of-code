@@ -1,55 +1,51 @@
 ﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace AdventOfCode.Y2019.Day14
 {
-    internal static class Puzzle14
-    {
-		public static void Run()
+	internal class Puzzle : SoloParts<long>
+	{
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 14;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunPart1For("test1", 31);
+			RunPart1For("test2", 165);
+			RunFor("test3", 13312, 82892753);
+			RunFor("test4", 180697, 5586022);
+			RunFor("test5", 2210736, 460664);
+			RunFor("input", 397771, 3126714);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
-			Debug.Assert(new NanoFactory("Y2019/Day14/input-1.txt").ReduceFuelToOre(1) == 31);
-			Debug.Assert(new NanoFactory("Y2019/Day14/input-2.txt").ReduceFuelToOre(1) == 165);
-			Debug.Assert(new NanoFactory("Y2019/Day14/input-3.txt").ReduceFuelToOre(1) == 13312);
-			Debug.Assert(new NanoFactory("Y2019/Day14/input-4.txt").ReduceFuelToOre(1) == 180697);
-			Debug.Assert(new NanoFactory("Y2019/Day14/input-5.txt").ReduceFuelToOre(1) == 2210736);
-
-			var oreNeeded = new NanoFactory("Y2019/Day14/input.txt").ReduceFuelToOre(1);
-			Console.WriteLine($"Day 14 Puzzle 1: {oreNeeded}");
+			var oreNeeded = new NanoFactory(input).ReduceFuelToOre(1);
+			return oreNeeded;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
 			var target = 1000000000000;
 			var maxfuel = Guess.Find(Guess.ValueIs.ExactOrLowerThan, target,
-				fuel => new NanoFactory("Y2019/Day14/input.txt").ReduceFuelToOre(fuel));
-
-			Console.WriteLine($"Day 14 Puzzle 2: {maxfuel}");
-			Debug.Assert(maxfuel == 3126714);
+				fuel => new NanoFactory(input).ReduceFuelToOre(fuel));
+			return maxfuel;
 		}
+
 
 		internal class NanoFactory
 		{
 			private readonly Dictionary<Chemical, Reaction> _reactions;
-			private readonly Chemical _fuel;
-			private readonly Chemical _ore;
 
-			public NanoFactory(string filename)
+			public NanoFactory(string[] input)
 			{
-				_reactions = File.ReadAllLines(filename)
+				_reactions = input
 					.Select(Reaction.Parse)
 					.ToDictionary(x => x.Output, x => x);
-				_fuel = _reactions.First(x => x.Key.Name == "FUEL").Key;
-				_ore = _reactions.SelectMany(x => x.Value.Inputs).FirstOrDefault(c => c.IsOre);
 			}
 
 			public long ReduceFuelToOre(long fuel)

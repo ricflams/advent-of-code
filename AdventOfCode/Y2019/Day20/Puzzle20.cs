@@ -1,38 +1,39 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using AdventOfCode.Helpers;
 
 namespace AdventOfCode.Y2019.Day20
 {
-	internal static class Puzzle20
+	internal class Puzzle : SoloParts<int>
 	{
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 20;
+
+		public void Run()
+		{
+			// TODO, fail: RunPart1For("test1", 23);
+			RunPart1For("test2", 58);
+			RunPart2For("test3", 396);
+			RunFor("input", 608, 6706);
+		}
+
 		const int Infinite = 10000000;
 
-		public static void Run()
+		protected override int Part1(string[] input)
 		{
-			Puzzle1();
-			Puzzle2();
-		}
-
-		private static void Puzzle1()
-		{
-			var maze = new PortalMaze("Y2019/Day20/input.txt");
+			var maze = new PortalMaze(input);
 			var graph = PortalGraph.BuildWeightedGraphFromMaze(maze);
 			var shortestPath = graph.ShortestPathDijkstra(maze.Entry, maze.Exit);
-
-			Console.WriteLine($"Day 20 Puzzle 1: {shortestPath}");
-			Debug.Assert(shortestPath == 608);
+			return shortestPath;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var maze = new PortalMaze("Y2019/Day20/input.txt");
+			var maze = new PortalMaze(input);
 			var shortestPath = MaxDepths().Select(d => FindMinimumDistanceBfsPlutonian(maze, d)).First(x => x != Infinite);
-
-			Console.WriteLine($"Day 20 Puzzle 2: {shortestPath}");
-			Debug.Assert(shortestPath == 6706);
+			return shortestPath;
 		}
 
 		private static IEnumerable<int> MaxDepths()
@@ -172,11 +173,7 @@ namespace AdventOfCode.Y2019.Day20
 							node = next;
 							break;
 						default:
-							var forks = positions.Select(x =>
-							{
-								var fork = graph.AddVertex(x.Dest);
-								return fork;
-							}).ToList();
+							var forks = positions.Select(x => graph.AddVertex(x.Dest)).ToList();
 							foreach (var fork in forks)
 							{
 								BuildSimpleGraph(fork);

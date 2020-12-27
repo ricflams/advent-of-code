@@ -15,7 +15,6 @@ namespace AdventOfCode.Helpers.Puzzles
 		}
 
 		public void RunPart1For(string filename, T expectedResult) => RunPart(filename, 1, Part1, expectedResult);
-
 		public void RunPart2For(string filename, T expectedResult) => RunPart(filename, 2, Part2, expectedResult);
 
 		private void RunPart(string filename, int part, Func<string[],T> solution, T expectedResult)

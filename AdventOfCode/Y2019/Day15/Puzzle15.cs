@@ -1,14 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using AdventOfCode.Helpers;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day15
 {
-    internal static class Puzzle15
-    {
+	internal class Puzzle : ComboParts<int>
+	{
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 15;
+
+		public void Run()
+		{
+			RunFor("input", 300, 312);
+		}
+
 		private const int MoveNone = 0;
 		private const int MoveNorth = 1;
 		private const int MoveSouth = 2;
@@ -22,13 +31,9 @@ namespace AdventOfCode.Y2019.Day15
 		const char MapDroid = 'D';
 		const char MapOxygen = 'O';
 
-		public static void Run()
+		protected override (int, int) Part1And2(string[] input)
 		{
-			Puzzle1And2();
-		}
-
-		private static void Puzzle1And2()
-		{
+			var intcode = input[0];
 			var map = new CharMap();
 
 			var movements = new MoveGenerator();
@@ -38,7 +43,7 @@ namespace AdventOfCode.Y2019.Day15
 			var debug = false;
 
 			var engine2 = new Engine()
-				.WithMemoryFromFile("Y2019/Day15/input.txt")
+				.WithMemory(intcode)
 				.OnInput(engine =>
 				{
 					var movement = movements.NextProposal(map);
@@ -78,8 +83,6 @@ namespace AdventOfCode.Y2019.Day15
 					}
 				})
 				.Execute();
-			Console.WriteLine($"Day 15 Puzzle 1: {stepsToOxygen}");
-			Debug.Assert(stepsToOxygen == 300);
 
 			var minutes = 0;
 			while (map.AllPoints(val => val == MapSpace).Count() > 0)
@@ -97,14 +100,14 @@ namespace AdventOfCode.Y2019.Day15
 				}
 				minutes++;
 			}
-			Console.WriteLine($"Day 15 Puzzle 2: {minutes}");
-			Debug.Assert(minutes == 312);
+
+			return (stepsToOxygen, minutes);
 
 			// Draw Droid on top of map
 			char MapOverlay(Point p, char val)
 			{
 				var droid = movements.Current?.Position;
-				return p == droid ? 'D' : val;
+				return p == droid ? MapDroid : val;
 			}
 		}
 

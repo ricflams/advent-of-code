@@ -1,30 +1,33 @@
-﻿using System;
-using System.Linq;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day04
 {
-	internal class Puzzle04
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 4;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 460, 290);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var matches = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
-			Console.WriteLine($"Day  4 Puzzle 1: {matches}");
-			Debug.Assert(matches == 460);
+			input[0].RegexCapture("%d-%d").Get(out int begin).Get(out int end);
+			var matches = CalcMatches(begin, end).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
+			return matches;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var matches = CalcMatches(382345, 843167).Count(v => SequenceLengths(v).Any(seq => seq == 2));
-			Console.WriteLine($"Day  4 Puzzle 2: {matches}");
-			Debug.Assert(matches == 290);
+			input[0].RegexCapture("%d-%d").Get(out int begin).Get(out int end);
+			var matches = CalcMatches(begin, end).Count(v => SequenceLengths(v).Any(seq => seq == 2));
+			return matches;
 		}
 
 		private static IEnumerable<int> SequenceLengths(IReadOnlyList<int> value)

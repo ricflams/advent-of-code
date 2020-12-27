@@ -1,22 +1,24 @@
 ﻿using AdventOfCode.Helpers;
-using System;
-using System.Linq;
-using System.Diagnostics;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day07
 {
-	internal class Puzzle07
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 7;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 19650, 35961106);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
-			var memory = Engine.ReadMemoryFromFile("Y2019/Day07/input.txt");
+			var memory = Engine.ReadAsMemory(input[0]);
 			var maxSignal = MathHelper.Permute(Enumerable.Range(0, 5))
 				.Max(phases =>
 				{
@@ -32,13 +34,12 @@ namespace AdventOfCode.Y2019.Day07
 					}
 					return signal;
 				});
-			Console.WriteLine($"Day  7 Puzzle 1: {maxSignal}");
-			Debug.Assert(maxSignal == 19650);
+			return maxSignal;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
-			var memory = Engine.ReadMemoryFromFile("Y2019/Day07/input.txt");
+			var memory = Engine.ReadAsMemory(input[0]);
 			var maxSignal = MathHelper.Permute(Enumerable.Range(5, 5))
 				.Max(phases =>
 				{
@@ -58,8 +59,7 @@ namespace AdventOfCode.Y2019.Day07
 						.Output
 						.Take();
 				});
-			Console.WriteLine($"Day  7 Puzzle 2: {maxSignal}");
-			Debug.Assert(maxSignal == 35961106);
+			return maxSignal;
 		}
 	}
 }

@@ -1,23 +1,32 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Y2019.Intcode;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using AdventOfCode.Helpers;
-using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day21
 {
-	internal static class Puzzle21
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 21;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 19354083, 1143499964);
 		}
 
-		private static void Puzzle1()
+
+		private long[] _springdroidMemory;
+
+		protected override long Part1(string[] input)
 		{
+			var intcode = input[0];
+			_springdroidMemory = Engine.ReadAsMemory(intcode);
+
 			// My first successful attempt, so let's keep that
 			var program = @"
 				NOT A T
@@ -41,12 +50,15 @@ namespace AdventOfCode.Y2019.Day21
 			//Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
 			var hullDamage = FindHullDamage(program);
-			Console.WriteLine($"Day 21 Puzzle 1: {hullDamage}");
-			Debug.Assert(hullDamage == 19354083);
+			return hullDamage;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
+			var intcode = input[0];
+			_springdroidMemory = Engine.ReadAsMemory(intcode);
+
+
 			//// Solve by brute force
 			//for (var i = 12; i > 6; i--)
 			//{
@@ -78,17 +90,16 @@ namespace AdventOfCode.Y2019.Day21
 			// Console.WriteLine(ExecuteSpringdroidProgramForDebug(program));
 
 			var hullDamage = FindHullDamage(program);
-			Console.WriteLine($"Day 21 Puzzle 2: {hullDamage}");
-			Debug.Assert(hullDamage == 1143499964);
+			return hullDamage;
 		}
 
-		private static long FindHullDamage(string program)
+		private long FindHullDamage(string program)
 		{
 			return ExecuteSpringdroidProgram(program)
 				.FirstOrDefault(x => x > 255);
 		}
 
-		private static (long, int, string) FindHullDamageResultByBruteForce(int length)
+		private (long, int, string) FindHullDamageResultByBruteForce(int length)
 		{
 			var memo = new HashSet<uint>();
 			var step = 0;
@@ -110,7 +121,7 @@ namespace AdventOfCode.Y2019.Day21
 			}
 		}
 
-		private static IEnumerable<string> LastMoments()
+		private IEnumerable<string> LastMoments()
 		{
 			var lastMoments = new HashSet<string>();
 			while (true)
@@ -130,8 +141,7 @@ namespace AdventOfCode.Y2019.Day21
 			}
 		}
 
-		private static long[] _springdroidMemory = Engine.ReadMemoryFromFile("Y2019/Day21/input.txt");
-		private static long[] ExecuteSpringdroidProgram(string program)
+		private long[] ExecuteSpringdroidProgram(string program)
 		{
 			return new Engine()
 				.WithMemory(_springdroidMemory)
@@ -140,7 +150,7 @@ namespace AdventOfCode.Y2019.Day21
 				.Output.TakeAll().ToArray();
 		}
 
-		private static string ExecuteSpringdroidProgramForDebug(string program)
+		private string ExecuteSpringdroidProgramForDebug(string program)
 		{
 			var output = ExecuteSpringdroidProgram(program);
 			return new string(output.Select(v => (char)v).ToArray());

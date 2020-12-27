@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace AdventOfCode.Helpers
 {
-    public class Maze
+	public class Maze
     {
 		public CharMap Map { get; protected set; }
 
@@ -17,10 +15,9 @@ namespace AdventOfCode.Helpers
 		public virtual bool IsWalkable(Point p) => Map[p] != '#';
 		public virtual bool IsFork(Point p) => false;
 
-		public static CharMap ReadMapFromFile(string filename)
+		public static CharMap ReadMapFromFile(string[] lines)
 		{
 			var map = new CharMap();
-			var lines = File.ReadAllLines(filename);
 			for (var y = 0; y < lines.Length; y++)
 			{
 				var line = lines[y];

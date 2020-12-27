@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AdventOfCode.Helpers.Puzzles
+﻿namespace AdventOfCode.Helpers.Puzzles
 {
 	public static class PuzzleOptions
 	{

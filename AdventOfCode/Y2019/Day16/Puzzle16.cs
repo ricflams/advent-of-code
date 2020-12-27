@@ -1,46 +1,64 @@
-﻿using System;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace AdventOfCode.Y2019.Day16
 {
-	internal static class Puzzle16
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 16;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 58672132, 91689380);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var input = File.ReadAllText("Y2019/Day16/input.txt")
-				.ToArray().Select(x => x - '0').ToArray();
-
-			var result = Fft(100, input).AsNumberFromDigits(8);
-			Console.WriteLine($"Day 16 Puzzle 1: {result}");
-			Debug.Assert(result == 58672132);
+			var rawinput = input[0];
+			var signal = rawinput.Select(x => x - '0').ToArray();
+			var result = Fft(100, signal).AsNumberFromDigits(8);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var rawinput = File.ReadAllText("Y2019/Day16/input.txt");
-			var numinput = rawinput.ToArray().Select(x => x - '0').ToArray();
+			var rawinput = input[0];
+			var numinput = rawinput.Select(x => x - '0').ToArray();
 			var N = rawinput.Length;
 
 			var offset = int.Parse(rawinput.Substring(0, 7));
 			var length = N * 10000 - offset;
-			var input = new int[length];
+			var input2 = new int[length];
 			for (var i = 0; i < length; i++)
 			{
-				input[i] = numinput[(offset + i) % N];
+				input2[i] = numinput[(offset + i) % N];
 			}
-			var result = FFt2(100, input).AsNumberFromDigits(8);
-			Console.WriteLine($"Day 16 Puzzle 2: {result}");
-			Debug.Assert(result == 91689380);
+			var result = FFt2(100, input2).AsNumberFromDigits(8);
+			return result;
 		}
+
+		//private static void Puzzle2()
+		//{
+		//	var rawinput = File.ReadAllText("Y2019/Day16/input.txt");
+		//	var numinput = rawinput.ToArray().Select(x => x - '0').ToArray();
+		//	var N = rawinput.Length;
+
+		//	var offset = int.Parse(rawinput.Substring(0, 7));
+		//	var length = N * 10000 - offset;
+		//	var input = new int[length];
+		//	for (var i = 0; i < length; i++)
+		//	{
+		//		input[i] = numinput[(offset + i) % N];
+		//	}
+		//	var result = FFt2(100, input).AsNumberFromDigits(8);
+		//	Console.WriteLine($"Day 16 Puzzle 2: {result}");
+		//	Debug.Assert(result == 91689380);
+		//}
 
 		private static int[] Fft(int phases, int[] input)
 		{
@@ -93,8 +111,11 @@ namespace AdventOfCode.Y2019.Day16
 			}
 			return input;
 		}
+	}
 
-		private static int AsNumberFromDigits(this IEnumerable<int> input, int length)
+	internal static class Extensions
+	{
+		public static int AsNumberFromDigits(this IEnumerable<int> input, int length)
 		{
 			return input.Take(length).Aggregate((sum, digit) => sum * 10 + digit);
 		}

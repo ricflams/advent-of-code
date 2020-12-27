@@ -1,31 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using AdventOfCode.Helpers;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day17
 {
-	internal static class Puzzle17
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 17;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 5056, 942367);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
-			var map = CreateMap();
+			var map = CreateMap(input[0]);
 			//map.ConsoleWrite();
 
 			var intersections = map.AllPoints(ch => ch == '#')
 				.ToList()
 				.Where(IsIntersection)
 				.Sum(x => x.X * x.Y);
-			Console.WriteLine($"Day 17 Puzzle 1: {intersections}");
-			Debug.Assert(intersections == 5056);
+			return intersections;
 
 			bool IsIntersection(Point p) =>
 				'#' == map[p.Up] &&
@@ -38,9 +39,10 @@ namespace AdventOfCode.Y2019.Day17
 				'.' == map[p.Up.Left];
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
-			var map = CreateMap();
+			var intcode = input[0];
+			var map = CreateMap(intcode);
 			var path = CalculatePath(map);
 			var programs = GenerateAsciiProgram(path.AsMovement(), path.ToList(), new List<string>());
 			programs.Add("n");
@@ -51,18 +53,19 @@ namespace AdventOfCode.Y2019.Day17
 			//	Console.WriteLine(p);
 			//}
 
-			var input = string.Concat(programs.Select(x => x + "\n")).Select(ch => (long)ch);
+			var engineinput = string.Concat(programs.Select(x => x + "\n")).Select(ch => (long)ch);
 			var dust = new Engine()
-				.WithMemoryFromFile("Y2019/Day17/input.txt")
+				.WithMemory(intcode)
 				.WithMemoryValueAt(0, 2)
-				.WithInput(input.ToArray())
+				.WithInput(engineinput.ToArray())
 				.Execute()
 				.Output
 				.TakeAll()
 				.Last();
-			Console.WriteLine($"Day 17 Puzzle 2: {dust}");
-			Debug.Assert(dust == 942367);
+
+			return dust;
 		}
+
 
 		private static List<string> GenerateAsciiProgram(string fullpath, List<string> path, List<string> moves)
 		{
@@ -102,12 +105,12 @@ namespace AdventOfCode.Y2019.Day17
 			return null;
 		}
 
-		private static CharMap CreateMap()
+		private static CharMap CreateMap(string intcode)
 		{
 			var map = new CharMap();
 			var pos = Point.From(0, 0);
 			new Engine()
-				.WithMemoryFromFile("Y2019/Day17/input.txt")
+				.WithMemory(intcode)
 				.OnOutput(engine =>
 				{
 					var ch = (char)engine.Output.Take();

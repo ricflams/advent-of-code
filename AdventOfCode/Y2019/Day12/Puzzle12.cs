@@ -1,24 +1,25 @@
 ﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 namespace AdventOfCode.Y2019.Day12
 {
-    internal static class Puzzle12
-    {
-		public static void Run()
+	internal class Puzzle : SoloParts<long>
+	{
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 12;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunPart2For("test1", 4686774924);
+			RunFor("input", 10845, 551272644867044);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
-			var mooninfo = File.ReadAllLines("Y2019/Day12/input.txt").ToArray();
-
-			var moons = mooninfo
+			var moons = input
 				.Select(x => Moon.ParseFrom(x))
 				.ToArray();
 			var jupiter = new Planet(moons);
@@ -27,15 +28,12 @@ namespace AdventOfCode.Y2019.Day12
 				jupiter.SimulateMotionStep();
 			}
 			var totalEnergy = jupiter.TotalEnergy;
-			Console.WriteLine($"Day 12 Puzzle 1: {totalEnergy}");
-			Debug.Assert(totalEnergy == 10845);
+			return totalEnergy;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
-			var mooninfo = File.ReadAllLines("Y2019/Day12/input.txt").ToArray();
-
-			var moons = mooninfo
+			var moons = input
 				.Select(x => Moon.ParseFrom(x))
 				.ToArray();
 			var planet = new Planet(moons);
@@ -64,8 +62,7 @@ namespace AdventOfCode.Y2019.Day12
 			}
 
 			var cycle = MathHelper.LeastCommonMultiple(xcycle, ycycle, zcycle);
-			Console.WriteLine($"Day 12 Puzzle 2: {cycle}");
-			Debug.Assert(cycle == 551272644867044);
+			return cycle;
 		}
 	}
 }

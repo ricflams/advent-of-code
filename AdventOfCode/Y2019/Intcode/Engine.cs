@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+ using System.Linq;
 
 namespace AdventOfCode.Y2019.Intcode
 {
@@ -17,19 +16,18 @@ namespace AdventOfCode.Y2019.Intcode
 		public BlockingCollection<long> Output { get; set; } = new BlockingCollection<long>();
 		public bool Halt { get; set; }
 
-		public Engine WithMemoryFromFile(string filename)
+		public static long[] ReadAsMemory(string input)
 		{
-			var memory = ReadMemoryFromFile(filename);
-			return WithMemory(memory);
-		}
-
-		public static long[] ReadMemoryFromFile(string filename)
-		{
-			var memory = File.ReadAllText(filename)
+			var memory = input
 				.Split(',', StringSplitOptions.RemoveEmptyEntries)
 				.Select(long.Parse)
 				.ToArray();
 			return memory;
+		}
+
+		public Engine WithMemory(string input)
+		{
+			return WithMemory(ReadAsMemory(input));
 		}
 
 		public Engine WithMemory(int[] memory)

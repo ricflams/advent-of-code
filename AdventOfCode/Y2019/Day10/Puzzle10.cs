@@ -1,31 +1,34 @@
-﻿using System;
-using System.Linq;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 
 namespace AdventOfCode.Y2019.Day10
 {
-	internal class Puzzle10
+	internal class Puzzle : SoloParts<int>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 10;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("test1", 210, 802);
+			RunFor("input", 299, 1419);
 		}
 
-		private static void Puzzle1()
+		protected override int Part1(string[] input)
 		{
-			var asteroidmap = File.ReadAllLines("Y2019/Day10/input.txt");
+			var asteroidmap = input;
 			var (_, _, detectableAsteroids) = MaxDetectable(asteroidmap);
-			Console.WriteLine($"Day 10 Puzzle 1: {detectableAsteroids}");
-			Debug.Assert(detectableAsteroids == 299);
+			return detectableAsteroids;
 		}
 
-		private static void Puzzle2()
+		protected override int Part2(string[] input)
 		{
-			var asteroidmap = File.ReadAllLines("Y2019/Day10/input.txt");
-			var (stationX, stationY, detectableAsteroids) = MaxDetectable(asteroidmap);
+			var asteroidmap = input;
+			var (stationX, stationY, _) = MaxDetectable(asteroidmap);
 
 			//var map2 = asteroidmap.Select(x => x.ToArray()).ToArray();
 			//map2[stationY][stationX] = 'X';
@@ -45,9 +48,9 @@ namespace AdventOfCode.Y2019.Day10
 			var asteroid200 = VaporizedAsteroidsFrom(asteroidmap, stationX, stationY)
 				.Skip(199)
 				.First();
-			Console.WriteLine($"Day 10 Puzzle 2: {asteroid200}");
-			Debug.Assert(asteroid200 == 1419);
+			return asteroid200;
 		}
+
 
 		private static (int, int, int) MaxDetectable(string[] mapinfo)
 		{

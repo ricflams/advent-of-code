@@ -1,35 +1,38 @@
-﻿using System;
-using System.Diagnostics;
+﻿using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Y2019.Intcode;
+using System;
 
 namespace AdventOfCode.Y2019.Day02
 {
-	internal class Puzzle02
+	internal class Puzzle : SoloParts<long>
 	{
-		public static void Run()
+		public static Puzzle Instance = new Puzzle();
+		protected override int Year => 2019;
+		protected override int Day => 2;
+
+		public void Run()
 		{
-			Puzzle1();
-			Puzzle2();
+			RunFor("input", 5866714, 5208);
 		}
 
-		private static void Puzzle1()
+		protected override long Part1(string[] input)
 		{
+			var intcode = input[0];
 			var result = new Engine()
-				.WithMemoryFromFile("Y2019/Day02/input.txt")
+				.WithMemory(intcode)
 				.WithMemoryValueAt(1, 12)
 				.WithMemoryValueAt(2, 2)
 				.Execute()
 				.ReadMemory(0);
-			Console.WriteLine($"Day  2 Puzzle 1: {result}");
-			Debug.Assert(result == 5866714);
+			return result;
 		}
 
-		private static void Puzzle2()
+		protected override long Part2(string[] input)
 		{
-			var memory = Engine.ReadMemoryFromFile("Y2019/Day02/input.txt");
+			var intcode = input[0];
+			var memory = Engine.ReadAsMemory(intcode);
 			var desiredOutput = 19690720;
 
-			var result = 0;
 			var engine = new Engine();
 			for (var op1 = 0; op1 < 100; op1++)
 			{
@@ -43,13 +46,12 @@ namespace AdventOfCode.Y2019.Day02
 						.ReadMemory(0);
 					if (output == desiredOutput)
 					{
-						result = op1 * 100 + op2;
-						break;
+						return op1 * 100 + op2;
 					}
 				}
 			}
-			Console.WriteLine($"Day  2 Puzzle 2: {result}");
-			Debug.Assert(result == 5208);
+
+			throw new Exception("No result found");
 		}
 	}
 }
