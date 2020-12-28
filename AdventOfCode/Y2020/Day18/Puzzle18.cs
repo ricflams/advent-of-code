@@ -1,16 +1,9 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2020.Day18
 {
-	// TODO: Cleanup
 	internal class Puzzle : SoloParts<ulong>
 	{
 		public static Puzzle Instance = new Puzzle();
@@ -28,198 +21,97 @@ namespace AdventOfCode.Y2020.Day18
 			RunFor("input", 69490582260, 362464596624526);
 		}
 
-
-		internal int EvalLine(string line)
-		{
-			//Console.WriteLine($"Eval: {line}");
-			// 1 + (2 * 3) + (4 * (5 + 6))
-			line = line.Replace(" ", "");
-			while (true)
-			{
-				var org = line;
-				line = Regex.Replace(line, @"(\d+)(.)(\d+)", match =>
-				{
-					var val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
-					var op1 = int.Parse(val[0]);
-					var op2 = int.Parse(val[2]);
-					var eval = val[1] == "+"
-						? op1 + op2
-						: op1 * op2;
-					return eval.ToString();
-				});
-				line = Regex.Replace(line, @"\((\d+)\)", match =>
-				{
-					var val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
-					return val[0];
-				});
-				//Console.WriteLine($"  line: {line}");
-				if (line == org)
-					break;
-			}
-			Console.WriteLine($"  done: {line}");
-			return int.Parse(line);
-		}
-
-		internal ulong EvalLine2(string line)
-		{
-			//Console.WriteLine($"Eval: {line}");
-			var pos = 0;
-			line = line.Replace(" ", "");
-			var value = EvalLine3(line, ref pos);
-			//Console.WriteLine($"  done: {value}");
-			return value;
-		}
-
-		internal ulong EvalLine3(string line, ref int pos)
-		{
-			// 1 + (2 * 3) + (4 * (5 + 6))
-
-			//((9 * 2 + 4) * (6 * 2 * 2 * 2 + 2) + 5 * 3 + 2) + 7 * 7 + 9
-			//6 + 5 * 7 * 9
-			//(9 * 7 * (2 * 4 + 7 * 7 + 6) * 5) + 7
-
-			ulong? value = null;
-			char? op = null;
-			while (pos < line.Length)
-			{
-				ulong? v = null;
-				char? o = null;
-				var ch = line[pos++];
-				if (ch == ')')
-					return value.Value;
-				if (ch == '(')
-				{
-					v = EvalLine3(line, ref pos);
-				}
-				else if (Char.IsDigit(ch))
-				{
-					v = (ulong)(ch - '0');
-				}
-				else if (ch == '+' || ch == '*')
-				{
-					op = ch;
-				}
-				if (v.HasValue)
-				{
-					if (value.HasValue)
-					{
-						value = op == '+'
-							? v.Value + value.Value
-							: v.Value * value.Value;
-					}
-					else
-					{
-						value = v;
-					}
-				}
-			}
-			return value.Value;
-
-		}
-
-
 		protected override ulong Part1(string[] input)
 		{
-			return input.Select(EvalLine2).Sum();
-
-
-		}
-
-
-		internal ulong EvalLinePart2(string line)
-		{
-			//Console.WriteLine($"Eval: {line}");
-			var pos = 0;
-			line = line.Replace(" ", "");
-			var value = EvalLinePart2X(line, ref pos);
-			//Console.WriteLine($"  done: {value}");
-			return value;
-		}
-
-		internal ulong EvalLinePart2X(string line, ref int pos)
-		{
-			// 1 + (2 * 3) + (4 * (5 + 6))
-
-			//((9 * 2 + 4) * (6 * 2 * 2 * 2 + 2) + 5 * 3 + 2) + 7 * 7 + 9
-			//6 + 5 * 7 * 9
-			//(9 * 7 * (2 * 4 + 7 * 7 + 6) * 5) + 7
-
-			ulong? value = null;
-			ulong? subvalue = null;
-			char? op = null;
-			while (pos < line.Length)
+			return input.Select(line =>
 			{
-				ulong? v = null;
-				var ch = line[pos++];
-				if (ch == ')')
-					break;
-				if (ch == '(')
-				{
-					v = EvalLinePart2X(line, ref pos);
-				}
-				else if (Char.IsDigit(ch))
-				{
-					v = (ulong)(ch - '0');
-				}
-				else if (ch == '+' || ch == '*')
-				{
-					op = ch;
-				}
-				if (v.HasValue)
-				{
-					if (subvalue.HasValue)
-					{
-						if (op == '+')
-						{
-							subvalue = v.Value + subvalue.Value;
-						}
-						else
-						{
-							if (value.HasValue)
-							{
-								value *= subvalue;
-							}
-							else
-							{
-								value = subvalue;
-							}
-							subvalue = v;
-						}
-					}
-					else
-					{
-						subvalue = v;
-					}
-				}
-			}
-			if (subvalue.HasValue)
-			{
-				if (value.HasValue)
-				{
-					value *= subvalue;
-				}
-				else
-				{
-					value = subvalue;
-				}
-			}
-			return value.Value;
-
+				var pos = 0;
+				return EvalWithoutPrecedence(line.TrimAll(), ref pos);
+			}).Sum();
 		}
-
-
-
 
 		protected override ulong Part2(string[] input)
 		{
+			return input.Select(line =>
+			{
+				var pos = 0;
+				return EvalWithPrecedence(line.TrimAll(), ref pos);
+			}).Sum();
+		}
 
-			return input.Select(EvalLinePart2).Sum();
+		private static ulong EvalWithoutPrecedence(string expr, ref int pos)
+		{
+			// Examples:
+			// 1 + (2 * 3) + (4 * (5 + 6))
+			// ((9 * 2 + 4) * (6 * 2 * 2 * 2 + 2) + 5 * 3 + 2) + 7 * 7 + 9
+			// 6 + 5 * 7 * 9
+			// (9 * 7 * (2 * 4 + 7 * 7 + 6) * 5) + 7
+			ulong sum = 0;
+			char op = default;
+			while (pos < expr.Length)
+			{
+				var ch = expr[pos++];
+				if (ch == ')')
+				{
+					return sum;
+				}
+				if (ch == '+' || ch == '*')
+				{
+					op = ch;
+					continue;
+				}
+				var v = ch == '('
+					? EvalWithoutPrecedence(expr, ref pos)
+					: (ulong)(ch - '0');
+				sum = sum == 0
+					? v
+					: op == '+' ? v + sum : v * sum;
+			}
+			return sum;
+		}
 
-
-
-			return 0;
+		private static ulong EvalWithPrecedence(string expr, ref int pos)
+		{
+			ulong product = 1;
+			char op = default;
+			ulong? pending = null;
+			while (pos < expr.Length)
+			{
+				var ch = expr[pos++];
+				if (ch == ')')
+				{
+					break;
+				}
+				if (ch == '+' || ch == '*')
+				{
+					op = ch;
+					continue;
+				}
+				var v = ch == '('
+					? EvalWithPrecedence(expr, ref pos)
+					: (ulong)(ch - '0');
+				if (pending.HasValue)
+				{
+					if (op == '+')
+					{
+						pending += v;
+					}
+					else
+					{
+						product *= pending.Value;
+						pending = v;
+					}
+				}
+				else
+				{
+					pending = v;
+				}
+			}
+			if (pending.HasValue)
+			{
+				product *= pending.Value;
+			}
+			return product;
 		}
 	}
-
-
 }
