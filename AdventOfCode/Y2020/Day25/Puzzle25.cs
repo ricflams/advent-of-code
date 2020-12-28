@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers.Puzzles;
+using System.Numerics;
 
 namespace AdventOfCode.Y2020.Day25
 {
@@ -31,12 +32,8 @@ namespace AdventOfCode.Y2020.Day25
 
 		private static uint EncodeSubject(uint subject, uint secret)
 		{
-			var num = 1UL;
-			for (var i = 0; i < secret; i++)
-			{
-				num = (num * subject) % 20201227;
-			}
-			return (uint)num;
+			// x = a^b % n can be solved for x using ModPow
+			return (uint)BigInteger.ModPow(subject, secret, 20201227);
 		}
 
 		private static uint FindSecret(uint subject, uint pub)
