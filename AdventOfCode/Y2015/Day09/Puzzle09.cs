@@ -6,6 +6,7 @@ namespace AdventOfCode.Y2015.Day09
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "All in a Single Night";
 		protected override int Year => 2015;
 		protected override int Day => 9;
 

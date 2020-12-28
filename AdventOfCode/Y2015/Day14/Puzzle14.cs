@@ -9,6 +9,7 @@ namespace AdventOfCode.Y2015.Day14
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Reindeer Olympics";
 		protected override int Year => 2015;
 		protected override int Day => 14;
 
@@ -42,7 +43,7 @@ namespace AdventOfCode.Y2015.Day14
 			var points = new int[reindeers.Count()];
 			for (var t = 0; t < duration; t++)
 			{
-				// Find the reíndeers that have travelled the longest distance
+				// Find the reï¿½ndeers that have travelled the longest distance
 				var leaders = distances
 					.Select((travelled, i) => new
 					{

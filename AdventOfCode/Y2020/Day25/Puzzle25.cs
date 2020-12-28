@@ -6,6 +6,7 @@ namespace AdventOfCode.Y2020.Day25
 	internal class Puzzle : SoloParts<uint>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Combo Breaker";
 		protected override int Year => 2020;
 		protected override int Day => 25;
 

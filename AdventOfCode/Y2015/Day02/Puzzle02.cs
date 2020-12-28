@@ -8,6 +8,7 @@ namespace AdventOfCode.Y2015.Day02
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "I Was Told There Would Be No Math";
 		protected override int Year => 2015;
 		protected override int Day => 2;
 

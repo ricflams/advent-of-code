@@ -8,6 +8,7 @@ namespace AdventOfCode.Y2019.Day06
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Universal Orbit Map";
 		protected override int Year => 2019;
 		protected override int Day => 6;
 

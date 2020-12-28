@@ -9,6 +9,7 @@ namespace AdventOfCode.Y2020.Day14
 	internal class Puzzle : SoloParts<ulong>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Docking Data";
 		protected override int Year => 2020;
 		protected override int Day => 14;
 

@@ -9,6 +9,7 @@ namespace AdventOfCode.Y2019.Day16
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Flawed Frequency Transmission";
 		protected override int Year => 2019;
 		protected override int Day => 16;
 

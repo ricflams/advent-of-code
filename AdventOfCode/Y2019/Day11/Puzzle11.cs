@@ -8,6 +8,7 @@ namespace AdventOfCode.Y2019.Day11
 	internal class Puzzle : SoloParts<string>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Space Police";
 		protected override int Year => 2019;
 		protected override int Day => 11;
 

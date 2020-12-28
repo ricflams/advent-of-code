@@ -1,5 +1,6 @@
 ﻿using AdventOfCode.Helpers.Puzzles;
 using System;
+using System.Diagnostics;
 
 namespace AdventOfCode
 {
@@ -8,21 +9,17 @@ namespace AdventOfCode
 		private static void Main()
 		{
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2015);
-
-			var sw = System.Diagnostics.Stopwatch.StartNew();
+			var sw = Stopwatch.StartNew();
 
 			PuzzleOptions.OnlyRunForInputs = true;
 			PuzzleOptions.ShowTimings = true;
 			//PuzzleOptions.TimingLoops = 2;
-
 
 			Y2015Puzzles();
 			Y2019Puzzles();
 			Y2020Puzzles();
 
 			Console.WriteLine($"Elapsed: {(int)(sw.ElapsedMilliseconds / (1 + PuzzleOptions.TimingLoops))} ms");
-			Console.Write("Done - press any key");
-			Console.ReadKey();
 		}
 
 		private static void Y2015Puzzles()

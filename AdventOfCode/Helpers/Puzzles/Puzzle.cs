@@ -8,6 +8,7 @@ namespace AdventOfCode.Helpers.Puzzles
 		private static readonly string TimingBar = new string('#', 10);
 		private static readonly string NoTiming = new string(' ', 22);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
+		protected abstract string Name { get; }
 		protected abstract int Year { get; }
 		protected abstract int Day { get; }
 
@@ -29,7 +30,11 @@ namespace AdventOfCode.Helpers.Puzzles
 					Console.Write(NoTiming);
 				}
 			}
-			Console.Write($"{Year} Day {Day:D2} Part {part} for {filename}: {result}");
+			if (!PuzzleOptions.OnlyRunForInputs)
+			{
+				Console.Write($"[{filename}] ");
+			}
+			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: {result}");
 			if (result.Equals(expectedResult))
 			{
 				Console.WriteLine();

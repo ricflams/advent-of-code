@@ -7,6 +7,7 @@ namespace AdventOfCode.Y2015.Day18
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Like a GIF For Your Yard";
 		protected override int Year => 2015;
 		protected override int Day => 18;
 

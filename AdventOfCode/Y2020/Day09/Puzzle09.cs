@@ -7,6 +7,7 @@ namespace AdventOfCode.Y2020.Day09
 	internal class Puzzle : ComboParts<long>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "Encoding Error";
 		protected override int Year => 2020;
 		protected override int Day => 9;
 

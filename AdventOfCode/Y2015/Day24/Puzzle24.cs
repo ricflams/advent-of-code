@@ -12,6 +12,7 @@ namespace AdventOfCode.Y2015.Day24
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "It Hangs in the Balance";
 		protected override int Year => 2015;
 		protected override int Day => 24;
 

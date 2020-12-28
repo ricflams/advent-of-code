@@ -10,6 +10,7 @@ namespace AdventOfCode.Y2015.Day04
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
+		protected override string Name => "The Ideal Stocking Stuffer";
 		protected override int Year => 2015;
 		protected override int Day => 4;
 
