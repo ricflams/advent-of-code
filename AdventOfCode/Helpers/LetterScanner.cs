@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AdventOfCode.Helpers
 {
-	internal static class LetterScanner
+	public static class LetterScanner
 	{
         // Taken from https://www.reddit.com/r/adventofcode/comments/5h52ro/2016_day_8_solutions/daxv8cr/
         private static readonly Dictionary<uint,char> LetterMap = new Dictionary<uint, char>
@@ -60,6 +60,10 @@ namespace AdventOfCode.Helpers
                 {
                     lines = lines.Select(x => x[..^1]).ToArray();
                 }
+                if (lines.Any(x => x.Last() != ' ') && lines[0].Length % 5 == 4)
+                {
+                    lines = lines.Select(x => x + " ").ToArray();
+                }                
 
                 // After trimming spaces, make sure letters are 5 chars wide
                 if (lines[0].Length % 5 != 0)
