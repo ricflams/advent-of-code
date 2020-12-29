@@ -8,7 +8,7 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		protected void RunFor(string filename, T expectedResult1, T expectedResult2)
 		{
-			if (PuzzleOptions.ShouldRun(filename))
+			if (PuzzleOptions.ShouldRun(this, filename))
 			{
 				var loops = 1;
 				var sw = Stopwatch.StartNew();

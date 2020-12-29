@@ -7,9 +7,9 @@ namespace AdventOfCode.Y2019.Day08
 	internal class Puzzle : ComboParts<string>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Space Image Format";
-		protected override int Year => 2019;
-		protected override int Day => 8;
+		public override string Name => "Space Image Format";
+		public override int Year => 2019;
+		public override int Day => 8;
 
 		public void Run()
 		{

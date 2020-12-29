@@ -10,9 +10,9 @@ namespace AdventOfCode.Y2015.Day12
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "JSAbacusFramework.io";
-		protected override int Year => 2015;
-		protected override int Day => 12;
+		public override string Name => "JSAbacusFramework.io";
+		public override int Year => 2015;
+		public override int Day => 12;
 
 		public void Run()
 		{

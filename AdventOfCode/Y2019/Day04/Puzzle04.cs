@@ -8,9 +8,9 @@ namespace AdventOfCode.Y2019.Day04
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Secure Container";
-		protected override int Year => 2019;
-		protected override int Day => 4;
+		public override string Name => "Secure Container";
+		public override int Year => 2019;
+		public override int Day => 4;
 
 		public void Run()
 		{

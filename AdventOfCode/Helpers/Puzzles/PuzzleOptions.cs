@@ -2,10 +2,24 @@
 {
 	public static class PuzzleOptions
 	{
+		private static int? _year;
+		private static int? _day;
 		static public bool OnlyRunForInputs { get; set; } = false;
 		static public bool ShowTimings { get; set; } = false;
 		static public int TimingLoops { get; set; } = 0;
+		static public void RunOnly(int year, int day)
+		{
+			_year = year;
+			_day = day;
+		}
 
-		static public bool ShouldRun(string filename) => !OnlyRunForInputs || filename == "input";
+		static public bool ShouldRun(IPuzzle puzzle, string filename)
+		{
+			if (_year.HasValue && !(puzzle.Year == _year && puzzle.Day == _day))
+				return false;
+			if (OnlyRunForInputs)
+				return filename == "input";
+			return true;
+		}
 	}
 }

@@ -3,14 +3,14 @@ using System.IO;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
-	internal abstract class Puzzle<T>
+	internal abstract class Puzzle<T> : IPuzzle
 	{
 		private static readonly string TimingBar = new string('#', 10);
 		private static readonly string NoTiming = new string(' ', 22);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
-		protected abstract string Name { get; }
-		protected abstract int Year { get; }
-		protected abstract int Day { get; }
+		public abstract string Name { get; }
+		public abstract int Year { get; }
+		public abstract int Day { get; }
 
 		protected string[] ReadInput(string filename) => File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
 
@@ -41,7 +41,9 @@ namespace AdventOfCode.Helpers.Puzzles
 			}
 			else
 			{
+		        Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine($"  ****FAIL**** expected {expectedResult}");
+		        Console.ResetColor();
 			}
 		}
 	}

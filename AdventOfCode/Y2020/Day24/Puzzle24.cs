@@ -8,9 +8,9 @@ namespace AdventOfCode.Y2020.Day24
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Lobby Layout";
-		protected override int Year => 2020;
-		protected override int Day => 24;
+		public override string Name => "Lobby Layout";
+		public override int Year => 2020;
+		public override int Day => 24;
 
 		public void Run()
 		{

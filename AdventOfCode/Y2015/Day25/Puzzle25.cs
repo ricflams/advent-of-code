@@ -12,9 +12,9 @@ namespace AdventOfCode.Y2015.Day25
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Let It Snow";
-		protected override int Year => 2015;
-		protected override int Day => 25;
+		public override string Name => "Let It Snow";
+		public override int Year => 2015;
+		public override int Day => 25;
 
 		public void Run()
 		{
@@ -50,8 +50,8 @@ namespace AdventOfCode.Y2015.Day25
 	//  internal class Puzzle : ComboParts<int>
 	//  {
 	//  	public static Puzzle Instance = new Puzzle();
-	//  	protected override int Year => 2015;
-	//  	protected override int Day => 25;
+	//  	public override int Year => 2015;
+	//  	public override int Day => 25;
 	//  
 	//  	public void Run()
 	//  	{

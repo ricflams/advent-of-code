@@ -12,9 +12,9 @@ namespace AdventOfCode.Y2015.Day22
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Wizard Simulator 20XX";
-		protected override int Year => 2015;
-		protected override int Day => 22;
+		public override string Name => "Wizard Simulator 20XX";
+		public override int Year => 2015;
+		public override int Day => 22;
 
 		public void Run()
 		{

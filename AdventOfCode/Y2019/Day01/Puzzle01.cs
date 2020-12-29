@@ -7,9 +7,9 @@ namespace AdventOfCode.Y2019.Day01
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "The Tyranny of the Rocket Equation";
-		protected override int Year => 2019;
-		protected override int Day => 1;
+		public override string Name => "The Tyranny of the Rocket Equation";
+		public override int Year => 2019;
+		public override int Day => 1;
 
 		public void Run()
 		{

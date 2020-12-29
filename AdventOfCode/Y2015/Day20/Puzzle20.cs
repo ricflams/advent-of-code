@@ -6,9 +6,9 @@ namespace AdventOfCode.Y2015.Day20
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Infinite Elves and Infinite Houses";
-		protected override int Year => 2015;
-		protected override int Day => 20;
+		public override string Name => "Infinite Elves and Infinite Houses";
+		public override int Year => 2015;
+		public override int Day => 20;
 
 		public void Run()
 		{

@@ -12,10 +12,10 @@ namespace AdventOfCode.Y2015.Day23
 	internal class Puzzle : ComboParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Opening the Turing Lock";
-		protected override int Year => 2015;
-		protected override int Day => 23;
-
+		public override string Name => "Opening the Turing Lock";
+		public override int Year => 2015;
+		public override int Day => 23;
+ 
 		public void Run()
 		{
 			RunFor("input", 184, 231);

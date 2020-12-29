@@ -19,7 +19,7 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		private void RunPart(string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
-			if (PuzzleOptions.ShouldRun(filename))
+			if (PuzzleOptions.ShouldRun(this, filename))
 			{
 				var loops = 1;
 				var sw = Stopwatch.StartNew();

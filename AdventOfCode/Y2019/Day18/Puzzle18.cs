@@ -10,9 +10,9 @@ namespace AdventOfCode.Y2019.Day18
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		protected override string Name => "Many-Worlds Interpretation";
-		protected override int Year => 2019;
-		protected override int Day => 18;
+		public override string Name => "Many-Worlds Interpretation";
+		public override int Year => 2019;
+		public override int Day => 18;
 
 		public void Run()
 		{
