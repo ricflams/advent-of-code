@@ -1,11 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.IO;
-using System.Text;
+using System.Numerics;
 
 namespace AdventOfCode.Y2015.Day25
 {
@@ -18,57 +13,32 @@ namespace AdventOfCode.Y2015.Day25
 
 		public void Run()
 		{
-			//RunFor("test1", 0, 0);
-			//RunFor("test2", 0, 0);
-			RunFor("input", 0, 0);
+			RunPart1For("input", 9132360);
 		}
 
 		protected override int Part1(string[] input)
 		{
+			input[0].RegexCapture("To continue, please consult the code grid in the manual.  Enter the code at row %d, column %d.")
+				.Get(out int row)
+				.Get(out int col);
 
+			var a0 = 20151125;
+			var a = 252533;
+			var n = 33554393;
 
-
-
-
-			return 0;
+			//    | 1   2   3   4   5   6  
+			// ---+---+---+---+---+---+---+
+			//  1 |  1   3   6  10  15  21
+			//  2 |  2   5   9  14  20
+			//  3 |  4   8  13  19
+			//  4 |  7  12  18
+			//  5 | 11  17
+			//  6 | 16
+			var pos = col*(col+1)/2 + row*(row-1)/2 + (row-1)*(col-1);
+			var pow = (int)((a0 * BigInteger.ModPow(a, pos - 1, n)) % n);
+			return pow;
 		}
 
-		protected override int Part2(string[] input)
-		{
-
-
-
-
-
-			return 0;
-		}
+		protected override int Part2(string[] _) => 0;
 	}
-
-
-
-
-	//  internal class Puzzle : ComboParts<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//  	public override int Year => 2015;
-	//  	public override int Day => 25;
-	//  
-	//  	public void Run()
-	//  	{
-	//  		RunFor("test1", 0, 0);
-	//  		RunFor("test2", 0, 0);
-	//  		RunFor("input", 0, 0);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
-
 }
