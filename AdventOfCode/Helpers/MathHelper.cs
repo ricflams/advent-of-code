@@ -26,6 +26,46 @@ namespace AdventOfCode.Helpers
 			long Lcm(long a, long b) => (a / GreatestCommonFactor(a, b)) * b;
 		}
 
+		public static long Prod(this long[] values)
+		{
+			var prod = 1L;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
+		public static long Prod(this int[] values)
+		{
+			var prod = 1L;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
+		public static ulong Prod(this uint[] values)
+		{
+			var prod = 1UL;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
+		public static ulong Prod(this ulong[] values)
+		{
+			var prod = 1UL;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
 		public static IEnumerable<long> Factorize(long n)
 		{
 			var max = (long)Math.Ceiling(Math.Sqrt(n));
