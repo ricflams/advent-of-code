@@ -19,14 +19,14 @@ namespace AdventOfCode.Y2020.Day23
 
 		protected override long Part1(string[] input)
 		{
-			var cuparr = ShuffleCups(input[0], 100, input[0].Length);
+			var cups = ShuffleCups(input[0], 100, input[0].Length);
 
 			var n = 0;
-			var digit = cuparr[0];
-			for (var i = 0; i < cuparr.Length - 1; i++)
+			var digit = cups[0];
+			for (var i = 0; i < cups.Length - 1; i++)
 			{
 				n = n * 10 + digit + 1; // +1 to go back from 0-based to 1-based
-				digit = cuparr[digit];
+				digit = cups[digit];
 			}
 
 			return n;
@@ -34,10 +34,10 @@ namespace AdventOfCode.Y2020.Day23
 
 		protected override long Part2(string[] input)
 		{
-			var cuparr = ShuffleCups(input[0], 10_000_000, 1_000_000);
-			var cup1 = cuparr[0];
-			var cup2 = cuparr[cup1];
-			var result = (long)(cup1 + 1) * (cup2 + 1); // +1 to go back fmom 0-based to 1-based
+			var cups = ShuffleCups(input[0], 10_000_000, 1_000_000);
+			var cup1 = cups[0];
+			var cup2 = cups[cup1];
+			var result = (long)(cup1 + 1) * (cup2 + 1); // +1 to go back from 0-based to 1-based
 			return result;
 		}
 
