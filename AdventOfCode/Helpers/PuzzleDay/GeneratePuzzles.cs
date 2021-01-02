@@ -13,6 +13,7 @@ namespace AdventOfCode.Helpers.PuzzleDay
 			var yyyy = year.ToString();
 			var template = File.ReadAllText("Helpers/PuzzleDay/template.txt");
 
+			Directory.CreateDirectory($"Y{yyyy}");
 			var csproj = File.CreateText($"Y{yyyy}/itemgroup.txt");
 
 			csproj.WriteLine("  <ItemGroup>");

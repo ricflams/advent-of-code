@@ -1,4 +1,4 @@
-﻿using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Diagnostics;
 
@@ -17,6 +17,7 @@ namespace AdventOfCode
 			PuzzleOptions.RunOnly(2015, 19);
 
 			Y2015Puzzles();
+			Y2016Puzzles();
 			Y2019Puzzles();
 			Y2020Puzzles();
 
@@ -50,6 +51,34 @@ namespace AdventOfCode
 			Y2015.Day23.Puzzle.Instance.Run();
 			Y2015.Day24.Puzzle.Instance.Run();
 			Y2015.Day25.Puzzle.Instance.Run();
+		}
+		private static void Y2016Puzzles()
+		{
+			// Y2016.Day01.Puzzle.Instance.Run();
+			// Y2016.Day02.Puzzle.Instance.Run();
+			// Y2016.Day03.Puzzle.Instance.Run();
+			// Y2016.Day04.Puzzle.Instance.Run();
+			// Y2016.Day05.Puzzle.Instance.Run();
+			// Y2016.Day06.Puzzle.Instance.Run();
+			// Y2016.Day07.Puzzle.Instance.Run();
+			// Y2016.Day08.Puzzle.Instance.Run();
+			// Y2016.Day09.Puzzle.Instance.Run();
+			// Y2016.Day10.Puzzle.Instance.Run();
+			// Y2016.Day11.Puzzle.Instance.Run();
+			// Y2016.Day12.Puzzle.Instance.Run();
+			// Y2016.Day13.Puzzle.Instance.Run();
+			// Y2016.Day14.Puzzle.Instance.Run();
+			// Y2016.Day15.Puzzle.Instance.Run();
+			// Y2016.Day16.Puzzle.Instance.Run();
+			// Y2016.Day17.Puzzle.Instance.Run();
+			// Y2016.Day18.Puzzle.Instance.Run();
+			// Y2016.Day19.Puzzle.Instance.Run();
+			// Y2016.Day20.Puzzle.Instance.Run();
+			// Y2016.Day21.Puzzle.Instance.Run();
+			// Y2016.Day22.Puzzle.Instance.Run();
+			// Y2016.Day23.Puzzle.Instance.Run();
+			// Y2016.Day24.Puzzle.Instance.Run();
+			// Y2016.Day25.Puzzle.Instance.Run();
 		}
 		private static void Y2019Puzzles()
 		{
