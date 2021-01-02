@@ -54,7 +54,7 @@ namespace AdventOfCode
 		}
 		private static void Y2016Puzzles()
 		{
-			// Y2016.Day01.Puzzle.Instance.Run();
+			Y2016.Day01.Puzzle.Instance.Run();
 			// Y2016.Day02.Puzzle.Instance.Run();
 			// Y2016.Day03.Puzzle.Instance.Run();
 			// Y2016.Day04.Puzzle.Instance.Run();

@@ -1,5 +1,8 @@
-﻿namespace AdventOfCode.Helpers
+﻿using System;
+
+namespace AdventOfCode.Helpers
 {
+	[System.Diagnostics.DebuggerDisplay("{ToString()}")]
 	public class PointWithDirection
 	{
 		public PointWithDirection(int x, int y, Direction direction)
@@ -14,8 +17,14 @@
 			Direction = direction;
 		}
 
+		static public PointWithDirection From(int x, int y, Direction direction) => new PointWithDirection(x, y, direction);
+		static public PointWithDirection From(Point p, Direction direction) => new PointWithDirection(p, direction);
+
 		public Point Point { get; private set; }
 		public Direction Direction { get; private set; }
+
+		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
+		public override string ToString() => $"{Point}{Direction.ToString()[0]}";
 
 		public void Move(int n) => Point = Point.Move(Direction, n);
 
@@ -35,6 +44,27 @@
 
 		public void TurnRight() => Direction = Direction.TurnRight();
 		public void TurnLeft() => Direction = Direction.TurnLeft();
+		public void Turn(DirectionTurn turn)
+		{
+ 			if (turn == DirectionTurn.Right)
+				TurnRight();
+			else
+				TurnLeft();
+		}
+		public void Turn(char ch)
+		{
+			switch (ch)
+			{
+				case 'R':
+					TurnRight();
+					break;
+				case 'L':
+					TurnLeft();
+					break;
+				default:
+					throw new Exception($"Unknown turn {ch}");
+			}
+		}
 
 		public void RotateRight(int angle) => Direction = Direction.RotateRight(angle);
 		public void RotateLeft(int angle) => Direction = Direction.RotateLeft(angle);
