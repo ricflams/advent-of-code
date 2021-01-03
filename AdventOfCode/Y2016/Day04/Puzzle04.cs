@@ -1,0 +1,67 @@
+using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Puzzles;
+using System.Linq;
+
+namespace AdventOfCode.Y2016.Day04
+{
+	internal class Puzzle : SoloParts<int>
+	{
+		public static Puzzle Instance = new Puzzle();
+		public override string Name => "Security Through Obscurity";
+		public override int Year => 2016;
+		public override int Day => 4;
+
+		public void Run()
+		{
+			RunPart1For("test1", 1514);
+			RunFor("input", 158835, 993);
+		}
+
+		protected override int Part1(string[] input)
+		{
+			// Each room consists of an encrypted name (lowercase letters separated by dashes)
+			// followed by a dash, a sector ID, and a checksum in square brackets.
+			var checksum = input
+				.Select(line =>
+				{
+					// Eg aaaaa-bbb-z-y-x-123[abxyz]
+					line.RegexCapture("%*-%d[%s]").Get(out string info).Get(out int id).Get(out string checksum);
+					return IsRealRoom(info, checksum) ? id : 0;
+				})
+				.Sum();
+			return checksum;
+
+			static bool IsRealRoom(string info, string checksum)
+			{
+				var letters = info.Replace("-", "").ToCharArray().GroupBy(x => x).OrderByDescending(x => x.Count()).ThenBy(x => x.Key);
+				var mostcommon = new string(letters.Take(5).Select(x => x.Key).ToArray());
+				return mostcommon == checksum;
+			}
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var roomname = "northpole object storage";
+			var sectorId = input
+				.Select(line =>
+				{
+					// Eg aaaaa-bbb-z-y-x-123[abxyz]
+					line.RegexCapture("%*-%d").Get(out string info).Get(out int id);
+					return DecryptName(info, id) == roomname ? id : 0;
+				})
+				.First(x => x != 0);
+
+			return sectorId;
+
+			static string DecryptName(string s, int n)
+			{
+				var shift = n % 26;
+				return new string(s.Select(DecryptChar).ToArray());
+				char DecryptChar(char c) =>
+					c == '-' ? ' ' :
+					c + shift <= 'z' ? (char)(c + shift) :
+					(char)(c + shift - 26);
+			}
+		}
+	}
+}
