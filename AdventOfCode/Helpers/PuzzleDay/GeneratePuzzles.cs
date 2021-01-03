@@ -13,8 +13,8 @@ namespace AdventOfCode.Helpers.PuzzleDay
 			var yyyy = year.ToString();
 			var template = File.ReadAllText("Helpers/PuzzleDay/template.txt");
 
-			Directory.CreateDirectory($"Y{yyyy}");
-			var csproj = File.CreateText($"Y{yyyy}/itemgroup.txt");
+			Directory.CreateDirectory($"Templates/Y{yyyy}");
+			var csproj = File.CreateText($"Templates/Y{yyyy}/itemgroup.txt");
 
 			csproj.WriteLine("  <ItemGroup>");
 			for (var day = 1; day <= 25; day++)
@@ -26,7 +26,7 @@ namespace AdventOfCode.Helpers.PuzzleDay
 					.Replace("{DAY}", d)
 					.Replace("{DAY2}", dd)
 					;
-				var folder = $"Y{yyyy}/Day{dd}";
+				var folder = $"Templates/Y{yyyy}/Day{dd}";
 				Directory.CreateDirectory(folder);
 				File.WriteAllText($"{folder}/Puzzle{dd}.cs", source);
 				File.Create($"{folder}/test1.txt");
