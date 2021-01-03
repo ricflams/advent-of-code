@@ -154,6 +154,28 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public static char[,] ExpandBy(this char[,] map, int n, char defaultChar)
+		{
+			var w = map.GetLength(0);
+			var h = map.GetLength(1);
+			var newmap = new char[w + 2*n, h + 2*n];
+			for (var x = 0; x < w + 2*n; x++)
+			{
+				for (var y = 0; y < h + 2*n; y++)
+				{
+					newmap[x, y] = defaultChar;
+				}
+			}
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					newmap[x + n, y + n] = map[x, y];
+				}
+			}
+			return newmap;
+		}
+
 		public static int CountChar(this char[,] map, char searched)
 		{
 			var count = 0;
@@ -183,5 +205,7 @@ namespace AdventOfCode.Helpers
 				}
 			}
 		}
+
+		public static char CharAt(this char[,] map, Point p) => map[p.X, p.Y];
 	}
 }
