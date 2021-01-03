@@ -35,7 +35,7 @@ namespace AdventOfCode.Helpers.Puzzles
 				Console.Write($"[{filename}] ");
 			}
 			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: {result}");
-			if (result.Equals(expectedResult))
+			if (result?.Equals(expectedResult) ?? false)
 			{
 				Console.WriteLine();
 			}

@@ -76,7 +76,7 @@ namespace AdventOfCode.Y2015.Day19
 					return (from, sequence);
 				})
 				.GroupBy(x => x.from, x => x.sequence)
-				.ToDictionary(x => x.Key, x => x);
+				.ToDictionary(x => x.Key, x => x.ToArray());
 
 
 			var allreductions = parts[0]
@@ -114,7 +114,13 @@ namespace AdventOfCode.Y2015.Day19
 					}
 				}
 			}
+			Console.WriteLine("Molecule name: " + moleculeName);
 			Console.WriteLine("Molecule: " + string.Join(" ", molecule));
+			Console.WriteLine("Molecule parts:");
+			for (var i = 0; i < mols.Count; i++)			
+			{
+				Console.WriteLine($"{i,2} {mols[i],-5}:  {molecule.Count(x => x == i)}");
+			}	
 
 			Console.WriteLine("Reductions to:");
 			for (var i = 0; i < mols.Count(); i++)
@@ -142,12 +148,137 @@ namespace AdventOfCode.Y2015.Day19
 			var terminals = allredux.Where(x => !reductions.ContainsKey(x)).ToList();
 			Console.WriteLine("Terminals: " + string.Join(" ", terminals));
 
+			Console.WriteLine("Can be reduced to: ");
+			for (var i = 0; i < mols.Count(); i++)
+			{
+				var reducable = CanReduceTo(i, new List<int>());
+				Console.WriteLine($"{i,2} {mols[i],-5}:  {string.Join(" ", reducable.OrderBy(x => x))}");
+			}
 
+			Console.WriteLine("Can end with: ");
+			var canendwithall = new List<int>();
+			for (var i = 0; i < mols.Count(); i++)
+			{
+				var endwith = CanEndWith(i, new List<int>());
+				canendwithall = canendwithall.Concat(endwith).Distinct().ToList();
+				Console.WriteLine($"{i,2} {mols[i],-5}:  {string.Join(" ", endwith.OrderBy(x => x))}");
+			}
+			Console.WriteLine($"Can end with in total: {string.Join(" ", canendwithall.OrderBy(x => x))}");
 
-			//var finals = allredux.Select(x => x.ToList .Where(x => x.Any(z => terminals.Contains(z)));
+			Console.WriteLine("Can start with: ");
+			var canStartWith = new List<int>[mols.Count];
+			for (var i = 0; i < mols.Count(); i++)
+			{
+				var startwith = CanStartWith(i, new List<int>());
+				canStartWith[i] = startwith;
+				Console.WriteLine($"{i,2} {mols[i],-5}:  {string.Join(" ", startwith.OrderBy(x => x))}");
+			}
+
+			List<int> CanReduceTo(int from, List<int> seen)
+			{
+				if (!reductions.ContainsKey(from))
+					return new List<int>();
+				var reduceto = reductions[from]
+					//.SelectMany(x => x.Select(y => y))
+					.SelectMany(x => x)
+					.Distinct()
+					.Where(x => !seen.Contains(x) && x != from)
+					.ToList();
+				seen = seen.Concat(reduceto).ToList();
+				foreach (var r in reduceto)
+				{
+					var reduce2 = CanReduceTo(r, seen);
+					seen = seen.Concat(reduce2).Distinct().ToList();
+				}
+				return seen;
+			}
+
+			List<int> CanEndWith(int from, List<int> seen)
+			{
+				if (!reductions.ContainsKey(from))
+					return new List<int>();
+				var canendwith = reductions[from]
+					//.SelectMany(x => x.Select(y => y))
+					.Select(x => x.Last())
+					.Distinct()
+					.Where(x => !seen.Contains(x) && x != from)
+					.ToList();
+				seen = seen.Concat(canendwith).ToList();
+				foreach (var r in canendwith)
+				{
+					var canendwith2 = CanEndWith(r, seen);
+					seen = seen.Concat(canendwith2).Distinct().ToList();
+				}
+				return seen;
+			}
+
+			List<int> CanStartWith(int from, List<int> seen)
+			{
+				if (!reductions.ContainsKey(from))
+					return new List<int>();
+				var canstartwith = reductions[from]
+					//.SelectMany(x => x.Select(y => y))
+					.Select(x => x.First())
+					.Distinct()
+					.Where(x => !seen.Contains(x) && x != from)
+					.ToList();
+				seen = seen.Concat(canstartwith).ToList();
+				foreach (var r in canstartwith)
+				{
+					var canstartwith2 = CanStartWith(r, seen);
+					seen = seen.Concat(canstartwith2).Distinct().ToList();
+				}
+				return seen;
+			}
+
+			foreach (var x in MathHelper.AllCombinations<int>(new [] { new int[]{1, 2, 3, 4}, new int[]{10, 11, 12}, new int[]{99}, new int[]{33,44} } ))
+			{
+				System.Console.WriteLine(string.Join(" ", x));
+			}
+
+			var molredux = new Dictionary<int[], int>();
+			var molq = new Queue<(int[], int)>();
+			molq.Enqueue((new int[] { mols.IndexOf("e") }, 0));
+			while (molq.Any())
+			{
+				var (seq, redux) = molq.Dequeue();
+				if (seq.Length == molecule.Length)
+				{
+					if (seq.SequenceEqual(molecule))
+					{
+						Console.WriteLine("Found it!!!!!!!!!!!! " + redux);
+						break;
+					}
+					continue;
+				}
+				molredux[seq] = redux;
+
+				var reduxtions = seq
+					.Select(s =>
+					{
+						if (!reductions.ContainsKey(s) || !reductions[s].Any())
+							return new int[][] { new [] {s} };
+						return reductions[s];
+
+					})
+					.ToArray();
+				
+				foreach (var x in MathHelper.AllCombinations(reduxtions))
+				{
+					var mol2 = x.SelectMany(x => x).ToArray();
+					if (molredux.ContainsKey(mol2))
+						continue;
+					var redux2 = mol2.Zip(seq, (x1, x2) => x1 == x2 ? 0 : 1).Count();
+					molq.Enqueue((mol2, redux + redux2));
+					System.Console.WriteLine(string.Join(" ", mol2));
+				}
+				//foreach (var reduc in mols[seq.Last()])
+			};
+
 
 
 			return 0;
+		
 		}
 
 		//var froms = reductions.Select(x => x.From).Distinct().ToList();

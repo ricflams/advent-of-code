@@ -11,10 +11,9 @@ namespace AdventOfCode
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2015);
 			var sw = Stopwatch.StartNew();
 
-			//PuzzleOptions.OnlyRunForInputs = true;
+			// PuzzleOptions.OnlyRunForInputs = true;
 			PuzzleOptions.ShowTimings = true;
-			//PuzzleOptions.TimingLoops = 2;
-			PuzzleOptions.RunOnly(2015, 19);
+			// PuzzleOptions.TimingLoops = 2;
 
 			Y2015Puzzles();
 			Y2016Puzzles();
@@ -44,7 +43,7 @@ namespace AdventOfCode
 			Y2015.Day16.Puzzle.Instance.Run();
 			Y2015.Day17.Puzzle.Instance.Run();
 			Y2015.Day18.Puzzle.Instance.Run();
-			Y2015.Day19.Puzzle.Instance.Run();
+			//Y2015.Day19.Puzzle.Instance.Run();
 			Y2015.Day20.Puzzle.Instance.Run();
 			Y2015.Day21.Puzzle.Instance.Run();
 			//Y2015.Day22.Puzzle.Instance.Run();

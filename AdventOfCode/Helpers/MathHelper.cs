@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
-    internal static class MathHelper
+    public static class MathHelper
     {
 		public static long GreatestCommonFactor(long a, long b)
 		{
@@ -37,6 +37,16 @@ namespace AdventOfCode.Helpers
 		}
 
 		public static long Prod(this int[] values)
+		{
+			var prod = 1L;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
+		public static long Prod(this IEnumerable<int> values)
 		{
 			var prod = 1L;
 			foreach (var v in values)
@@ -116,6 +126,22 @@ namespace AdventOfCode.Helpers
 				for (var pos = n - 1; pos >= 0 && ++digits[pos] >= numberBase; pos--)
 				{
 					digits[pos] = 0;
+				}
+			}
+		}
+
+		public static IEnumerable<T[]> AllCombinations<T>(T[][] sequence)
+		{
+			var n = sequence.Length;
+			var lengths = sequence.Select(x => x.Length).ToArray();
+			var indexes = new int[n];
+			var iterations = lengths.Prod();
+			while (iterations-- > 0)
+			{
+				yield return sequence.Select((x, i) => x[indexes[i]]).ToArray();
+				for (var pos = n - 1; pos >= 0 && ++indexes[pos] >= lengths[pos]; pos--)
+				{
+					indexes[pos] = 0;
 				}
 			}
 		}
