@@ -154,6 +154,16 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public static string[] ToStringArray(this char[,] map)
+		{
+			var w = map.GetLength(0);
+			var h = map.GetLength(1);
+
+			return Enumerable.Range(0, h)
+				.Select(y => new string(Enumerable.Range(0, w).Select(x => map[x,y]).ToArray()))
+				.ToArray();
+		}
+	
 		public static char[,] ExpandBy(this char[,] map, int n, char defaultChar)
 		{
 			var w = map.GetLength(0);
