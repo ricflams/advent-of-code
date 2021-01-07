@@ -35,6 +35,11 @@ namespace AdventOfCode.Helpers
         //  █  █ █    █  █ █    █ █  █  █ █  █ █  █
         //   ██  █    ███  ████ █  █ ███   ██  █  █
 
+        public static string Scan(char [,] matrix)
+		{
+			return Scan(matrix.ToStringArray());
+		}
+
         public static string Scan(IEnumerable<string> raw)
         {
             var lines = raw.ToArray();
