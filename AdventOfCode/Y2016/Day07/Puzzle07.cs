@@ -1,8 +1,7 @@
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace AdventOfCode.Y2016.Day07
 {
@@ -29,7 +28,19 @@ namespace AdventOfCode.Y2016.Day07
 				var (supernet, hypernet) = DecomposeIp7Addr(s);
 				// The supernet MUST, and the hypernet must NOT, contain an abba sequence
 				// Use positive-lookahead of first char to weed out cases of duplicates
-				return Regex.IsMatch(supernet, @"(\w)(?!\1)(\w)\2\1") && !Regex.IsMatch(hypernet, @"(\w)(\w)\2\1");
+				return ContainsAbba(supernet) && !ContainsAbba(hypernet);
+
+				static bool ContainsAbba(string s)
+				{
+					for (var i = 0; i < s.Length-3; i++)
+					{
+						if (s[i] != s[i+1] && s[i] == s[i+3] && s[i+1] == s[i+2])
+						{
+							return true;
+						}
+					}
+					return false;
+				}
 			}
 		}
 
@@ -43,29 +54,54 @@ namespace AdventOfCode.Y2016.Day07
 
 				// ABAs can be overlapping, so we need to search the entire supernet without
 				// risk of missing some needed matches due to an unwanted overlapping match
-				var abas = Enumerable.Range(0, supernet.Length - 3)
-					.SelectMany(startAt => new Regex(@"(\w)(?!\1)(\w)\1").Matches(supernet, startAt))
-					.Select(m => m.Value)
-					.Distinct()
-					.ToArray();
+				var abas = FindAba(supernet).Distinct();
 
 				// Success if any ABA has a matching BAB in the hypernet part
 				return abas.Any(x => hypernet.Contains($"{x[1]}{x[0]}{x[1]}"));
+			}
+
+			static IEnumerable<string> FindAba(string s)
+			{
+				for (var i = 0; i < s.Length-2; i++)
+				{
+					if (s[i] != s[i+1] && s[i] == s[i+2])
+					{
+						yield return s[i..(i+2)];
+					}
+				}
 			}
 		}
 
 		private static (string, string) DecomposeIp7Addr(string ip)
 		{
 			// Extract (add up and remove) bracketed hypernet-parts from the supernet-part
-			var supernet = ip;
-			var hypernet = "";
-			while (supernet.MaybeRegexCapture("%*[%*]%*").Get(out string s1).Get(out string hyp).Get(out string s2).IsMatch)
+			var supernet = new StringBuilder();
+			var hypernet = new StringBuilder();
+			bool hyper = false;
+			foreach (var c in ip)
 			{
-				// Add arbitrary delimiter to avoid false matches across bracketed strings
-				supernet = s1 + "-" + s2;
-				hypernet += hyp + "-";
+				// When leaving supernet or hupernet, add an arbitrary delimiter to avoid
+				// false matches across brackets on these consolidated strings afterwards
+				if (c == '[')
+				{
+					hyper = true;
+					supernet.Append('-');
+				}
+				else if (c == ']')
+				{
+					hyper = false;
+					hypernet.Append('-');
+				}
+				else if (hyper)
+				{
+					hypernet.Append(c);
+				}
+				else
+				{
+					supernet.Append(c);
+				}
 			}
-			return (supernet, hypernet);
-		}
+			return (supernet.ToString(), hypernet.ToString());
+		}		
 	}
 }
