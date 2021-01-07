@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2016.Day02
 				"123",
 				"456",
 				"789",
-			}.ToMultiDim().ExpandBy(1, ' ');
+			}.ToCharMatrix().ExpandBy(1, ' ');
 			return PressKeypad(pad, input);
 		}
 
@@ -38,7 +38,7 @@ namespace AdventOfCode.Y2016.Day02
 				"56789",
 				" ABC ",
 				"  D  "
-			}.ToMultiDim().ExpandBy(1, ' ');
+			}.ToCharMatrix().ExpandBy(1, ' ');
 			return PressKeypad(pad, input);
 		}		
 

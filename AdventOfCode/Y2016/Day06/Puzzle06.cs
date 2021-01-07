@@ -30,7 +30,7 @@ namespace AdventOfCode.Y2016.Day06
 		private string Decode(string[] input, bool takeMostFrequentChar)
 		{
 			// Rotate input, then find the most frequent (or infrequent) letters in each line
-			var lines = input.ToMultiDim().RotateClockwise(90).ToStringArray();
+			var lines = input.ToCharMatrix().RotateClockwise(90).ToStringArray();
 			var letters = takeMostFrequentChar
 				? lines.Select(line => line.GroupBy(x => x).OrderByDescending(x => x.Count()).Select(x => x.Key).First())
 				: lines.Select(line => line.GroupBy(x => x).OrderBy(x => x.Count()).Select(x => x.Key).First());

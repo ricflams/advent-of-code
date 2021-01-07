@@ -71,7 +71,7 @@ namespace AdventOfCode.Y2020.Day20
 			{
 				get
 				{
-					var map = _map.ToMultiDim();
+					var map = _map.ToCharMatrix();
 					if (Bounds.Rotations > 0)
 					{
 						map = map.RotateClockwise(Bounds.Rotations * 90);
@@ -204,7 +204,7 @@ namespace AdventOfCode.Y2020.Day20
 				"                  # ",
 				"#    ##    ##    ###",
 				" #  #  #  #  #  #   "
-			}.ToMultiDim();
+			}.ToCharMatrix();
 			var result2 = 0;
 			for (var angle = 0; angle < 360; angle += 90)
 			{
