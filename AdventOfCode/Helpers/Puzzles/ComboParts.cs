@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
@@ -25,8 +26,12 @@ namespace AdventOfCode.Helpers.Puzzles
 					loops = PuzzleOptions.TimingLoops;
 				}
 				var elapsed = sw.Elapsed / loops;
-				WriteAndVerifyfyResult(elapsed, filename, 1, result1, expectedResult1);
-				WriteAndVerifyfyResult(null, filename, 2, result2, expectedResult2);
+				WriteName(elapsed, filename, 1);
+				WriteResult(result1, expectedResult1);
+				Console.WriteLine();
+				WriteName(null, filename, 2);
+				WriteResult(result2, expectedResult2);
+				Console.WriteLine();
 			}
 		}
 	}

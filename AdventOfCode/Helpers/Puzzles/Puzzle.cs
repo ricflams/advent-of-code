@@ -14,7 +14,7 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		protected string[] ReadInput(string filename) => File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
 
-		protected void WriteAndVerifyfyResult(TimeSpan? elapsed, string filename, int part, T result, T expectedResult)
+		protected void WriteName(TimeSpan? elapsed, string filename, int part)
 		{
 			if (PuzzleOptions.ShowTimings)
 			{
@@ -34,17 +34,28 @@ namespace AdventOfCode.Helpers.Puzzles
 			{
 				Console.Write($"[{filename}] ");
 			}
-			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: {result}");
-			if (result?.Equals(expectedResult) ?? false)
-			{
-				Console.WriteLine();
-			}
-			else
+			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: ");
+		}
+
+		protected void WriteResult(T result, T expectedResult)
+		{
+			Console.Write(result);
+			if (result != null && !result.Equals(expectedResult))
 			{
 		        Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine($"  ****FAIL**** expected {expectedResult}");
+				Console.Write($"  ****FAIL**** expected {expectedResult}");
 		        Console.ResetColor();
 			}
+		}
+
+		protected void WriteSpeedup(TimeSpan elapsed, TimeSpan optimized)
+		{
+			var speed =
+				elapsed.TotalMilliseconds == 0 ? "(???)" :
+				(optimized / elapsed).ToString(".#%");
+	        Console.ForegroundColor = ConsoleColor.DarkGreen;
+			Console.Write($"  Optimized runtime: {speed}");
+	        Console.ResetColor();
 		}
 	}
 }
