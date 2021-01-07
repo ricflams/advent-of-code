@@ -26,8 +26,8 @@ namespace AdventOfCode.Y2016.Day07
 			static bool SupportsTls(string s)
 			{
 				var (supernet, hypernet) = DecomposeIp7Addr(s);
+				
 				// The supernet MUST, and the hypernet must NOT, contain an abba sequence
-				// Use positive-lookahead of first char to weed out cases of duplicates
 				return ContainsAbba(supernet) && !ContainsAbba(hypernet);
 
 				static bool ContainsAbba(string s)
@@ -74,7 +74,6 @@ namespace AdventOfCode.Y2016.Day07
 
 		private static (string, string) DecomposeIp7Addr(string ip)
 		{
-			// Extract (add up and remove) bracketed hypernet-parts from the supernet-part
 			var supernet = new StringBuilder();
 			var hypernet = new StringBuilder();
 			bool hyper = false;
