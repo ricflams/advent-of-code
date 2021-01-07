@@ -11,12 +11,13 @@
 			"logging": {
                 "engineLogging": false,
                 "moduleLoad": false
-            },			
+			},
 			"preLaunchTask": "build",
 			"program": "${workspaceFolder}/AdventOfCode/bin/Debug/netcoreapp3.1/AdventOfCode.dll",
 			"args": [],
 			"cwd": "${workspaceFolder}/AdventOfCode",
-			"console": "internalConsole",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
 			"stopAtEntry": false
 		},
 		{
