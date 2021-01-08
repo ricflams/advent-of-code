@@ -80,10 +80,60 @@ namespace AdventOfCode.Y2016.Day11
 
 		protected override int Part2(string[] input)
 		{
-			var modinput = new string[input.Length];
-			input.CopyTo(modinput, 0);
-			modinput[0] = modinput[0] + "an elerium generator, an elerium-compatible microchip, a dilithium generator, dilithium-compatible microchip.";
-			return Solve(modinput);
+			var extra = new []
+			{
+				"An elerium generator.",
+				"An elerium-compatible microchip.",
+				"A dilithium generator.",
+				"A dilithium-compatible microchip."
+			};
+			input[0] += string.Concat(extra);
+			// var modinput = new string[input.Length];
+			// input.CopyTo(modinput, 0);
+			// modinput[0] = modinput[0] + "an elerium generator, an elerium-compatible microchip, a dilithium generator, a dilithium-compatible microchip.";
+			//return Solve(input);
+			return SolveRecursive(input);
+		}
+
+		private int SolveRecursive(string[] input)
+		{
+			var BIGVALUE = 100000;
+			var maxsteps = Solve(input);
+
+			var floors0 = Floors.Create(input);
+			var seen = new Dictionary<ulong, int>();
+			var progress = 0;
+
+			SolveFor(floors0, 0);
+			return maxsteps;
+
+			void SolveFor(ulong floors, int steps)
+			{
+				if (progress++ % 100000 == 0)
+					Console.Write(".");
+				if (seen.TryGetValue(floors, out var oldsteps) && steps >= oldsteps)
+				{
+					return;
+				}
+				seen[floors] = steps;
+				if (Floors.AllMovedTo4thFloor(floors))
+				{
+					Console.Write($"#{steps}#");
+					if (steps < maxsteps)
+					{
+						Console.Write($"!{steps}!");
+						maxsteps = steps;
+					}
+					return;
+				}
+				if (steps >= maxsteps)
+					return;// BIGVALUE;
+				foreach (var m in Floors.ValidMoves(floors))
+				{
+					SolveFor(m, steps + 1);
+				}
+			}
+
 		}
 
 		private int Solve(string[] input)
@@ -96,25 +146,32 @@ namespace AdventOfCode.Y2016.Day11
 
 			var maxstep = 0;
 			//var maxlifted = 0;
+			var seen1 = 0;
+			var seen2 = 0;
 
 			backlog.Add((floors0, 0, 0));
 			while (backlog.Any())
 			{
 
-				var climbers = backlog.OrderByDescending(x => x.Item3).Take(1000000);
-				var queue = new Queue<(ulong, int, int)>(climbers);
+				//Console.Write($"<{backlog.Count} {backlog.Count(x => !seen.Contains(x.Item1))}>");
+				var queue = backlog.OrderByDescending(x => x.Item3).Take(20000).ToArray();
+
+
+				//var queue = new Queue<(ulong, int, int)>(climbers);
 				backlog.Clear();
 
-				while (queue.Any())
+				foreach (var (floors, steps, _) in queue)
+				//while (queue.Any())
 				{
-					var (floors, steps, _) = queue.Dequeue();
+					//var (floors, steps, _) = queue.Dequeue();
 					if (seen.Contains(floors))
 					{
+						seen1++;
 						continue;
 					}
 					seen.Add(floors);
 					// seen.Add(floors>>16);
-					// seen.Add(floors>>24);
+					// seen.Add(floors>>32);
 
 					// if (memo.Contains(floors.Identity))
 					// {
@@ -134,14 +191,16 @@ namespace AdventOfCode.Y2016.Day11
 					if (steps > maxstep)
 					{
 						maxstep = steps;
-						Console.WriteLine($"step={steps} queue={queue.Count()}");
+						Console.Write($"[{steps} {queue.Count()}]");
 						//Floors.WriteToConsole(floors);
 						//Console.WriteLine();
 					}
 
 					if (Floors.AllMovedTo4thFloor(floors))
 					{
+						Console.WriteLine();
 						Console.WriteLine("############### BAM2: " + steps);
+						Console.WriteLine($"seen1={seen1} seen2={seen2}");
 						result = steps;
 						break;
 					}
@@ -155,6 +214,7 @@ namespace AdventOfCode.Y2016.Day11
 						//if (memo.Contains(m))
 						if (seen.Contains(m))// || queued.Contains(m))
 						{
+							seen2++;
 							continue;
 						}
 						//queue.Enqueue((m, steps + 1, Floors.Height(m)));
