@@ -68,5 +68,14 @@ namespace AdventOfCode.Helpers
 			}
 			return sum;
 		}
+
+		public static Tv GetOrAdd<Tk,Tv>(this IDictionary<Tk,Tv> dict, Tk key, Func<Tv> producer)
+		{
+			if (!dict.TryGetValue(key, out var value))
+			{
+				value = dict[key] = producer();
+			}
+			return value;
+		}
 	}
 }
