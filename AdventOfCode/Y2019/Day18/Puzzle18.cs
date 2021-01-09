@@ -92,8 +92,8 @@ namespace AdventOfCode.Y2019.Day18
 		internal class VaultMaze : Maze
 		{
 			public VaultMaze(string[] lines)
+				: base(CharMap.FromArray(lines))
 			{
-				Map = ReadMapFromFile(lines); // TODO: assigning Map this way is a bit dodgy
 				Entry = Map.FirstOrDefault(ch => ch == '@');
 			}
 		}

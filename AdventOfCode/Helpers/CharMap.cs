@@ -12,12 +12,6 @@ namespace AdventOfCode.Helpers
 		{
 		}
 
-		public static CharMap FromFile(string filename, char defaultValue = default(char))
-		{
-			var input = File.ReadAllLines(filename);
-			return FromArray(input, defaultValue);
-		}
-
 		public static CharMap FromArray(string[] lines, char defaultValue = default(char))
 		{
 			var map = new CharMap(defaultValue);
@@ -32,7 +26,7 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
-		public void ConsoleWrite(bool clear, params string[] headers)
+		public void ConsoleWrite(bool clear = false, params string[] headers)
 		{
 			if (clear)
 			{

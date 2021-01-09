@@ -15,14 +15,13 @@ namespace AdventOfCode.Y2019.Day20
 		}
 
 		public PortalMaze(string[] lines)
-			: this(ReadMapFromFile(lines))
+			: this(CharMap.FromArray(lines))
 		{
 		}
 
 		public PortalMaze(CharMap map)
+			: base(map)
 		{
-			Map = map;
-
 			var portalinfo = Map.AllPoints(char.IsUpper).OrderBy(p => p.Y).ThenBy(p => p.X);
 			var portalsByName = new Dictionary<string, List<Tuple<Point, Point>>>();
 
