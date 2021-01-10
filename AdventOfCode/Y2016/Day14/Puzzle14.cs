@@ -2,11 +2,8 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
@@ -15,265 +12,131 @@ namespace AdventOfCode.Y2016.Day14
 	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		public override string Name => "";
+		public override string Name => "One-Time Pad";
 		public override int Year => 2016;
 		public override int Day => 14;
 
 		public void Run()
 		{
-			//RunFor("test1", 22728, 22551);
-			RunPart2For("test1", 22551);
-			//RunFor("test2", 0, 0);
-			//RunFor("input", 25427, 22045);
-			RunPart2For("input", 22045);
+			RunFor("test1", 22728, 22551);
+			RunFor("input", 25427, 22045);
 		}
 
 		protected override int Part1(string[] input)
 		{
 			var salt = input[0];
-
-			// It contains three of the same character in a row, like 777. Only consider the first such triplet in a hash.
-			// One of the next 1000 hashes in the stream contains that same character five times in a row, like 77777.
-
-			//bool HasTripleSequence(byte[] hash, out byte val) => MathHelper.HasAny4BitSequence(hash, 3, out val);
-//			bool HasTripleSequence(byte[] hash) => MathHelper.HasAny4BitSequence(hash, 3, out var _);
-
-//			var tripletFinder = new Md5HashFinder(HasTripleSequence);
-			var start = 0;
-			var index = 0;
-			for (var i = 0; i < 64; i++)
-			{
-				// var triplet = tripletFinder.FindMatches(salt, start).First();
-				while (true)
-				{
-					byte hexval = 0;
-					var tripletFinder = new Md5HashFinder((byte[] hash, int _) => MathHelper.HasAnyHexSequence(hash, 3, out hexval));
-					var seq3 = tripletFinder.FindMatches(salt, start, int.MaxValue).First();
-					index = seq3.Iterations;
-					start = seq3.Iterations + 1;
-
-					var seq5Finder = new Md5HashFinder((byte[] hash, int _) => MathHelper.HasHexSequence(hash, 5, hexval));
-					var next = seq5Finder.FindMatches(salt, start, start + 1000).Count();
-
-					if (next == 1)
-					{
-						//Console.WriteLine($"At i={i} index {index} found hex={hexval}");
-						break;
-					}
-				}
-			}
-
-			// var match = finder.FindMatches(salt, 0).Skip(63).First();
-
-			return index;
+			var hasher = new Hasher(salt, Md5Hash);
+			return hasher.FindAtIndex64();
 		}
-
-// 		protected override int Part2(string[] input)
-// 		{
-// 			var salt = input[0];
-
-// 			// It contains three of the same character in a row, like 777. Only consider the first such triplet in a hash.
-// 			// One of the next 1000 hashes in the stream contains that same character five times in a row, like 77777.
-
-// 			//bool HasTripleSequence(byte[] hash, out byte val) => MathHelper.HasAny4BitSequence(hash, 3, out val);
-// //			bool HasTripleSequence(byte[] hash) => MathHelper.HasAny4BitSequence(hash, 3, out var _);
-
-// //			var tripletFinder = new Md5HashFinder(HasTripleSequence);
-// 			var start = 0;
-// 			var index = 0;
-
-// 			var memo = new Dictionary<int, byte[]>();
-
-// 			byte[] Rehash2016x(byte[] hash, int iter)
-// 			{
-// 				if (!memo.TryGetValue(iter, out var result))
-// 				{
-// 					var md5 = MD5.Create();
-// 					for (var i = 0; i < 2016; i++)
-// 					{
-// 						var sb = new StringBuilder();
-// 						foreach (var b in hash)
-// 						{
-// 							sb.Append(b.ToString("x2"));
-// 						}
-// 						var ba = Encoding.ASCII.GetBytes(sb.ToString());
-// 						hash = md5.ComputeHash(ba, 0, ba.Length);
-// 					}
-// 					memo[iter] = hash;
-// 					result = hash;
-// 				}
-// 				return result;
-// 			}
-
-// 			for (var i = 0; i < 64; i++)
-// 			{
-// 				// var triplet = tripletFinder.FindMatches(salt, start).First();
-// 				while (true)
-// 				{
-// 					byte hexval = 0;
-// 					var tripletFinder = new Md5HashFinder((byte[] hash, int iter) => Rehash2016x(hash, iter).HasAnyHexSequence(3, out hexval));
-// 					var seq3 = tripletFinder.FindMatches(salt, start, int.MaxValue).First();
-// 					index = seq3.Iterations;
-// 					start = seq3.Iterations + 1;
-
-// 					var seq5Finder = new Md5HashFinder((byte[] hash, int iter) => Rehash2016x(hash, iter).HasHexSequence(5, hexval));
-// 					var next = seq5Finder.FindMatches(salt, start, start + 1000).Count();
-
-// 					if (next == 1)
-// 					{
-// 						//Console.WriteLine($"[i={i} {index}]");
-// 						break;
-// 					}
-// 				}
-// 			}
-// 			//Console.WriteLine();
-
-// 			// var match = finder.FindMatches(salt, 0).Skip(63).First();
-
-// 			return index;
-
-// 		}
-
-
 
 		protected override int Part2(string[] input)
 		{
 			var salt = input[0];
+			var hasher = new Hasher(salt, Md5Hash2016x);
+			return hasher.FindAtIndex64();
+		}
 
-			// It contains three of the same character in a row, like 777. Only consider the first such triplet in a hash.
-			// One of the next 1000 hashes in the stream contains that same character five times in a row, like 77777.
+		private static byte[] Md5Hash(MD5 md5, string salt, int i)
+		{
+			var str = salt + i.ToString();
+			var ba0 = Encoding.ASCII.GetBytes(str);
+			var hash = md5.ComputeHash(ba0, 0, ba0.Length);
+			return hash;
+		}
 
-			//bool HasTripleSequence(byte[] hash, out byte val) => MathHelper.HasAny4BitSequence(hash, 3, out val);
-//			bool HasTripleSequence(byte[] hash) => MathHelper.HasAny4BitSequence(hash, 3, out var _);
-
-//			var tripletFinder = new Md5HashFinder(HasTripleSequence);
-
-			var memo = new Dictionary<int, byte[]>();
-
-			var byteAsString = new byte[256][];
-			for (var i = 0; i < 256; i++)
+		private static byte[] Md5Hash2016x(MD5 md5, string salt, int i)
+		{
+			var hash = Md5Hash(md5, salt, i);
+			var ba = new byte[hash.Length * 2];
+			for (var loop = 0; loop < 2016; loop++)
 			{
-				byteAsString[i] = Encoding.ASCII.GetBytes(i.ToString("x2"));
-			}
-
-			byte[] Rehash2016x(int iter)
-			{
-				if (!memo.TryGetValue(iter, out var result))
+				var bi = 0;
+				for (var j = 0; j < hash.Length; j++)
 				{
-					Parallel.For(iter, iter + 2000, it =>
-					{
-						var md5 = MD5.Create();
-						var str = salt + it.ToString();
-						var ba0 = Encoding.ASCII.GetBytes(str);
-						var hash = md5.ComputeHash(ba0, 0, ba0.Length);
-						var ba = new byte[hash.Length * 2];
-						for (var i = 0; i < 2016; i++)
-						{
-							var bi = 0;
-							for (var j = 0; j < hash.Length; j++)
-							{
-								var s = byteAsString[hash[j]];
-								ba[bi++] = s[0];
-								ba[bi++] = s[1];
-							}
-							hash = md5.ComputeHash(ba, 0, ba.Length);
-						}
-						lock (memo)
-						{
-							memo[it] = hash;
-						}
-					});
-					result = memo[iter];
+					var s = Hasher.ByteAsString[hash[j]];
+					ba[bi++] = s[0];
+					ba[bi++] = s[1];
 				}
-				return result;
+				hash = md5.ComputeHash(ba, 0, ba.Length);
+			}
+			return hash;
+		}
+
+		internal class Hasher
+		{
+			private const int Parallelism = 2000;
+			private readonly string _salt;
+			private readonly Func<MD5, string, int, byte[]> _hashing;
+			private readonly MD5[] _md5s;
+
+			public Hasher(string salt, Func<MD5, string, int, byte[]> hashing)
+			{
+				_salt = salt;
+				_hashing = hashing;
+				_md5s = Enumerable.Range(0, Parallelism).Select(_ => MD5.Create()).ToArray();
 			}
 
-			// var finder = new Md5HashFinder((byte[] hash, int iter) => Rehash2016x(hash, iter).Any());
-			// var sw = Stopwatch.StartNew();
-			// var z = finder.FindMatches(salt, 0, int.MaxValue).Take(25000).ToArray();
-			// var elapsed = sw.ElapsedMilliseconds;
-			// Console.WriteLine($"Elapsed={elapsed}");
+			public static readonly byte[][] ByteAsString;
 
-
-			// var secret = salt.ToCharArray().Select(x => (byte)x).ToArray();
-			// var buffer = new byte[100]; // more than big enough
-			// Array.Copy(secret, 0, buffer, 0, secret.Length);
-
-			var md5 = MD5.Create();
-			var iteration = 0;
-			var seq3Iteration = 0;
-			for (var loop = 0; loop < 64; loop++)
+			static Hasher()
 			{
-				// var triplet = tripletFinder.FindMatches(salt, start).First();
-				for (var found = false; !found; iteration++)
+				ByteAsString = new byte[256][];
+				for (var i = 0; i < 256; i++)
 				{
-					var hash = Rehash2016x(iteration);
-					if (hash.HasAnyHexSequence(3, out var hexval))
+					ByteAsString[i] = Encoding.ASCII.GetBytes(i.ToString("x2"));
+				}
+			}
+
+			public int FindAtIndex64()
+			{
+				var iteration = 0;
+				var seq3Iteration = 0;
+				for (var loop = 0; loop < 64; loop++)
+				{
+					// It contains three of the same character in a row, like 777. Only consider the first such triplet in a hash.
+					// One of the next 1000 hashes in the stream contains that same character five times in a row, like 77777.
+					for (var found = false; !found; iteration++)
 					{
-						for (var j = 0; j < 1000; j++)
+						var hash = GetHash(iteration);
+						if (hash.HasAnyHexSequence(3, out var hexval))
 						{
-							hash = Rehash2016x(iteration + j + 1);
-							if (hash.HasHexSequence(5, hexval))
+							for (var j = 0; j < 1000; j++)
 							{
-								seq3Iteration = iteration;
-								found = true;
-								break;
+								hash = GetHash(iteration + j + 1);
+								if (hash.HasHexSequence(5, hexval))
+								{
+									seq3Iteration = iteration;
+									found = true;
+									break;
+								}
 							}
 						}
 					}
+					//Console.WriteLine($"[#{loop} found at {seq3Iteration}]");
 				}
-				Console.WriteLine($"[#{loop} found at {seq3Iteration}]");
+				return seq3Iteration;			
 			}
-			//Console.WriteLine();
 
-			// var match = finder.FindMatches(salt, 0).Skip(63).First();
+			private readonly Dictionary<int, byte[]> _memo = new Dictionary<int, byte[]>();
 
-			return seq3Iteration;
-
+			private byte[] GetHash(int iteration)
+			{
+				if (!_memo.TryGetValue(iteration, out var result))
+				{
+					Parallel.For(0, Parallelism, j =>
+					{
+						var md5 = _md5s[j];
+						var i = iteration + j;
+						var hash = _hashing(md5, _salt, i);
+						lock (_memo)
+						{
+							_memo[i] = hash;
+						}
+					});
+					result = _memo[iteration];
+				}
+				return result;
+			}
 		}
-
-
 	}
-
-
-				// 	var tripletFinder = new Md5HashFinder((byte[] hash, int iter) => Rehash2016x(hash, iter).HasAnyHexSequence(3, out hexval));
-				// 	var seq3 = tripletFinder.FindMatches(salt, start, int.MaxValue).First();
-				// 	index = seq3.Iterations;
-				// 	start = seq3.Iterations + 1;
-
-				// 	var seq5Finder = new Md5HashFinder((byte[] hash, int iter) => Rehash2016x(hash, iter).HasHexSequence(5, hexval));
-				// 	var next = seq5Finder.FindMatches(salt, start, start + 1000).Count();
-
-				// 	if (next == 1)
-				// 	{
-				// 		//Console.WriteLine($"[i={i} {index}]");
-				// 		break;
-				// 	}
-				// }
-
-	//  internal class Puzzle : ComboParts<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//		public override string Name => "";
-	//  	public override int Year => 2016;
-	//  	public override int Day => 14;
-	//  
-	//  	public void Run()
-	//  	{
-	//  		RunFor("test1", 0, 0);
-	//  		RunFor("test2", 0, 0);
-	//  		RunFor("input", 0, 0);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
-
 }
