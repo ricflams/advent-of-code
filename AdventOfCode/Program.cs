@@ -13,9 +13,9 @@ namespace AdventOfCode
 
 			//PuzzleOptions.OnlyRunForInputs = true;
 			PuzzleOptions.ShowTimings = true;
-			PuzzleOptions.TimingLoops = 50;
-			//PuzzleOptions.RunOnly(2016, 11);
-			PuzzleOptions.RunOnly(2016, 10);
+			PuzzleOptions.TimingLoops = 1;
+			//PuzzleOptions.RunOnly(2016, 5);
+			PuzzleOptions.RunOnly(2016, 14);
 
 			Y2015Puzzles();
 			Y2016Puzzles();
@@ -66,9 +66,9 @@ namespace AdventOfCode
 			Y2016.Day09.Puzzle.Instance.Run();
 			Y2016.Day10.Puzzle.Instance.Run();
 			Y2016.Day11.Puzzle.Instance.Run();
-			// Y2016.Day12.Puzzle.Instance.Run();
-			// Y2016.Day13.Puzzle.Instance.Run();
-			// Y2016.Day14.Puzzle.Instance.Run();
+			Y2016.Day12.Puzzle.Instance.Run();
+			Y2016.Day13.Puzzle.Instance.Run();
+			Y2016.Day14.Puzzle.Instance.Run();
 			// Y2016.Day15.Puzzle.Instance.Run();
 			// Y2016.Day16.Puzzle.Instance.Run();
 			// Y2016.Day17.Puzzle.Instance.Run();

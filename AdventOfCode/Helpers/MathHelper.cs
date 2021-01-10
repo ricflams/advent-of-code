@@ -204,6 +204,80 @@ namespace AdventOfCode.Helpers
 			return reversed;
 		}
 
+		public static bool HasAnyHexSequence(this byte[] ba, int length, out byte val)
+		{
+			var digits = new byte[ba.Length*2];
+			var di = 0;
+			for (var i = 0; i < ba.Length; i++)
+			{
+				digits[di++] = (byte)((ba[i] & 0xf0) >> 4);
+				digits[di++] = (byte)(ba[i] & 0x0f);
+			}
+
+			for (var i = 0; i < digits.Length - length + 1; i++)
+			{
+				var match = true;
+				for (var j = 1; match && j < length; j++)
+				{
+					match = digits[i] == digits[i+j];
+				}
+				if (match)
+				{
+					val = digits[i];
+					return true;
+				}
+			}
+			val = 0;
+			return false;
+		}
+
+		public static bool HasHexSequence(this byte[] ba, int length, byte val)
+		{
+			var digits = new byte[ba.Length*2];
+			var di = 0;
+			for (var i = 0; i < ba.Length; i++)
+			{
+				digits[di++] = (byte)((ba[i] & 0xf0) >> 4);
+				digits[di++] = (byte)(ba[i] & 0x0f);
+			}
+
+			for (var i = 0; i < digits.Length - length + 1; i++)
+			{
+				if (digits[i] == val)
+				{
+					var match = true;
+					for (var j = 1; match && j < length; j++)
+					{
+						match = digits[i+j] == val;
+					}
+					if (match)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		private static string[] HexDigitTable = null;
+		public static string FormatAsHex(this byte[] ba)
+		{
+			if (HexDigitTable == null)
+			{
+				HexDigitTable = Enumerable.Range(0, 256)
+					.Select(x => x.ToString("x2"))
+					.ToArray();
+			}
+
+			return string.Create(ba.Length * 2, ba, (chars, ba) =>
+			{
+				for (var i = 0; i < ba.Length; i++)
+				{
+					HexDigitTable[ba[i]].AsSpan().CopyTo(chars.Slice(i * 2));
+				}
+			});
+		}
+
 		public static bool AreDistinct(params int[] values)
 		{
 			for (var i = 0; i < values.Length - 1; i++)

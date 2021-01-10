@@ -10,9 +10,14 @@ namespace AdventOfCode.Helpers
     {
 		private readonly int N = Environment.ProcessorCount;
 		private readonly int BatchSize = 50_000;
-		private readonly Func<byte[], bool> _condition;
+		private readonly Func<byte[], int, bool> _condition;
 
 		public Md5HashFinder(Func<byte[], bool> condition)
+		{
+			_condition = (hash, _) => condition(hash);
+		}
+
+		public Md5HashFinder(Func<byte[], int, bool> condition)
 		{
 			_condition = condition;
 		}
@@ -33,7 +38,7 @@ namespace AdventOfCode.Helpers
 				var hashes = Enumerable.Range(0, N)
 					.AsParallel()
 					.WithDegreeOfParallelism(N)
-					.SelectMany(i => Find(input, start + i*BatchSize, start + (i+1)*BatchSize).ToArray())
+					.SelectMany(i => FindMatches(input, start + i*BatchSize, start + (i+1)*BatchSize).ToArray())
 					.AsSequential()
 					.OrderBy(x => x.Iterations);
 				foreach (var h in hashes)
@@ -44,7 +49,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		private IEnumerable<Match> Find(string input, int start, int end)
+		public IEnumerable<Match> FindMatches(string input, int start, int end)
 		{
 			var md5 = MD5.Create();
 			var secret = input.ToCharArray().Select(x => (byte)x).ToArray();
@@ -55,7 +60,7 @@ namespace AdventOfCode.Helpers
 				var guess = Encoding.ASCII.GetBytes(i.ToString());
 				Array.Copy(guess, 0, buffer, secret.Length, guess.Length);
 				var hash = md5.ComputeHash(buffer, 0, secret.Length + guess.Length);
-				if (_condition(hash))
+				if (_condition(hash, i))
 				{
 					yield return new Match
 					{
