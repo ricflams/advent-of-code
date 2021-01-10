@@ -10,14 +10,9 @@ namespace AdventOfCode.Helpers
     {
 		private readonly int N = Environment.ProcessorCount;
 		private readonly int BatchSize = 50_000;
-		private readonly Func<byte[], int, bool> _condition;
+		private readonly Func<byte[], bool> _condition;
 
 		public Md5HashFinder(Func<byte[], bool> condition)
-		{
-			_condition = (hash, _) => condition(hash);
-		}
-
-		public Md5HashFinder(Func<byte[], int, bool> condition)
 		{
 			_condition = condition;
 		}
@@ -60,7 +55,7 @@ namespace AdventOfCode.Helpers
 				var guess = Encoding.ASCII.GetBytes(i.ToString());
 				Array.Copy(guess, 0, buffer, secret.Length, guess.Length);
 				var hash = md5.ComputeHash(buffer, 0, secret.Length + guess.Length);
-				if (_condition(hash, i))
+				if (_condition(hash))
 				{
 					yield return new Match
 					{
