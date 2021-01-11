@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace AdventOfCode.Helpers
 {
@@ -74,6 +75,49 @@ namespace AdventOfCode.Helpers
 				prod *= v;
 			}
 			return prod;
+		}
+
+		public static BigInteger ModInverse(this BigInteger a, BigInteger m)
+		{
+			if (m == 1) return 0;
+			var m0 = m;
+			(var x, var y) = (BigInteger.One, BigInteger.Zero);
+
+			while (a > 1)
+			{
+				var q = a / m;
+				(a, m) = (m, a % m);
+				(x, y) = (y, x - q * y);
+			}
+			return x < 0 ? x + m0 : x;
+		}
+
+		public static int ModInverse(this int a, int m)
+		{
+			if (m == 1) return 0;
+			var m0 = m;
+			(var x, var y) = (1, 0);
+
+			while (a > 1)
+			{
+				var q = a / m;
+				(a, m) = (m, a % m);
+				(x, y) = (y, x - q * y);
+			}
+			return x < 0 ? x + m0 : x;
+		}
+
+		public static int SolveChineseRemainderTheorem(int[] n, int[] a)
+		{
+            var prod = (int)n.Prod();
+            var sum = 0;
+            for (int i = 0; i < n.Length; i++)
+            {
+                var p = prod / n[i];
+                sum += a[i] * p.ModInverse(n[i]) * p;
+				//sum += a[i] * ModularMultiplicativeInverse(p, n[i]) * p;
+            }
+            return sum % prod;
 		}
 
 		public static IEnumerable<long> Factorize(long n)
