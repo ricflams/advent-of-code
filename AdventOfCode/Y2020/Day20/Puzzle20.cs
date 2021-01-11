@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2020.Day20
 			public int Dim { get; private set; }
 			public HashSet<uint> AllPossibleSides { get; private set; }
 			public Variant[] Variants { get; private set; }
-			public Variant Bounds { get; set; }
+			public Variant Chosen { get; set; }
 
 			private readonly string[] _map;
 
@@ -72,11 +72,11 @@ namespace AdventOfCode.Y2020.Day20
 				get
 				{
 					var map = _map.ToCharMatrix();
-					if (Bounds.Rotations > 0)
+					if (Chosen.Rotations > 0)
 					{
-						map = map.RotateClockwise(Bounds.Rotations * 90);
+						map = map.RotateClockwise(Chosen.Rotations * 90);
 					}
-					if (Bounds.Flip)
+					if (Chosen.Flip)
 					{
 						map = map.FlipH();
 					}
@@ -119,30 +119,30 @@ namespace AdventOfCode.Y2020.Day20
 				{
 					var tile = corners[0];
 					var tilesides = new HashSet<uint>(tile.AllPossibleSides.Where(side => border.Contains(side)));
-					tile.Bounds = tile.Variants.First(v => tilesides.Contains(v.Top) && tilesides.Contains(v.Left));
+					tile.Chosen = tile.Variants.First(v => tilesides.Contains(v.Top) && tilesides.Contains(v.Left));
 					tilemap[x, 0] = tile;
 					tiles.Remove(tile);
 				}
 				else
 				{
-					var left = tilemap[x - 1, 0].Bounds.Right;
+					var left = tilemap[x - 1, 0].Chosen.Right;
 					var tile = tiles.First(t => t.AllPossibleSides.Contains(left));
-					tile.Bounds = tile.Variants.Where(v => border.Contains(v.Top)).First(v => v.Left == left);
+					tile.Chosen = tile.Variants.Where(v => border.Contains(v.Top)).First(v => v.Left == left);
 					tilemap[x, 0] = tile;
 					tiles.Remove(tile);
 				}
 				for (var y = 1; y < N; y++)
 				{
-					var top = tilemap[x, y - 1].Bounds.Bot;
+					var top = tilemap[x, y - 1].Chosen.Bot;
 					var tile = tiles.First(t => t.AllPossibleSides.Contains(top));
 					if (x == 0)
 					{
-						tile.Bounds = tile.Variants.Where(v => border.Contains(v.Left)).First(v => v.Top == top);
+						tile.Chosen = tile.Variants.Where(v => border.Contains(v.Left)).First(v => v.Top == top);
 					}
 					else
 					{
-						var left = tilemap[x - 1, y].Bounds.Right;
-						tile.Bounds = tile.Variants.First(v => v.Left == left && v.Top == top);
+						var left = tilemap[x - 1, y].Chosen.Right;
+						tile.Chosen = tile.Variants.First(v => v.Left == left && v.Top == top);
 					}
 					tilemap[x, y] = tile;
 					tiles.Remove(tile);
