@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day16
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Aunt Sue";
@@ -17,7 +17,42 @@ namespace AdventOfCode.Y2015.Day16
 			RunFor("input", 40, 241);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
+		{
+			var (possessions, measures) = GetPossessionsAndMeasures(input);
+
+			var sue = possessions.First(AllMustMatch).Number;
+			return sue;
+
+			bool AllMustMatch(Possessions p) => p.All(i => measures.ContainsKey(i.Key) && i.Value == measures[i.Key]);
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var (possessions, measures) = GetPossessionsAndMeasures(input);
+
+			var realSue = possessions.First(MatchOutdatedRetroencabulator).Number;
+			return realSue;
+
+			bool MatchOutdatedRetroencabulator(Possessions p) => p.All(i =>
+			{
+				var name = i.Key;
+				var value = i.Value;
+				// cats and trees readings indicates that there are greater than that many
+				// pomeranians and goldfish readings indicate that there are fewer than that many
+				if (name == "cats" || name == "trees")
+				{
+					return measures.ContainsKey(i.Key) && i.Value > measures[i.Key];
+				}
+				if (name == "pomeranians" || name == "goldfish")
+				{
+					return !measures.ContainsKey(i.Key) || i.Value < measures[i.Key];
+				}
+				return measures.ContainsKey(i.Key) && i.Value == measures[i.Key];
+			});
+		}
+
+		private (List<Possessions>, Dictionary<string, int>) GetPossessionsAndMeasures(string[] input)
 		{
 			var message = new string[]
 			{
@@ -33,38 +68,16 @@ namespace AdventOfCode.Y2015.Day16
 				"perfumes: 1"
 			};
 
-			var posessions = input.Select(x => new Posessions(x)).ToList();
+			var posessions = input.Select(x => new Possessions(x)).ToList();
 			var measured = message
 				.Select(x => x.Split(':'))
 				.ToDictionary(x => x[0], x => int.Parse(x[1]));
-
-			var sue = posessions.First(AllMustMatch).Number;
-			var realSue = posessions.First(MatchOutdatedRetroencabulator).Number;
-			return (sue, realSue);
-
-			bool AllMustMatch(Posessions p) => p.All(i => measured.ContainsKey(i.Key) && i.Value == measured[i.Key]);
-
-			bool MatchOutdatedRetroencabulator(Posessions p) => p.All(i =>
-			{
-				var name = i.Key;
-				var value = i.Value;
-				// cats and trees readings indicates that there are greater than that many
-				// pomeranians and goldfish readings indicate that there are fewer than that many
-				if (name == "cats" || name == "trees")
-				{
-					return measured.ContainsKey(i.Key) && i.Value > measured[i.Key];
-				}
-				if (name == "pomeranians" || name == "goldfish")
-				{
-					return !measured.ContainsKey(i.Key) || i.Value < measured[i.Key];
-				}
-				return measured.ContainsKey(i.Key) && i.Value == measured[i.Key];
-			});
+			return (posessions, measured);
 		}
 
-		private class Posessions : Dictionary<string, int>
+		private class Possessions : Dictionary<string, int>
 		{
-			public Posessions(string line)
+			public Possessions(string line)
 			{
 				// Example:
 				// Sue 16: vizslas: 6, cats: 6, pomeranians: 10

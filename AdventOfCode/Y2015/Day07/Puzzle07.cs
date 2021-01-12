@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day07
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Some Assembly Required";
@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2015.Day07
 			RunFor("input", 46065, 14134);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var gates = new Gates(input);
 
@@ -26,7 +26,14 @@ namespace AdventOfCode.Y2015.Day07
 			{
 				gates.EmulateAllGates();
 			}
-			var signal1 = gates["a"].Output.Value;
+			var signal = gates["a"].Output.Value;
+			return signal;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var gates = new Gates(input);
+			var signal1 = Part1(input);
 
 			gates["b"].Input1 = signal1.ToString();
 			gates.ResetAllGates();
@@ -35,8 +42,7 @@ namespace AdventOfCode.Y2015.Day07
 				gates.EmulateAllGates();
 			}
 			var signal2 = gates["a"].Output.Value;
-
-			return (signal1, signal2);
+			return signal2;
 		}
 
 		private class Gates : Dictionary<string, Gates.Gate>

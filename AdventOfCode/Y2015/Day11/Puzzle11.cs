@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day11
 {
-	internal class Puzzle : ComboParts<string>
+	internal class Puzzle : SoloParts<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Corporate Policy";
@@ -16,12 +16,18 @@ namespace AdventOfCode.Y2015.Day11
 			RunFor("input", "cqjxxyzz", "cqkaabcc");
 		}
 
-		protected override (string, string) Part1And2(string[] input)
+		protected override string Part1(string[] input)
 		{
 			var password0 = input[0];
 			var password1 = NextPassword(password0);
+			return password1;
+		}
+
+		protected override string Part2(string[] input)
+		{
+			var password1 = Part1(input);
 			var password2 = NextPassword(password1);
-			return (password1, password2);
+			return password2;
 		}
 
 		private static string NextPassword(string password)

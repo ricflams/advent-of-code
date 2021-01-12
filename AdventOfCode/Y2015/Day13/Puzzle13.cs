@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day13
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Knights of the Dinner Table";
@@ -18,7 +18,14 @@ namespace AdventOfCode.Y2015.Day13
 			RunFor("input", 618, 601);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
+		{
+			var relations = input.Select(Relation.ParseFrom).ToList();
+			int maxHappiness = CalculateMaxHappiness(relations);
+			return maxHappiness;
+		}
+
+		protected override int Part2(string[] input)
 		{
 			var relations = input.Select(Relation.ParseFrom).ToList();
 			int maxHappiness = CalculateMaxHappiness(relations);
@@ -43,9 +50,9 @@ namespace AdventOfCode.Y2015.Day13
 				})
 				.ToList();
 			relations.AddRange(myRelations);
+			
 			int maxHappinessWithMe = CalculateMaxHappiness(relations);
-
-			return (maxHappiness, maxHappinessWithMe);
+			return maxHappinessWithMe;
 		}
 
 		private static int CalculateMaxHappiness(List<Relation> relations)

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day18
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Like a GIF For Your Yard";
@@ -16,8 +16,21 @@ namespace AdventOfCode.Y2015.Day18
 			RunFor("input", 768, 781);
 		}
 
+		protected override int Part1(string[] input)
+		{
+			var lights = GetLights(input);
+			var n = CountLightsOnAfter(lights, 100, false);
+			return n;
+		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part2(string[] input)
+		{
+			var lights = GetLights(input);
+			var n = CountLightsOnAfter(lights, 100, true);
+			return n;
+		}
+
+		private static SparseMap<bool> GetLights(string[] input)
 		{
 			var map = CharMap.FromArray(input);
 			var lights = new SparseMap<bool>();
@@ -25,11 +38,7 @@ namespace AdventOfCode.Y2015.Day18
 			{
 				lights[p] = map[p] == '#';
 			}
-
-			var n1 = CountLightsOnAfter(lights, 100, false);
-			var n2 = CountLightsOnAfter(lights, 100, true);
-
-			return (n1, n2);
+			return lights;
 		}
 
 		private static int CountLightsOnAfter(SparseMap<bool> lights, int rounds, bool cornersAreStuck)

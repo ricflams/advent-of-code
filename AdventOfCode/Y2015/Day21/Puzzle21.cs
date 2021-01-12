@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day21
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "RPG Simulator 20XX";
@@ -17,7 +17,19 @@ namespace AdventOfCode.Y2015.Day21
 			RunFor("input", 111, 188);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
+		{
+			var (minCostForWinning, _) = CostOfFighting(input);
+			return minCostForWinning;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var (_, maxCostForLosing) = CostOfFighting(input);
+			return maxCostForLosing;
+		}
+
+		protected (int, int) CostOfFighting(string[] input)
 		{
 			var boss = ReadStats(input);
 
@@ -58,6 +70,7 @@ namespace AdventOfCode.Y2015.Day21
 			}
 			return (minCostForWinning, maxCostForLosing);
 		}
+
 
 		internal static bool YouWinFight(Stats boss, Stats you)
 		{

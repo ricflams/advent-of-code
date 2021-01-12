@@ -2,14 +2,11 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day23
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Opening the Turing Lock";
@@ -28,7 +25,21 @@ namespace AdventOfCode.Y2015.Day23
 			public int Offset { get; set; }
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
+		{
+			var code = GetCode(input);
+			var result = Run(code, 0, 0);
+			return result;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var code = GetCode(input);
+			var result = Run(code, 1, 0);
+			return result;
+		}
+
+		private Ins[] GetCode(string[] input)
 		{
 			var code = input
 				.Select(line =>
@@ -48,13 +59,8 @@ namespace AdventOfCode.Y2015.Day23
 					throw new Exception($"Unexpected line {line}");
 				})
 				.ToArray();
-
-			var result1 = Run(code, 0, 0);
-			var result2 = Run(code, 1, 0);
-
-			return (result1, result2);
+			return code;
 		}
-
 
 		private static int Run(Ins[] code, int a, int b)
 		{

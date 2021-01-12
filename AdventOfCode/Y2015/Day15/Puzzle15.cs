@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day15
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Science for Hungry People";
@@ -19,13 +19,18 @@ namespace AdventOfCode.Y2015.Day15
 			RunFor("input", 13882464, 11171160);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var ingredients = input.Select(Ingredient.ParseFrom).ToArray();
-
 			var score1 = FindMaximumScore(ingredients, _ => true);
+			return score1;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var ingredients = input.Select(Ingredient.ParseFrom).ToArray();
 			var score2 = FindMaximumScore(ingredients, calories => calories == 500);
-			return (score1, score2);
+			return score2;
 		}
 
 		private static int FindMaximumScore(Ingredient[] ingredients, Func<int,bool> calorieCondition)
