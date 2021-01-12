@@ -40,7 +40,7 @@ namespace AdventOfCode.Helpers.Puzzles
 		protected void WriteResult(T result, T expectedResult)
 		{
 			Console.Write(result);
-			if (result != null && !result.Equals(expectedResult))
+			if (!expectedResult.Equals(result))
 			{
 		        Console.ForegroundColor = ConsoleColor.Red;
 				Console.Write($"  ****FAIL**** expected {expectedResult}");
