@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day15
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Oxygen System";
@@ -32,9 +32,39 @@ namespace AdventOfCode.Y2019.Day15
 		const char MapDroid = 'D';
 		const char MapOxygen = 'O';
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var intcode = input[0];
+			var (_, stepsToOxygen) = BuildMapAndFindOxygen(intcode);
+			return stepsToOxygen;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var intcode = input[0];
+			var (map, _) = BuildMapAndFindOxygen(intcode);
+
+			var minutes = 0;
+			while (map.AllPoints(val => val == MapSpace).Count() > 0)
+			{
+				foreach (var p in map.AllPoints(val => val == MapOxygen).ToList())
+				{
+					foreach (var d in AllDirections())
+					{
+						var neighboor = MoveGenerator.MoveFrom(p, d);
+						if (map[neighboor] == MapSpace)
+						{
+							map[neighboor] = MapOxygen;
+						}
+					}
+				}
+				minutes++;
+			}
+			return minutes;
+		}
+
+		private static (CharMap, int) BuildMapAndFindOxygen(string intcode)
+		{
 			var map = new CharMap();
 
 			var movements = new MoveGenerator();
@@ -85,24 +115,7 @@ namespace AdventOfCode.Y2019.Day15
 				})
 				.Execute();
 
-			var minutes = 0;
-			while (map.AllPoints(val => val == MapSpace).Count() > 0)
-			{
-				foreach (var p in map.AllPoints(val => val == MapOxygen).ToList())
-				{
-					foreach (var d in AllDirections())
-					{
-						var neighboor = MoveGenerator.MoveFrom(p, d);
-						if (map[neighboor] == MapSpace)
-						{
-							map[neighboor] = MapOxygen;
-						}
-					}
-				}
-				minutes++;
-			}
-
-			return (stepsToOxygen, minutes);
+			return (map, stepsToOxygen);
 
 			// Draw Droid on top of map
 			char MapOverlay(Point p, char val)

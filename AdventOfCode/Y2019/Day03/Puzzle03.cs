@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day03
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Crossed Wires";
@@ -20,10 +20,29 @@ namespace AdventOfCode.Y2019.Day03
 			RunFor("input", 860, 9238);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
-			var wiredefs = input;
+			var crossings = GetWireCrossings(input);
+			var nearest = crossings.Min(x => Math.Abs(x.X) + Math.Abs(x.Y));
+			return nearest;
+		}
 
+		protected override int Part2(string[] input)
+		{
+			var crossings = GetWireCrossings(input);
+			var fewestSteps = crossings.Min(x => x.Steps);
+			return fewestSteps;
+		}
+
+		private class WireCrossing
+		{
+			public int X { get; set; }
+			public int Y { get; set; }
+			public int Steps { get; set; }
+		}
+
+		private static WireCrossing[] GetWireCrossings(string[] wiredefs)
+		{
 			var map = new Dictionary<int, int[]>();
 			for (var i = 0; i < wiredefs.Length; i++)
 			{
@@ -37,18 +56,14 @@ namespace AdventOfCode.Y2019.Day03
 
 			var crossings = map
 				.Where(x => x.Value.All(s => s != 0))
-				.Select(x => new
+				.Select(x => new WireCrossing
 				{
 					X = MakeX(x.Key),
 					Y = MakeY(x.Key),
 					Steps = x.Value.Sum()
 				})
-				.ToList();
-
-			var nearest = crossings.Min(x => Math.Abs(x.X) + Math.Abs(x.Y));
-			var fewestSteps = crossings.Min(x => x.Steps);
-
-			return (nearest, fewestSteps);
+				.ToArray();
+			return crossings;
 
 			void MapWire(int wireIndex, int wireCount, string wiredef)
 			{

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day08
 {
-	internal class Puzzle : ComboParts<string>
+	internal class Puzzle : SoloParts<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Space Image Format";
@@ -16,18 +16,13 @@ namespace AdventOfCode.Y2019.Day08
 			RunFor("input", "2356", "PZEKB");
 		}
 
-		protected override (string, string) Part1And2(string[] input)
+		const int Width = 25;
+		const int Height = 6;
+		const int Size = Width * Height;
+
+		protected override string Part1(string[] input)
 		{
-			var imagedata = input[0];
-			const int width = 25;
-			const int height = 6;
-
-			const int size = width * height;
-
-			// Divide raw imagedata into the individual layers
-			var layers = Enumerable.Range(0, imagedata.Length / size)
-				.Select(i => imagedata.Substring(i * size, size))
-				.ToList();
+			var layers = GetLayers(input[0]);
 
 			// FInd the layer with most 0's and multiply its 1's and 2's
 			var layerWithMostZeros = layers
@@ -41,24 +36,40 @@ namespace AdventOfCode.Y2019.Day08
 				.First();
 			var sum = layerWithMostZeros.Count(x => x == '1') * layerWithMostZeros.Count(x => x == '2');
 
+			return sum.ToString();
+		}
+
+		protected override string Part2(string[] input)
+		{
+			var layers = GetLayers(input[0]);
+
 			// Render all "pixels" by looping through each layer's similar positions and
 			// pick the first non-transparent value, turning '1' into black and '2' into blank.
-			var rendering = Enumerable.Range(0, size)
+			var rendering = Enumerable.Range(0, Size)
 				.Select(pos => layers.Select(x => x[pos]))
 				.Select(x =>
 				{
 					var value = x.First(pixel => pixel != '2');
-					return value == '1' ? Graphics.FullBlock : ' ';
+					return value == '1' ? '#' : ' ';
 				})
 				.ToArray();
 			var image = new string(rendering);
 
 			// Split rendering into <height> individual lines and scan them
-			var lines = Enumerable.Range(0, height)
-				.Select(x => image.Substring(x * width, width));
+			var lines = Enumerable.Range(0, Height)
+				.Select(x => image.Substring(x * Width, Width));
 			var message = LetterScanner.Scan(lines);
 
-			return (sum.ToString(), message);
+			return message;
 		}
+
+		private static string[] GetLayers(string imagedata)
+		{
+			// Divide raw imagedata into the individual layers
+			var layers = Enumerable.Range(0, imagedata.Length / Size)
+				.Select(i => imagedata.Substring(i * Size, Size))
+				.ToArray();
+			return layers;
+		}		
 	}
 }
