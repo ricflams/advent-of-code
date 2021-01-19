@@ -81,13 +81,12 @@ namespace AdventOfCode.Y2015.Day16
 			{
 				// Example:
 				// Sue 16: vizslas: 6, cats: 6, pomeranians: 10
-				var val = SimpleRegex.Match(line, "Sue %d:%*");
-				Number = int.Parse(val[0]);
-				var posessions = val[1];
-				foreach (var p in posessions.Split(','))
+				var (number, possessions) = line.RxMatch("Sue %d:%*").Get<int, string>();
+				Number = number;
+				foreach (var p in possessions.Split(','))
 				{
-					var item = SimpleRegex.Match(p.Trim(), "%s: %d");
-					this[item[0]] = int.Parse(item[1]);
+					var (name, n) = p.Trim().RxMatch("%s: %d").Get<string, int>();
+					this[name] = n;
 				}
 			}
 			public int Number { get; private set; }

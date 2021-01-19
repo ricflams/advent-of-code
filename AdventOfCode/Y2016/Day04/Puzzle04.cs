@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2016.Day04
 				.Select(line =>
 				{
 					// Eg aaaaa-bbb-z-y-x-123[abxyz]
-					line.RegexCapture("%*-%d[%s]").Get(out string info).Get(out int id).Get(out string checksum);
+					var (info, id, checksum) = line.RxMatch("%*-%d[%s]").Get<string, int, string>();
 					return IsRealRoom(info, checksum) ? id : 0;
 				})
 				.Sum();
@@ -46,7 +46,7 @@ namespace AdventOfCode.Y2016.Day04
 				.Select(line =>
 				{
 					// Eg aaaaa-bbb-z-y-x-123[abxyz]
-					line.RegexCapture("%*-%d").Get(out string info).Get(out int id);
+					var (info, id) = line.RxMatch("%*-%d").Get<string, int>();
 					return DecryptName(info, id) == roomname ? id : 0;
 				})
 				.First(x => x != 0);

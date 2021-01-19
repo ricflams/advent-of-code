@@ -45,27 +45,27 @@ namespace AdventOfCode.Y2019.Day22
 				if (shuffle == "deal into new stack")
 				{
 					deck = deck.Reverse().ToArray();
-					continue;
 				}
-				if (SimpleRegex.IsMatch(shuffle, "deal with increment %d", out var incval))
+				else if (shuffle.IsRxMatch("deal with increment %d", out var captures))
 				{
-					var inc = int.Parse(incval[0]);
+					var inc = captures.Get<int>();
 					var newdeck = new int[N];
 					for (var i = 0; i < N; i++)
 					{
 						newdeck[(i * inc) % N] = deck[i];
 					}
 					deck = newdeck;
-					continue;
 				}
-				if (SimpleRegex.IsMatch(shuffle, "cut %d", out var cutval))
+				else if (shuffle.IsRxMatch("cut %d", out captures))
 				{
-					var cut = int.Parse(cutval[0]);
+					var cut = captures.Get<int>();
 					cut = (cut + N) % N;
 					deck = deck.Skip(cut).Concat(deck.Take(cut)).ToArray();
-					continue;
 				}
-				throw new Exception($"Unknown shuffle: {shuffle}");
+				else
+				{
+					throw new Exception($"Unknown shuffle: {shuffle}");
+				}
 			}
 			return deck;
 		}

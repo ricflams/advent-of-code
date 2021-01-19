@@ -31,7 +31,7 @@ namespace AdventOfCode.Y2020.Day08
 			var code = input
 				.Select(line =>
 				{
-					line.RegexCapture("%s %c%d").Get(out string opcode).Get(out char sign).Get(out int val);
+					var (opcode, sign, val) = line.RxMatch("%s %c%d").Get<string, char, int>();
 					return new Ins
 					{
 						Opcode = opcode,

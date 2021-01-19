@@ -1,5 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +28,15 @@ namespace AdventOfCode.Y2015.Day19
 			// Ex: H => HCa
 			var reductions = input
 				.TakeWhile(x => x.Any())
-				.Select(x => SimpleRegex.Match(x, "%s => %s"))
-				.Select(x => new { From = x[0], To = x[1] })
+				.Select(x =>
+				{
+					var (from, to) = x.RxMatch("%s => %s").Get<string, string>();
+					return new 
+					{
+						From = from,
+						To = to
+					};
+				})
 				.ToArray();
 			var molecule = input.Last();
 
@@ -70,7 +78,7 @@ namespace AdventOfCode.Y2015.Day19
 			var reductions = parts[0]
 				.Select(line =>
 				{
-					line.RegexCapture("%s => %s").Get(out string fromName).Get(out string replacementNames);
+					var (fromName, replacementNames) = line.RxMatch("%s => %s").Get<string, string>();
 					var sequence = regex.Matches(replacementNames).Select(m => mols.IndexOf(m.Value)).ToArray();
 					var from = mols.IndexOf(fromName);
 					return (from, sequence);
@@ -82,7 +90,7 @@ namespace AdventOfCode.Y2015.Day19
 			var allreductions = parts[0]
 				.Select(line =>
 				{
-					line.RegexCapture("%s => %s").Get(out string fromName).Get(out string replacementNames);
+					var (fromName, replacementNames) = line.RxMatch("%s => %s").Get<string, string>();
 					var sequence = regex.Matches(replacementNames).Select(m => mols.IndexOf(m.Value)).ToArray();
 					var from = mols.IndexOf(fromName);
 					return (from, sequence);

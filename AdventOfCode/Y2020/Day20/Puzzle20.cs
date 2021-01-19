@@ -31,7 +31,7 @@ namespace AdventOfCode.Y2020.Day20
 
 			public Tile(string[] line)
 			{
-				line[0].RegexCapture("Tile %d:").Get(out int id);
+				var id = line[0].RxMatch("Tile %d:").Get<int>();
 				Id = id;
 				_map = line[1..];
 

@@ -18,9 +18,9 @@ namespace AdventOfCode.Y2015.Day25
 
 		protected override int Part1(string[] input)
 		{
-			input[0].RegexCapture("To continue, please consult the code grid in the manual.  Enter the code at row %d, column %d.")
-				.Get(out int row)
-				.Get(out int col);
+			var (row, col) = input[0]
+				.RxMatch("To continue, please consult the code grid in the manual.  Enter the code at row %d, column %d.")
+				.Get<int, int>();
 
 			var a0 = 20151125;
 			var a = 252533;

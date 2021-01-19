@@ -97,9 +97,9 @@ namespace AdventOfCode.Y2015.Day21
 			var info = string.Join(Environment.NewLine, input);
 			return new Stats
 			{
-				Hitpoints = SimpleRegex.MatchInt(info, "Hit Points: %d"),
-				Damage = SimpleRegex.MatchInt(info, "Damage: %d"),
-				Armor = SimpleRegex.MatchInt(info, "Armor: %d")
+				Hitpoints = info.RxMatch("Hit Points: %d").Get<int>(),
+				Damage = info.RxMatch("Damage: %d").Get<int>(),
+				Armor = info.RxMatch("Armor: %d").Get<int>()
 			};
 		}
 

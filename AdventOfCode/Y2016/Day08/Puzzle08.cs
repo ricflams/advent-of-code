@@ -42,8 +42,9 @@ namespace AdventOfCode.Y2016.Day08
 				// rect 49x1
 				// rotate row y=2 by 34
 				// rotate column x=44 by 1
-				if (line.MaybeRegexCapture("rect %dx%d").Get(out int w).Get(out int h).IsMatch)
+				if (line.IsRxMatch("rect %dx%d", out var captures))
 				{
+					var (w, h) = captures.Get<int, int>();
 					for (var x = 0; x < w; x++)
 					{
 						for (var y = 0; y < h; y++)
@@ -52,12 +53,14 @@ namespace AdventOfCode.Y2016.Day08
 						}
 					}
 				}
-				else if (line.MaybeRegexCapture("rotate row y=%d by %d").Get(out int row).Get(out int dx).IsMatch)
+				else if (line.IsRxMatch("rotate row y=%d by %d", out captures))
 				{
+					var (row, dx) = captures.Get<int, int>();
 					screen.ShiftRowRight(row, dx);
 				}
-				else if (line.MaybeRegexCapture("rotate column x=%d by %d").Get(out int col).Get(out int dy).IsMatch)
+				else if (line.IsRxMatch("rotate column x=%d by %d", out captures))
 				{
+					var (col, dy) = captures.Get<int, int>();
 					screen.ShiftColDown(col, dy);
 				}
 				else

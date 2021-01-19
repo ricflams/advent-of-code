@@ -74,13 +74,15 @@ namespace AdventOfCode.Y2015.Day14
 			{
 				// Example:
 				// Rudolph can fly 11 km/s for 5 seconds, but then must rest for 48 seconds.
-				var val = SimpleRegex.Match(line, "%s can fly %d km/s for %d seconds, but then must rest for %d");
+				var (name, velocity, fly, rest) = line
+					.RxMatch("%s can fly %d km/s for %d seconds, but then must rest for %d")
+					.Get<string, int, int, int>();
 				return new Reindeer
 				{
-					Name = val[0],
-					FlyVelocity = int.Parse(val[1]),
-					FlyDuration = int.Parse(val[2]),
-					RestDuration = int.Parse(val[3])
+					Name = name,
+					FlyVelocity = velocity,
+					FlyDuration = fly,
+					RestDuration = rest
 				};
 			}
 

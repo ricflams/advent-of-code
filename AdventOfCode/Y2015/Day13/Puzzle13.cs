@@ -101,12 +101,14 @@ namespace AdventOfCode.Y2015.Day13
 				// Examples:
 				// David would gain 91 happiness units by sitting next to Eric.
 				// David would lose 51 happiness units by sitting next to Alice.
-				var val = SimpleRegex.Match(line, "%s would %s %d happiness units by sitting next to %s");
+				var (name, would, happiness, neighbor) = line
+					.RxMatch("%s would %s %d happiness units by sitting next to %s")
+					.Get<string, string, int, string>();
 				return new Relation
 				{
-					Name = val[0],
-					Happiness = (val[1] == "gain" ? 1 : -1) * int.Parse(val[2]),
-					Neighbor = val[3]
+					Name = name,
+					Happiness = (would == "gain" ? 1 : -1) * happiness,
+					Neighbor = neighbor
 				};
 			}
 		}

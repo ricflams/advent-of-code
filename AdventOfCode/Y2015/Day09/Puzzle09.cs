@@ -36,11 +36,7 @@ namespace AdventOfCode.Y2015.Day09
 			foreach (var line in input)
 			{
 				// Example: Faerun to Tambi = 129
-				var val = SimpleRegex.Match(line, "%s to %s = %d");
-				var city1 = val[0];
-				var city2 = val[1];
-				var distance = int.Parse(val[2]);
-
+				var (city1, city2, distance) = line.RxMatch("%s to %s = %d").Get<string, string, int>();
 				graph.AddVertices(city1, city2, distance);
 			}
 			// graph.WriteAsGraphwiz();			

@@ -89,8 +89,9 @@ namespace AdventOfCode.Y2016.Day10
 			// First register all the bots, and only then start sending values into them
 			foreach (var line in instructions)
 			{
-				if (line.MaybeRegexCapture("bot %d gives low to %s %d and high to %s %d").Get(out int id).Get(out string loType).Get(out int loId).Get(out string hiType).Get(out int hiId).IsMatch)
+				if (line.IsRxMatch("bot %d gives low to %s %d and high to %s %d", out var captures))
 				{
+					var (id, loType, loId, hiType, hiId) = captures.Get<int, string, int, string, int>();
 					var bot = GetOrCreateBot(id);
 					var loRecipient = GetOrCreateReceiver(loType, loId);
 					var hiRecipient = GetOrCreateReceiver(hiType, hiId);
@@ -99,8 +100,9 @@ namespace AdventOfCode.Y2016.Day10
 			}
 			foreach (var line in instructions)
 			{
-				if (line.MaybeRegexCapture("value %d goes to bot %d").Get(out int chip).Get(out int id).IsMatch)
+				if (line.IsRxMatch("value %d goes to bot %d", out var captures))
 				{
+					var (chip, id) = captures.Get<int, int>();
 					var bot = GetOrCreateBot(id);
 					bot.Send(chip);
 				}

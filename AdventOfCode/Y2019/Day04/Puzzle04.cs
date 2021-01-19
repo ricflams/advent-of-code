@@ -19,14 +19,14 @@ namespace AdventOfCode.Y2019.Day04
 
 		protected override int Part1(string[] input)
 		{
-			input[0].RegexCapture("%d-%d").Get(out int begin).Get(out int end);
+			var (begin, end) = input[0].RxMatch("%d-%d").Get<int, int>();
 			var matches = CalcMatches(begin, end).Count(v => SequenceLengths(v).Any(seq => seq >= 2));
 			return matches;
 		}
 
 		protected override int Part2(string[] input)
 		{
-			input[0].RegexCapture("%d-%d").Get(out int begin).Get(out int end);
+			var (begin, end) = input[0].RxMatch("%d-%d").Get<int, int>();
 			var matches = CalcMatches(begin, end).Count(v => SequenceLengths(v).Any(seq => seq == 2));
 			return matches;
 		}

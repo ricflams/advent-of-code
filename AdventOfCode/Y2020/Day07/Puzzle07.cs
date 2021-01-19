@@ -27,9 +27,9 @@ namespace AdventOfCode.Y2020.Day07
 				.Select(line =>
 				{
 					// clear chartreuse bags contain 3 mirrored olive bags, 1 posh yellow bag, 1 faded salmon bag, 5 drab salmon bags.
-					line.RegexCapture("%* bags contain %*.")
-						.Get(out string color)
-						.Get(out string content);
+					var (color, content) = line
+						.RxMatch("%* bags contain %*.")
+						.Get<string, string>();
 					return new 
 					{
 						Color = color,
@@ -37,9 +37,7 @@ namespace AdventOfCode.Y2020.Day07
 							.Split(",", StringSplitOptions.RemoveEmptyEntries)
 							.Select(x =>
 							{
-								x.RegexCapture("%d %* bag")
-									.Get(out int n)
-									.Get(out string color);
+								var (n, color) = x.RxMatch("%d %* bag").Get<int, string>();
 								return (color, n);
 							})
 							.ToDictionary(x => x.color, x => x.n)

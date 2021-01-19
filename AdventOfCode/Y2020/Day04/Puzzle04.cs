@@ -88,16 +88,22 @@ namespace AdventOfCode.Y2020.Day04
 			{
 				get
 				{
-					Hgt.RegexCapture("%d%s")
-						.Get(out int h)
-						.Get(out string unit);
+					var (h, unit) = Hgt.RxMatch("%d%s").Get<int, string>();
 					return unit == "cm" && h >= 150 && h <= 193 || unit == "in" && h >= 59 && h <= 76;
 				}
 			}
-			public bool IsHclValid =>
-				SimpleRegex.IsMatch(Hcl, "#%s", out var haircolor) &&
-					haircolor[0].Length == 6 &&
-					haircolor[0].All(x => char.IsDigit(x) || "abcdef".Contains(x));
+			public bool IsHclValid
+			{
+				get
+				{
+					if (Hcl.IsRxMatch("#%s", out var captures))
+					{
+						var haircolor = captures.Get<string>();
+						return haircolor.Length == 6 && haircolor.All(x => char.IsDigit(x) || "abcdef".Contains(x));
+					}
+					return false;
+				}
+			}
 			public bool IsEclValid => new[] { "amb", "blu", "brn", "gry", "grn", "hzl", "oth" }.Contains(Ecl);
 			public bool IsPidValid => Pid.Length == 9 && Pid.All(c => char.IsDigit(c));
 		}

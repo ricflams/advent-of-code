@@ -44,17 +44,20 @@ namespace AdventOfCode.Y2015.Day23
 			var code = input
 				.Select(line =>
 				{
-					if (SimpleRegex.IsMatch(line, "%s %c, %d", out var val))
+					if (line.IsRxMatch("%s %c, %d", out var captures))
 					{
-						return new Ins { Opcode = val[0], Register = val[1][0], Offset =  int.Parse(val[2]) };
+						var (opc, reg, offset) = captures.Get<string, char, int>();
+						return new Ins { Opcode = opc, Register = reg, Offset = offset };
 					}
-					if (SimpleRegex.IsMatch(line, "%s %d", out val))
+					if (line.IsRxMatch("%s %d", out captures))
 					{
-						return new Ins { Opcode = val[0], Offset = int.Parse(val[1]) };
+						var (opc, offset) = captures.Get<string, int>();
+						return new Ins { Opcode = opc, Offset = offset };
 					}
-					if (SimpleRegex.IsMatch(line, "%s %c", out val))
+					if (line.IsRxMatch("%s %c", out captures))
 					{
-						return new Ins { Opcode = val[0], Register = val[1][0] };
+						var (opc, reg) = captures.Get<string, char>();
+						return new Ins { Opcode = opc, Register = reg };
 					}
 					throw new Exception($"Unexpected line {line}");
 				})

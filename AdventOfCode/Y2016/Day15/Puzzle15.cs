@@ -52,10 +52,9 @@ namespace AdventOfCode.Y2016.Day15
 				{
 					// Disc #1 has 5 positions; at time=0, it is at position 4.
 					// Disc #2 has 2 positions; at time=0, it is at position 1.
-					line.RegexCapture("Disc #%d has %d positions; at time=0, it is at position %d.")
-						.Get(out int d)
-						.Get(out int n)
-						.Get(out int p);
+					var (d, n, p) = line
+						.RxMatch("Disc #%d has %d positions; at time=0, it is at position %d.")
+						.Get<int, int, int>();
 					return new Disc(d, n, p);
 				})
 				.Concat(extraDisc != null ? new[] {extraDisc} : Enumerable.Empty<Disc>())

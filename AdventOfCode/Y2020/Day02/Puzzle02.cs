@@ -23,12 +23,7 @@ namespace AdventOfCode.Y2020.Day02
 			var result2 = 0;
 			foreach (var line in input)
 			{
-				line.RegexCapture("%d-%d %c: %s")
-					.Get(out int min)
-					.Get(out int max)
-					.Get(out char c)
-					.Get(out string pwd);
-
+				var (min, max, c, pwd) = line.RxMatch("%d-%d %c: %s").Get<int, int, char, string>();
 				var n = pwd.Count(x => x == c);
 				if (n >= min && n <= max)
 				{

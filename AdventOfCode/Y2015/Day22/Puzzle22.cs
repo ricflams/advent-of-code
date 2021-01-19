@@ -49,8 +49,8 @@ namespace AdventOfCode.Y2015.Day22
 			};
 			var boss = new Boss
 			{
-				Hitpoints = SimpleRegex.MatchInt(rawinput, "Hit Points: %d"),
-				Damage = SimpleRegex.MatchInt(rawinput, "Damage: %d")
+				Hitpoints = rawinput.RxMatch("Hit Points: %d").Get<int>(),
+				Damage = rawinput.RxMatch("Damage: %d").Get<int>(),
 			};
 
 			var leastSpent = Fight(player, boss);

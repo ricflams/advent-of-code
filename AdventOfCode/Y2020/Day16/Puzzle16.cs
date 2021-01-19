@@ -34,12 +34,9 @@ namespace AdventOfCode.Y2020.Day16
 			var fields = parts[0]
 				.Select(x =>
 				{
-					x.RegexCapture("%*: %d-%d or %d-%d")
-						.Get(out string name)
-						.Get(out int opt1min)
-						.Get(out int opt1max)
-						.Get(out int opt2min)
-						.Get(out int opt2max);
+					var (name, opt1min, opt1max, opt2min, opt2max) = x
+						.RxMatch("%*: %d-%d or %d-%d")
+						.Get<string, int, int, int, int>();
 					return new TicketField
 					{
 						Name = name,

@@ -34,9 +34,7 @@ namespace AdventOfCode.Y2020.Day21
 			var food = input
 				.Select(line =>
 				{
-					line.RegexCapture(@"%* (contains %*)")
-						.Get(out string ingredients)
-						.Get(out string allergies);
+					var (ingredients, allergies) = line.RxMatch(@"%* (contains %*)").Get<string, string>();
 					return new Food
 					{
 						Ingredients = new HashSet<string>(ingredients.Split(" ", StringSplitOptions.RemoveEmptyEntries)),
@@ -45,7 +43,7 @@ namespace AdventOfCode.Y2020.Day21
 				})
 				.ToArray();
 
-			// All ingredients anda allergies
+			// All ingredients and allergies
 			var allIngredients = food.Aggregate(new HashSet<string>(), (set, f) => { set.UnionWith(f.Ingredients); return set; });
 			var allAllergies = food.Aggregate(new HashSet<string>(), (set, f) => { set.UnionWith(f.Allergies); return set; });
 

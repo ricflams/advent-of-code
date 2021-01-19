@@ -178,30 +178,35 @@ namespace AdventOfCode.Y2015.Day07
 				// x LSHIFT 2 -> f
 				// y RSHIFT 2 -> g
 				// NOT y -> i
-				string[] op;
-				if (SimpleRegex.IsMatch(operation, "NOT %s -> %s", out op))
+				if (operation.IsRxMatch("NOT %s -> %s", out var captures))
 				{
-					return new NotGate { Input1 = op[0], Name = op[1] };
+					var (input1, name) = captures.Get<string, string>();
+					return new NotGate { Input1 = input1, Name = name };
 				}
-				if (SimpleRegex.IsMatch(operation, "%s AND %s -> %s", out op))
+				if (operation.IsRxMatch("%s AND %s -> %s", out captures))
 				{
-					return new AndGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
+					var (input1, input2, name) = captures.Get<string, string, string>();
+					return new AndGate { Input1 = input1, Input2 = input2, Name = name };
 				}
-				if (SimpleRegex.IsMatch(operation, "%s OR %s -> %s", out op))
+				if (operation.IsRxMatch("%s OR %s -> %s", out captures))
 				{
-					return new OrGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
+					var (input1, input2, name) = captures.Get<string, string, string>();
+					return new OrGate { Input1 = input1, Input2 = input2, Name = name };
 				}
-				if (SimpleRegex.IsMatch(operation, "%s LSHIFT %d -> %s", out op))
+				if (operation.IsRxMatch("%s LSHIFT %d -> %s", out captures))
 				{
-					return new LShiftGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
+					var (input1, input2, name) = captures.Get<string, string, string>();
+					return new LShiftGate { Input1 = input1, Input2 = input2, Name = name };
 				}
-				if (SimpleRegex.IsMatch(operation, "%s RSHIFT %d -> %s", out op))
+				if (operation.IsRxMatch("%s RSHIFT %d -> %s", out captures))
 				{
-					return new RShiftGate { Input1 = op[0], Input2 = op[1], Name = op[2] };
+					var (input1, input2, name) = captures.Get<string, string, string>();
+					return new RShiftGate { Input1 = input1, Input2 = input2, Name = name };
 				}
-				if (SimpleRegex.IsMatch(operation, "%s -> %s", out op))
+				if (operation.IsRxMatch("%s -> %s", out captures))
 				{
-					return new ValueGate { Input1 = op[0], Name = op[1] };
+					var (input1, name) = captures.Get<string, string>();
+					return new ValueGate { Input1 = input1, Name = name };
 				}
 
 				throw new Exception($"Unexpected input in line {operation}");

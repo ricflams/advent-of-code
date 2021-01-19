@@ -93,12 +93,14 @@ namespace AdventOfCode.Y2015.Day15
 			{
 				// Example:
 				// Frosting: capacity 0, durability -1, flavor 4, texture 0, calories 6
-				var val = SimpleRegex.Match(line, "%s: capacity %d, durability %d, flavor %d, texture %d, calories %d");
+				var (name, capacity, durability, flavor, texture, calories) = line
+					.RxMatch("%s: capacity %d, durability %d, flavor %d, texture %d, calories %d")
+					.Get<string, int, int, int, int, int>();
 				return new Ingredient
 				{
-					Name = val[0],
-					Scores = new int[ScoresCount] { int.Parse(val[1]), int.Parse(val[2]), int.Parse(val[3]), int.Parse(val[4]) },
-					Calories = int.Parse(val[5])
+					Name = name,
+					Scores = new int[ScoresCount] { capacity, durability, flavor, texture },
+					Calories = calories
 				};
 			}
 		}

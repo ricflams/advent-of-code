@@ -28,14 +28,15 @@ namespace AdventOfCode.Y2020.Day14
 			var maskclear = 0UL;
 			foreach (var line in input)
 			{
-				if (line.MaybeRegexCapture("mask = %s").Get(out string mask).IsMatch)
+				if (line.IsRxMatch("mask = %s", out var captures))
 				{
+					var mask = captures.Get<string>();
 					maskset = Convert.ToUInt64(mask.Replace("X", "0"), 2);
 					maskclear = Convert.ToUInt64(mask.Replace("X", "1"), 2);
 				}
 				else
 				{
-					line.RegexCapture(@"mem[%d] = %d").Get(out int addr).Get(out ulong val);
+					var (addr, val) = line.RxMatch(@"mem[%d] = %d").Get<int, ulong>();
 					mem[addr] = (val & maskclear) | maskset;
 				}
 			}
@@ -51,8 +52,9 @@ namespace AdventOfCode.Y2020.Day14
 			var floatingbits = new ulong[0];
 			foreach (var line in input)
 			{
-				if (line.MaybeRegexCapture("mask = %s").Get(out string mask).IsMatch)
+				if (line.IsRxMatch("mask = %s", out var captures))
 				{
+					var mask = captures.Get<string>();
 					maskset = Convert.ToUInt64(mask.Replace("X", "0"), 2);
 					var maskfloat = Convert.ToUInt64(mask.Replace("1", "0").Replace("X", "1"), 2);
 
@@ -69,7 +71,7 @@ namespace AdventOfCode.Y2020.Day14
 				}
 				else
 				{
-					line.RegexCapture(@"mem[%d] = %d").Get(out ulong vaddr).Get(out ulong val);
+					var (vaddr, val) = line.RxMatch(@"mem[%d] = %d").Get<ulong, ulong>();
 					var addr = vaddr | maskset;
 					SetAllFloatingValues(addr, val, floatingbits);
 				}

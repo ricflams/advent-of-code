@@ -139,10 +139,10 @@ namespace AdventOfCode.Y2019.Day25
 				// You take the boulder.
 				//   
 				// Command?
-				if (SimpleRegex.IsMatch(PeekLine(), @"You take the %*.", out var takeval))
+				if (PeekLine().IsRxMatch("You take the %*.", out var captures))
 				{
 					ReadLine();
-					var item = takeval[0];
+					var item = captures.Get<string>();
 					Inventory.Add(item);
 					CurrentRoom.Items.Remove(item);
 				}
@@ -152,10 +152,10 @@ namespace AdventOfCode.Y2019.Day25
 				// You drop the boulder.
 				//   
 				// Command?
-				if (SimpleRegex.IsMatch(PeekLine(), @"You drop the %*.", out var dropval))
+				if (PeekLine().IsRxMatch("You drop the %*.", out captures))
 				{
 					ReadLine();
-					var item = dropval[0];
+					var item = captures.Get<string>();
 					Inventory.Remove(item);
 					CurrentRoom.Items.Add(item);
 				}
