@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day24
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Lobby Layout";
@@ -18,7 +18,49 @@ namespace AdventOfCode.Y2020.Day24
 			RunFor("input", 459, 4150);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
+		{
+			var lobby = GetAndFillLobby(input);
+			var tiles = lobby.Count('#');
+			return tiles;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var lobby = GetAndFillLobby(input);
+
+			static Point[] Adjacents(Point p) => new Point[]
+			{
+				p.Up,
+				p.DiagonalUpRight,
+				p.Right,
+				p.Down,
+				p.DiagonalDownLeft,
+				p.Left
+			};
+
+			for (var i = 0; i < 100; i++)
+			{
+				lobby = lobby.TransformAutomata(Adjacents, (p, ch, adjcount) =>
+				{
+					var isBlack = ch == '#';
+					if (isBlack && (adjcount == 0 || adjcount > 2))
+					{
+						return '.';
+					}
+					if (isBlack || !isBlack && adjcount == 2)
+					{
+						return '#';
+					}
+					return ch;
+				});
+			}
+
+			var tiles = lobby.Count('#');
+			return tiles;
+		}
+
+		private static CharMap GetAndFillLobby(string[] input)
 		{
 			var moves = input
 				.Select(line =>
@@ -49,39 +91,7 @@ namespace AdventOfCode.Y2020.Day24
 				lobby[tile] = color == '.' ? '#' : '.';
 			}
 
-			var result1 = lobby.Count('#');
-
-
-			static Point[] Adjacents(Point p) => new Point[]
-			{
-				p.Up,
-				p.DiagonalUpRight,
-				p.Right,
-				p.Down,
-				p.DiagonalDownLeft,
-				p.Left
-			};
-
-			for (var i = 0; i < 100; i++)
-			{
-				lobby = lobby.TransformAutomata(Adjacents, (p, ch, adjcount) =>
-				{
-					var isBlack = ch == '#';
-					if (isBlack && (adjcount == 0 || adjcount > 2))
-					{
-						return '.';
-					}
-					if (isBlack || !isBlack && adjcount == 2)
-					{
-						return '#';
-					}
-					return ch;
-				});
-			}
-
-			var result2 = lobby.Count('#');
-
-			return (result1, result2);
+			return lobby;
 		}
 	}
 }

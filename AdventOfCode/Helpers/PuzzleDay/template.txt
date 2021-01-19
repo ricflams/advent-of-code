@@ -43,33 +43,4 @@ namespace AdventOfCode.Y{YEAR}.Day{DAY2}
 			return 0;
 		}
 	}
-
-
-
-
-	//  internal class Puzzle : ComboParts<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//		public override string Name => "";
-	//  	public override int Year => {YEAR};
-	//  	public override int Day => {DAY};
-	//  
-	//  	public void Run()
-	//  	{
-	//  		//RunFor("test1", 0, 0);
-	//  		//RunFor("test2", 0, 0);
-	//  		RunFor("input", 0, 0);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
-
 }

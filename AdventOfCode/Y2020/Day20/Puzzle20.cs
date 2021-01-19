@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day20
 {
-	internal class Puzzle : ComboParts<long>
+	internal class Puzzle : SoloParts<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Jurassic Jigsaw";
@@ -17,6 +17,140 @@ namespace AdventOfCode.Y2020.Day20
 		{
 			RunFor("test1", 20899048083289, 273);
 			RunFor("input", 18262194216271, 2023);
+		}
+
+		protected override long Part1(string[] input)
+		{
+			var (_, _, corners) = GetTiles(input);
+
+			// Find product of the four corners
+			var result = corners.Select(x => x.Id).Prod();
+			return result;
+		}
+
+		protected override long Part2(string[] input)
+		{
+			var (tiles, borders, corners) = GetTiles(input);
+
+			// Assemple the map
+			// (This will remove the tiles from the collection, one by one)
+			var N = (int)Math.Sqrt(tiles.Count());
+			var tilemap = new Tile[N, N];
+			for (var x = 0; x < N; x++)
+			{
+				if (x == 0)
+				{
+					var tile = corners[0];
+					var tilesides = new HashSet<uint>(tile.AllPossibleSides.Where(side => borders.Contains(side)));
+					tile.Chosen = tile.Variants.First(v => tilesides.Contains(v.Top) && tilesides.Contains(v.Left));
+					tilemap[x, 0] = tile;
+					tiles.Remove(tile);
+				}
+				else
+				{
+					var left = tilemap[x - 1, 0].Chosen.Right;
+					var tile = tiles.First(t => t.AllPossibleSides.Contains(left));
+					tile.Chosen = tile.Variants.Where(v => borders.Contains(v.Top)).First(v => v.Left == left);
+					tilemap[x, 0] = tile;
+					tiles.Remove(tile);
+				}
+				for (var y = 1; y < N; y++)
+				{
+					var top = tilemap[x, y - 1].Chosen.Bot;
+					var tile = tiles.First(t => t.AllPossibleSides.Contains(top));
+					if (x == 0)
+					{
+						tile.Chosen = tile.Variants.Where(v => borders.Contains(v.Left)).First(v => v.Top == top);
+					}
+					else
+					{
+						var left = tilemap[x - 1, y].Chosen.Right;
+						tile.Chosen = tile.Variants.First(v => v.Left == left && v.Top == top);
+					}
+					tilemap[x, y] = tile;
+					tiles.Remove(tile);
+				}
+			}
+
+			// Build one big map from tiles with borders removed
+			var dim = tilemap[0, 0].Dim - 2;
+			var bigmap = new char[N * dim, N * dim];
+			for (var x = 0; x < N; x++)
+			{
+				for (var y = 0; y < N; y++)
+				{
+					var map = tilemap[x, y].TransformedMap;
+					for (var mapx = 0; mapx < dim; mapx++)
+					{
+						for (var mapy = 0; mapy < dim; mapy++)
+						{
+							bigmap[x * dim + mapx, y * dim + mapy] = map[mapx + 1, mapy + 1];
+						}
+					}
+				}
+			}
+
+			// Find monsters by rotating/flipping until some are found
+			// Rotate the monster instead of the map, as it's cheaper
+			static bool FindWaterRoughness(char[,] map, char[,] monster, ref int roughness)
+			{
+				var mapw = map.GetLength(0);
+				var maph = map.GetLength(1);
+				var monw = monster.GetLength(0);
+				var monh = monster.GetLength(1);
+				var xscan = mapw - monw;
+				var yscan = maph - monh;
+
+				var monsterspots = monster.PositionsOf('#');
+				var monsters = 0;
+				// Scan map for occurrences of the monster (don't care about overlaps)
+				for (var x = 0; x < xscan; x++)
+				{
+					for (var y = 0; y < yscan; y++)
+					{
+						if (monsterspots.All(p => map[x + p.X, y + p.Y] == '#'))
+						{
+							monsters++;
+						}
+					}
+				}
+				if (monsters == 0)
+				{
+					return false;
+				}
+				roughness = map.CountChar('#') - monsters * monsterspots.Count();
+				return true;
+			}
+
+			var monster = new string[]
+			{
+				"                  # ",
+				"#    ##    ##    ###",
+				" #  #  #  #  #  #   "
+			}.ToCharMatrix();
+			var roughness = 0;
+			for (var angle = 0; angle < 360; angle += 90)
+			{
+				var m = monster.RotateClockwise(angle);
+				if (FindWaterRoughness(bigmap, m, ref roughness) || FindWaterRoughness(bigmap, m.FlipV(), ref roughness))
+				{
+					break;
+				}
+			}
+
+			return roughness;
+		}
+
+		private static (List<Tile>, HashSet<uint>, Tile[]) GetTiles(string[] input)
+		{
+			var rawtiles = input.GroupByEmptyLine();
+			var tiles = rawtiles.Select(x => new Tile(x)).ToList();
+
+			var sides = tiles.SelectMany(x => x.AllPossibleSides).GroupBy(x => x);
+			var borders = new HashSet<uint>(sides.Where(g => g.Count() == 1).Select(g => g.Key));
+			var corners = tiles.Where(t => t.Variants.Any(v => v.Sides.Count(x => borders.Contains(x)) == 2)).ToArray();
+
+			return (tiles, borders, corners);
 		}
 
 		internal class Tile
@@ -95,127 +229,6 @@ namespace AdventOfCode.Y2020.Day20
 				public int Rotations { get; set; }
 				public bool Flip { get; set; }
 			}
-		}
-
-		protected override (long, long) Part1And2(string[] input)
-		{
-			var rawtiles = input.GroupByEmptyLine();
-			var tiles = rawtiles.Select(x => new Tile(x)).ToList();
-
-			var sides = tiles.SelectMany(x => x.AllPossibleSides).GroupBy(x => x);
-			var border = new HashSet<uint>(sides.Where(g => g.Count() == 1).Select(g => g.Key));
-			var corners = tiles.Where(t => t.Variants.Any(v => v.Sides.Count(x => border.Contains(x)) == 2)).ToArray();
-
-			// Find product of the four corners
-			var result1 = corners.Aggregate(1L, (sum, t) => sum * t.Id);
-
-			// Assemple the map
-			// (This will remove the tiles from the collection, one by one)
-			var N = (int)Math.Sqrt(tiles.Count());
-			var tilemap = new Tile[N, N];
-			for (var x = 0; x < N; x++)
-			{
-				if (x == 0)
-				{
-					var tile = corners[0];
-					var tilesides = new HashSet<uint>(tile.AllPossibleSides.Where(side => border.Contains(side)));
-					tile.Chosen = tile.Variants.First(v => tilesides.Contains(v.Top) && tilesides.Contains(v.Left));
-					tilemap[x, 0] = tile;
-					tiles.Remove(tile);
-				}
-				else
-				{
-					var left = tilemap[x - 1, 0].Chosen.Right;
-					var tile = tiles.First(t => t.AllPossibleSides.Contains(left));
-					tile.Chosen = tile.Variants.Where(v => border.Contains(v.Top)).First(v => v.Left == left);
-					tilemap[x, 0] = tile;
-					tiles.Remove(tile);
-				}
-				for (var y = 1; y < N; y++)
-				{
-					var top = tilemap[x, y - 1].Chosen.Bot;
-					var tile = tiles.First(t => t.AllPossibleSides.Contains(top));
-					if (x == 0)
-					{
-						tile.Chosen = tile.Variants.Where(v => border.Contains(v.Left)).First(v => v.Top == top);
-					}
-					else
-					{
-						var left = tilemap[x - 1, y].Chosen.Right;
-						tile.Chosen = tile.Variants.First(v => v.Left == left && v.Top == top);
-					}
-					tilemap[x, y] = tile;
-					tiles.Remove(tile);
-				}
-			}
-
-			// Build one big map from tiles with borders removed
-			var dim = tilemap[0, 0].Dim - 2;
-			var bigmap = new char[N * dim, N * dim];
-			for (var x = 0; x < N; x++)
-			{
-				for (var y = 0; y < N; y++)
-				{
-					var map = tilemap[x, y].TransformedMap;
-					for (var mapx = 0; mapx < dim; mapx++)
-					{
-						for (var mapy = 0; mapy < dim; mapy++)
-						{
-							bigmap[x * dim + mapx, y * dim + mapy] = map[mapx + 1, mapy + 1];
-						}
-					}
-				}
-			}
-
-			// Find monsters by rotating/flipping until some are found
-			// Rotate the monster instead of the map, as it's cheaper
-			static bool FindWaterRoughness(char[,] map, char[,] monster, ref int roughness)
-			{
-				var mapw = map.GetLength(0);
-				var maph = map.GetLength(1);
-				var monw = monster.GetLength(0);
-				var monh = monster.GetLength(1);
-				var xscan = mapw - monw;
-				var yscan = maph - monh;
-
-				var monsterspots = monster.PositionsOf('#');
-				var monsters = 0;
-				// Scan map for occurrences of the monster (don't care about overlaps)
-				for (var x = 0; x < xscan; x++)
-				{
-					for (var y = 0; y < yscan; y++)
-					{
-						if (monsterspots.All(p => map[x + p.X, y + p.Y] == '#'))
-						{
-							monsters++;
-						}
-					}
-				}
-				if (monsters == 0)
-				{
-					return false;
-				}
-				roughness = map.CountChar('#') - monsters * monsterspots.Count();
-				return true;
-			}
-
-			var monster = new string[]
-			{
-				"                  # ",
-				"#    ##    ##    ###",
-				" #  #  #  #  #  #   "
-			}.ToCharMatrix();
-			var result2 = 0;
-			for (var angle = 0; angle < 360; angle += 90)
-			{
-				var m = monster.RotateClockwise(angle);
-				if (FindWaterRoughness(bigmap, m, ref result2) || FindWaterRoughness(bigmap, m.FlipV(), ref result2))
-				{
-					break;
-				}
-			}
-
-			return (result1, result2);
 		}
 	}
 }

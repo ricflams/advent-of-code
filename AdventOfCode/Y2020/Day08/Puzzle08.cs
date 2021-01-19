@@ -6,7 +6,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day08
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Handheld Halting";
@@ -19,6 +19,32 @@ namespace AdventOfCode.Y2020.Day08
 			RunFor("input", 2034, 672);
 		}
 
+		protected override int Part1(string[] input)
+		{
+			var code = GetCode(input);
+			RunToCompletion(code, out var acc);
+			return acc;
+		}
+
+		protected override int Part2(string[] input)
+		{
+			var code = GetCode(input);
+			var acc = 0;
+			foreach (var ins in code)
+			{
+				var opcode = ins.Opcode;
+				ins.Opcode =
+					opcode == "jmp" ? "nop" :
+					opcode == "nop" ? "jmp" :
+					opcode;
+				if (RunToCompletion(code, out acc))
+				{
+					break;
+				}
+				ins.Opcode = opcode;
+			}
+			return acc;
+		}
 
 		private class Ins
 		{
@@ -26,7 +52,7 @@ namespace AdventOfCode.Y2020.Day08
 			public int Val { get; set; }
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		private static Ins[] GetCode(string[] input)
 		{
 			var code = input
 				.Select(line =>
@@ -39,25 +65,7 @@ namespace AdventOfCode.Y2020.Day08
 					};
 				})
 				.ToArray();
-
-			RunToCompletion(code, out var result1);
-
-			var result2 = 0;
-			foreach (var ins in code)
-			{
-				var opcode = ins.Opcode;
-				ins.Opcode =
-					opcode == "jmp" ? "nop" :
-					opcode == "nop" ? "jmp" :
-					opcode;
-				if (RunToCompletion(code, out result2))
-				{
-					break;
-				}
-				ins.Opcode = opcode;
-			}
-
-			return (result1, result2);
+			return code;
 		}
 
 		private static bool RunToCompletion(Ins[] code, out int acc)

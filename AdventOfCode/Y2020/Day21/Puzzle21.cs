@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day21
 {
-	internal class Puzzle : ComboParts<string>
+	internal class Puzzle : SoloParts<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Allergen Assessment";
@@ -25,7 +25,29 @@ namespace AdventOfCode.Y2020.Day21
 			public HashSet<string> Allergies { get; set; }
 		}
 
-		protected override (string,string) Part1And2(string[] input)
+		protected override string Part1(string[] input)
+		{
+			var (food, allIngredients, allergyIngredients) = GetIngredientsAndAllergies(input);
+
+			var ingredientsWithoutAllergy = new HashSet<string>(allIngredients.Except(allergyIngredients.Values));
+			var result = food
+				.Sum(f => f.Ingredients.Count(i => ingredientsWithoutAllergy.Contains(i)))
+				.ToString();
+			return result;
+		}
+
+		protected override string Part2(string[] input)
+		{
+			var (_, _, allergyIngredients) = GetIngredientsAndAllergies(input);
+
+			var ingredientsWithAllergy = allergyIngredients
+				.OrderBy(x => x.Key)
+				.Select(x => x.Value);
+			var result = string.Join(",", ingredientsWithAllergy);
+			return result;
+		}
+
+		private static (Food[], HashSet<string>, Dictionary<string, string>) GetIngredientsAndAllergies(string[] input)
 		{
 			// mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
 			// trh fvjkl sbzzf mxmxvkd (contains dairy)
@@ -75,17 +97,7 @@ namespace AdventOfCode.Y2020.Day21
 				}
 			}
 
-			var ingredientsWithoutAllergy = new HashSet<string>(allIngredients.Except(allergyIngredients.Values));
-			var result1 = food
-				.Sum(f => f.Ingredients.Count(i => ingredientsWithoutAllergy.Contains(i)))
-				.ToString();
-
-			var ingredientsWithAllergy = allergyIngredients
-				.OrderBy(x => x.Key)
-				.Select(x => x.Value);
-			var result2 = string.Join(",", ingredientsWithAllergy);
-
-			return (result1, result2);
+			return (food, allIngredients, allergyIngredients);
 		}
 	}
 }

@@ -4,7 +4,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day02
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Password Philosophy";
@@ -17,26 +17,33 @@ namespace AdventOfCode.Y2020.Day02
 			RunFor("input", 607, 321);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
-			var result1 = 0;
-			var result2 = 0;
+			var result = 0;
 			foreach (var line in input)
 			{
 				var (min, max, c, pwd) = line.RxMatch("%d-%d %c: %s").Get<int, int, char, string>();
 				var n = pwd.Count(x => x == c);
 				if (n >= min && n <= max)
 				{
-					result1++;
-				}
-
-				if (pwd[min - 1] == c ^ pwd[max - 1] == c)
-				{
-					result2++;
+					result++;
 				}
 			}
-
-			return (result1, result2);
+			return result;
+		}
+		
+		protected override int Part2(string[] input)
+		{
+			var result = 0;
+			foreach (var line in input)
+			{
+				var (min, max, c, pwd) = line.RxMatch("%d-%d %c: %s").Get<int, int, char, string>();
+				if (pwd[min - 1] == c ^ pwd[max - 1] == c)
+				{
+					result++;
+				}
+			}
+			return result;
 		}
 	}
 }

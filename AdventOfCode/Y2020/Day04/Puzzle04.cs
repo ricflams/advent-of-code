@@ -6,7 +6,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day04
 {
-	internal class Puzzle : ComboParts<int>
+	internal class Puzzle : SoloParts<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Passport Processing";
@@ -15,24 +15,21 @@ namespace AdventOfCode.Y2020.Day04
 
 		public void Run()
 		{
-			//RunFor("test1", 2, null);
+			RunPart1For("test1", 2);
 			RunFor("input", 210, 131);
 		}
 
-		protected override (int, int) Part1And2(string[] input)
+		protected override int Part1(string[] input)
 		{
-			var passports = input
-				.GroupByEmptyLine()
-				.Select(raw =>
-				{
-					var info = string.Join(" ", raw);
-					var fields = info.Split(" ").Select(x => x.Split(":")).ToDictionary(x => x[0], x => x[1]);
-					return Passport.Create(fields);
-				});
+			var passports = GetPassports(input);
+			var n = passports.Count(x => x.AreAllFieldsPresent);
+			return n;
+		}
 
-			var result1 = passports.Count(x => x.AreAllFieldsPresent);
-
-			var result2 = passports.Count(x =>
+		protected override int Part2(string[] input)
+		{
+			var passports = GetPassports(input);
+			var n = passports.Count(x =>
 				x.AreAllFieldsPresent &&
 				x.IsByrValid &&
 				x.IsIyrValid &&
@@ -42,8 +39,20 @@ namespace AdventOfCode.Y2020.Day04
 				x.IsEclValid &&
 				x.IsPidValid
 			);
+			return n;
+		}
 
-			return (result1, result2);
+		private static Passport[] GetPassports(string[] input)
+		{
+			return input
+				.GroupByEmptyLine()
+				.Select(raw =>
+				{
+					var info = string.Join(" ", raw);
+					var fields = info.Split(" ").Select(x => x.Split(":")).ToDictionary(x => x[0], x => x[1]);
+					return Passport.Create(fields);
+				})
+				.ToArray();
 		}
 
 		private class Passport
