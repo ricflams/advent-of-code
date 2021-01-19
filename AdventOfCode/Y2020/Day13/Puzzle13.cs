@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2020.Day13
 {
-	internal class Puzzle : SoloParts<long>
+	internal class Puzzle : Puzzle<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Shuttle Search";

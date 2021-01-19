@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2015.Day05
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Doesn't He Have Intern-Elves For This?";

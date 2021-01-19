@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2015.Day17
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "No Such Thing as Too Much";

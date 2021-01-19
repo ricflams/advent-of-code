@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day05
 {
-	internal class Puzzle : SoloParts<string>
+	internal class Puzzle : Puzzle<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "How About a Nice Game of Chess?";

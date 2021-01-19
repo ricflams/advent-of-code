@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 namespace AdventOfCode.Y2016.Day17
 {
-	internal class Puzzle : SoloParts<string>
+	internal class Puzzle : Puzzle<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Two Steps Forward";

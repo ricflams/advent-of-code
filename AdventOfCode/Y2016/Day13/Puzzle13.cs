@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day13
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "A Maze of Twisty Little Cubicles";

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day18
 {
-	internal class Puzzle : SoloParts<ulong>
+	internal class Puzzle : Puzzle<ulong>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Operation Order";

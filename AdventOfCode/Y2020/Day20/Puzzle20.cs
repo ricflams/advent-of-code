@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day20
 {
-	internal class Puzzle : SoloParts<long>
+	internal class Puzzle : Puzzle<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Jurassic Jigsaw";

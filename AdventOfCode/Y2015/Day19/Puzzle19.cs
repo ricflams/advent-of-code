@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2015.Day19
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Medicine for Rudolph";

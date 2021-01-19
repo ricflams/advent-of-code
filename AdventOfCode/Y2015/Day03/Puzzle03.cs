@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2015.Day03
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Perfectly Spherical Houses in a Vacuum";

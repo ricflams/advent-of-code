@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2019.Day22
 {
-	internal class Puzzle : SoloParts<long>
+	internal class Puzzle : Puzzle<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Slam Shuffle";

@@ -3,7 +3,7 @@ using AdventOfCode.Y2019.Intcode;
 
 namespace AdventOfCode.Y2019.Day09
 {
-	internal class Puzzle : SoloParts<long>
+	internal class Puzzle : Puzzle<long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Sensor Boost";

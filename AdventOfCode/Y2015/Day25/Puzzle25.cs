@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2015.Day25
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Let It Snow";

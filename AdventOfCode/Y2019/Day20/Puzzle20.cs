@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day20
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Donut Maze";

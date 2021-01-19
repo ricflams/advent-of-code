@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day21
 {
-	internal class Puzzle : SoloParts<string>
+	internal class Puzzle : Puzzle<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Allergen Assessment";

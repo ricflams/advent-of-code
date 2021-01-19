@@ -3,7 +3,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2016.Day19
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "An Elephant Named Joseph";

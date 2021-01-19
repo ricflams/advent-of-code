@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day20
 {
-	internal class Puzzle : SoloParts<uint>
+	internal class Puzzle : Puzzle<uint>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Firewall Rules";

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day11
 {
-	internal class Puzzle : SoloParts<string>
+	internal class Puzzle : Puzzle<string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Space Police";

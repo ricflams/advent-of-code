@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2020.Day19
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Monster Messages";

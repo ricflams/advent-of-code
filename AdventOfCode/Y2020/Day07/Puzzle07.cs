@@ -6,7 +6,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day07
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Handy Haversacks";
@@ -36,7 +36,7 @@ namespace AdventOfCode.Y2020.Day07
 				}
 				return memo[color];
 			}
-			
+
 			var result = bags.Keys.Count(ContainsShinyGold) - 1;
 			return result;
 		}

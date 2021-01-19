@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2016.Day11
 {
-	internal class Puzzle : SoloParts<int>
+	internal class Puzzle : Puzzle<int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Radioisotope Thermoelectric Generators";
@@ -490,37 +490,6 @@ namespace AdventOfCode.Y2016.Day11
 			}
 		}
 	}
-
-	
-
-
-
-
-	//  internal class Puzzle : ComboParts<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//		public override string Name => "";
-	//  	public override int Year => 2016;
-	//  	public override int Day => 11;
-	//  
-	//  	public void Run()
-	//  	{
-	//  		//RunFor("test1", 0, 0);
-	//  		//RunFor("test2", 0, 0);
-	//  		RunFor("input", 0, 0);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
-
 
 	public class PriorityQueue<T> where T : IComparable<T>
 	{
