@@ -2,7 +2,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2016.Day18
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Like a Rogue";

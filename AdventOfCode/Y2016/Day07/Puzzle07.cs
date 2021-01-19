@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2016.Day07
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Internet Protocol Version 7";

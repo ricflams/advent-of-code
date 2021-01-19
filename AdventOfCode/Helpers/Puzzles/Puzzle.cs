@@ -5,7 +5,7 @@ using System.IO;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
-	internal abstract class Puzzle<T> : IPuzzle
+	internal abstract class Puzzle<T1,T2> : IPuzzle
 	{
 		private static readonly string TimingBar = new string('#', 10);
 		private static readonly string NoTiming = new string(' ', 22);
@@ -14,18 +14,18 @@ namespace AdventOfCode.Helpers.Puzzles
 		public abstract int Year { get; }
 		public abstract int Day { get; }
 
-		protected abstract T Part1(string[] input);
-		protected abstract T Part2(string[] input);
-		protected virtual T Part1Optimized(string[] input) => default(T);
-		protected virtual T Part2Optimized(string[] input) => default(T);
+		protected abstract T1 Part1(string[] input);
+		protected abstract T2 Part2(string[] input);
+		protected virtual T1 Part1Optimized(string[] input) => default(T1);
+		protected virtual T2 Part2Optimized(string[] input) => default(T2);
 
-		protected void RunFor(string filename, T expectedResult1, T expectedResult2)
+		protected void RunFor(string filename, T1 expectedResult1, T2 expectedResult2)
 		{
 			RunPart1For(filename, expectedResult1);
 			RunPart2For(filename, expectedResult2);
 		}
 
-		public void RunPart1For(string filename, T expectedResult)
+		public void RunPart1For(string filename, T1 expectedResult)
 		{
 			if (PuzzleOptions.ShouldRun(this, filename))
 			{
@@ -40,7 +40,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			}
 		}
 
-		public void RunPart2For(string filename, T expectedResult)
+		public void RunPart2For(string filename, T2 expectedResult)
 		{
 			if (PuzzleOptions.ShouldRun(this, filename))
 			{
@@ -57,7 +57,7 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		private string[] ReadInput(string filename) => File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
 
-		private TimeSpan RunPart(string filename, int part, Func<string[],T> solution, T expectedResult)
+		private TimeSpan RunPart<T>(string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
 			var loops = 1;
 			var sw = Stopwatch.StartNew();
@@ -113,7 +113,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: ");
 		}
 
-		protected void WriteResult(T result, T expectedResult)
+		protected void WriteResult<T>(T result, T expectedResult)
 		{
 			Console.Write(result);
 			if (!expectedResult.Equals(result))

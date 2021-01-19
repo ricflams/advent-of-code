@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day11
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<int, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Space Police";
@@ -14,17 +14,17 @@ namespace AdventOfCode.Y2019.Day11
 
 		public void Run()
 		{
-			RunFor("input", "2343", "JFBERBUH");
+			RunFor("input", 2343, "JFBERBUH");
 		}
 
 		const int ColorBlack = 0;
 		const int ColorWhite = 1;
 
-		protected override string Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var map = PaintHull(input[0], ColorBlack);
 			var numberOfPoints = map.AllPoints().Count();
-			return numberOfPoints.ToString();
+			return numberOfPoints;
 		}
 
 		protected override string Part2(string[] input)

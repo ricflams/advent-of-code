@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2015.Day22
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Wizard Simulator 20XX";

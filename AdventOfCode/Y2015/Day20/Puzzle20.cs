@@ -3,7 +3,7 @@ using System;
 
 namespace AdventOfCode.Y2015.Day20
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Infinite Elves and Infinite Houses";

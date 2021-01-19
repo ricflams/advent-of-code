@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2019.Day22
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Slam Shuffle";
@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2019.Day22
 			RunFor("input", 4096, 78613970589919);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var shuffles = input;
 			var deck = Enumerable.Range(0, 10007).ToArray();

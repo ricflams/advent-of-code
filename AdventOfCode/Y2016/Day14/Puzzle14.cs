@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace AdventOfCode.Y2016.Day14
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "One-Time Pad";

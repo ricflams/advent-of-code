@@ -4,7 +4,7 @@ using System;
 
 namespace AdventOfCode.Y2019.Day02
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<long, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "1202 Program Alarm";
@@ -28,7 +28,7 @@ namespace AdventOfCode.Y2019.Day02
 			return result;
 		}
 
-		protected override long Part2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			var intcode = input[0];
 			var memory = Engine.ReadAsMemory(intcode);

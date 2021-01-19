@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day23
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Crab Cups";
@@ -17,7 +17,7 @@ namespace AdventOfCode.Y2020.Day23
 			RunFor("input", 34952786, 505334281774);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var cups = ShuffleCups(input[0], 100, input[0].Length);
 

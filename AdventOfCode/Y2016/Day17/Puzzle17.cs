@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 namespace AdventOfCode.Y2016.Day17
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<string, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Two Steps Forward";
@@ -16,10 +16,10 @@ namespace AdventOfCode.Y2016.Day17
 
 		public void Run()
 		{
-			RunFor("test1", "DDRRRD", "370");
-			RunFor("test2", "DDUDRLRRUDRD", "492");
-			RunFor("test3", "DRURDRUDDLLDLUURRDULRLDUUDDDRR", "830");
-			RunFor("input", "DUDRDLRRRD", "502");
+			RunFor("test1", "DDRRRD", 370);
+			RunFor("test2", "DDUDRLRRUDRD", 492);
+			RunFor("test3", "DRURDRUDDLLDLUURRDULRLDUUDDDRR", 830);
+			RunFor("input", "DUDRDLRRRD", 502);
 		}
 
 		protected override string Part1(string[] input)
@@ -29,11 +29,11 @@ namespace AdventOfCode.Y2016.Day17
 			return shortest;
 		}
 
-		protected override string Part2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			var passcode = input[0];
 			var longest = FindPath(passcode, false);
-			return longest.Length.ToString();
+			return longest.Length;
 		}
 
 		private string FindPath(string passcode, bool findShortest)

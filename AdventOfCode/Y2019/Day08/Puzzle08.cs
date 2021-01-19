@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day08
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<int, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Space Image Format";
@@ -13,14 +13,14 @@ namespace AdventOfCode.Y2019.Day08
 
 		public void Run()
 		{
-			RunFor("input", "2356", "PZEKB");
+			RunFor("input", 2356, "PZEKB");
 		}
 
 		const int Width = 25;
 		const int Height = 6;
 		const int Size = Width * Height;
 
-		protected override string Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var layers = GetLayers(input[0]);
 
@@ -36,7 +36,7 @@ namespace AdventOfCode.Y2019.Day08
 				.First();
 			var sum = layerWithMostZeros.Count(x => x == '1') * layerWithMostZeros.Count(x => x == '2');
 
-			return sum.ToString();
+			return sum;
 		}
 
 		protected override string Part2(string[] input)

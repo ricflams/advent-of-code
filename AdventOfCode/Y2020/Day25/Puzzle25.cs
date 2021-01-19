@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2020.Day25
 {
-	internal class Puzzle : Puzzle<uint>
+	internal class Puzzle : Puzzle<uint, object>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Combo Breaker";
@@ -50,6 +50,6 @@ namespace AdventOfCode.Y2020.Day25
 			}
 		}
 
-		protected override uint Part2(string[] input) => 0U;
+		protected override object Part2(string[] input) => null;
 	}
 }

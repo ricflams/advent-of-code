@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day15
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Timing is Everything";

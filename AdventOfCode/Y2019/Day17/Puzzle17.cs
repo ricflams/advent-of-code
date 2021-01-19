@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2019.Day17
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Set and Forget";
@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2019.Day17
 			RunFor("input", 5056, 942367);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var map = CreateMap(input[0]);
 			//map.ConsoleWrite();

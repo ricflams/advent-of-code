@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day21
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<int, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Allergen Assessment";
@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2020.Day21
 
 		public void Run()
 		{
-			RunFor("test1", "5", "mxmxvkd,sqjhc,fvjkl");
-			RunFor("input", "2423", "jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp");
+			RunFor("test1", 5, "mxmxvkd,sqjhc,fvjkl");
+			RunFor("input", 2423, "jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp");
 		}
 
 		internal class Food
@@ -25,14 +25,12 @@ namespace AdventOfCode.Y2020.Day21
 			public HashSet<string> Allergies { get; set; }
 		}
 
-		protected override string Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var (food, allIngredients, allergyIngredients) = GetIngredientsAndAllergies(input);
 
 			var ingredientsWithoutAllergy = new HashSet<string>(allIngredients.Except(allergyIngredients.Values));
-			var result = food
-				.Sum(f => f.Ingredients.Count(i => ingredientsWithoutAllergy.Contains(i)))
-				.ToString();
+			var result = food.Sum(f => f.Ingredients.Count(i => ingredientsWithoutAllergy.Contains(i)));
 			return result;
 		}
 

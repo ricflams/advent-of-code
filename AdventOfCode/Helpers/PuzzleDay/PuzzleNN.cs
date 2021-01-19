@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2020.Day00
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "";

@@ -5,7 +5,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day09
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Encoding Error";

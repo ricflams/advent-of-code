@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day10
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Adapter Array";
@@ -18,7 +18,7 @@ namespace AdventOfCode.Y2020.Day10
 			RunFor("input", 2070, 24179327893504);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var joltages = input
 				.Select(int.Parse)

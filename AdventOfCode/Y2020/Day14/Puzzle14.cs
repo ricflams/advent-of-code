@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day14
 {
-	internal class Puzzle : Puzzle<ulong>
+	internal class Puzzle : Puzzle<ulong, ulong>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Docking Data";

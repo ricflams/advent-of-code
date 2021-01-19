@@ -2,7 +2,7 @@
 
 namespace AdventOfCode.Y2019.Day25
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Cryostasis";

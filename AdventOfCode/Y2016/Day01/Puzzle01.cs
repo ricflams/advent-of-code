@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AdventOfCode.Y2016.Day01
 {
-	internal class Puzzle : Puzzle<int>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "No Time for a Taxicab";

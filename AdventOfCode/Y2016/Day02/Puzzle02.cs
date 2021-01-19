@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day02
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<int, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Bathroom Security";
@@ -14,11 +14,11 @@ namespace AdventOfCode.Y2016.Day02
 
 		public void Run()
 		{
-			RunFor("test1", "1985", "5DB3");
-			RunFor("input", "65556", "CB779");
+			RunFor("test1", 1985, "5DB3");
+			RunFor("input", 65556, "CB779");
 		}
 
-		protected override string Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var pad = new []
 			{
@@ -26,7 +26,8 @@ namespace AdventOfCode.Y2016.Day02
 				"456",
 				"789",
 			}.ToCharMatrix().ExpandBy(1, ' ');
-			return PressKeypad(pad, input);
+			var code = int.Parse(PressKeypad(pad, input));
+			return code;
 		}
 
 		protected override string Part2(string[] input)

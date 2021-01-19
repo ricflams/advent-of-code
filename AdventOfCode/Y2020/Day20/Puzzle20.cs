@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day20
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<long, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Jurassic Jigsaw";
@@ -28,7 +28,7 @@ namespace AdventOfCode.Y2020.Day20
 			return result;
 		}
 
-		protected override long Part2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			var (tiles, borders, corners) = GetTiles(input);
 

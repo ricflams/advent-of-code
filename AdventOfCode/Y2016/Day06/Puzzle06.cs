@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day06
 {
-	internal class Puzzle : Puzzle<string>
+	internal class Puzzle : Puzzle<string, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Signals and Noise";

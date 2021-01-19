@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2020.Day16
 {
-	internal class Puzzle : Puzzle<long>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Ticket Translation";
@@ -55,7 +55,7 @@ namespace AdventOfCode.Y2020.Day16
 			return (fields, yourTicket, otherTickets);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var (fields, _, otherTickets) = ParseInput(input);
 			var invalids = otherTickets
