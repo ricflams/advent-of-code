@@ -20,15 +20,17 @@ namespace AdventOfCode.Y2016.Day11
 		public void Run()
 		{
 			//RunPart1For("test1", 11);
-			RunFor("input", 37, 61);
-			//RunPart2For("input", 0);
+			//RunFor("input", 37, 61);
+			RunPart2For("input", 61);
 		}
 
 
 
 		protected override int Part1(string[] input)
 		{
-			return Solve(input);
+			// return Solve(input);
+			return SolveMcts(input);
+
 			// var floors0 = Floors.Create(input);
 
 			// var memo = new HashSet<ulong>();
@@ -92,13 +94,16 @@ namespace AdventOfCode.Y2016.Day11
 			// input.CopyTo(modinput, 0);
 			// modinput[0] = modinput[0] + "an elerium generator, an elerium-compatible microchip, a dilithium generator, a dilithium-compatible microchip.";
 			//return Solve(input);
-			return SolveRecursive(input);
+
+			//return SolveRecursive(input);
+			return SolveMcts(input);
+			//return Solve(input);
 		}
 
 		private int SolveRecursive(string[] input)
 		{
 			var BIGVALUE = 100000;
-			var maxsteps = Solve(input);
+			var maxsteps = 200;//Solve(input);
 
 			var floors0 = Floors.Create(input);
 			var seen = new Dictionary<ulong, int>();
@@ -136,6 +141,124 @@ namespace AdventOfCode.Y2016.Day11
 
 		}
 
+		class Node
+		{
+			public static readonly double C = Math.Sqrt(2);
+			public Node[] Children { get; set; }
+			public Node Parent { get; set; }
+			public int Visited { get; set; }
+			public int Wins { get; set; }
+			public ulong Floors { get; set; }
+			public int Steps { get; set; }
+			public double Uct
+			{
+				get
+				{
+					if (Parent == null || Visited == 0)
+						return 1000000;
+					return (double)Wins / Visited + C*Math.Sqrt(Math.Log(Parent.Visited) / Visited);
+				}
+			}
+		}
+
+		private int SolveMcts(string[] input)
+		{
+			var Random = new Random();
+			var floors0 = Floors.Create(input);
+
+			var root = new Node
+			{
+				Parent = null,
+				Visited = 0,
+				Wins = 0,
+				Floors = floors0,
+				Steps = 0
+			};
+
+			var minsteps = 10000000;
+			var solutionheight = 0;
+			// var seen = new Dictionary<ulong, int>();
+
+			for (var i = 0; i < 1000000; i++)
+			{
+				var leaf = Traverse(root);
+				var result = Rollout(leaf);
+				BackPropagate(root, leaf, result);
+			}
+
+			return minsteps;
+
+			Node Traverse(Node node)
+			{
+				if (node.Visited == 0)
+				{
+					var moves = Floors.ValidMoves(node.Floors);
+					node.Children = moves.Select(m => new Node
+					{
+						Parent = node,
+						Visited = 0,
+						Wins = 0,
+						Floors = m,
+						Steps = node.Steps + 1
+					})
+					.ToArray();
+				}
+				var pick = node.Children.OrderByDescending(n => n.Uct).FirstOrDefault();
+				return pick;
+			}
+
+			int Rollout(Node n)
+			{
+				var floors = n.Floors;
+				for (var i = 0; i < 500 && n.Steps + i < minsteps; i++)
+				{
+					var height = Floors.Height(floors);
+					if (n.Steps + i + (solutionheight - height)*1.8 >= minsteps)
+						break;
+					// if (seen.TryGetValue(floors, out var steps) && steps < n.Steps + i)
+					// {
+					// 	Console.Write("x");
+					// 	return 0;
+					// }
+					if (Floors.AllMovedTo4thFloor(floors))
+					{
+						minsteps = n.Steps + i;
+						solutionheight = Floors.Height(floors);
+						// seen[floors] = minsteps;
+						Console.Write($"[{minsteps}]");
+						return 1;
+					}
+					var moves = Floors.ValidMoves(floors).ToArray();
+					if (moves.Length == 0)
+					{
+						//Console.Write("-");
+						return 0;
+					}
+					if (Random.NextDouble() < .6)
+					{
+						floors = moves.OrderByDescending(Floors.Height).First();
+					}
+					else
+					{
+						floors = moves.PickRandom();
+					}
+				}
+				//Console.Write(".");
+				return 0;
+			}
+
+			void BackPropagate(Node root, Node node, int win)
+			{
+				while (node != root)
+				{
+					node.Visited++;
+					node.Wins += win;
+					node = node.Parent;
+				}
+			}
+
+		}
+
 		private int Solve(string[] input)
 		{
 			var floors0 = Floors.Create(input);
@@ -154,7 +277,7 @@ namespace AdventOfCode.Y2016.Day11
 			{
 
 				//Console.Write($"<{backlog.Count} {backlog.Count(x => !seen.Contains(x.Item1))}>");
-				var queue = backlog.OrderByDescending(x => x.Item3).Take(20000).ToArray();
+				var queue = backlog.OrderByDescending(x => x.Item3).Take(100000).ToArray();
 
 
 				//var queue = new Queue<(ulong, int, int)>(climbers);
@@ -386,7 +509,6 @@ namespace AdventOfCode.Y2016.Day11
 		private static uint ObjectsOnFloor(ulong objects, int floor) => (uint)((objects >> (floor*16)) & 0xffff);
 		private static bool HasObjectsOnFloorOrBelow(ulong objects, int floor) => ((ulong.MaxValue >> (3-floor)*16) & objects) != 0;
 
-
 		public static IEnumerable<ulong> ValidMoves(ulong identity)
 		{
 			var (objects, elevator) = Decompose(identity);
@@ -439,8 +561,10 @@ namespace AdventOfCode.Y2016.Day11
 
 				IEnumerable<ulong> ValidMoveables()
 				{
-					bool MicrochipCanMove(uint microchip) => gthere == 0 || (microchip & gthere) != 0;
+					bool MicrochipCanMove(uint microchip) => (gthere == 0 || (microchip & gthere) != 0);// && MicrochipShouldMove(microchip);
 					bool GeneratorCanMove(uint generator) => (generator & mhere) == 0 || (generator & ghere) == generator;
+
+					bool MicrochipShouldMove(uint microchip) => dest > elevator || (microchip & ghere) == 0;
 
 					// Move 1 or 2 microchips
 					foreach (var m1 in mherebits)
@@ -489,78 +613,6 @@ namespace AdventOfCode.Y2016.Day11
 				}
 			}
 		}
-	}
-
-	public class PriorityQueue<T> where T : IComparable<T>
-	{
-	private readonly List<T> _pq = new List<T>();
-	
-	public void Enqueue(T item)
-	{
-		_pq.Add(item);
-		BubbleUp();
-	}
-	
-	public T Dequeue()
-	{
-		var item = _pq[0];
-		MoveLastItemToTheTop();
-		SinkDown();
-		return item;
-	}
-	
-	private void BubbleUp() // Implementation of the Min Heap Bubble Up operation
-	{
-		var childIndex = _pq.Count - 1;
-		while (childIndex > 0)
-		{
-		var parentIndex = (childIndex - 1) / 2;
-		if (_pq[childIndex].CompareTo(_pq[parentIndex]) >= 0)
-			break;
-		Swap(childIndex, parentIndex);
-		childIndex = parentIndex;
-		}
-	}
-	
-	private void MoveLastItemToTheTop()
-	{
-		var lastIndex = _pq.Count - 1;
-		_pq[0] = _pq[lastIndex];
-		_pq.RemoveAt(lastIndex);
-	}
-	
-	private void SinkDown() // Implementation of the Min Heap Sink Down operation
-	{
-		var lastIndex = _pq.Count - 1;
-		var parentIndex = 0;
-		
-		while (true)
-		{
-		var firstChildIndex = parentIndex * 2 + 1;
-		if (firstChildIndex > lastIndex)
-		{
-			break;
-		}
-		var secondChildIndex = firstChildIndex + 1;
-		if (secondChildIndex <= lastIndex && _pq[secondChildIndex].CompareTo(_pq[firstChildIndex]) < 0)
-		{
-			firstChildIndex = secondChildIndex;
-		}
-		if (_pq[parentIndex].CompareTo(_pq[firstChildIndex]) < 0)
-		{
-			break;
-		}
-		Swap(parentIndex, firstChildIndex);
-		parentIndex = firstChildIndex;
-		}
-	}
-	
-	private void Swap(int index1, int index2)
-	{
-		var tmp = _pq[index1];
-		_pq[index1] = _pq[index2];
-		_pq[index2] = tmp;
-	}
 	}
 
 
