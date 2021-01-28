@@ -190,6 +190,14 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		private static Random Random = new Random();
+		public static T PickRandom<T>(this T[] set)
+		{
+			var N = set.Length;
+			var n = Random.Next(N);
+			return set[n];
+		}
+
 		public static IEnumerable<int[]> PlusZeroMinusSequence(int numberOfDigits)
 		{
 			var n = numberOfDigits;
