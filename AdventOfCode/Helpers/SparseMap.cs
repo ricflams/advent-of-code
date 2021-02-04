@@ -94,6 +94,27 @@ namespace AdventOfCode.Helpers
 			yield return Point.From(min.X, max.Y);
 		}
 
+		
+		public string[] Render(Func<Point, T, char> rendering)
+		{
+			var (min, max) = Area();
+			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
+				.Select(y => Enumerable.Range(min.X, max.X - min.X + 1)
+					.Select(x => rendering(Point.From(x, y), this[x][y]))
+					.ToArray()
+				)
+				.Select(ch => new string(ch))
+				.ToArray();
+		}
+
+		public void ConsoleWrite(Func<Point, T, char> rendering)
+		{
+			foreach (var line in Render(rendering))
+			{
+				Console.WriteLine(line);
+			}
+		}
+
 		public class SparseMapColumn
 		{
 			internal readonly Dictionary<int, T> Row = new Dictionary<int, T>();

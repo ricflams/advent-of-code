@@ -96,8 +96,8 @@ namespace AdventOfCode.Y2016.Day11
 			//return Solve(input);
 
 			//return SolveRecursive(input);
-			return SolveMcts(input);
-			//return Solve(input);
+			//return SolveMcts(input);
+			return Solve(input);
 		}
 
 		private int SolveRecursive(string[] input)
@@ -261,7 +261,15 @@ namespace AdventOfCode.Y2016.Day11
 
 		private int Solve(string[] input)
 		{
+			var floors2 = new Floor(input);
+			floors2.WriteToConsole();
+
+
 			var floors0 = Floors.Create(input);
+			Floors.WriteToConsole(floors0);
+
+			//return 0;
+
 			var seen = new HashSet<ulong>();
 			//var queued = new HashSet<ulong>();
 			var backlog = new List<(ulong, int, int)>();
@@ -364,6 +372,218 @@ namespace AdventOfCode.Y2016.Day11
 			return result;
 
 		}
+	}
+
+	internal class Floor
+	{
+		private const int Levels = 4;
+
+		private readonly int _elevator;
+		private readonly int[] _generators;
+		private readonly int[] _microchips;
+
+		public Floor(string[] input)
+		{
+			// The first floor contains a strontium generator, a strontium-compatible microchip, a plutonium generator, and a plutonium-compatible microchip.
+			// The second floor contains a thulium generator, a ruthenium generator, a ruthenium-compatible microchip, a curium generator, and a curium-compatible microchip.
+			// The third floor contains a thulium-compatible microchip.
+			// The fourth floor contains nothing relevant.
+			var rxGenerator = new Regex(@"\w+(?= generator)");
+			//var rxMicrochip = new Regex(@"\w+(?=-compatible microchip)");
+			var names = rxGenerator
+				.Matches(string.Join("", input))
+				.Select(m => m.Value)
+				.ToArray();
+
+			var floors = input.ToList();
+
+			// var generators = input.Select((s, idx) => (rxGenerator.Matches(s).Select(m => m.Value), idx)).ToArray();
+			// var microchips = input.Select((s, idx) => (rxMicrochip.Matches(s).Select(m => m.Value), idx)).ToArray();
+			_elevator = 0;
+			_generators = names
+				.Select(name => floors.FindIndex(s => s.Contains($"{name} generator")))
+				.ToArray();
+			_microchips = names
+				.Select(name => floors.FindIndex(s => s.Contains($"{name}-compatible microchip")))
+				.ToArray();
+		}
+
+		public Floor(Floor other)
+		{
+			_elevator = other._elevator;
+			_generators = other._generators.ToArray();
+			_microchips = other._microchips.ToArray();
+		}
+
+		public int Height => _generators.Sum() + _microchips.Sum() + _elevator;
+
+		public void WriteToConsole()
+		{
+			for (var floor = Levels - 1; floor >= 0; floor--)
+			{
+				Console.Write($"F{floor + 1} ");
+				if (floor == _elevator)
+					Console.Write("E ");
+				else
+					Console.Write(". ");
+				for (var i = 0; i < _generators.Length; i++)
+				{
+					if (_generators[i] == floor)
+						Console.Write($"{i}G ");
+					else
+						Console.Write($".  ");
+				}
+				for (var i = 0; i < _microchips.Length; i++)
+				{
+					if (_microchips[i] == floor)
+						Console.Write($"{i}M ");
+					else
+						Console.Write($".  ");
+				}
+				Console.WriteLine();
+			}
+		}
+
+		public IEnumerable<Floor> ValidMoves()
+		{
+			// if (IdentityOf(objects, elevator) != identity)
+			// {
+			// 	throw new Exception("Bad");
+			// }
+
+			if (_elevator < Levels-1)
+			{
+				// return moves going up
+				foreach (var floor in ValidNextMoves(_elevator + 1))
+				{
+					yield return floor;
+				}
+			}
+			if (_elevator > 0 && HasObjectsOnFloorOrBelow(_elevator - 1))
+			{
+				// return moves going down
+				foreach (var floor in ValidNextMoves(_elevator - 1))
+				{
+					yield return floor;
+				}
+			}
+
+			bool HasObjectsOnFloorOrBelow(int floor)
+			{
+				return _generators.Any(x => x <= floor) || _microchips.Any(x => x <= floor);
+			}
+
+			IEnumerable<Floor> ValidNextMoves(int dest)
+			{
+				var gthere = _generators.Select(g => g == dest).ToArray();
+				var ghere = _generators.Select(g => g == _elevator).ToArray();
+				// var here = ObjectsOnFloor(objects, elevator);
+				// var there = ObjectsOnFloor(objects, dest);
+				// var ghere =  here & 0xff;
+				// var mhere = here >> 8;
+				// var gthere = there & 0xff;
+
+				// // var gherebits = MathHelper.Bits(ghere).ToArray();
+				// // var mherebits = MathHelper.Bits(mhere).ToArray();
+				// var gherebits = BitsInMask[ghere];
+				// var mherebits = BitsInMask[mhere];
+
+				//var gtherebits = MathHelper.Bits(gthere).ToArray();
+				//var mthere = (ushort)(there >> 8);
+
+				// var moveables = ValidMoveables();//.Distinct(); // we get duplets
+				// foreach (var m in moveables)
+				// {
+				// 	var o = objects;
+				// 	o ^= m << (elevator * 16);
+				// 	o |=  m << (dest * 16);
+				// 	yield return IdentityOf(o, dest);
+				// }
+
+				// IEnumerable<ulong> ValidMoveables()
+				// {
+					bool MicrochipCanMove(int index) => !gthere[index] || _generators[index] == dest;
+					bool GeneratorCanMove(int index) => ghere.Length == 1 || _microchips[index] != _elevator;
+
+					// Move 1 or 2 microchips
+					for (var i1 = 0; i1 < _microchips.Length; i1++)
+					{
+						if (_microchips[i1] != _elevator)
+							continue;
+						// Microchips can move to an empty floor or a floor where protected by its generator
+						if (MicrochipCanMove(i1))
+						{
+							var f = new Floor(this);
+							f._microchips[i1] = dest;
+							yield return f;
+						}
+						for (int i2 = 0; i2 < _microchips.Length; i2++)//.Where(x => x != m1))
+						{
+							if (i2 == i1)
+								continue;
+							if (_microchips[i2] != _elevator)
+								continue;
+							if (MicrochipCanMove(i1) && MicrochipCanMove(i2))
+							{
+								var f = new Floor(this);
+								f._microchips[i1] = dest;
+								f._microchips[i2] = dest;
+								yield return f;
+							}
+						}
+					}
+
+					// Move 1 or 2 generators
+					for (var i1 = 0; i1 < _generators.Length; i1++)
+					{
+						if (_generators[i1] != _elevator)
+							continue;
+						// Generators can move unless protecting an otherwise threatened microchip
+						if (GeneratorCanMove(i1))
+						{
+							var f = new Floor(this);
+							f._generators[i1] = dest;
+							yield return f;
+						}
+						for (int i2 = 0; i2 < _generators.Length; i2++)//.Where(x => x != m1))
+						{
+							if (i2 == i1)
+								continue;
+							if (_generators[i2] != _elevator)
+								continue;
+							if (GeneratorCanMove(i1) && GeneratorCanMove(i2))
+							{
+								var f = new Floor(this);
+								f._generators[i1] = dest;
+								f._generators[i2] = dest;
+								yield return f;
+							}
+						}
+					}
+
+					// Move 1 microchip and 1 generator
+					for (var i1 = 0; i1 < _microchips.Length; i1++)
+					{
+						if (_microchips[i1] != _elevator)
+							continue;
+						for (int i2 = 0; i2 < _generators.Length; i2++)//.Where(x => x != m1))
+						{
+							if (_generators[i2] != _elevator)
+								continue;							
+							// Combo can move if they're on the same floor or otherwise if both are allowed
+							if (i1 == i2 || MicrochipCanMove(i1) && GeneratorCanMove(i2))
+							{
+								var f = new Floor(this);
+								f._microchips[i1] = dest;
+								f._generators[i2] = dest;
+								yield return f;
+							}
+						}						
+					}					
+				// }
+			}
+		}
+	
 	}
 
 	internal static class Floors
@@ -604,7 +824,7 @@ namespace AdventOfCode.Y2016.Day11
 						foreach (uint g in gherebits)
 						{
 							// Combo can move if both are allowed
-							if (MicrochipCanMove(m) && GeneratorCanMove(g))
+							if (m == g || MicrochipCanMove(m) && GeneratorCanMove(g))
 							{
 								yield return g | (m << 8);
 							}
