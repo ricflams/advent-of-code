@@ -19,9 +19,10 @@ namespace AdventOfCode.Y2016.Day11
 
 		public void Run()
 		{
-			//RunPart1For("test1", 11);
+			RunPart1For("test1", 11);
+			RunPart1For("input", 37);
 			//RunFor("input", 37, 61);
-			RunPart2For("input", 61);
+			//RunPart2For("input", 61);
 		}
 
 
@@ -29,7 +30,8 @@ namespace AdventOfCode.Y2016.Day11
 		protected override int Part1(string[] input)
 		{
 			// return Solve(input);
-			return SolveMcts(input);
+			//return SolveMcts(input);
+			return SolveRecursive2(input);
 
 			// var floors0 = Floors.Create(input);
 
@@ -96,8 +98,9 @@ namespace AdventOfCode.Y2016.Day11
 			//return Solve(input);
 
 			//return SolveRecursive(input);
+			return SolveRecursive2(input);
 			//return SolveMcts(input);
-			return Solve(input);
+			//return Solve2(input);
 		}
 
 		private int SolveRecursive(string[] input)
@@ -134,6 +137,59 @@ namespace AdventOfCode.Y2016.Day11
 				if (steps >= maxsteps)
 					return;// BIGVALUE;
 				foreach (var m in Floors.ValidMoves(floors))
+				{
+					SolveFor(m, steps + 1);
+				}
+			}
+
+		}
+
+		private int SolveRecursive2(string[] input)
+		{
+			var BIGVALUE = 100000;
+			var maxsteps = 50;//Solve(input);
+
+			var floor0 = new Floor(input);
+			floor0.WriteToConsole();
+			Console.WriteLine();
+
+			var seen = new Dictionary<string, int>();
+			var progress = 0;
+
+			SolveFor(floor0, 0);
+			return maxsteps;
+
+			void SolveFor(Floor floor, int steps)
+			{
+				if (progress++ % 100000 == 0)
+					Console.Write(".");
+				if (seen.TryGetValue(floor.Id, out var oldsteps) && steps >= oldsteps)
+				{
+					Console.Write("-"); Console.Out.Flush();
+					return;
+				}
+				seen[floor.Id] = steps;
+				if (floor.AllMovedTo4thFloor)
+				{
+					Console.Write($"#{steps}#");
+					if (steps < maxsteps)
+					{
+						Console.Write($"!{steps}!");
+						maxsteps = steps;
+					}
+					return;
+				}
+				if (steps >= maxsteps)
+					return;// BIGVALUE;
+				var moves = floor.ValidMoves().ToArray();
+				//Console.WriteLine($"<step={steps} moves={moves.Length}>");
+				// foreach (var m in moves)
+				// {
+				// 	m.WriteToConsole();
+				// }
+				// Console.WriteLine();
+
+				foreach (var m in moves)
 				{
 					SolveFor(m, steps + 1);
 				}
@@ -261,10 +317,6 @@ namespace AdventOfCode.Y2016.Day11
 
 		private int Solve(string[] input)
 		{
-			var floors2 = new Floor(input);
-			floors2.WriteToConsole();
-
-
 			var floors0 = Floors.Create(input);
 			Floors.WriteToConsole(floors0);
 
@@ -372,13 +424,124 @@ namespace AdventOfCode.Y2016.Day11
 			return result;
 
 		}
+
+		private int Solve2(string[] input)
+		{
+			var floor0 = new Floor(input);
+			floor0.WriteToConsole();
+
+			//return 0;
+
+			var seen = new HashSet<string>();
+			//var queued = new HashSet<ulong>();
+			var backlog = new List<(Floor, int, int)>();
+			var result = 0;
+
+			var maxstep = 0;
+			//var maxlifted = 0;
+			var seen1 = 0;
+			var seen2 = 0;
+
+			backlog.Add((floor0, 0, 0));
+			while (backlog.Any())
+			{
+
+				//Console.Write($"<{backlog.Count} {backlog.Count(x => !seen.Contains(x.Item1))}>");
+				var queue = backlog.OrderByDescending(x => x.Item3).Take(100000).ToArray();
+
+
+				//var queue = new Queue<(ulong, int, int)>(climbers);
+				backlog.Clear();
+
+				foreach (var (floor, steps, _) in queue)
+				//while (queue.Any())
+				{
+					//var (floors, steps, _) = queue.Dequeue();
+					if (seen.Contains(floor.Id))
+					{
+						seen1++;
+						continue;
+					}
+					seen.Add(floor.Id);
+					// seen.Add(floors>>16);
+					// seen.Add(floors>>32);
+
+					// if (memo.Contains(floors.Identity))
+					// {
+					// 	continue;
+					// }
+					// memo.Add(floors.Identity);
+					// var lifted = floors.Lifted;
+					// if (lifted > maxlifted)
+					// {
+					// 	maxlifted = lifted;
+					// }
+					// if (lifted < maxlifted - 7)
+					// {
+					// 	continue;
+					// }
+
+					if (steps > maxstep)
+					{
+						maxstep = steps;
+						Console.Write($"[{steps} {queue.Count()}]");
+						//Floors.WriteToConsole(floors);
+						//Console.WriteLine();
+					}
+
+					if (floor.AllMovedTo4thFloor)
+					{
+						Console.WriteLine();
+						Console.WriteLine("############### BAM2: " + steps);
+						Console.WriteLine($"seen1={seen1} seen2={seen2}");
+						result = steps;
+						break;
+					}
+					//var moves = floors.ValidMoves().Where(m => m.Lifted >= maxlifted-7 && !m.Identities.Any(id => memo.Contains(id)));
+					var moves = floor.ValidMoves();
+					//Floors.WriteToConsole(floors);
+					//Console.WriteLine($"Step {steps}: found {moves.Count()} queue={queue.Count()}:");
+					foreach (var m in moves)
+					{
+						//Floors.WriteToConsole(m);
+						//if (memo.Contains(m))
+						if (seen.Contains(m.Id))// || queued.Contains(m))
+						{
+							seen2++;
+							continue;
+						}
+						//queue.Enqueue((m, steps + 1, Floors.Height(m)));
+						backlog.Add((m, steps + 1, m.Height));
+						//queued.Add(m);
+						// queued.Add(m>>16);
+						// queued.Add(m>>24);
+
+						// foreach (var id in m.Identities)
+						// {
+						// 	memo.Add(id);
+						// }
+						//memo.Add(m);
+
+
+					}
+					// Console.WriteLine();
+					// Console.WriteLine();
+				}
+
+
+			}
+
+			return result;
+
+		}
+	
 	}
 
 	internal class Floor
 	{
 		private const int Levels = 4;
 
-		private readonly int _elevator;
+		private int _elevator;
 		private readonly int[] _generators;
 		private readonly int[] _microchips;
 
@@ -406,6 +569,7 @@ namespace AdventOfCode.Y2016.Day11
 			_microchips = names
 				.Select(name => floors.FindIndex(s => s.Contains($"{name}-compatible microchip")))
 				.ToArray();
+			FixateId();
 		}
 
 		public Floor(Floor other)
@@ -444,6 +608,27 @@ namespace AdventOfCode.Y2016.Day11
 			}
 		}
 
+		public string Id { get; private set;}
+
+		private void FixateId()
+		{
+			var sb = new StringBuilder();
+			sb.Append(_elevator);
+			foreach (var m in _microchips)
+			{
+				sb.Append('-');
+				sb.Append(m);
+			}
+			foreach (var g in _generators)
+			{
+				sb.Append('-');
+				sb.Append(g);
+			}
+			Id = sb.ToString();
+		}
+
+		public bool AllMovedTo4thFloor => _elevator == 3 && _microchips.All(x => x == 3) && _generators.All(x => x == 3);
+
 		public IEnumerable<Floor> ValidMoves()
 		{
 			// if (IdentityOf(objects, elevator) != identity)
@@ -475,8 +660,11 @@ namespace AdventOfCode.Y2016.Day11
 
 			IEnumerable<Floor> ValidNextMoves(int dest)
 			{
-				var gthere = _generators.Select(g => g == dest).ToArray();
-				var ghere = _generators.Select(g => g == _elevator).ToArray();
+				// var gthere = _generators.Select(g => g == dest).ToArray();
+				// var ghere = _generators.Select(g => g == _elevator).ToArray();
+				var gthere = _generators.Count(g => g == dest);
+				var ghere = _generators.Count(g => g == _elevator);
+
 				// var here = ObjectsOnFloor(objects, elevator);
 				// var there = ObjectsOnFloor(objects, dest);
 				// var ghere =  here & 0xff;
@@ -502,8 +690,21 @@ namespace AdventOfCode.Y2016.Day11
 
 				// IEnumerable<ulong> ValidMoveables()
 				// {
-					bool MicrochipCanMove(int index) => !gthere[index] || _generators[index] == dest;
-					bool GeneratorCanMove(int index) => ghere.Length == 1 || _microchips[index] != _elevator;
+				var lonelyMicrochipsOnDest = false;
+				for (var i = 0 ; i < _generators.Length; i++)
+				{
+					if (_microchips[i] == dest && _generators[i] != dest)
+						lonelyMicrochipsOnDest = true;
+				}
+
+
+
+
+					bool MicrochipCanMove(int index) => gthere == 0 || _generators[index] == dest;
+					bool GeneratorCanMove(int index) => ghere == 1 || _microchips[index] != _elevator;
+					bool MicrochipAndGeneratorCanMove(int mi, int gi) =>
+						MicrochipCanMove(mi) && GeneratorCanMove(gi) || (mi == gi && !lonelyMicrochipsOnDest)
+						;
 
 					// Move 1 or 2 microchips
 					for (var i1 = 0; i1 < _microchips.Length; i1++)
@@ -515,6 +716,8 @@ namespace AdventOfCode.Y2016.Day11
 						{
 							var f = new Floor(this);
 							f._microchips[i1] = dest;
+							f._elevator = dest;
+							f.FixateId();
 							yield return f;
 						}
 						for (int i2 = 0; i2 < _microchips.Length; i2++)//.Where(x => x != m1))
@@ -528,6 +731,8 @@ namespace AdventOfCode.Y2016.Day11
 								var f = new Floor(this);
 								f._microchips[i1] = dest;
 								f._microchips[i2] = dest;
+								f._elevator = dest;
+								f.FixateId();
 								yield return f;
 							}
 						}
@@ -543,6 +748,8 @@ namespace AdventOfCode.Y2016.Day11
 						{
 							var f = new Floor(this);
 							f._generators[i1] = dest;
+							f._elevator = dest;
+							f.FixateId();
 							yield return f;
 						}
 						for (int i2 = 0; i2 < _generators.Length; i2++)//.Where(x => x != m1))
@@ -556,6 +763,8 @@ namespace AdventOfCode.Y2016.Day11
 								var f = new Floor(this);
 								f._generators[i1] = dest;
 								f._generators[i2] = dest;
+								f._elevator = dest;
+								f.FixateId();
 								yield return f;
 							}
 						}
@@ -571,11 +780,13 @@ namespace AdventOfCode.Y2016.Day11
 							if (_generators[i2] != _elevator)
 								continue;							
 							// Combo can move if they're on the same floor or otherwise if both are allowed
-							if (i1 == i2 || MicrochipCanMove(i1) && GeneratorCanMove(i2))
+							if (MicrochipAndGeneratorCanMove(i1, i2))
 							{
 								var f = new Floor(this);
 								f._microchips[i1] = dest;
 								f._generators[i2] = dest;
+								f._elevator = dest;
+								f.FixateId();
 								yield return f;
 							}
 						}						
