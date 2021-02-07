@@ -22,7 +22,7 @@ namespace AdventOfCode.Y2016.Day11
 			RunPart1For("test1", 11);
 			RunPart1For("input", 37);
 			//RunFor("input", 37, 61);
-			//RunPart2For("input", 61);
+			RunPart2For("input", 61);
 		}
 
 
@@ -147,7 +147,7 @@ namespace AdventOfCode.Y2016.Day11
 		private int SolveRecursive2(string[] input)
 		{
 			var BIGVALUE = 100000;
-			var maxsteps = 50;//Solve(input);
+			var maxsteps = BIGVALUE;//Solve(input);
 
 			var floor0 = new Floor(input);
 			floor0.WriteToConsole();
@@ -165,16 +165,16 @@ namespace AdventOfCode.Y2016.Day11
 					Console.Write(".");
 				if (seen.TryGetValue(floor.Id, out var oldsteps) && steps >= oldsteps)
 				{
-					Console.Write("-"); Console.Out.Flush();
+					//Console.Write("-"); Console.Out.Flush();
 					return;
 				}
 				seen[floor.Id] = steps;
 				if (floor.AllMovedTo4thFloor)
 				{
-					Console.Write($"#{steps}#");
+					Console.WriteLine($"#{steps}#");
 					if (steps < maxsteps)
 					{
-						Console.Write($"!{steps}!");
+						Console.WriteLine($"!{steps}!");
 						maxsteps = steps;
 					}
 					return;
@@ -204,7 +204,8 @@ namespace AdventOfCode.Y2016.Day11
 			public Node Parent { get; set; }
 			public int Visited { get; set; }
 			public int Wins { get; set; }
-			public ulong Floors { get; set; }
+			//public ulong Floors { get; set; }
+			public Floor Floors { get; set; }
 			public int Steps { get; set; }
 			public double Uct
 			{
@@ -220,7 +221,8 @@ namespace AdventOfCode.Y2016.Day11
 		private int SolveMcts(string[] input)
 		{
 			var Random = new Random();
-			var floors0 = Floors.Create(input);
+			//var floors0 = Floors.Create(input);
+			var floors0 = new Floor(input);
 
 			var root = new Node
 			{
@@ -233,7 +235,7 @@ namespace AdventOfCode.Y2016.Day11
 
 			var minsteps = 10000000;
 			var solutionheight = 0;
-			// var seen = new Dictionary<ulong, int>();
+			var seen = new Dictionary<string, int>();
 
 			for (var i = 0; i < 1000000; i++)
 			{
@@ -248,7 +250,8 @@ namespace AdventOfCode.Y2016.Day11
 			{
 				if (node.Visited == 0)
 				{
-					var moves = Floors.ValidMoves(node.Floors);
+					//var moves = Floors.ValidMoves(node.Floors);
+					var moves = node.Floors.ValidMoves().GroupBy(x => x.Id).Select(x => x.First());
 					node.Children = moves.Select(m => new Node
 					{
 						Parent = node,
@@ -268,7 +271,7 @@ namespace AdventOfCode.Y2016.Day11
 				var floors = n.Floors;
 				for (var i = 0; i < 500 && n.Steps + i < minsteps; i++)
 				{
-					var height = Floors.Height(floors);
+					var height = floors.Height;
 					if (n.Steps + i + (solutionheight - height)*1.8 >= minsteps)
 						break;
 					// if (seen.TryGetValue(floors, out var steps) && steps < n.Steps + i)
@@ -276,15 +279,15 @@ namespace AdventOfCode.Y2016.Day11
 					// 	Console.Write("x");
 					// 	return 0;
 					// }
-					if (Floors.AllMovedTo4thFloor(floors))
+					if (floors.AllMovedTo4thFloor)
 					{
 						minsteps = n.Steps + i;
-						solutionheight = Floors.Height(floors);
+						solutionheight = floors.Height;
 						// seen[floors] = minsteps;
 						Console.Write($"[{minsteps}]");
 						return 1;
 					}
-					var moves = Floors.ValidMoves(floors).ToArray();
+					var moves = floors.ValidMoves().GroupBy(x => x.Id).Select(x => x.First()).ToArray();
 					if (moves.Length == 0)
 					{
 						//Console.Write("-");
@@ -292,7 +295,7 @@ namespace AdventOfCode.Y2016.Day11
 					}
 					if (Random.NextDouble() < .6)
 					{
-						floors = moves.OrderByDescending(Floors.Height).First();
+						floors = moves.OrderByDescending(m => m.Height).First();
 					}
 					else
 					{
@@ -614,12 +617,12 @@ namespace AdventOfCode.Y2016.Day11
 		{
 			var sb = new StringBuilder();
 			sb.Append(_elevator);
-			foreach (var m in _microchips)
+			foreach (var m in _microchips.OrderByDescending(x => x))
 			{
 				sb.Append('-');
 				sb.Append(m);
 			}
-			foreach (var g in _generators)
+			foreach (var g in _generators.OrderByDescending(x => x))
 			{
 				sb.Append('-');
 				sb.Append(g);
