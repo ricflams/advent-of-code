@@ -19,19 +19,19 @@ namespace AdventOfCode.Y2016.Day11
 
 		public void Run()
 		{
-			RunPart1For("test1", 11);
-			RunPart1For("input", 37);
-			//RunFor("input", 37, 61);
-			RunPart2For("input", 61);
+			 RunPart1For("test1", 11);
+			// RunPart1For("input", 37);
+			RunFor("input", 37, 61);
+			//RunPart2For("input", 61);
 		}
 
 
 
 		protected override int Part1(string[] input)
 		{
-			// return Solve(input);
+			return Solve2(input);
 			//return SolveMcts(input);
-			return SolveRecursive2(input);
+			//return SolveRecursive2(input);
 
 			// var floors0 = Floors.Create(input);
 
@@ -98,9 +98,9 @@ namespace AdventOfCode.Y2016.Day11
 			//return Solve(input);
 
 			//return SolveRecursive(input);
-			return SolveRecursive2(input);
+			//return SolveRecursive2(input);
 			//return SolveMcts(input);
-			//return Solve2(input);
+			return Solve2(input);
 		}
 
 		private int SolveRecursive(string[] input)
@@ -189,7 +189,7 @@ namespace AdventOfCode.Y2016.Day11
 				// }
 				// Console.WriteLine();
 
-				foreach (var m in moves)
+				foreach (var m in moves.OrderByDescending(m => m.Height))
 				{
 					SolveFor(m, steps + 1);
 				}
@@ -268,31 +268,33 @@ namespace AdventOfCode.Y2016.Day11
 
 			int Rollout(Node n)
 			{
+				var localseen = new HashSet<string>();
 				var floors = n.Floors;
 				for (var i = 0; i < 500 && n.Steps + i < minsteps; i++)
 				{
 					var height = floors.Height;
-					if (n.Steps + i + (solutionheight - height)*1.8 >= minsteps)
+					if (n.Steps + i + (solutionheight - height) >= minsteps)
 						break;
-					// if (seen.TryGetValue(floors, out var steps) && steps < n.Steps + i)
-					// {
-					// 	Console.Write("x");
-					// 	return 0;
-					// }
+					if (seen.TryGetValue(floors.Id, out var steps) && steps < n.Steps + i)
+					{
+						Console.Write("x"); Console.Out.Flush();
+						return 0;
+					}
 					if (floors.AllMovedTo4thFloor)
 					{
 						minsteps = n.Steps + i;
 						solutionheight = floors.Height;
-						// seen[floors] = minsteps;
-						Console.Write($"[{minsteps}]");
+						seen[floors.Id] = n.Steps + i;
+						Console.Write($"[{minsteps}]"); Console.Out.Flush();
 						return 1;
 					}
-					var moves = floors.ValidMoves().GroupBy(x => x.Id).Select(x => x.First()).ToArray();
+					var moves = floors.ValidMoves().GroupBy(x => x.Id).Select(x => x.First()).Where(x => !localseen.Contains(x.Id)).ToArray();
 					if (moves.Length == 0)
 					{
 						//Console.Write("-");
 						return 0;
 					}
+
 					if (Random.NextDouble() < .6)
 					{
 						floors = moves.OrderByDescending(m => m.Height).First();
@@ -301,6 +303,7 @@ namespace AdventOfCode.Y2016.Day11
 					{
 						floors = moves.PickRandom();
 					}
+					localseen.Add(floors.Id);
 				}
 				//Console.Write(".");
 				return 0;
@@ -431,13 +434,13 @@ namespace AdventOfCode.Y2016.Day11
 		private int Solve2(string[] input)
 		{
 			var floor0 = new Floor(input);
-			floor0.WriteToConsole();
+			//floor0.WriteToConsole();
 
 			//return 0;
 
 			var seen = new HashSet<string>();
 			//var queued = new HashSet<ulong>();
-			var backlog = new List<(Floor, int, int)>();
+			var backlog = new Queue<(Floor, int)>();
 			var result = 0;
 
 			var maxstep = 0;
@@ -445,18 +448,18 @@ namespace AdventOfCode.Y2016.Day11
 			var seen1 = 0;
 			var seen2 = 0;
 
-			backlog.Add((floor0, 0, 0));
+			backlog.Enqueue((floor0, 0));
 			while (backlog.Any())
 			{
 
 				//Console.Write($"<{backlog.Count} {backlog.Count(x => !seen.Contains(x.Item1))}>");
-				var queue = backlog.OrderByDescending(x => x.Item3).Take(100000).ToArray();
+				//var queue = backlog.OrderByDescending(x => x.Item1.Height).Take(100000).ToArray();
 
 
 				//var queue = new Queue<(ulong, int, int)>(climbers);
-				backlog.Clear();
+				//backlog.Clear();
 
-				foreach (var (floor, steps, _) in queue)
+				var (floor, steps) = backlog.Dequeue();
 				//while (queue.Any())
 				{
 					//var (floors, steps, _) = queue.Dequeue();
@@ -484,19 +487,19 @@ namespace AdventOfCode.Y2016.Day11
 					// 	continue;
 					// }
 
-					if (steps > maxstep)
-					{
-						maxstep = steps;
-						Console.Write($"[{steps} {queue.Count()}]");
-						//Floors.WriteToConsole(floors);
-						//Console.WriteLine();
-					}
+					// if (steps > maxstep)
+					// {
+					// 	maxstep = steps;
+					// 	Console.Write($"[{steps} {backlog.Count()}]");
+					// 	//Floors.WriteToConsole(floors);
+					// 	//Console.WriteLine();
+					// }
 
 					if (floor.AllMovedTo4thFloor)
 					{
-						Console.WriteLine();
-						Console.WriteLine("############### BAM2: " + steps);
-						Console.WriteLine($"seen1={seen1} seen2={seen2}");
+						// Console.WriteLine();
+						// Console.WriteLine("############### BAM2: " + steps);
+						// Console.WriteLine($"seen1={seen1} seen2={seen2}");
 						result = steps;
 						break;
 					}
@@ -514,7 +517,7 @@ namespace AdventOfCode.Y2016.Day11
 							continue;
 						}
 						//queue.Enqueue((m, steps + 1, Floors.Height(m)));
-						backlog.Add((m, steps + 1, m.Height));
+						backlog.Enqueue((m, steps + 1));
 						//queued.Add(m);
 						// queued.Add(m>>16);
 						// queued.Add(m>>24);
@@ -582,8 +585,6 @@ namespace AdventOfCode.Y2016.Day11
 			_microchips = other._microchips.ToArray();
 		}
 
-		public int Height => _generators.Sum() + _microchips.Sum() + _elevator;
-
 		public void WriteToConsole()
 		{
 			for (var floor = Levels - 1; floor >= 0; floor--)
@@ -612,6 +613,8 @@ namespace AdventOfCode.Y2016.Day11
 		}
 
 		public string Id { get; private set;}
+		public int Height { get; private set; }
+		public bool AllMovedTo4thFloor { get; private set; }
 
 		private void FixateId()
 		{
@@ -628,9 +631,10 @@ namespace AdventOfCode.Y2016.Day11
 				sb.Append(g);
 			}
 			Id = sb.ToString();
-		}
 
-		public bool AllMovedTo4thFloor => _elevator == 3 && _microchips.All(x => x == 3) && _generators.All(x => x == 3);
+			Height = _generators.Sum() + _microchips.Sum() + _elevator;
+			AllMovedTo4thFloor = _elevator == 3 && _microchips.All(x => x == 3) && _generators.All(x => x == 3);
+		}
 
 		public IEnumerable<Floor> ValidMoves()
 		{
