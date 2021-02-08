@@ -87,7 +87,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			}
 			var flags = BindingFlags.NonPublic | BindingFlags.Instance;
 			var method = GetType()?.GetMethod(methodName, flags);
-			return method != null;
+			return method != null && method.DeclaringType != typeof(Puzzle<T1,T2>);
 		}
 
 		private void WriteName(TimeSpan? elapsed, string filename, int part)
