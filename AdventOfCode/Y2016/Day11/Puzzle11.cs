@@ -54,8 +54,7 @@ namespace AdventOfCode.Y2016.Day11
 					continue;
 				}
 				seen.Add(floor.Id);
-				var floors = floor.NextMoves().ToArray();
-				foreach (var f in floors.Where(x => !seen.Contains(x.Id)))
+				foreach (var f in floor.NextMoves().Where(x => !seen.Contains(x.Id)))
 				{
 					if (f.AtTopLevel)
 					{
