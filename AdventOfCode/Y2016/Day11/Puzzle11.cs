@@ -16,6 +16,8 @@ namespace AdventOfCode.Y2016.Day11
 		public void Run()
 		{
 			RunPart1For("test1", 11);
+			RunFor("test2", 25, 49); // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db4omkn/
+			RunFor("test3", 33, 57); // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db5ctc6
 			RunFor("input", 37, 61);
 		}
 
