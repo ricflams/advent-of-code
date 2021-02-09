@@ -54,14 +54,14 @@ namespace AdventOfCode.Y2016.Day11
 					continue;
 				}
 				seen.Add(floor.Id);
-				if (floor.AtTopLevel)
+				var floors = floor.NextMoves().ToArray();
+				foreach (var f in floors.Where(x => !seen.Contains(x.Id)))
 				{
-					return floor.Steps;
-				}
-				var moves = floor.NextMoves().ToArray();
-				foreach (var m in moves.Where(m => !seen.Contains(m.Id)))
-				{
-					queue.Enqueue(m);
+					if (f.AtTopLevel)
+					{
+						return f.Steps;
+					}
+					queue.Enqueue(f);
 				}
 			}
 
