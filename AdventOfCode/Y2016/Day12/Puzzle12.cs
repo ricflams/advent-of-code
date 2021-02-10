@@ -69,8 +69,8 @@ namespace AdventOfCode.Y2016.Day12
 							"inc" => new Ins(OpCode.Inc, Reg(p[1]), 0),
 							"dec" => new Ins(OpCode.Dec, Reg(p[1]), 0),
 							"jnz" => char.IsLetter(p[1].First())
-										? new Ins(OpCode.JnzReg, Reg(p[1]), int.Parse(p[2]) - 1)
-										: new Ins(OpCode.JnzVal, int.Parse(p[1]), int.Parse(p[2]) - 1), // subtract 1 for easier jumps
+										? new Ins(OpCode.JnzReg, Reg(p[1]), int.Parse(p[2]))
+										: new Ins(OpCode.JnzVal, int.Parse(p[1]), int.Parse(p[2])), // subtract 1 for easier jumps
 							_ => throw new Exception($"Unknown instruction {p[0]}")
 						};
 					})
@@ -102,13 +102,13 @@ namespace AdventOfCode.Y2016.Day12
 						case OpCode.JnzReg:
 							if (Regs[ins.Op1] != 0)
 							{
-								_ip += ins.Op2;
+								_ip += ins.Op2 - 1;
 							}
 							break;
 						case OpCode.JnzVal:
 							if (ins.Op1 != 0)
 							{
-								_ip += ins.Op2;
+								_ip += ins.Op2 - 1;
 							}
 							break;
 					}

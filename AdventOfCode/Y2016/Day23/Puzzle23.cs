@@ -1,11 +1,6 @@
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2016.Day23
 {
@@ -19,7 +14,6 @@ namespace AdventOfCode.Y2016.Day23
 		public void Run()
 		{
 			RunPart1For("test1", 3);
-			//RunFor("test2", 0, 0);
 			RunFor("input", 12762, 479009322);
 		}
 
@@ -33,20 +27,6 @@ namespace AdventOfCode.Y2016.Day23
 
 		protected override int Part2(string[] input)
 		{
-			input[3] = "MX1"; //  cpy 0 a
-			input[4] = "NOP"; //  cpy b c
-			input[5] = "NOP"; //  inc a
-			input[6] = "NOP"; //  dec c
-			input[7] = "NOP"; //  jnz c -2
-			input[8] = "NOP"; //  dec d
-			input[9] = "NOP"; //  jnz d -5
-
-			input[11] = "MX2"; // cpy b c
-			input[12] = "NOP"; // cpy c d
-			input[13] = "NOP"; // dec d
-			input[14] = "NOP"; // inc c
-			input[15] = "NOP"; // jnz d -2
-
 			var comp = new Computer(input);
 			comp.Regs[0] = 12;
 			comp.Run();
@@ -56,17 +36,6 @@ namespace AdventOfCode.Y2016.Day23
 
 		internal class Computer
 		{
-			private enum OpCode { CpyRegReg, CpyRegVal, CpyValReg, CpyValVal, Inc, Dec, JnzRegReg, JnzRegVal, JnzValReg, JnzValVal, Tgl, MyNop, MyMult1, MyMult2};
-			private class Ins
-			{
-				public Ins(OpCode opc, int op1, int op2)
-				{
-					OpCode = opc; Op1 = op1; Op2 = op2;
-				}
-				public OpCode OpCode { get; set; }
-				public int Op1 { get; private set; }
-				public int Op2 { get; private set; }
-			}
 			private readonly Ins[] _code;
 			private int _ip;
 
@@ -74,6 +43,39 @@ namespace AdventOfCode.Y2016.Day23
 
 			public Computer(string[] code)
 			{
+				OptimizeFragment(code,
+					new[]
+					{
+						"cpy 0 a",
+						"cpy b c",
+						"inc a",
+						"dec c",
+						"jnz c -2",
+						"dec d",
+						"jnz d -5"
+					},
+					new[]
+					{
+						"mul b d a",
+						"cpy 0 c",
+						"cpy 0 d"
+					});
+				OptimizeFragment(code,
+					new[]
+					{
+						"cpy b c",
+						"cpy c d",
+						"dec d",
+						"inc c",
+						"jnz d -2"
+					},
+					new[]
+					{
+						"mul b 2 c",
+						"cpy 0 d"
+					});
+
+
 				Regs[0] = Regs[1] = Regs[2] = Regs[3] = 0;
 				_code = code
 					.Select(line =>
@@ -91,86 +93,89 @@ namespace AdventOfCode.Y2016.Day23
 							//     The arguments of a toggled instruction are not affected.
 							//     If an attempt is made to toggle an instruction outside the program, nothing happens.
 							//     If toggling produces an invalid instruction (like cpy 1 2) and an attempt is later made to execute that instruction, skip it instead.
-							"cpy" => char.IsLetter(p[1].First())
-										? new Ins(OpCode.CpyRegReg, Reg(p[1]), Reg(p[2]))
-										: new Ins(OpCode.CpyValReg, int.Parse(p[1]), Reg(p[2])),
-							"inc" => new Ins(OpCode.Inc, Reg(p[1]), 0),
-							"dec" => new Ins(OpCode.Dec, Reg(p[1]), 0),
-							"jnz" => char.IsLetter(p[1].First())
-										? char.IsLetter(p[2].First())
-											? new Ins(OpCode.JnzRegReg, Reg(p[1]), Reg(p[2]))
-											: new Ins(OpCode.JnzRegVal, Reg(p[1]), int.Parse(p[2]))
-										: char.IsLetter(p[2].First())
-											? new Ins(OpCode.JnzValReg, int.Parse(p[1]), Reg(p[2]))
-											: new Ins(OpCode.JnzValVal, int.Parse(p[1]), int.Parse(p[2])),
-							"tgl" => new Ins(OpCode.Tgl, Reg(p[1]), 0),
-							"MX1" => new Ins(OpCode.MyMult1, 0, 0),
-							"MX2" => new Ins(OpCode.MyMult2, 0, 0),
-							"NOP" => new Ins(OpCode.MyNop, 0, 0),
+							// NEW:
+							// nop do nothing
+							// mul x y z copies x*y (values or registers) into register z
+							"cpy" => new Ins(OpCode.Cpy, GetOp(p[1]), GetOp(p[2])),
+							"inc" => new Ins(OpCode.Inc, GetOp(p[1])),
+							"dec" => new Ins(OpCode.Dec, GetOp(p[1])),
+							"jnz" => new Ins(OpCode.Jnz, GetOp(p[1]), GetOp(p[2])),
+							"tgl" => new Ins(OpCode.Tgl, GetOp(p[1])),
+							"mul" => new Ins(OpCode.Mul, GetOp(p[1]), GetOp(p[2]), GetOp(p[3])),
+							"nop" => new Ins(OpCode.Nop),
 							_ => throw new Exception($"Unknown instruction {p[0]}")
 						};
 					})
 					.ToArray();
 				_ip = 0;
 
-				int Reg(string s) => s.First() - 'a';
+				(int, bool) GetOp(string op) => char.IsLetter(op.First()) ? (op.First() - 'a', true) : (int.Parse(op), false);
 			}
 
-			//private string CodeId => $"{_ip}{new string(_code.Select(ins => (char)('a'+(int)ins.OpCode)).ToArray())}";
+			private enum OpCode { Cpy, Inc, Dec, Jnz, Tgl, Nop, Mul };
+			private class Operand
+			{
+				public int Value { get; set; }
+				public bool IsRegister { get; set; }
+			}
+			private class Ins
+			{
+				public Ins(OpCode opc, params (int, bool)[] ops)
+				{
+					OpCode = opc;
+					Ops = ops.Select(x => new Operand { Value = x.Item1, IsRegister = x.Item2 }).ToArray();
+				}
+				public OpCode OpCode { get; set; }
+				public Operand[] Ops { get; set; }
+			}
+
+			private int ValueOf(Operand op) => op.IsRegister ? Regs[op.Value] : op.Value;
+			
+			private void OptimizeFragment(string[] code, string[] fragment, string[] replacement)
+			{
+				var len = fragment.Length;
+				for (var i = 0; i < code.Length - len; i++)
+				{
+					if (code[i..(i+len)].SequenceEqual(fragment))
+					{
+						for (var j = 0; j < len; j++)
+						{
+							code[i+j] = j < replacement.Length ? replacement[j] : "nop";
+						}
+						break;
+					}
+				}
+			}
 
 			public void Run()
 			{
-				var modified = new bool[_code.Length];
+				//var modified = new bool[_code.Length];
 				while (_ip < _code.Length)
 				{
 					var ins = _code[_ip];
+					var ops = ins.Ops;
 					switch (ins.OpCode)
 					{
-						case OpCode.CpyRegReg:
-							Regs[ins.Op2] = Regs[ins.Op1];
-							break;
-						case OpCode.CpyRegVal:
-							// Invalid, coming from toggling JnzRegVal
-							break;
-						case OpCode.CpyValReg:
-							Regs[ins.Op2] = ins.Op1;
-							break;
-						case OpCode.CpyValVal:
-							// Invalid, coming from toggling JnzValVal
+						case OpCode.Cpy:
+							if (ops[1].IsRegister)
+							{
+								Regs[ops[1].Value] = ValueOf(ops[0]);
+							}
 							break;
 						case OpCode.Inc:
-							Regs[ins.Op1]++;
+							Regs[ops[0].Value]++;
 							break;
 						case OpCode.Dec:
-							Regs[ins.Op1]--;
+							Regs[ops[0].Value]--;
 							break;
-						case OpCode.JnzRegReg:
-							if (Regs[ins.Op1] != 0)
+						case OpCode.Jnz:
+							if (ValueOf(ops[0]) != 0)
 							{
-								_ip += Regs[ins.Op2] - 1;
-							}
-							break;
-						case OpCode.JnzRegVal:
-							if (Regs[ins.Op1] != 0)
-							{
-								_ip += ins.Op2 - 1;
-							}
-							break;
-						case OpCode.JnzValReg:
-							if (ins.Op1 != 0)
-							{
-								_ip += Regs[ins.Op2] - 1;
-							}
-							break;
-						case OpCode.JnzValVal:
-							if (ins.Op1 != 0)
-							{
-								_ip += ins.Op2 - 1;
+								_ip += ValueOf(ops[1]) - 1;
 							}
 							break;
 						case OpCode.Tgl:
-							var offset = Regs[ins.Op1];
-							var ip = _ip + offset;
+							var ip = _ip + ValueOf(ops[0]);
 							if (ip >= 0 && ip < _code.Length)
 							{
 								var modins = _code[ip];
@@ -178,156 +183,73 @@ namespace AdventOfCode.Y2016.Day23
 									OpCode.Inc => OpCode.Dec,
 									OpCode.Dec => OpCode.Inc,
 									OpCode.Tgl => OpCode.Inc,
-									OpCode.JnzRegReg => OpCode.CpyRegReg,
-									OpCode.JnzRegVal => OpCode.CpyRegVal,
-									OpCode.JnzValReg => OpCode.CpyValReg,
-									OpCode.JnzValVal => OpCode.CpyValVal,
-									OpCode.CpyRegReg => OpCode.JnzRegReg,
-									OpCode.CpyRegVal => OpCode.JnzRegVal,
-									OpCode.CpyValReg => OpCode.JnzValReg,
-									OpCode.CpyValVal => OpCode.JnzValVal,
-									_ => throw new Exception($"Unexpected opcode {modins.OpCode}")
+									OpCode.Jnz => OpCode.Cpy,
+									OpCode.Cpy => OpCode.Jnz,
+									_ => throw new Exception($"Unexpected tgl opcode {modins.OpCode}")
 								};
-								modified[ip] = true;
+								//modified[ip] = true;
 							}
 							break;
 
-						case OpCode.MyNop:
-							// Filler-instruction, do nothing
+						case OpCode.Nop:
 							break;
-						case OpCode.MyMult1:
-							Regs[0] = Regs[1] * Regs[3]; // a = b*d
-							Regs[2] = 0; // c = 0
-							Regs[3] = 0; // d = 0
-							break;
-						case OpCode.MyMult2:
-							Regs[2] = Regs[1] * 2; // c = b*2
-							Regs[3] = 0; // d = 0
+						case OpCode.Mul:
+							Regs[ops[2].Value] = ValueOf(ops[0]) * ValueOf(ops[1]);
 							break;
 
+						default:
+							throw new Exception($"Unhandled opcode {ins.OpCode}");
 					}
 					_ip++;
 				}
 			}
 		}
-
-
-		// Code looks like this.
-		// Only lines marked by * are toggled at runtime, rest remaind fixed:
-		//   cpy a b
-		//   dec b
-		//   cpy a d
-		//   cpy 0 a
-		//   cpy b c
-		//   inc a
-		//   dec c
-		//   jnz c -2
-		//   dec d
-		//   jnz d -5
-		//   dec b
-		//   cpy b c
-		//   cpy c d
-		//   dec d
-		//   inc c
-		//   jnz d -2
-		//   tgl c
-		//   cpy -16 c
-		// * jnz 1 c
-		//   cpy 78 c
-		// * jnz 99 d
-		//   inc a
-		// * inc d
-		//   jnz d -2
-		// * inc c
-		//   jnz c -5		
-
-
-///
-/// b = a
-/// b--
-/// d = a
-/// a = 0
-/// do
-///   c = b
-///   do
-///     a++
-///     c--
-///   while c != 0
-///   d--
-/// while d != 0
-/// b--
-/// c = b
-/// d = c
-/// do
-///   d--
-///   c++
-/// while d != 0
-/// tgl c
-/// ........
-/// 
-/// 
-/// a = 0
-/// do
-///   c = b
-///   do
-///     a++
-///     c--
-///   while c != 0
-///   d--
-/// while d != 0
-/// 
-/// equal to
-/// 
-/// a = b * d
-/// c = 0
-/// d = 0
-/// 
-/// 
-/// c = b
-/// d = c
-/// do
-///   d--
-///   c++
-/// while d != 0
-/// 
-/// equal to
-/// 
-/// c = b * 2
-/// d = 0
-/// 
-/// 
-/// 
-/// 
-/// 
-/// 
 	}
 
+	// Only lines marked by * are toggled at runtime, rest remain
+	// fixed and are therefore safe to modify:
+	//     cpy a b
+	//     dec b
+	//     cpy a d
+	//     cpy 0 a
+	//     cpy b c
+	//     inc a
+	//     dec c
+	//     jnz c -2
+	//     dec d
+	//     jnz d -5
+	//     dec b
+	//     cpy b c
+	//     cpy c d
+	//     dec d
+	//     inc c
+	//     jnz d -2
+	//     tgl c
+	//     cpy -16 c
+	//   * jnz 1 c
+	//     cpy 78 c
+	//   * jnz 99 d
+	//     inc a
+	//   * inc d
+	//     jnz d -2
+	//   * inc c
+	//     jnz c -5		
 
-
-
-	//  internal class Puzzle : ComboParts<int>
-	//  {
-	//  	public static Puzzle Instance = new Puzzle();
-	//		public override string Name => "";
-	//  	public override int Year => 2016;
-	//  	public override int Day => 23;
-	//  
-	//  	public void Run()
-	//  	{
-	//  		//RunFor("test1", 0, 0);
-	//  		//RunFor("test2", 0, 0);
-	//  		RunFor("input", 0, 0);
-	//  	}
-	//  
-	//  	protected override (int, int) Part1And2(string[] input)
-	//  	{
-	//  
-	//  
-	//  
-	//  
-	//  
-	//  		return (0, 0);
-	//  	}
-	//  }
-
+	// Two multiplication optimizations:
+	//     a = 0             =>  a = b * d       
+	//     do                    c = 0
+	//       c = b               d = 0
+	//       do
+	//         a++
+	//         c--
+	//       while c != 0
+	//       d--
+	//     while d != 0
+	//     ....
+	//     c = b              =>  c = b * 2
+	//     d = c                  d = 0
+	//     do
+	//       d--
+	//       c++
+	//     while d != 0
 }
