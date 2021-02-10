@@ -57,12 +57,12 @@ namespace AdventOfCode.Y2016.Day11
 					continue;
 				}
 				seen.Add(floor.Id);
+				if (floor.AtTopLevel)
+				{
+					return floor.Steps;
+				}
 				foreach (var f in floor.NextMoves().Where(x => !seen.Contains(x.Id)))
 				{
-					if (f.AtTopLevel)
-					{
-						return f.Steps;
-					}
 					queue.Enqueue(f);
 				}
 			}
