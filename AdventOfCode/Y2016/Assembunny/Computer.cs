@@ -29,6 +29,7 @@ namespace AdventOfCode.Y2016.Assembunny
 						//     The arguments of a toggled instruction are not affected.
 						//     If an attempt is made to toggle an instruction outside the program, nothing happens.
 						//     If toggling produces an invalid instruction (like cpy 1 2) and an attempt is later made to execute that instruction, skip it instead.
+						// out x transmits x (either an integer or the value of a register) to out
 						// NEW:
 						// nop do nothing
 						// mul x y z copies x*y (values or registers) into register z
@@ -49,7 +50,7 @@ namespace AdventOfCode.Y2016.Assembunny
 			(int, bool) GetOp(string op) => char.IsLetter(op.First()) ? (op.First() - 'a', true) : (int.Parse(op), false);
 		}
 
-		private enum OpCode { Cpy, Inc, Dec, Jnz, Tgl, Nop, Mul };
+		private enum OpCode { Cpy, Inc, Dec, Jnz, Tgl, Out, Nop, Mul };
 		private class Operand
 		{
 			public int Value { get; set; }
@@ -83,6 +84,8 @@ namespace AdventOfCode.Y2016.Assembunny
 				}
 			}
 		}
+
+		public Func<int, bool> OnOutShouldHalt { get; set; }
 
 		public void Run()
 		{
@@ -127,6 +130,11 @@ namespace AdventOfCode.Y2016.Assembunny
 							};
 							//modified[ip] = true;
 						}
+						break;
+					case OpCode.Out:
+						var v = ValueOf(ops[0]);
+						if (OnOutShouldHalt(v))
+							return;
 						break;
 
 					case OpCode.Nop:
