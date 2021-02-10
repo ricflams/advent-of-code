@@ -96,6 +96,7 @@ namespace AdventOfCode.Helpers
 				set => base[p] = value;
 			}
 		}
+
 		[DebuggerDisplay("{ToString()}")]
 		public class Vertex
 		{

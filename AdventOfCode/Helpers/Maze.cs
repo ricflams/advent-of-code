@@ -14,6 +14,12 @@ namespace AdventOfCode.Helpers
 			Map = map;
 		}
 
+		public Maze WithEntry(Point p)
+		{
+			Entry = p;
+			return this;
+		}
+
 		public IEnumerable<Point> ExternalMapPoints = Enumerable.Empty<Point>();
 
 		public virtual Point Transform(Point p) => p;
