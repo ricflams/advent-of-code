@@ -12,15 +12,15 @@ namespace AdventOfCode.Y2016.Day22
 	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		public override string Name => "";
+		public override string Name => "Grid Computing";
 		public override int Year => 2016;
 		public override int Day => 22;
 
 		public void Run()
 		{
-			RunPart2For("test1", 0);
+			//RunPart2For("test1", 0);
 			//RunFor("test2", 0, 0);
-			//RunFor("input", 993, 0);
+			RunFor("input", 993, 0);
 		}
 
 		protected override int Part1(string[] input)
@@ -56,18 +56,31 @@ namespace AdventOfCode.Y2016.Day22
 					return 'G';
 				if (p == Point.Origin)
 					return 'H';
-				if (disk.Used == 0)
-					return '_';
-				if (disk.Used > 25)
-					return '#';
-				if (disk.Avail >= home.Used)
-					return 'O';
 				if (disk.Avail >= disks[goal].Used)
 					return '+';
+				if (disk.Used == 0)
+					return '0';
 				return '.';
 			});
 
+			var goaldisk = disks[goal];
+			var fitdisks = disks.AllPoints(d => d.Avail >= goaldisk.Used).ToArray();
+			var fitdisk = fitdisks.First();
+			var disk1 = disks[fitdisk];
+			var remains = disk1.Avail - disks[goal].Used;
 
+			Console.WriteLine();
+			disks.ConsoleWrite((p, disk) =>
+			{
+				var moves = p.LookAround().Count(x => disks[x] != null && disks[x].Avail >= disk.Used);
+				return moves switch {
+					0 => '_',
+					1 => '.',
+					2 => 'x',
+					3 => 'X',
+					4 => '#'
+				};
+			});
 
 
 			return 0;
