@@ -172,12 +172,9 @@ namespace AdventOfCode.Y2016.Day11
 
 			IEnumerable<Floor> NextMovesTo(int dest)
 			{
-				foreach (var objects in NextMoveCandidates())
+				foreach (var objects in NextMoveCandidates().Where(IsValidMove))
 				{
-					if (IsValidMove(objects))
-					{
-						yield return new Floor(objects, dest, Steps + 1);
-					}
+					yield return new Floor(objects, dest, Steps + 1);
 				}
 
 				static bool IsValidMove(MicrochipGeneratorPair[] objects)
