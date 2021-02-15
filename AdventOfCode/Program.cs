@@ -8,17 +8,20 @@ namespace AdventOfCode
 	{
 		private static void Main()
 		{
-			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2015);
+			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2018);
 			var sw = Stopwatch.StartNew();
 
 			//PuzzleOptions.OnlyRunForInputs = true;
 			PuzzleOptions.ShowTimings = true;
 			//PuzzleOptions.TimingLoops = 10;
-			PuzzleOptions.RunOnly(2016, 22);
+			//PuzzleOptions.RunOnly(2016, 22);
 			//PuzzleOptions.RunOnly(2020, 24);
+			PuzzleOptions.RunOnly(2017, 4);
 
 			Y2015Puzzles();
 			Y2016Puzzles();
+			Y2017Puzzles();
+			Y2018Puzzles();
 			Y2019Puzzles();
 			Y2020Puzzles();
 
@@ -80,6 +83,62 @@ namespace AdventOfCode
 			Y2016.Day23.Puzzle.Instance.Run();
 			Y2016.Day24.Puzzle.Instance.Run();
 			Y2016.Day25.Puzzle.Instance.Run();
+		}
+		private static void Y2017Puzzles()
+		{
+			Y2017.Day01.Puzzle.Instance.Run();
+			Y2017.Day02.Puzzle.Instance.Run();
+			Y2017.Day03.Puzzle.Instance.Run();
+			Y2017.Day04.Puzzle.Instance.Run();
+			//Y2017.Day05.Puzzle.Instance.Run();
+			//Y2017.Day06.Puzzle.Instance.Run();
+			//Y2017.Day07.Puzzle.Instance.Run();
+			//Y2017.Day08.Puzzle.Instance.Run();
+			//Y2017.Day09.Puzzle.Instance.Run();
+			//Y2017.Day10.Puzzle.Instance.Run();
+			//Y2017.Day11.Puzzle.Instance.Run();
+			//Y2017.Day12.Puzzle.Instance.Run();
+			//Y2017.Day13.Puzzle.Instance.Run();
+			//Y2017.Day14.Puzzle.Instance.Run();
+			//Y2017.Day15.Puzzle.Instance.Run();
+			//Y2017.Day16.Puzzle.Instance.Run();
+			//Y2017.Day17.Puzzle.Instance.Run();
+			//Y2017.Day18.Puzzle.Instance.Run();
+			//Y2017.Day19.Puzzle.Instance.Run();
+			//Y2017.Day20.Puzzle.Instance.Run();
+			//Y2017.Day21.Puzzle.Instance.Run();
+			//Y2017.Day22.Puzzle.Instance.Run();
+			//Y2017.Day23.Puzzle.Instance.Run();
+			//Y2017.Day24.Puzzle.Instance.Run();
+			//Y2017.Day25.Puzzle.Instance.Run();
+		}
+		private static void Y2018Puzzles()
+		{
+			//Y2018.Day01.Puzzle.Instance.Run();
+			//Y2018.Day02.Puzzle.Instance.Run();
+			//Y2018.Day03.Puzzle.Instance.Run();
+			//Y2018.Day04.Puzzle.Instance.Run();
+			//Y2018.Day05.Puzzle.Instance.Run();
+			//Y2018.Day06.Puzzle.Instance.Run();
+			//Y2018.Day07.Puzzle.Instance.Run();
+			//Y2018.Day08.Puzzle.Instance.Run();
+			//Y2018.Day09.Puzzle.Instance.Run();
+			//Y2018.Day10.Puzzle.Instance.Run();
+			//Y2018.Day11.Puzzle.Instance.Run();
+			//Y2018.Day12.Puzzle.Instance.Run();
+			//Y2018.Day13.Puzzle.Instance.Run();
+			//Y2018.Day14.Puzzle.Instance.Run();
+			//Y2018.Day15.Puzzle.Instance.Run();
+			//Y2018.Day16.Puzzle.Instance.Run();
+			//Y2018.Day17.Puzzle.Instance.Run();
+			//Y2018.Day18.Puzzle.Instance.Run();
+			//Y2018.Day19.Puzzle.Instance.Run();
+			//Y2018.Day20.Puzzle.Instance.Run();
+			//Y2018.Day21.Puzzle.Instance.Run();
+			//Y2018.Day22.Puzzle.Instance.Run();
+			//Y2018.Day23.Puzzle.Instance.Run();
+			//Y2018.Day24.Puzzle.Instance.Run();
+			//Y2018.Day25.Puzzle.Instance.Run();
 		}
 		private static void Y2019Puzzles()
 		{
