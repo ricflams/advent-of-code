@@ -136,7 +136,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public static IEnumerable<IEnumerable<int>> Permute(IEnumerable<int> x)
+		public static IEnumerable<IEnumerable<T>> Permute<T>(IEnumerable<T> x)
 		{
 			if (x.Count() == 1)
 			{
@@ -146,7 +146,7 @@ namespace AdventOfCode.Helpers
 			{
 				foreach (var head in x)
 				{
-					foreach (var perm in Permute(x.Where(y => y != head)))
+					foreach (var perm in Permute(x.Where(y => !y.Equals(head))))
 					{
 						yield return new[] { head }.Concat(perm);
 					}
