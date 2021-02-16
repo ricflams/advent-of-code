@@ -21,9 +21,8 @@ namespace AdventOfCode.Y2017.Day05
 			var jumps = input.Select(int.Parse).ToArray();
 
 			var steps = 0;
-			for (var i = 0; i >= 0 && i < jumps.Length; )
+			for (var i = 0; i >= 0 && i < jumps.Length; i += jumps[i]++)
 			{
-				i += jumps[i]++;
 				steps++;
 			}
 
