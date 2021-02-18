@@ -39,51 +39,29 @@ namespace AdventOfCode.Y2017.Day09
 
 		private static (int, int) CalcScoreAndGarbage(string s)
 		{
-			// Easiest (to avoid initial special case of "no groups") to populate the
-			// group-score stack with the always present outer group, that has a score
-			// of 1.
-			var groupscore = new Stack<int>();
-			groupscore.Push(1);
-			var score = 1;
-
+			var score = 0;
 			var garbage = 0;
 
-			// Loop the inner part of the outer-most {}-group
-			var N = s.Length - 1;
-			for (var i = 1; i < N; i++)
+			var inGarbage = false;
+			var nesting = 0;
+			for (var i = 0; i < s.Length; i++)
 			{
-				switch (s[i])
+				var c = s[i];
+				if (inGarbage)
 				{
-					case '{':
-						groupscore.Push(groupscore.Peek() + 1);
-						break;
-
-					case '}':
-						score += groupscore.Pop();
-						break;
-
-					case ',':
-						break;
-					
-					case '<':
+					if (c == '!')
 						i++;
-						while (s[i] != '>')
-						{
-							// If looking at ! then repeat skipping it and then next char; else
-							// we're looking at real garbage, which should be skipped and counted
-							if (s[i] == '!')
-							{
-								while (s[i] == '!')
-									i+=2;
-							}
-							else
-							{
-								i++;
-								garbage++;
-							}
-						}
-						break;
+					else if (c == '>')
+						inGarbage = false;
+					else
+						garbage++;
 				}
+				else if (c == '{')
+					nesting++;
+				else if (c == '}')
+					score += nesting--;
+				else if (c == '<')
+					inGarbage = true;
 			}
 
 			return (score, garbage);
