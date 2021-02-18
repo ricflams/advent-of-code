@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2016.Day19
 		public void Run()
 		{
 			RunFor("test1", 3, 2);
-			RunFor("input", 1834471, 1420064  );
+			RunFor("input", 1834471, 1420064);
 		}
 
 		protected override int Part1(string[] input)
