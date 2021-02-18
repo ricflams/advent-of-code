@@ -1,5 +1,4 @@
 using AdventOfCode.Helpers.Puzzles;
-using System.Collections.Generic;
 
 namespace AdventOfCode.Y2017.Day09
 {
