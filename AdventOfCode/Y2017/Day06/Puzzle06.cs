@@ -1,5 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System.Linq;
 
 namespace AdventOfCode.Y2017.Day06
@@ -19,13 +20,13 @@ namespace AdventOfCode.Y2017.Day06
 
 		protected override int Part1(string[] input)
 		{
-			var banks = input[0].Split('\t').Select(int.Parse).ToArray();
+			var banks = input[0].AsIntArray();
 			return FindFirstCycle(banks);
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var banks = input[0].Split('\t').Select(int.Parse).ToArray();
+			var banks = input[0].AsIntArray();
 			
 			// Find the id to look for, the first bank of the cycle
 			FindFirstCycle(banks);
