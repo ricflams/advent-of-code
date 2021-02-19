@@ -28,9 +28,9 @@ namespace AdventOfCode.Helpers
 			public T Value { get; set; }
 			public HashSet<Vertex> Edges { get; } = new HashSet<Vertex>();
 
-			// Always present, for ease-of-use in graph-searches
-			public int Distance { get; set; }
-			public bool Visited { get; set; }
+			// // Always present, for ease-of-use in graph-searches
+			// public int Distance { get; set; }
+			// public bool Visited { get; set; }
 
 			public override string ToString() => Value?.ToString() ?? "";
 		}
@@ -79,6 +79,22 @@ namespace AdventOfCode.Helpers
 			return Vertices[value];
 		}
 
+		public Vertex[] VerticesReachableFrom(Vertex v0)
+		{
+			var visited = new Dictionary<T, Vertex>();
+			var queue = new Queue<Vertex>();
+			queue.Enqueue(v0);
+			while (queue.Any())
+			{
+				var v = queue.Dequeue();
+				visited[v.Value] = v;
+				foreach (var e in v.Edges.Where(e => !visited.ContainsKey(e.Value)))
+				{
+					queue.Enqueue(e);
+				}
+			}
+			return visited.Values.ToArray();
+		}
 
 	}
 
