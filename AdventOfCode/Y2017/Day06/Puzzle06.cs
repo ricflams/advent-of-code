@@ -20,13 +20,13 @@ namespace AdventOfCode.Y2017.Day06
 
 		protected override int Part1(string[] input)
 		{
-			var banks = input[0].AsIntArray();
+			var banks = input[0].ToIntArray();
 			return FindFirstCycle(banks);
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var banks = input[0].AsIntArray();
+			var banks = input[0].ToIntArray();
 			
 			// Find the id to look for, the first bank of the cycle
 			FindFirstCycle(banks);

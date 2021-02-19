@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,7 @@ namespace AdventOfCode.Y2016.Day03
 			var valid = input
 				.Where(line => 
 				{
-					var side = line
-						.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-						.Select(int.Parse)
+					var side = line.ToIntArray()
 						.OrderBy(x => x)
 						.ToArray();
 					return side[0] + side[1] > side[2];
@@ -41,10 +40,7 @@ namespace AdventOfCode.Y2016.Day03
 			var tv3 = new TriangleValidator();
 			foreach (var line in input)
 			{
-				var side = line
-					.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-					.Select(int.Parse)
-					.ToArray();
+				var side = line.ToIntArray();
 				tv1.AddSide(side[0]);
 				tv2.AddSide(side[1]);
 				tv3.AddSide(side[2]);

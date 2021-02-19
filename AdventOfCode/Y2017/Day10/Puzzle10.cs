@@ -21,7 +21,7 @@ namespace AdventOfCode.Y2017.Day10
 		protected override int Part1(string[] input)
 		{
 			var N = input[0].RxMatch("size:%d").Get<int>();
-			var lengths = input[1].AsIntArray();
+			var lengths = input[1].ToIntArray();
 
 			var pos = 0;
 			var skip = 0;

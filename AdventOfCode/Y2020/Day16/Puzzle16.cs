@@ -1,5 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System.Linq;
 
 
@@ -47,10 +48,10 @@ namespace AdventOfCode.Y2020.Day16
 					};
 				})
 				.ToArray();
-			var yourTicket = parts[1][1].Split(",").Select(int.Parse).ToArray();
+			var yourTicket = parts[1][1].ToIntArray();
 			var otherTickets = parts[2]
 				.Skip(1)
-				.Select(x => x.Split(",").Select(int.Parse).ToArray())
+				.Select(x => x.ToIntArray())
 				.ToArray();
 			return (fields, yourTicket, otherTickets);
 		}

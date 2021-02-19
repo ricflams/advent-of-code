@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System.Linq;
 
 namespace AdventOfCode.Y2020.Day15
@@ -24,13 +25,13 @@ namespace AdventOfCode.Y2020.Day15
 
 		protected override int Part1(string[] input)
 		{
-			var seq = input[0].Split(",").Select(int.Parse).ToArray();
+			var seq = input[0].ToIntArray();
 			return LastSpokenNumber(seq, 2020);
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var seq = input[0].Split(",").Select(int.Parse).ToArray();
+			var seq = input[0].ToIntArray();
 			return LastSpokenNumber(seq, 30000000);
 		}
 

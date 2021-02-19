@@ -43,5 +43,10 @@ namespace AdventOfCode.Helpers.Strings
 			return temp;
 		}
 
+		private static readonly char[] IntArraySep = new char[] { ' ', '\t', ',' };
+		public static int[] ToIntArray(this string s)
+		{
+			return s.Split(IntArraySep, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+		}
     }
 }

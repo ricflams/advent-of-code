@@ -1,5 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
+using AdventOfCode.Helpers.Strings;
 using System;
 using System.Linq;
 
@@ -47,9 +48,8 @@ namespace AdventOfCode.Y2017.Day02
 
 		private static int[][] ReadSheet(string[] input)
 		{
-			var sep = new char[] {' ', '\t'};
 			var sheet = input
-				.Select(line => line.Split(sep, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray())
+				.Select(line => line.ToIntArray())
 				.ToArray();
 			return sheet;
 		}
