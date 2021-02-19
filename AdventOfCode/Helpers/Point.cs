@@ -141,6 +141,13 @@ namespace AdventOfCode.Helpers
 			return Math.Abs(X - pos.X) + Math.Abs(Y - pos.Y);
 		}
 
+		public int DiagonalDistanceTo(Point pos)
+		{
+			var dx = Math.Abs(X - pos.X);
+			var dy = Math.Abs(Y - pos.Y);
+			return Math.Max(dx, dy);
+		}
+
 		public Point RotateRight(int angle)
 		{
 			switch (angle)
