@@ -1,6 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.Strings;
+using AdventOfCode.Helpers.String;
 using System.Linq;
 
 

@@ -2,7 +2,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System.Collections.Generic;
 using System.Linq;
-using AdventOfCode.Helpers.Strings;
+using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2017.Day12
 {

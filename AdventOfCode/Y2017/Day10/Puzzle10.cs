@@ -1,7 +1,7 @@
 using System.Linq;
 using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.Strings;
+using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2017.Day10
 {

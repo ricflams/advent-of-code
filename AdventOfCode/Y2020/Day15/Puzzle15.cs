@@ -1,5 +1,5 @@
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.Strings;
+using AdventOfCode.Helpers.String;
 using System.Linq;
 
 namespace AdventOfCode.Y2020.Day15
