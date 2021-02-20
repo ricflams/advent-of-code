@@ -35,7 +35,8 @@ namespace AdventOfCode.Y2017.Day12
 			var graph = new Graph(input);
 
 			// Pick out vertice-clusters, group by group, adding all the group's vertices
-			// to one big common seen-set to eventually there are none left unseen.
+			// to one big common seen-set until eventually there are none left unseen,
+			// while counting each group.
 			var n = 0;
 			var seen = new HashSet<int>();
 			while (true)
