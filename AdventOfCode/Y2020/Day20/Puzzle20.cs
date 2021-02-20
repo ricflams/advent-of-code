@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
@@ -181,7 +182,7 @@ namespace AdventOfCode.Y2020.Day20
 					b = (b << 1) + (_map[y][0] == '#' ? 1U : 0);
 					d = (d << 1) + (_map[y][Dim - 1] == '#' ? 1U : 0);
 				}
-				uint inv(ulong x) => (uint)MathHelper.ReverseBits(x, Dim);
+				uint inv(ulong x) => (uint)x.ReverseBits(Dim);
 				uint ai = inv(a), bi = inv(b), ci = inv(c), di = inv(d);
 				// Only include Rotated and Flipped; that's enough to do everything
 				Variants = new[]

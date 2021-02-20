@@ -1,11 +1,8 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day17
 {

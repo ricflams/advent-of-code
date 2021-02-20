@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
 
@@ -64,7 +65,7 @@ namespace AdventOfCode.Y2016.Day13
 				{
 					// x*x + 3*x + 2*x*y + y + y*y
 					var n = x*x + 3*x + 2*x*y + y + y*y;
-					var bits = MathHelper.NumberOfSetBits((uint)(n + favorite));
+					var bits = ((uint)(n + favorite)).NumberOfSetBits();
 					map[x][y] = bits%2 == 1 ? '#' : '.';
 				}
 			}

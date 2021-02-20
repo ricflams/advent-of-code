@@ -1,4 +1,5 @@
 using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
 

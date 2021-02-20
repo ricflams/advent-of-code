@@ -1,5 +1,5 @@
 using System.Linq;
-using AdventOfCode.Helpers;
+using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.Strings;
 
@@ -46,7 +46,7 @@ namespace AdventOfCode.Y2017.Day10
 		{
 			var message = input[0];
 			var hash = Common.KnotHash.Hash(message);
-			return MathHelper.FormatAsHex(hash);
+			return hash.FormatAsHex();
 		}
 	}
 }
