@@ -85,8 +85,11 @@ namespace AdventOfCode.Y2017.Day16
 			public void Step(char[] s)
 			{
 				// Spin, written sX, makes X programs move from the end to the front
-				var tmp = s[^_x..].Concat(s[..^_x]).ToArray();
-				Array.Copy(tmp, s, s.Length);
+				var s0 = s.ToArray();
+				for (var i = 0; i < s.Length; i++)
+				{
+					s[i] = s0[(i - _x + s.Length) % s.Length];
+				}
 			}
 		}
 		internal class Exchange : IMove
