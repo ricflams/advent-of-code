@@ -6,6 +6,10 @@ namespace AdventOfCode.Helpers
 {
     public static class CharMatrix
     {
+        public static int Width(this char[,] mx) => mx.GetLength(0);
+        public static int Height(this char[,] mx) => mx.GetLength(1);
+        public static (int, int) Dim(this char[,] mx) => (mx.Width(), mx.Height());
+
 		public static char[,] Create(int w, int h, char defaultChar)
 		{
 			var map = new char[w, h];
@@ -36,8 +40,7 @@ namespace AdventOfCode.Helpers
 
 		public static string[] ToStringArray(this char[,] mx)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			return Enumerable.Range(0, h)
 				.Select(y => new string(Enumerable.Range(0, w).Select(x => mx[x,y]).ToArray()))
@@ -46,8 +49,7 @@ namespace AdventOfCode.Helpers
 
         public static char[,] RotateClockwise(this char[,] mx, int angle)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			Func<int, int, (int, int)> rotate = (int x, int y) => (x, y);
 
@@ -84,8 +86,7 @@ namespace AdventOfCode.Helpers
 
 		public static char[,] FlipV(this char[,] mx)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			var flipped = new char[w, h];
 			for (var x = 0; x < w; x++)
@@ -100,8 +101,7 @@ namespace AdventOfCode.Helpers
 
 		public static char[,] FlipH(this char[,] mx)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			var flipped = new char[w, h];
 			for (var x = 0; x < w; x++)
@@ -116,8 +116,7 @@ namespace AdventOfCode.Helpers
 
 		public static void ShiftRowRight(this char[,] mx, int row, int n)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			n = (n % w + w) % w; // normalized n % w
 			if (n == 0)
@@ -138,8 +137,7 @@ namespace AdventOfCode.Helpers
 
 		public static void ShiftColDown(this char[,] mx, int col, int n)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			n = (n % h + h) % h; // normalized n % w
 			if (n == 0)
@@ -160,8 +158,8 @@ namespace AdventOfCode.Helpers
 
 		public static char[,] ExpandBy(this char[,] mx, int n, char defaultChar)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
+
 			var expanded = new char[w + 2*n, h + 2*n];
 			for (var x = 0; x < w + 2*n; x++)
 			{
@@ -195,8 +193,7 @@ namespace AdventOfCode.Helpers
 
 		public static IEnumerable<Point> PositionsOf(this char[,] mx, char searchFor)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			for (var x = 0; x < w; x++)
 			{
@@ -214,8 +211,7 @@ namespace AdventOfCode.Helpers
 
 		public static void ConsoleWrite(this char[,] mx)
 		{
-			var w = mx.GetLength(0);
-			var h = mx.GetLength(1);
+			var (w, h) = mx.Dim();
 
 			Console.Write('\\');
 			for (var x = 0; x < w; x++)
