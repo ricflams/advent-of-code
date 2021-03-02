@@ -64,4 +64,22 @@ namespace AdventOfCode.Y2016.Day01
 			throw new Exception("No solution");
 		}
 	}
+
+	internal static class Extensions
+	{
+		public static void Turn(this PointWithDirection p, char ch)
+		{
+			switch (ch)
+			{
+				case 'R':
+					p.TurnRight();
+					break;
+				case 'L':
+					p.TurnLeft();
+					break;
+				default:
+					throw new Exception($"Unknown turn {ch}");
+			}
+		}
+	}
 }

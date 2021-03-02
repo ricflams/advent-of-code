@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace AdventOfCode.Helpers
 {
@@ -50,20 +50,6 @@ namespace AdventOfCode.Helpers
 				TurnRight();
 			else
 				TurnLeft();
-		}
-		public void Turn(char ch)
-		{
-			switch (ch)
-			{
-				case 'R':
-					TurnRight();
-					break;
-				case 'L':
-					TurnLeft();
-					break;
-				default:
-					throw new Exception($"Unknown turn {ch}");
-			}
 		}
 
 		public void RotateRight(int angle) => Direction = Direction.RotateRight(angle);
