@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace AdventOfCode.Helpers
 {
@@ -42,8 +42,14 @@ namespace AdventOfCode.Helpers
 		public void Move(char ch) => Point = Point.Move(ch);
 		public void Move(Point vector, int factor = 1) => Point = Point.Move(vector, factor);
 
+		public Point PeekRight => Point.Move(Direction.TurnRight());
+		public Point PeekLeft => Point.Move(Direction.TurnLeft());
+		public Point PeekAhead => Point.Move(Direction);
+		public Point PeekBehind => Point.Move(Direction.TurnAround());
+		
 		public void TurnRight() => Direction = Direction.TurnRight();
 		public void TurnLeft() => Direction = Direction.TurnLeft();
+		public void TurnAround() => Direction = Direction.TurnAround();
 		public void Turn(DirectionTurn turn)
 		{
  			if (turn == DirectionTurn.Right)
