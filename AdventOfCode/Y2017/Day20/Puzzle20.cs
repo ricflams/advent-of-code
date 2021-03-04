@@ -2,182 +2,80 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2017.Day20
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		public override string Name => "";
+		public override string Name => "Particle Swarm";
 		public override int Year => 2017;
 		public override int Day => 20;
 
 		public void Run()
 		{
-			//RunFor("test1", 0, 0);
-			//RunPart2For("test2", 3);
-			RunFor("input", 0, 0);
+			RunPart1For("test1", 0);
+			RunPart2For("test2", 1);
+			RunFor("input", 119, 471);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var ps = ReadParticles(input);
-			// for (var n = 1; n < 1000; n++)
-			// {
-			// 	var p = ps.OrderBy(p => p.Step(n).Dist).First();
-			// 	Console.WriteLine($"{n}: {p.Id}");
-			// }
-			// for (var n = 1; n < int.MaxValue/10; n *= 10)
-			// {
-			// 	var p = ps.OrderBy(p => p.Step(n).Dist).First();
-			// 	Console.WriteLine(p.Id);
-			// }
+			var particles = ReadParticles(input);
 
+			// Just pick a large number of steps;
+			// above 1000 seems to do it, so we pick 10000
+			var step = 10000;
+			var closest = particles.OrderBy(p => p.Step(step).Dist).First();
 
-			return 0;
+			return closest.Id;
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var ps = ReadParticles(input);
-			var collisions = new bool[ps.Length];
+			var particles = ReadParticles(input);
 
-			for (var i = 0; i < ps.Length; i++)
+			// Loop all pairs of particles and find out at what step, if any,
+			// they collide. This will give a list of collidin particles at every
+			// step where there are any collisions at all.
+			var collisionsAtStep = new SafeDictionary<int, HashSet<int>>(() => new HashSet<int>());
+			for (var i = 0; i < particles.Length; i++)
 			{
-				var cols = ps.Skip(i+1)
-					.Select(p2 =>
-					{
-						var n = ps[i].WillCollideWith(p2);
-						return (p2, n);
-					})
-					.Where(x => x.n.HasValue)
-					.ToArray();
-
-				if (cols.Any())
+				for (var j = i + 1; j < particles.Length; j++)
 				{
-					Console.WriteLine($"{i}: will colllide with:");
-					foreach (var c in cols)
+					var n = particles[i].CollisionAt(particles[j]);
+					if (n > 0)
 					{
-						Console.WriteLine($"   {c.p2.Id} after step={c.n.Value}");
+						collisionsAtStep[n].Add(i);
+						collisionsAtStep[n].Add(j);
 					}
 				}
 			}
 
-			var uncollided = collisions.Count(x => !x);
+			// Now go through the steps for which there are collisions, starting
+			// from the smallest as a real simulation would do. At every such step
+			// we look at what particles have not yet been destroyed; if two or more
+			// particles are still present at this step then they are both destroyed,
+			// byt if only one is still undestroyed at this step it will remain. At
+			// the end of this, all destroyed particles will have been placed in the
+			// destroyed-collection.
+			var destroyed = new HashSet<int>();
+			foreach (var n in collisionsAtStep.Keys.OrderBy(x => x))
+			{
+				var remains = collisionsAtStep[n].Except(destroyed).ToArray();
+				if (remains.Count() > 1)
+				{
+					destroyed.UnionWith(remains);
+				}
+			}
 
-
-
+			// The number of particles left are those that weren't destroyed
+			var uncollided = particles.Length - destroyed.Count();
 
 			return uncollided;
 		}
 
-		internal class Particle
-		{
-			internal class Pos
-			{
-				 public Pos(long x, long y, long z) => (X, Y, Z) = (x, y, z);
-				 public long X, Y, Z;
-				 public long Dist => Math.Abs(X) + Math.Abs(Y) + Math.Abs(Z);
-				 public static Pos operator +(Pos a, Pos b) => new Pos(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-				 public static Pos operator -(Pos a, Pos b) => new Pos(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
-				 public static Pos operator *(int n, Pos a) => new Pos(a.X * n, a.Y * n, a.Z * n);
-			}
-			public int Id { get; set; }
-			public Pos P { get; set; }
-			public Pos V { get; set; }
-			public Pos A { get; set; }
-
-			public Pos Step(int n) => P + n*V + n*(n+1)/2 * A;
-
-			public int? WillCollideWith(Particle p)
-			{
-				var nx = Collisions(P.X, V.X, A.X, p.P.X, p.V.X, p.A.X);
-				var ny = Collisions(P.Y, V.Y, A.Y, p.P.Y, p.V.Y, p.A.Y);
-				var nz = Collisions(P.Z, V.Z, A.Z, p.P.Z, p.V.Z, p.A.Z);
-
-				if ((nx?.Any()??true) && (ny?.Any()??true) && (nz?.Any()??true))
-				{
-
-				}
-
-				var ps = nx ?? ny ?? nz;
-				if (ps == null)
-				{
-					// Same position!
-					throw new Exception("Same position");
-					return null;
-				}
-				if (nx != null) ps = ps.Intersect(nx).ToArray();
-				if (ny != null) ps = ps.Intersect(ny).ToArray();
-				if (nz != null) ps = ps.Intersect(nz).ToArray();
-
-				var collisions = ps;
-
-				if (collisions.Any())
-				{
-					// Got it! Check
-					foreach (var n in collisions)
-					{
-						var p1 = Step(n);
-						var p2 = p.Step(n);
-						var collide = p1.X == p2.X && p1.Y == p2.Y && p1.Z == p2.Z;
-						if (!collide)
-							throw new Exception("No collision");
-					}
-					return collisions.Min();
-				}
-				return null;
-
-				static int[] Collisions(long ap, long av, long aa, long bp, long bv, long ba)
-				{
-					if (aa==ba && av==bv && ap==bp)
-						return null;
-					return PotentialCollisions().Where(x => x > 0).Select(x => (int)x).ToArray();
-					IEnumerable<long> PotentialCollisions()
-					{
-						if (aa == ba)
-						{
-							// 1st degree equation, only solveable for av!=bv
-							if (av != bv)
-							{
-								if ((bp - ap) % (av - bv) == 0)
-									yield return (bp - ap) / (av - bv);
-							}
-						}
-						else
-						{
-							// 2nd degree equation
-							var a = aa - ba;
-							var b = 2*(av - bv) + (aa - ba);
-							var c = 2*(ap - bp) + (aa - ba);
-							var d = b*b - 4*a*c;
-							if (d == 0)
-							{
-								if (b % (2*a) == 0)
-									yield return -b / (2*a);
-							}
-							else
-							{
-								var droot = Math.Sqrt(d);
-								if (droot == (int)droot) // non-integer discriminants can never yield a whole number
-								{
-									var d2 = (int)droot;
-									if ((-b + d2) % (2*a) == 0)
-										yield return (-b + d2) / (2*a);
-									if ((-b - d2) % (2*a) == 0)
-										yield return (-b - d2) / (2*a);
-								}
-							}
-						}
-					}
-				}
-
-			}
-		}
 
 		public static Particle[] ReadParticles(string[] input)
 		{
@@ -199,7 +97,118 @@ namespace AdventOfCode.Y2017.Day20
 					};
 				})
 				.ToArray();
+		}
 
+		internal class Particle
+		{
+			internal class Pos
+			{
+				 public Pos(long x, long y, long z) => (X, Y, Z) = (x, y, z);
+				 public long X, Y, Z;
+				 public long Dist => Math.Abs(X) + Math.Abs(Y) + Math.Abs(Z);
+				 public static Pos operator +(Pos a, Pos b) => new Pos(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+				 public static Pos operator *(int n, Pos a) => new Pos(a.X * n, a.Y * n, a.Z * n);
+			}
+			public int Id { get; set; }
+			public Pos P { get; set; }
+			public Pos V { get; set; }
+			public Pos A { get; set; }
+
+			public Pos Step(int n) => P + n * V + n*(n+1)/2 * A;
+
+			public int CollisionAt(Particle p)
+			{
+				// Find all collisions for all three x,y,z dimensions
+				var nx = DimensionCollisions(P.X, V.X, A.X, p.P.X, p.V.X, p.A.X);
+				var ny = DimensionCollisions(P.Y, V.Y, A.Y, p.P.Y, p.V.Y, p.A.Y);
+				var nz = DimensionCollisions(P.Z, V.Z, A.Z, p.P.Z, p.V.Z, p.A.Z);
+
+				// Find out which collisions happens at the same time. A null result
+				// means "is always the same" (ie the particles follow the exact same
+				// path in that dimension; yes, that happens) ie no restrictions.
+				var ps = nx ?? ny ?? nz;
+				if (ps == null)
+				{
+					// No collisions in ANY dimension? This will only happen for particles
+					// that are exactly the same in all 3 dimensions and there are none of
+					// those in the input.
+					throw new Exception("No collisions in any dimension");
+				}
+				if (nx != null) ps.IntersectWith(nx);
+				if (ny != null) ps.IntersectWith(ny);
+				if (nz != null) ps.IntersectWith(nz);
+
+				// Get earliest collision in all dimensions, if any; 0 means none
+				return ps.Any() ? ps.Min() : 0;
+
+				static HashSet<int> DimensionCollisions(long p0, long v0, long a0, long p1, long v1, long a1)
+				{
+					// If tow two particles follow the exact same path in this
+					// dimension then they will match at any step; return null
+					if (a1 == a0 && v1 == v0 && p1 == p0)
+						return null;
+
+					// Find all solutions to the collision-equation that are positive, whole steps
+					return SolveCollisionEquation()
+						.Where(x => x > 0 && x == (int)x)
+						.Select(x => (int)x)
+						.ToHashSet();
+
+					IEnumerable<double> SolveCollisionEquation()
+					{
+						// The step-equation for a particle is:
+						//    Pn = P + V*n + n*(n+1)/2 * A
+						//       = P + V*n + A/2*n^2 + A/2*n
+						//       = A/2*n^2 + V*n + A/2*n + P
+						//       = (A*n^2 + (2*V+A)*n + 2*P) / 2    // divide by 2 outside is easier
+						//
+						// For two particles P0,P1 to collide, their positions P0n,P1n must be the same.
+						// This leads to a 2nd degree equation for solving n:
+						//      P0n = P1n
+						//  <=> P1n - P0n == 0
+						//  <=> (A1-A0) * n^2 + (2*(V1-V0)+(A1-A0)) * n + 2*(P1-P0) == 0
+						//  <=> an^2 + bn + c == 0, where
+						//          a = (A1-A0)
+						//          b = 2*(V1-V0)+(A1-A0)
+						//          c = 2*(P1-P0)
+						//
+						// In the case where a==0 we're just dealing with a 1st degree equation:
+						//      2*(V1-V0) * n + 2*(P1-P0) == 0
+						//  <=> n = -2*(P1-P0) / 2*(V1-V0)
+						//  <=> n = (P0-P1) / (V1-V0)
+						if (a1 == a0)
+						{
+							// 1st degree equation, unsolveable if v1 == v0
+							if (v1 != v0)
+							{
+								yield return (double)(p0 - p1) / (v1 - v0);
+							}
+						}
+						else
+						{
+							// 2nd degree equation; see above
+							var a = a1 - a0;
+							var b = 2*(v1 - v0) + (a1 - a0);
+							var c = 2*(p1 - p0);
+							var d = b*b - 4*a*c;
+							if (d == 0) // only 1 solution
+							{
+								yield return (double)-b / (2*a);
+							}
+							else // 2 solutions
+							{
+								var droot = Math.Sqrt(d);
+								if (droot == (int)droot) // only integer discriminants can yield a whole number
+								{
+									var dint = (int)droot;
+									yield return (double)(-b + dint) / (2*a);
+									yield return (double)(-b - dint) / (2*a);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
