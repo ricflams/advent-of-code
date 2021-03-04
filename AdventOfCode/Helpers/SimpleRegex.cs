@@ -65,6 +65,9 @@ namespace AdventOfCode.Helpers
 			public (T1, T2, T3, T4) Get<T1, T2, T3, T4>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>());
 			public (T1, T2, T3, T4, T5) Get<T1, T2, T3, T4, T5>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>(), Get<T5>());
 			public (T1, T2, T3, T4, T5, T6) Get<T1, T2, T3, T4, T5, T6>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>(), Get<T5>(), Get<T6>());
+			public (T1, T2, T3, T4, T5, T6, T7) Get<T1, T2, T3, T4, T5, T6, T7>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>(), Get<T5>(), Get<T6>(), Get<T7>());
+			public (T1, T2, T3, T4, T5, T6, T7, T8) Get<T1, T2, T3, T4, T5, T6, T7, T8>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>(), Get<T5>(), Get<T6>(), Get<T7>(), Get<T8>());
+			public (T1, T2, T3, T4, T5, T6, T7, T8, T9) Get<T1, T2, T3, T4, T5, T6, T7, T8, T9>() => (Get<T1>(), Get<T2>(), Get<T3>(), Get<T4>(), Get<T5>(), Get<T6>(), Get<T7>(), Get<T8>(), Get<T9>());
 		}
 
 		private static bool IsMatch(string input, string pattern, out string[] val)
