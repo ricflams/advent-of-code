@@ -178,6 +178,48 @@ namespace AdventOfCode.Helpers
 			return expanded;
 		}
 
+		public static char[,] CopyPart(this char[,] mx, int x, int y, int w, int h)
+		{
+			var part = new char[w, h];
+
+			for (var i = 0; i < w; i++)
+			{
+				for (var j = 0; j < h; j++)
+				{
+					part[i, j] = mx[x + i, y + j];
+				}
+			}
+			return part;
+		}
+
+		public static void PastePart(this char[,] mx, int x, int y, char[,] part)
+		{
+			var (w, h) = part.Dim();
+			for (var i = 0; i < w; i++)
+			{
+				for (var j = 0; j < h; j++)
+				{
+					mx[x + i, y + j] = part[i, j];
+				}
+			}
+		}
+
+		public static bool Match(this char[,] mx, int x, int y, char[,] part)
+		{
+			var (w, h) = part.Dim();
+			for (var i = 0; i < w; i++)
+			{
+				for (var j = 0; j < h; j++)
+				{
+					if (part[i, j] != mx[x + i, y + j])
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
 		public static int CountChar(this char[,] mx, char searched)
 		{
 			var count = 0;
