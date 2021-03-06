@@ -1,25 +1,19 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2017.Day21
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		public override string Name => "";
+		public override string Name => "Fractal Art";
 		public override int Year => 2017;
 		public override int Day => 21;
 
 		public void Run()
 		{
-			//RunFor("test1", 0, 0);
-			//RunFor("test2", 0, 0);
 			RunFor("input", 147, 1936582);
 		}
 
@@ -36,63 +30,52 @@ namespace AdventOfCode.Y2017.Day21
 		private static int FindPixelsOnAfter(string[] input, int steps)
 		{
 			var mappings = new Enhancements(input);
-			var pat = ".#./..#/###".Split('/').ToCharMatrix();
+			var pattern = ".#./..#/###".Split('/').ToCharMatrix();
 
 			for (var loop = 0; loop < steps; loop++)
 			{
-				var w = pat.Width();
+				var w = pattern.Width();
 				var dim = w % 2 == 0 ? 2 : 3;
 				var newdim = dim + 1;
 				var n = w / dim; // n is number of new squares across or down (same number)
-				var pat2 = new char[n*newdim, n*newdim];
+				var nextPattern = new char[n*newdim, n*newdim];
 				for (var i = 0; i < n; i++)
 				{
 					for (var j = 0; j < n; j++)
 					{
-						var part = pat.CopyPart(i*dim, j*dim, dim, dim);
+						var part = pattern.CopyPart(i*dim, j*dim, dim, dim);
 						var replacement = mappings.Enhance(part);
-						pat2.PastePart(i*newdim, j*newdim, replacement);
+						nextPattern.PastePart(i*newdim, j*newdim, replacement);
 					}
 				}
-				pat = pat2;
-				var on0 = pat.CountChar('#');
-				Console.WriteLine($"on={on0}");
+				pattern = nextPattern;
 			}
 
-			var on = pat.CountChar('#');
-
-
-			return on;
+			var pixelsOn = pattern.CountChar('#');
+			return pixelsOn;
 		}
 
 
 		internal class Enhancements
 		{
-			private readonly Dictionary<string, Enhancement> _rules;
+			private readonly Dictionary<string, char[,]> _rules;
 
 			public Enhancements(string[] input)
 			{
-				_rules = input
-					.Select(x => new Enhancement(x))
-					.ToDictionary(x => x.From, x => x);
+				_rules = new Dictionary<string, char[,]>();
+				foreach (var e in input.Select(x => new Enhancement(x)))
+				{
+					foreach (var from in e.Froms)
+					{
+						_rules[from] = e.To;
+					}
+				}
 			}
 
 			public char[,] Enhance(char[,] from)
 			{
-				for (var angle = 0; angle < 360; angle += 90)
-				{
-					var pat = from.RotateClockwise(angle);
-					var enhance = TryEnhance(pat) ?? TryEnhance(pat.FlipV());
-					if (enhance != null)
-						return enhance;
-				}
-				throw new Exception($"No enhancement");
-
-				char[,] TryEnhance(char[,] from)
-				{
-					var flat = string.Join('/', from.ToStringArray());
-					return _rules.TryGetValue(flat, out var e) ? e.To : null;
-				}
+				var flat = string.Join('/', from.ToStringArray());
+				return _rules[flat];
 			}
 		}
 
@@ -103,14 +86,21 @@ namespace AdventOfCode.Y2017.Day21
 				// ##/## => .##/#../##.
 				// .../.../... => .#.#/###./##.#/###.
 				var parts = def.Split(" => ");
-				From = parts[0];
+				Dim = parts[0].Length == 5 ? 2 : 3;
+				var from = parts[0].Split('/').ToCharMatrix();
 				To = parts[1].Split('/').ToCharMatrix();
-				Dim = From.Length == 5 ? 2 : 3;
+				var froms = new List<string>();
+				for (var angle = 0; angle < 360; angle += 90)
+				{
+					var pat = from.RotateClockwise(angle);
+					froms.Add(string.Join('/', pat.ToStringArray()));
+					froms.Add(string.Join('/', pat.FlipV().ToStringArray()));
+				}
+				Froms = froms.ToArray();
 			}
 			public int Dim { get; }
-			public string From { get; }
+			public string[] Froms { get; }
 			public char[,] To { get; }
 		}
-
 	}
 }
