@@ -1,13 +1,7 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
-using System.Collections.Concurrent;
-using System.Threading;
 
 namespace AdventOfCode.Y2017.Day23
 {
@@ -20,9 +14,6 @@ namespace AdventOfCode.Y2017.Day23
 
 		public void Run()
 		{
-			//RunPart2For("test1", 0);
-			//RunFor("test1", 0, 0);
-			//RunFor("test2", 0, 0);
 			RunFor("input", 4225, 905);
 		}
 
@@ -35,58 +26,116 @@ namespace AdventOfCode.Y2017.Day23
 
 		protected override long Part2(string[] input)
 		{
-			// var tablet = new Tablet(input);
-			// tablet.Regs['a'] = 1;
-			// tablet.Run();
-			// return tablet.Regs['h'];
+			// 1-1 translation of input into pseudocode:
+			//	b = 67;
+			//	b = (b*100)+100000;
+			//	c = b + 17000
+			//	loop
+			//		f = 1
+			//		d = 2
+			//		do
+			//			e = 2
+			//			do
+			//				g = d
+			//				g *= e
+			//				g -= b
+			//				if (g == 0)
+			//					f = 0
+			//				e++
+			//				g = e-b
+			//			while g != 0
+			//			d++
+			//			g = d-b
+			//		while (g != 0)
+			//		if (f == 0)
+			//			h++
+			//		g = b
+			//		g -= c
+			//		if (g == 0)
+			//			exit
+			//		b += 17
+			//
+			// g is always just used for calculating conditions so
+			// it can be replaced by the calculations themselves. Also,
+			// let's write loops as they would appear for real:
+			//
+			//	while (true)
+			//	{
+			// 		f = 1;
+			//		d = 2;
+			//		do
+			//		{
+			//			e = 2;
+			//			do
+			//			{
+			//				if (d*e == b)
+			//					f = 0;
+			//				e++;
+			//			}
+			//			while (e != b);
+			//			d++;
+			//		}
+			//		while (d != b);
+			//		if (f == 0)
+			//			h++;
+			//		if (b == c)
+			//			break;
+			//		b += 17
+			//	}
+			//
+			// The do-while (e != b) loop simply test for whether b%d == 0 (by
+			// doing e*d==b testing for e-values from 2 to b) so it can be replaced
+			// by a modulus-test. The outer loop is counting up b to c. The inner
+			// loop for d is counting from 2 to b.
+			//
+			//	for (; b <= c; b += 17)
+			//	{
+			// 		f = 1;
+			//		for (var d = 2; d < b; d++)
+			//		{
+			// 			if (b%d == 0)
+			//			{
+			//				f = 0;
+			//				break;
+			//			}
+			//		}
+			//		if (f == 0)
+			//			h++;
+			//	}
+			//
+			// The test-flag f isn't necessary. Algorithmically, d doesn't need to
+			// count all the way up to b but only to sqrt(b).
+			//
+			//	for (; b <= c; b += 17)
+			//	{
+			//		for (var d = 2; d*d <= b; d++)
+			//		{
+			// 			if (b%d == 0)
+			//			{
+			//				h++;
+			//				break;
+			//			}
+			//		}
+			//	}
 
-
-			var d = 0;
-			var e = 0;
-			var f = 0;
+			var b = input[0].RxMatch("set b %d").Get<int>();
+			
+			b = (b*100)+100000;
+			var c = b + 17000;
 			var h = 0;
-			for (var b = 100000+6700; b <= 100000+6700+17000; b += 17)
+			for (; b <= c; b += 17)
 			{
-				f = 1;
-				d = 2;
-				do
+				for (var d = 2; d*d <= b; d++)
 				{
-
-					// e = 2;
-					// do
-					// {
-					// 	if (d*e == b)
-					// 	{
-					// 		f = 0;
-					// 	}
-					// 	e++;
-					// }
-					// while (e != b);
-
-					if (b%d == 0)
+					if (b % d == 0)
 					{
-						f = 0;
+						h++;
 						break;
 					}
-
-
-
-					d++;
-				}
-				while (d != b);
-				if (f == 0)
-				{
-					h++;
 				}
 			}
-
 			return h;
-
 		}
-
-// 925  too high
-// 904 too low
-
 
 		public class Tablet
 		{
@@ -95,7 +144,7 @@ namespace AdventOfCode.Y2017.Day23
 
 			public SafeDictionary<char, long> Regs = new SafeDictionary<char, long>();
 
-			public bool Halt { get; set; }
+			public long MulCount { get; private set; }
 
 			public Tablet(string[] code)
 			{
@@ -109,26 +158,9 @@ namespace AdventOfCode.Y2017.Day23
 							// sub X Y decreases register X by the value of Y.
 							// mul X Y sets register X to the result of multiplying the value contained in register X by the value of Y.
 							// jnz X Y jumps with an offset of the value of Y, but only if the value of X is not zero. (An offset of 2 skips the next instruction, an offset of -1 jumps to the previous instruction, and so on.)
-
-							// // snd X plays a sound with a frequency equal to the value of X.
-							// // set X Y sets register X to the value of Y.
-							// // add X Y increases register X by the value of Y.
-							// // mul X Y sets register X to the result of multiplying the value contained in register X by the value of Y.
-							// // mod X Y sets register X to the remainder of dividing the value contained in register X by the value of Y (that is, it sets X to the result of X modulo Y).
-							// // rcv X recovers the frequency of the last sound played, but only when the value of X is not zero. (If it is zero, the command does nothing.)
-							// // jgz X Y jumps with an offset of the value of Y, but only if the value of X is greater than zero. (An offset of 2 skips the next instruction, an offset of -1 jumps to the previous instruction, and so on.)
-							// //
-							// // Part 2:
-							// // snd X sends the value of X to the other program.
-							// // rcv X receives the next value and stores it in register X.
-							//"snd" => new Ins(OpCode.Snd, GetOp(p[1])),
 							"set" => new Ins(OpCode.Set, GetOp(p[1]), GetOp(p[2])),
 							"sub" => new Ins(OpCode.Sub, GetOp(p[1]), GetOp(p[2])),
-							// "add" => new Ins(OpCode.Add, GetOp(p[1]), GetOp(p[2])),
 							"mul" => new Ins(OpCode.Mul, GetOp(p[1]), GetOp(p[2])),
-							// "mod" => new Ins(OpCode.Mod, GetOp(p[1]), GetOp(p[2])),
-							// "rcv" => new Ins(OpCode.Rcv, GetOp(p[1])),
-							//"jgz" => new Ins(OpCode.Jgz, GetOp(p[1]), GetOp(p[2])),
 							"jnz" => new Ins(OpCode.Jnz, GetOp(p[1]), GetOp(p[2])),
 							_ => throw new Exception($"Unknown instruction {p[0]}")
 						};
@@ -159,39 +191,13 @@ namespace AdventOfCode.Y2017.Day23
 			private long ValueOf(Operand op) => op.IsRegister ? Regs[(char)op.Value] : op.Value;
 			private char Reg(Operand op) => (char)op.Value;
 
-			public long MulCount { get; private set; }
-
 			public void Run()
 			{
 				MulCount = 0;
 				_ip = 0;
 
-				// Regs['a'] = 0;
-				// Regs['b'] = 0;
-				// Regs['c'] = 0;
-				// Regs['d'] = 0;
-				// Regs['e'] = 0;
-				// Regs['f'] = 0;
-				// Regs['g'] = 0;
-				// Regs['h'] = 0;
-
-				// var states = new HashSet<string>();
-
-
-
-				while (_ip >= 0 && _ip < _code.Length && !Halt)
+				while (_ip < _code.Length)
 				{
-					// var state = $"{_ip}:{string.Join(',', Regs.OrderBy(x=>x.Key).Select(x=>x.Value))}";
-					// Console.WriteLine(state);
-					// if (states.Contains(state))
-					// {
-					// 	//break;
-					// }
-					// states.Add(state);
-
-
-
-
 					var ins = _code[_ip];
 					var ops = ins.Ops;
 					switch (ins.OpCode)
@@ -210,12 +216,9 @@ namespace AdventOfCode.Y2017.Day23
 							if (ValueOf(ops[0]) != 0)
 							{
 								var offset = (int)ValueOf(ops[1]);
-								//_ip = (_ip + offset + _code.Length) % _code.Length;
-								//_ip--;
 								_ip += offset - 1;
 							}
 							break;
-
 						default:
 							throw new Exception($"Unhandled opcode {ins.OpCode}");
 					}
@@ -231,8 +234,9 @@ namespace AdventOfCode.Y2017.Day23
 
 #if false
 
-b = 100067
-c = 117067
+b = 67;
+b = (b*100)+100000;
+c = b + 17000
 loop
   f = 1
   d = 2
