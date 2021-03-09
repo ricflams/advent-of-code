@@ -1,11 +1,5 @@
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2017.Day24
 {
@@ -19,84 +13,112 @@ namespace AdventOfCode.Y2017.Day24
 		public void Run()
 		{
 			RunFor("test1", 31, 19);
-			//RunFor("test2", 0, 0);
-			RunFor("input", 1656, 0);
+			RunFor("input", 1656, 1642);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var components = ReadComponents(input);
+			var root = ReadComponents(input);
 
-			IEnumerable<Component[]> BuildBridges(int startswith, Component[] comps)
+			// Traverse all bridges to find the highest strength
+			var maxStrength = 0;
+			Traverse(root, 0, 0);
+			return maxStrength;
+
+			void Traverse(Component c, ulong seen, int bridgeStrength)
 			{
-				var fittings = comps.Where(c => c.Fits(startswith)).ToArray();
-				foreach (var f in fittings)
+				var strength = bridgeStrength + c.Strength;
+				if (strength > maxStrength)
 				{
-					yield return new Component[] { f };
-					var endswith = f.Pa == startswith ? f.Pb : f.Pa;
-					var bridges = BuildBridges(endswith, comps.Where(x => x != f).ToArray()).ToArray();
-					foreach (var b in bridges)
+					maxStrength = strength;
+				}
+
+				// Follow the next possible components not yet picked
+				foreach (var next in c.Nexts)
+				{
+					if ((seen & next.Id) == 0)
 					{
-						var bridge = new Component[] { f }.ToList().Concat(b).ToArray();
-						yield return bridge;
+						Traverse(next, seen | next.Id, strength);
 					}
 				}
 			}
-
-			var bridges = BuildBridges(0, components).ToArray();
-			var strengths = bridges.Select(b => b.Sum(x => x.Strength)).Max();
-
-
-			return strengths;
 		}
 
 		protected override int Part2(string[] input)
 		{
+			var root = ReadComponents(input);
 
-			var components = ReadComponents(input);
+			// Traverse all bridges to find the highest strength
+			var maxStrength = 0;
+			var maxLength = 0;
+			Traverse(root, 0, 0, 0);
+			return maxStrength;
 
-			IEnumerable<Component[]> BuildBridges(int startswith, Component[] comps)
+			void Traverse(Component comp, ulong seen, int bridgeLength, int bridgeStrength)
 			{
-				var fittings = comps.Where(c => c.Fits(startswith)).ToArray();
-				foreach (var f in fittings)
+				// If the bridge length is as high or higher than what we've seen
+				// so far then update max strenght if this strength is higher
+				var strength = bridgeStrength + comp.Strength;
+				var length = bridgeLength + 1;
+				if (length >= maxLength)
 				{
-					yield return new Component[] { f };
-					var endswith = f.Pa == startswith ? f.Pb : f.Pa;
-					var bridges = BuildBridges(endswith, comps.Where(x => x != f).ToArray()).ToArray();
-					foreach (var b in bridges)
+					maxLength = length;
+					if (strength > maxStrength)
 					{
-						var bridge = new Component[] { f }.ToList().Concat(b).ToArray();
-						yield return bridge;
+						maxStrength = strength;
+					}
+				}
+
+				// Follow the next possible components not yet picked
+				foreach (var next in comp.Nexts)
+				{
+					if ((seen & next.Id) == 0)
+					{
+						Traverse(next, seen | next.Id, length, strength);
 					}
 				}
 			}
-
-			var bridges = BuildBridges(0, components).ToArray();
-			var maxlen = bridges.Select(b => b.Length).Max();
-			var strength = bridges.Where(b => b.Length == maxlen).Select(b => b.Sum(x => x.Strength)).Max();
-
-
-			return strength;
 		}
 
 		internal class Component
 		{
-			public Component(int a, int b) => (Pa, Pb) = (a, b);
-			public int Pa { get; set;}
-			public int Pb { get; set;}
-			public int Strength => Pa + Pb;
-			public bool Fits(int x )=> x == Pa || x ==  Pb;
+			public Component(ulong id, int portI, int portO, int strength)
+				=> (Id, PortI, PortO, Strength) = (id, portI, portO, strength);
+			public ulong Id { get; }
+			public int PortI { get; }
+			public int PortO { get; }
+			public int Strength { get; }
+			public Component[] Nexts { get; set; }
 		}
 
-		private static Component[] ReadComponents(string[] input)
+		private static Component ReadComponents(string[] input)
 		{
-			return input.Select(line =>
+			// Setup a tree-structure that's really fast to traverse. Add
+			// each component twice: one for each way it can be turned, but
+			// still with the same bitmask-id used for determining which we
+			// have examine so far.
+			var components = input
+				.SelectMany((line, index) =>
+				{
+					var p = line.Split('/').Select(int.Parse).ToArray();
+					var strength = p[0] + p[1];
+					var id = 1UL << index;
+					return new Component[]
+					{
+						new Component(id, p[0], p[1], strength),
+						new Component(id, p[1], p[0], strength)
+					};
+				})
+				.ToArray();
+			foreach (var c in components)
 			{
-				var ports = line.Split('/');
-				return new Component(int.Parse(ports[0]), int.Parse(ports[1]));
+				c.Nexts = components.Where(x => x.PortI == c.PortO).ToArray();
+			}
 
-			})
-			.ToArray();
+			// It's easier to just have one single root
+			var root = new Component(0, 0, 0, 0);
+			root.Nexts = components.Where(c => c.PortI == 0).ToArray();
+			return root;
 		}
 	}
 }
