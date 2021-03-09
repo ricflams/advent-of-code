@@ -66,7 +66,7 @@ namespace AdventOfCode.Y2017.Day18
 
 			public int NumberOfSentValues { get; private set; }
 			internal bool IsWaitingForReceive { get; private set; }
-			internal bool IsBlocked => IsWaitingForReceive && !Queue.Any();
+			internal bool IsBlocked => IsWaitingForReceive && !Queue.Any() && NumberOfSentValues > 0;
 
 			public void CommunicatesWith(TabletWithIo other)
 			{
