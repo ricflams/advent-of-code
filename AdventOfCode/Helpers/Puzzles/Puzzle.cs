@@ -70,6 +70,10 @@ namespace AdventOfCode.Helpers.Puzzles
 				{
 					input = ReadInput(filename);
 					result = solution(input);
+					if (!expectedResult.Equals(result))
+					{
+						WriteResult(result, expectedResult);
+					}
 				}
 				loops = PuzzleOptions.TimingLoops;
 			}
