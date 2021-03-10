@@ -15,7 +15,7 @@ namespace AdventOfCode
 			PuzzleOptions.ShowTimings = true;
 			//PuzzleOptions.TimingLoops = 5;
 			PuzzleOptions.RunOnly(2016, 22);
-			PuzzleOptions.RunOnly(2018);
+			PuzzleOptions.RunOnly(2018, 2);
 
 			Y2015Puzzles();
 			Y2016Puzzles();
@@ -114,7 +114,7 @@ namespace AdventOfCode
 		private static void Y2018Puzzles()
 		{
 			Y2018.Day01.Puzzle.Instance.Run();
-			//Y2018.Day02.Puzzle.Instance.Run();
+			Y2018.Day02.Puzzle.Instance.Run();
 			//Y2018.Day03.Puzzle.Instance.Run();
 			//Y2018.Day04.Puzzle.Instance.Run();
 			//Y2018.Day05.Puzzle.Instance.Run();

@@ -15,6 +15,11 @@ namespace AdventOfCode.Y2018.Day02
 		public void Run()
 		{
 			RunFor("test1", 12, "abcde");
+
+ 			// https://www.reddit.com/r/adventofcode/comments/a2rt9s/2018_day_2_part_2_here_are_some_big_inputs_to/
+			// Input with 100,000 strings runs in 850ms
+			RunPart2For("test2", "imobgvpsuafxboeufbjpmstiw");
+
 			RunFor("input", 6150, "rteotyxzbodglnpkudawhijsc");
 		}
 
@@ -51,8 +56,8 @@ namespace AdventOfCode.Y2018.Day02
 		{
 			var ids = input;
 
-			// Instead od doing the trivial N^2 set of comparisons (where each comparison
-			// would need to step through the strings to find just one mismatch) do this:
+			// Instead of doing the trivial N^2 set of comparisons (where each comparison
+			// would even need to step through all chars to find just one mismatch) do this:
 			// For every string, remember n versions of it with each letter, one at a time,
 			// swapped out with a dot. If we ever come across a similar string then we've
 			// found the single-letter-mismatch. The result is the string except that dot
