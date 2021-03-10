@@ -12,6 +12,7 @@ namespace AdventOfCode.Helpers
 
 		public static ulong LongHash(string s) => LongHash(Encoding.Default.GetBytes(s));
 		public static ulong LongHash(int[] ia) => LongHash(ia.SelectMany(BitConverter.GetBytes).ToArray());
+		public static ulong LongHash(char[] ca) => LongHash(ca.SelectMany(BitConverter.GetBytes).ToArray());
 		public static ulong LongHash(byte[] data)
 		{
 			return _md5.ComputeHash(data).Select(b => (ulong)b).Aggregate((s, v) => 3074457345618258799ul * s + v);
@@ -19,6 +20,7 @@ namespace AdventOfCode.Helpers
 
 		public static uint Hash(string s) => Hash(Encoding.Default.GetBytes(s));
 		public static uint Hash(int[] ia) => Hash(ia.SelectMany(BitConverter.GetBytes).ToArray());
+		public static uint Hash(char[] ca) => Hash(ca.SelectMany(BitConverter.GetBytes).ToArray());
 		public static uint Hash(byte[] data)
 		{
 			var longhash = LongHash(data);
@@ -28,6 +30,7 @@ namespace AdventOfCode.Helpers
 
 		public static ulong KnuthHash(string s) => Hash(Encoding.Default.GetBytes(s));
 		public static ulong KnuthHash(int[] ia) => Hash(ia.SelectMany(BitConverter.GetBytes).ToArray());
+		public static ulong KnuthHash(char[] ca) => Hash(ca.SelectMany(BitConverter.GetBytes).ToArray());
 		public static ulong KnuthHash(IEnumerable<byte> bytes)
 		{
 			var hashedValue = 3074457345618258791UL;
@@ -41,6 +44,7 @@ namespace AdventOfCode.Helpers
 
 		public static uint JenkinsHash(string s) => Hash(Encoding.Default.GetBytes(s));
 		public static uint JenkinsHash(int[] ia) => Hash(ia.SelectMany(BitConverter.GetBytes).ToArray());
+		public static uint JenkinsHash(char[] ca) => Hash(ca.SelectMany(BitConverter.GetBytes).ToArray());
 		public static uint JenkinsHash(IEnumerable<byte> bytes)
 		{
 			var hash = 0U;
