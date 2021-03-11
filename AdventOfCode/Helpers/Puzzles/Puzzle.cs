@@ -8,7 +8,6 @@ namespace AdventOfCode.Helpers.Puzzles
 	internal abstract class Puzzle<T1,T2> : IPuzzle
 	{
 		private static readonly string TimingBar = new string('#', 10);
-		private static readonly string NoTiming = new string(' ', 22);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
 		public abstract string Name { get; }
 		public abstract int Year { get; }
@@ -95,22 +94,12 @@ namespace AdventOfCode.Helpers.Puzzles
 			return method != null && method.DeclaringType != typeof(Puzzle<T1,T2>);
 		}
 
-		private void WriteName(TimeSpan? elapsed, string filename, int part)
+		private void WriteName(TimeSpan elapsed, string filename, int part)
 		{
-			if (PuzzleOptions.ShowTimings)
-			{
-				if (elapsed.HasValue)
-				{
-					var units = Math.Round(elapsed.Value / TimingBarUnit, MidpointRounding.AwayFromZero);
-					var bars = (int)Math.Min(units, TimingBar.Length);
-					var t = (int)Math.Ceiling(elapsed.Value.TotalMilliseconds);
-					Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,4} ms: ");
-				}
-				else
-				{
-					Console.Write(NoTiming);
-				}
-			}
+			var units = Math.Round(elapsed / TimingBarUnit, MidpointRounding.AwayFromZero);
+			var bars = (int)Math.Min(units, TimingBar.Length);
+			var t = (int)Math.Ceiling(elapsed.TotalMilliseconds);
+			Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,4} ms: ");
 			if (!PuzzleOptions.OnlyRunForInputs)
 			{
 				Console.Write($"[{filename}] ");
