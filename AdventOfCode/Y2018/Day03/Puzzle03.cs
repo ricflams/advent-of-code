@@ -1,11 +1,7 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2018.Day03
 {
@@ -19,75 +15,77 @@ namespace AdventOfCode.Y2018.Day03
 		public void Run()
 		{
 			RunFor("test1", 4, 3);
-			//RunFor("test2", 0, 0);
-			RunFor("input", 116489, 0);
+			RunFor("input", 116489, 1260);
 		}
 
 		protected override int Part1(string[] input)
 		{
+			var claims = ReadClaims(input);
+
+			// Fastest way seem to be to simple hash memo-tables that register
+			// every square and therefore can count the first time a square is
+			// seen. It's faster than counting up all the overlappings and then
+			// searching for those with >1 overlap.
 			var once = new SimpleMemo<int>();
 			var twice = new SimpleMemo<int>();
 			var overlaps = 0;
-			foreach (var c in input)
-			{
-				// #1 @ 1,3: 4x4
-				var (id, x0, y0, w, h) = c.RxMatch("#%d @ %d,%d: %dx%d").Get<int, int, int, int, int>();
 
-				for (var x = x0; x < x0 + w; x++)
+			foreach (var pos in claims.SelectMany(c => c.Squares()))
+			{
+				if (once.IsSeenBefore(pos) && !twice.IsSeenBefore(pos))
 				{
-					for (var y = y0; y < y0 + h; y++)
-					{
-						var coord = x*10000 + y;
-						if (once.IsSeenBefore(coord) && !twice.IsSeenBefore(coord))
-						{
-							overlaps++;
-						}
-					}
+					overlaps++;
 				}
 			}
-			//var overlaps = map.Values.Count(x => x > 1);
+
 			return overlaps;
 		}
 
 		protected override int Part2(string[] input)
 		{
+			var claims = ReadClaims(input);
+
+			// Make a map of the number of claims overlapping anywhere
 			var map = new SafeDictionary<int, int>();
-			foreach (var c in input)
+			foreach (var pos in claims.SelectMany(c => c.Squares()))
+			{
+				map[pos]++;
+			}
+
+			// The sought claim is the one that's not overlapped by any other,
+			// ie where the map only has registered 1 claim for the area taken
+			// up by this claim.
+			var id = claims.First(c => c.Squares().All(x => map[x] == 1)).Id;
+			return id;
+		}
+
+		private static Claim[] ReadClaims(string[] input)
+		{
+			return input.Select(line => new Claim(line)).ToArray();
+		}
+
+		internal class Claim
+		{
+			private int _x, _y, _w, _h;
+		
+			public Claim(string s)
 			{
 				// #1 @ 1,3: 4x4
-				var (id, x0, y0, w, h) = c.RxMatch("#%d @ %d,%d: %dx%d").Get<int, int, int, int, int>();
+				(Id, _x, _y, _w, _h) = s.RxMatch("#%d @ %d,%d: %dx%d").Get<int, int, int, int, int>();
+			}
 
-				for (var x = x0; x < x0 + w; x++)
+			public int Id { get; }
+
+			public IEnumerable<int> Squares()
+			{
+				for (var x = _x; x < _x + _w; x++)
 				{
-					for (var y = y0; y < y0 + h; y++)
+					for (var y = _y; y < _y + _h; y++)
 					{
-						var coord = x*10000 + y;
-						map[coord]++;
+						yield return x*10000 + y;
 					}
 				}
 			}
-			foreach (var c in input)
-			{
-				// #1 @ 1,3: 4x4
-				var (id, x0, y0, w, h) = c.RxMatch("#%d @ %d,%d: %dx%d").Get<int, int, int, int, int>();
-
-				var nooverlap = true;
-				for (var x = x0; x < x0 + w; x++)
-				{
-					for (var y = y0; y < y0 + h; y++)
-					{
-						var coord = x*10000 + y;
-						if (map[coord] > 1)
-						{
-							nooverlap = false;
-							break;
-						}
-					}
-				}
-				if (nooverlap)
-					return id;
-			}
-			throw new Exception();
 		}
 	}
 }

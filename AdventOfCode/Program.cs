@@ -13,7 +13,7 @@ namespace AdventOfCode
 
 			//PuzzleOptions.OnlyRunForInputs = true;
 			PuzzleOptions.ShowTimings = true;
-			PuzzleOptions.TimingLoops = 5;
+			//PuzzleOptions.TimingLoops = 5;
 			PuzzleOptions.RunOnly(2016, 22);
 			PuzzleOptions.RunOnly(2018, 3);
 
