@@ -73,6 +73,7 @@ namespace AdventOfCode.Helpers.Puzzles
 					if (!expectedResult.Equals(result))
 					{
 						WriteResult(result, expectedResult);
+						Console.WriteLine();
 					}
 				}
 				loops = PuzzleOptions.TimingLoops;
