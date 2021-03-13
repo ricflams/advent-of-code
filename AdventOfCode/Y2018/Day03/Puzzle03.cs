@@ -8,7 +8,7 @@ namespace AdventOfCode.Y2018.Day03
 	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
-		public override string Name => "";
+		public override string Name => "No Matter How You Slice It";
 		public override int Year => 2018;
 		public override int Day => 3;
 
