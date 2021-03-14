@@ -24,16 +24,16 @@ namespace AdventOfCode.Y2016.Day01
 			var steps = input[0].Split(", ");
 
 			// Move point until all steps are completed
-			var pos = PointWithDirection.From(Point.Origin, Direction.Up);
+			var pose = Pose.From(Point.Origin, Direction.Up);
 			foreach (var step in steps)
 			{
 				var turn = step[0];
 				var dist = int.Parse(step[1..]);
-				pos.Turn(turn);
-				pos.Move(dist);
+				pose.Turn(turn);
+				pose.Move(dist);
 			}
 
-			var blocks = pos.Point.ManhattanDistanceTo(Point.Origin);
+			var blocks = pose.Point.ManhattanDistanceTo(Point.Origin);
 			return blocks;
 		}
 
@@ -44,21 +44,21 @@ namespace AdventOfCode.Y2016.Day01
 			// Move point until all steps are completed, but move along the
 			// entire path while keeping track of previously seen positions.
 			var seen = new HashSet<Point>();
-			var pos = PointWithDirection.From(Point.Origin, Direction.Up);
+			var pose = Pose.From(Point.Origin, Direction.Up);
 			foreach (var step in steps)
 			{
 				var turn = step[0];
 				var dist = int.Parse(step[1..]);
-				pos.Turn(turn);
+				pose.Turn(turn);
 				for (var i = 0; i < dist; i++)
 				{
-					pos.Move(1);
-					if (seen.Contains(pos.Point))
+					pose.Move(1);
+					if (seen.Contains(pose.Point))
 					{
-						var blocks = pos.Point.ManhattanDistanceTo(Point.Origin);
+						var blocks = pose.Point.ManhattanDistanceTo(Point.Origin);
 						return blocks;
 					}
-					seen.Add(pos.Point);
+					seen.Add(pose.Point);
 				}
 			}
 			throw new Exception("No solution");
@@ -67,7 +67,7 @@ namespace AdventOfCode.Y2016.Day01
 
 	internal static class Extensions
 	{
-		public static void Turn(this PointWithDirection p, char ch)
+		public static void Turn(this Pose p, char ch)
 		{
 			switch (ch)
 			{

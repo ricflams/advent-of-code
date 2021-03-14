@@ -35,26 +35,26 @@ namespace AdventOfCode.Y2017.Day19
 			var x0 = input[0].IndexOf('|');
 
 			// Move along the path, pick up letters and count the steps
-			var pos = PointWithDirection.From(x0, 0, Direction.Down);
+			var pose = Pose.From(x0, 0, Direction.Down);
 			var letters = "";
 			var steps = 0;
 			while (true)
 			{
-				pos.Move(1);
+				pose.Move(1);
 				steps++;
-				var ch = map.CharAt(pos.Point);
+				var ch = map.CharAt(pose.Point);
 				if (ch == ' ') // Stepping into the void means we're done
 					break;
 				else if (char.IsLetter(ch)) // Found a letter
 					letters += ch;
 				else if (ch == '|' || ch == '-') // Nothing to do, just continue down the path
 					{}
-				else if (map.CharAt(pos.PeekLeft) != ' ') // At a turning point with something to the left
-					pos.TurnLeft();
-				else if (map.CharAt(pos.PeekRight) != ' ') // At a turning point with something to the right
-					pos.TurnRight();
+				else if (map.CharAt(pose.PeekLeft) != ' ') // At a turning point with something to the left
+					pose.TurnLeft();
+				else if (map.CharAt(pose.PeekRight) != ' ') // At a turning point with something to the right
+					pose.TurnRight();
 				else
-					throw new Exception($"Unexpected situation at {pos}");
+					throw new Exception($"Unexpected situation at {pose}");
 			}
 
 			return (letters, steps);			

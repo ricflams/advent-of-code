@@ -3,22 +3,22 @@
 namespace AdventOfCode.Helpers
 {
 	[System.Diagnostics.DebuggerDisplay("{ToString()}")]
-	public class PointWithDirection
+	public class Pose
 	{
-		public PointWithDirection(int x, int y, Direction direction)
+		public Pose(int x, int y, Direction direction)
 		{
 			Point = Point.From(x, y);
 			Direction = direction;
 		}
 
-		public PointWithDirection(Point p, Direction direction)
+		public Pose(Point p, Direction direction)
 		{
 			Point = p;
 			Direction = direction;
 		}
 
-		static public PointWithDirection From(int x, int y, Direction direction) => new PointWithDirection(x, y, direction);
-		static public PointWithDirection From(Point p, Direction direction) => new PointWithDirection(p, direction);
+		static public Pose From(int x, int y, Direction direction) => new Pose(x, y, direction);
+		static public Pose From(Point p, Direction direction) => new Pose(p, direction);
 
 		public Point Point { get; private set; }
 		public Direction Direction { get; private set; }

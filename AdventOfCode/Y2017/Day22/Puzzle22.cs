@@ -21,7 +21,7 @@ namespace AdventOfCode.Y2017.Day22
 			var map = CharMap.FromArray(input, '.');
 
 			var (_, p2) = map.Area();
-			var p = PointWithDirection.From(p2.X/2, p2.Y/2, Direction.Up);
+			var p = Pose.From(p2.X/2, p2.Y/2, Direction.Up);
 
 			var infections = 0;
 			for (var i = 0; i < 10000; i++)

@@ -27,7 +27,7 @@ namespace AdventOfCode.Y2020.Day12
 
 		protected override int Part1(string[] input)
 		{
-			var ship = new PointWithDirection(Point.Origin, Direction.Right);
+			var ship = new Pose(Point.Origin, Direction.Right);
 			foreach (var line in input)
 			{
 				var n = int.Parse(line.Substring(1));
