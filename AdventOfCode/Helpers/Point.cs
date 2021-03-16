@@ -18,6 +18,11 @@ namespace AdventOfCode.Helpers
 		}
 
 		static public Point From(int x, int y) => new Point(x, y);
+		static public Point Parse(string s)
+		{
+			var v = s.Split(',', StringSplitOptions.RemoveEmptyEntries);
+			return From(int.Parse(v[0]), int.Parse(v[1]));
+		}
 
 		public static bool operator ==(Point p1, Point p2) => p1 is null ? p2 is null : p1.Equals(p2);
 		public static bool operator !=(Point p1, Point p2) => !(p1 == p2);
