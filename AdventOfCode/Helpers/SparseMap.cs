@@ -29,6 +29,18 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public IEnumerable<Point> AllArea()
+		{
+			var (min, max) = Area();
+			for (var x = min.X; x <= max.X; x++)
+			{
+				for (var y = min.Y; y <= max.Y; y++)
+				{
+					yield return Point.From(x, y);
+				}
+			}
+		}
+
 		public IEnumerable<(Point, T)> AllValues(Func<T, bool> predicate = null)
 		{
 			foreach (var x in _column.Keys)
