@@ -64,6 +64,8 @@ namespace AdventOfCode.Y2016.Day22
 			{
 				var (c, totalmoves) = queue.Dequeue();
 
+				//c.WriteToConsole();
+
 				if (loops++ % 1000 == 0)
 				{
 					Console.WriteLine($"At {loops} queue={queue.Count} skipped={skipped}");
@@ -72,7 +74,7 @@ namespace AdventOfCode.Y2016.Day22
 				if (c.Data.X < minx)
 				{
 					minx = c.Data.X;
-					Console.WriteLine($"At {minx} queue:{queue.Count} totalmoves={totalmoves}");
+//					Console.WriteLine($"At {minx} queue:{queue.Count} totalmoves={totalmoves}");
 				}
 
 				if (totalmoves >= minmovements)
@@ -95,10 +97,10 @@ namespace AdventOfCode.Y2016.Day22
 				var seen = new HashSet<Point>();
 				var dest = c.Data.Left;
 				var nextClustersInfo = PushAway(c, c.Data, dest, seen, 0).ToArray();
-				//Console.WriteLine($"Found {nextClustersInfo.Count()} with steps {string.Join(" ", nextClustersInfo.Select(x=>x.Item2))}");
+				Console.WriteLine($"Found {nextClustersInfo.Count()} with steps {string.Join(" ", nextClustersInfo.Select(x=>x.Item2))}");
 				// if (nextClustersInfo.Count() == 2)
 				// 	nextClustersInfo = nextClustersInfo.OrderByDescending(x => x.Item2).Skip(1).ToArray();
-				foreach (var xx in nextClustersInfo)
+				foreach (var xx in nextClustersInfo.OrderBy(x => x.Item2).Take(1))
 				{
 					xx.Item1.Data = dest;
 					//if (!cseen.Contains(xx.Item1.Id))
@@ -174,7 +176,8 @@ namespace AdventOfCode.Y2016.Day22
 
 			foreach (var n in neighborsWithEnoughSize)
 			{
-				foreach (var (cc,mov) in PushAway(c, dest, n, seen, moves))
+				var seen2 = new HashSet<Point>(seen);
+				foreach (var (cc,mov) in PushAway(c, dest, n, seen2, moves).OrderBy(x => x.Item2).Take(1))
 				{
 					var c4 = cc.MaybeMoveDataToDestination(data, dest);
 					if (c4 != null)
@@ -270,7 +273,7 @@ namespace AdventOfCode.Y2016.Day22
 			{
 				var needed = Disks[data].Used;
 				var available = Disks[dest].Avail;
-				if (needed > available)
+				if (available < needed)
 				{
 					return null;
 				}
