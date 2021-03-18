@@ -19,9 +19,9 @@ namespace AdventOfCode.Y2016.Day22
 
 		public void Run()
 		{
-			RunPart2For("test1", 7);
-			//RunFor("test2", 0, 0);
-			//RunFor("input", 993, 0);
+			//RunPart2For("test1", 7);
+			//RunFor("test2", 0, 0); 312, 305 too high
+			RunFor("input", 993, 0);
 		}
 
 		protected override int Part1(string[] input)
@@ -49,79 +49,165 @@ namespace AdventOfCode.Y2016.Day22
 		{
 			var cluster0 = new Cluster(input);
 
-			var clustersSeen = new HashSet<ulong>();
-			clustersSeen.Add(cluster0.Id);
-			
-			var queue = new SimplePriorityQueue<Cluster>();
-			queue.Enqueue(cluster0, cluster0.NumberOfMoves);
+			var minmovements = int.MaxValue;
+
+			//var queue = new Queue<(Cluster,int)>();
+			var queue = new SimplePriorityQueue<(Cluster,int)>();
+			queue.Enqueue((cluster0, 0), 10000);
+
+			var cseen = new HashSet<ulong>();
+			var minx = 40;
+			var loops = 0;
+			var skipped = 0;
+
 			while (queue.Any())
 			{
-				var cluster = queue.Dequeue();
-				cluster.WriteToConsole();
+				var (c, totalmoves) = queue.Dequeue();
 
-				if (cluster.Goal == Point.Origin)
+				if (loops++ % 1000 == 0)
 				{
-					Console.WriteLine($"BAM! Found");
-					return cluster.NumberOfMoves;
+					Console.WriteLine($"At {loops} queue={queue.Count} skipped={skipped}");
+				}
+
+				if (c.Data.X < minx)
+				{
+					minx = c.Data.X;
+					Console.WriteLine($"At {minx} queue:{queue.Count} totalmoves={totalmoves}");
+				}
+
+				if (totalmoves >= minmovements)
+				{
+					//Console.WriteLine($"Skip");
+					skipped++;
+					continue;
+				}
+				
+				if (c.Data == Point.Origin)
+				{
+					if (totalmoves < minmovements)
+					{
+						minmovements = totalmoves;
+						Console.WriteLine($"Found minimum={minmovements}");
+					}
+					continue;
 				}
 
 				var seen = new HashSet<Point>();
-				//var nextClusters = PushAway(cluster, cluster.Goal, seen).Where(c => !clustersSeen.Contains(c.Id)).ToArray();
-				var nextClusters = PushAway(cluster, cluster.Goal, seen).ToArray();
-				Console.WriteLine($"Enqueue {nextClusters.Length} clusters");
-				foreach (var c in nextClusters)
+				var dest = c.Data.Left;
+				var nextClustersInfo = PushAway(c, c.Data, dest, seen, 0).ToArray();
+				//Console.WriteLine($"Found {nextClustersInfo.Count()} with steps {string.Join(" ", nextClustersInfo.Select(x=>x.Item2))}");
+				// if (nextClustersInfo.Count() == 2)
+				// 	nextClustersInfo = nextClustersInfo.OrderByDescending(x => x.Item2).Skip(1).ToArray();
+				foreach (var xx in nextClustersInfo)
 				{
-					//clustersSeen.Add(c.Id);
-					queue.Enqueue(c, c.NumberOfMoves);
+					xx.Item1.Data = dest;
+					//if (!cseen.Contains(xx.Item1.Id))
+					{
+						var movs = totalmoves + xx.Item2;
+						//Console.WriteLine($"  Enqueue for {movs} moves");
+						queue.Enqueue((xx.Item1, movs), dest.X);
+					//	cseen.Add(xx.Item1.Id);
+					}
 				}
 			}
-			throw new Exception("Not found");
+
+			return minmovements;
+
+
+			// var clustersSeen = new HashSet<ulong>();
+			// clustersSeen.Add(cluster0.Id);
+			
+			// var queue = new SimplePriorityQueue<Cluster>();
+			// queue.Enqueue(cluster0, cluster0.NumberOfMoves);
+			// while (queue.Any())
+			// {
+			// 	var cluster = queue.Dequeue();
+			// 	cluster.WriteToConsole();
+
+			// 	if (cluster.Goal == Point.Origin)
+			// 	{
+			// 		Console.WriteLine($"BAM! Found");
+			// 		return cluster.NumberOfMoves;
+			// 	}
+
+			// 	var seen = new HashSet<Point>();
+			// 	//var nextClusters = PushAway(cluster, cluster.Goal, seen).Where(c => !clustersSeen.Contains(c.Id)).ToArray();
+			// 	var nextClusters = PushAway(cluster, cluster.Goal, seen).ToArray();
+			// 	Console.WriteLine($"Enqueue {nextClusters.Length} clusters");
+			// 	foreach (var c in nextClusters)
+			// 	{
+			// 		//clustersSeen.Add(c.Id);
+			// 		queue.Enqueue(c, c.NumberOfMoves);
+			// 	}
+			// }
+			// throw new Exception("Not found");
 
 
 		}
 
-		private static IEnumerable<Cluster> PushAway(Cluster c, Point spot, HashSet<Point> seen)
+		private static IEnumerable<(Cluster,int)> PushAway(Cluster c, Point data, Point dest, HashSet<Point> seen, int moves)
 		{
-			var used = c.Disks[spot].Used;
-			var neighbors = spot.LookAround().Where(p => !seen.Contains(p) && c.Disks[p] != null && c.Disks[p].Size >= used).ToArray();
-			var vacancies = neighbors.Where(p => c.Disks[p].Avail >= used).ToArray();
+			var cx = c.MaybeMoveDataToDestination(data, dest);
+			if (cx != null)
+			{
+				//Console.WriteLine($"  At step {moves+1}: could directly move {data} to {dest}");
+				//cx.NumberOfMoves = c.NumberOfMoves;
+				yield return (cx, moves+1);
+				yield break;
+			}
+
+			seen.Add(data);
+			var needed = c.Disks[data].Used;
+			var neighborsWithEnoughSize = dest.LookAround().Where(p => !seen.Contains(p) && c.Disks[p] != null && c.Disks[p].Size >= needed).ToArray();
+			// var vacancies = neighbors.Where(p => c.Disks[p].Avail >= used).ToArray();
 
 	//		Console.WriteLine($"At step={c.NumberOfMoves} seen={seen.Count} examine {spot}: neighbors=[{string.Join<Point>(" ", neighbors)}] vacancies=[{string.Join<Point>(" ", vacancies)}]");
 
 			// foreach (var v in vacancies)
 			// {
-			// 	var c2 = c.MoveFrom(spot, v);
+			// 	var c2 = c.MaybeMoveFrom(dest, v);
 			// 	if (c2 != null)
 			// 	{
 			// 		yield return c2;
 			// 	}
 			// }
-			seen.Add(spot);
 
-			foreach (var n in neighbors)
+			foreach (var n in neighborsWithEnoughSize)
 			{
-			 	var c2 = c.MaybeMoveFrom(spot, n);
-				if (c2 != null)
+				foreach (var (cc,mov) in PushAway(c, dest, n, seen, moves))
 				{
-					Console.WriteLine($"  Could move {spot} to {n}");
-					yield return c2;
-				}
-				else
-				{
-					var seen2 = seen.ToHashSet();
-					foreach (var c3 in PushAway(c, n, seen2))
+					var c4 = cc.MaybeMoveDataToDestination(data, dest);
+					if (c4 != null)
 					{
-						var c4 = c3.MaybeMoveFrom(spot, n);
-						if (c4 != null)
-						{
-							Console.WriteLine($"  And could move {spot} to {n}");
-							yield return c4;
-						}
-						else
-							throw new Exception("Expected to be able to move it");
+						//Console.WriteLine($"  At step {c.NumberOfMoves}: could indirectly move {dest} to {n}");
+						yield return (c4, mov+1);
 					}
-
+					else
+						throw new Exception("Expected to be able to move it");
 				}
+
+			 	// var c2 = c.MaybeMoveDataToDestination(dest, n);
+				// if (c2 != null)
+				// {
+				// 	Console.WriteLine($"  At step {c.NumberOfMoves}: could directly move {dest} to {n}");
+				// 	yield return c2;
+				// }
+				// else
+				// {
+				// 	var seen2 = seen.ToHashSet();
+				// 	foreach (var c3 in PushAway(c, dest, n, seen2))
+				// 	{
+				// 		var c4 = c3.MaybeMoveDataToDestination(dest, n);
+				// 		if (c4 != null)
+				// 		{
+				// 			Console.WriteLine($"  At step {c.NumberOfMoves}: could indirectly move {dest} to {n}");
+				// 			yield return c4;
+				// 		}
+				// 		else
+				// 			throw new Exception("Expected to be able to move it");
+				// 	}
+
+				// }
 			}
 			// //var pick = choices.OrderBy(c => c.Moves).ThenBy(c => c.Goal.ManhattanDistanceTo(Point.Origin)).First();
 
@@ -139,11 +225,11 @@ namespace AdventOfCode.Y2016.Day22
 		private class Cluster
 		{
 			public SparseMap<Disk> Disks { get; private set; }
-			public HashSet<ulong> Movements { get; private set; }
-			public int NumberOfMoves => Movements.Count();
+	//		public HashSet<ulong> Movements { get; private set; }
+			public int NumberOfMoves { get; set; }
 			
-			public ulong Id { get; private set; }
-			public Point Goal { get; private set; }
+	//		public ulong Id { get; private set; }
+			public Point Data { get; set; }
 
 			public Cluster(string[] input)
 			{
@@ -162,10 +248,10 @@ namespace AdventOfCode.Y2016.Day22
 						Used = used
 					};
 				}
-				Goal = Point.From(Disks.Area().Item2.X, 0);
+				Data = Point.From(Disks.Area().Item2.X, 0);
 
-				Id = 0;
-				Movements = new HashSet<ulong>();
+	//			Id = 0;
+	//			Movements = new HashSet<ulong>();
 			}
 
 			// public void MoveFrom(Cluster c0)
@@ -180,9 +266,11 @@ namespace AdventOfCode.Y2016.Day22
 
 			private Cluster() {}
 
-			public Cluster MaybeMoveFrom(Point pos, Point dest)
+			public Cluster MaybeMoveDataToDestination(Point data, Point dest)
 			{
-				if (Disks[pos].Used > Disks[dest].Avail)
+				var needed = Disks[data].Used;
+				var available = Disks[dest].Avail;
+				if (needed > available)
 				{
 					return null;
 				}
@@ -194,28 +282,30 @@ namespace AdventOfCode.Y2016.Day22
 				{
 					copy.Disks[p] = new Disk { Size = disk.Size, Used = disk.Used };
 				}
-				copy.Disks[dest].Used += copy.Disks[pos].Used;
-				copy.Disks[pos].Used = 0;
-				copy.Goal = pos == Goal ? dest : Goal;
+				copy.Disks[dest].Used += copy.Disks[data].Used;
+				copy.Disks[data].Used = 0;
+				// copy.Data = data == Data ? dest : Data;
 
-				var ids = copy.Disks.AllValues().Select(x => x.Item2.Used).ToArray();
-				copy.Id = Hashing.KnuthHash(ids);
+	//			var ids = copy.Disks.AllValues().Select(x => x.Item2.Used).ToArray();
+				// copy.Id = Hashing.KnuthHash(ids);
 
-				if (Movements.Contains(copy.Id))
-				{
-					return null;
-				}
+				// if (Movements.Contains(copy.Id))
+				// {
+				// 	return null;
+				// }
 
-				copy.Movements = Movements.ToHashSet();
-				copy.Movements.Add(Id);
+	//			copy.Movements = Movements.ToHashSet();
+//				copy.Movements.Add(Id);
+				// copy.NumberOfMoves = NumberOfMoves + 1;
 				return copy;
 			}
 
 			public void WriteToConsole()
 			{
+				Console.WriteLine();
 				Disks.ConsoleWrite((p, disk) =>
 				{
-					if (p == Goal)
+					if (p == Data)
 						return 'G';
 					if (p == Point.Origin)
 						return 'H';
@@ -223,10 +313,14 @@ namespace AdventOfCode.Y2016.Day22
 						return '_';
 					if (disk.Used > 100)
 						return '#';
-					if (disk.Avail >= Disks[Goal].Used)
+					if (disk.Avail >= Disks[Data].Used)
 						return '+';
 					return '.';
 				});				
+				foreach (var (p,d) in Disks.AllValues())
+				{
+					Console.WriteLine($"At {p}: [{d.Used}/{d.Size}]");
+				}
 			}
 		}
 	}
