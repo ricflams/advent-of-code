@@ -18,6 +18,8 @@ namespace AdventOfCode.Y2015.Day19
 		public void Run()
 		{
 			//RunFor("test1", 4, 0);
+			//RunPart2For("test1", 3);
+			RunPart2For("test2", 6);
 			RunFor("input", 535, 0);
 		}
 
@@ -238,6 +240,9 @@ namespace AdventOfCode.Y2015.Day19
 				}
 				return seen;
 			}
+
+return 0;
+
 
 			foreach (var x in MathHelper.AllCombinations<int>(new [] { new int[]{1, 2, 3, 4}, new int[]{10, 11, 12}, new int[]{99}, new int[]{33,44} } ))
 			{
