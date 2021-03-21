@@ -70,7 +70,7 @@ namespace AdventOfCode.Y2016.Day22
 				}
 			}
 
-			distmap.ConsoleWrite((p, v) => (char)('0' + (v%10)));
+			//distmap.ConsoleWrite((p, v) => (char)('0' + (v%10)));
 
 				// .Where(p => p.LookAround().Any(n => disks[n] != null && disks[p].Avail >= disks[n].Used))
 				// .ToArray();
@@ -115,7 +115,7 @@ namespace AdventOfCode.Y2016.Day22
 					if (totalmoves < minmovements)
 					{
 						minmovements = totalmoves;
-						Console.WriteLine($"Found minimum={minmovements}");
+//						Console.WriteLine($"Found minimum={minmovements}");
 					}
 					continue;
 				}
@@ -195,9 +195,9 @@ namespace AdventOfCode.Y2016.Day22
 						{
 							map[p] = (char)('0' + (i++%10));
 						}
-						Console.WriteLine($"Found new minimum at {moves} moves: {string.Join(" ", path.Reverse())}:");
-						map.ConsoleWrite();
-						Console.WriteLine();
+						// Console.WriteLine($"Found new minimum at {moves} moves: {string.Join(" ", path.Reverse())}:");
+						// map.ConsoleWrite();
+						// Console.WriteLine();
 					}
 					return;
 				}
