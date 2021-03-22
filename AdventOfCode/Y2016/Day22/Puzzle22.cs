@@ -2,11 +2,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
-using Priority_Queue;
 
 namespace AdventOfCode.Y2016.Day22
 {
@@ -20,7 +16,6 @@ namespace AdventOfCode.Y2016.Day22
 		public void Run()
 		{
 			RunPart2For("test1", 7);
-			//RunFor("test2", 0, 0); 312, 305, 284 276 too high
 			RunFor("input", 993, 202);
 		}
 
@@ -28,15 +23,19 @@ namespace AdventOfCode.Y2016.Day22
 		{
 			var cluster = new Cluster(input);
 
-			var viables = cluster.Disks
+			// Find all discs, ordered by space available
+			var allDiscs = cluster.Disks
 				.AllValues()
-				.Select(x => x.Item2)
 				.OrderByDescending(d => d.Avail)
 				.ToArray();
 
-			var viablePairs = viables
+			// For all discs, count how many other discs this content would
+			// fit onto. Because the discs are sorted by available space we
+			// can simply count how many we can Take which is ~6x faster than
+			// no sorting and checking through all.
+			var viablePairs = allDiscs
 				.Where(v => v.Used > 0)
-				.Sum(disk => viables
+				.Sum(disk => allDiscs
 					.Where(v => v != disk)
 					.TakeWhile(v => v.Avail >= disk.Used)
 					.Count()
@@ -47,213 +46,106 @@ namespace AdventOfCode.Y2016.Day22
 
 		protected override int Part2(string[] input)
 		{
-			var cluster0 = new Cluster(input);
+			var cluster = new Cluster(input);
 
-			var minmovements = int.MaxValue;
-
-			var disks = cluster0.Disks;
-
-			var bigblocks = new HashSet<Point>(disks.AllValues(d => d.Used > 100).Select(x => x.Item1));
-			var empty = disks.AllValues(d => d.Used == 0).Single().Item1;
-			var distmap = new SparseMap<int>();
+			// For moving the first point (and only for that, it seems) we need to
+			// know the preferred direction for moving data around. There is 1 empty
+			// disc and it's the only one we can move anything onto, and there are
+			// a number of big blocks that can't be moved at all. With that in mind
+			// we create a distance-field with shortest distance from (== to) the
+			// empty spot, working around the big blocks. When examining the routes
+			// this will tell us which discs are closest to the empty disc.
+			var distField = new SparseMap<int>();
 			var distq = new Queue<Point>();
+			var bigblocks = new HashSet<Point>(cluster.Disks.All(d => d.Used > 100).Select(x => x.Item1));
+			var empty = cluster.Disks.All(d => d.Used == 0).Single().Item1;
 			distq.Enqueue(empty);
 			while (distq.Any())
 			{
 				var p = distq.Dequeue();
-				var dist = distmap[p];
-				var neighbors = p.LookAround().Where(n => distmap[n] == 0 && disks[n] != null && !bigblocks.Contains(n));
+				var dist = distField[p];
+				var neighbors = p.LookAround().Where(n => distField[n] == 0 && cluster.Disks[n] != null && !bigblocks.Contains(n));
 				foreach (var n in neighbors)
 				{
-					distmap[n] = dist + 1;
+					distField[n] = dist + 1;
 					distq.Enqueue(n);
 				}
 			}
 
-			//distmap.ConsoleWrite((p, v) => (char)('0' + (v%10)));
-
-				// .Where(p => p.LookAround().Any(n => disks[n] != null && disks[p].Avail >= disks[n].Used))
-				// .ToArray();
-
-			// how exactly to find the big blocks?
-
-	//		cluster0.WriteToConsole();
-
-			//var queue = new Queue<(Cluster,int)>();
-			var queue = new SimplePriorityQueue<(Cluster,int)>();
-			queue.Enqueue((cluster0, 0), 10000);
-
-			var cseen = new HashSet<ulong>();
-
-
-			while (queue.Any())
+			// The stragegy:
+			// Move the Goal to the left, one spot at a time. (That seems to produce the
+			// shortest path overall). Do so by examining which of the neighbors has room
+			// to spare can can move their data away, either directly or by pushing data
+			// data away from their neighbors, recursively.
+			// We only need the distance-field for the first move. It's costly to calculate
+			// for the remaining moves and doesn't seem to make a difference so just set
+			// it to null after the first move.
+			var moves = 0;
+			while (cluster.Goal != Point.Origin)
 			{
-				var (c, totalmoves) = queue.Dequeue();
+				cluster = MoveLeft(distField, cluster);
+				moves += cluster.Moves;
+				distField = null;
+				//cluster.WriteToConsole();
+			}
+			return moves;
 
-				//c.WriteToConsole();
-
-// 				if (loops++ % 1000 == 0)
-// 				{
-// 					Console.WriteLine($"At {loops} queue={queue.Count} skipped={skipped}");
-// 				}
-
-// 				if (c.Data.X < minx)
-// 				{
-// 					minx = c.Data.X;
-// //					Console.WriteLine($"At {minx} queue:{queue.Count} totalmoves={totalmoves}");
-// 				}
-
-// 				if (totalmoves >= minmovements)
-// 				{
-// 					//Console.WriteLine($"Skip");
-// 					skipped++;
-// 					continue;
-// 				}
-				
-				if (c.Data == Point.Origin)
-				{
-					if (totalmoves < minmovements)
-					{
-						minmovements = totalmoves;
-//						Console.WriteLine($"Found minimum={minmovements}");
-					}
-					continue;
-				}
-
-				var seen = new HashSet<Point>();
-				// seen.Add(c.Data.Right);
-				// seen.Add(c.Data.Down);
-
-				var nextClustersInfo = new List<(Cluster, int)>();
+			static Cluster MoveLeft(SparseMap<int> distField, Cluster c)
+			{
+				// Keep track of the paths examined in a stack, starting with
+				// the Goal-point. MoveTo the Left will find the next cluster,
+				// ie the one that took the fewest moves.
 				var path = new Stack<Point>();
-				var dest = c.Data.Left;
-				path.Push(c.Data);
-				Cluster nextcluster = null;
-				var minmoves = int.MaxValue;
-				Walk(distmap, c, path, dest, ref minmoves, ref nextcluster);
-				distmap = null;
-				nextcluster.Data = dest;
-				var movs = totalmoves + minmoves;
-				queue.Enqueue((nextcluster, movs), 0);
+				path.Push(c.Goal);
+				Cluster nextCluster = null;
+				MoveTo(path, c.Goal.Left);
+				return nextCluster;
 
-				// // var nextClustersInfo = PushAway(c, c.Data, dest, seen, 0).ToArray();
-				// Console.WriteLine($"Found {nextClustersInfo.Count()} with steps {string.Join(" ", nextClustersInfo.Select(x=>x.Item2))}");
-				// if (nextClustersInfo.Count() == 2)
-				// 	nextClustersInfo = nextClustersInfo.OrderByDescending(x => x.Item2).Skip(1).ToArray();
-				// foreach (var xx in nextClustersInfo.OrderBy(x => x.Item2).Take(1))
-				// {
-				// 	xx.Item1.Data = dest;
-				// 	//if (!cseen.Contains(xx.Item1.Id))
-				// 	{
-				// 		var movs = totalmoves + xx.Item2;
-				// 		//Console.WriteLine($"  Enqueue for {movs} moves");
-				// 		queue.Enqueue((xx.Item1, movs), dest.X);
-				// 	//	cseen.Add(xx.Item1.Id);
-				// 	}
-				// }
-			}
-
-			return minmovements;
-
-			static void Walk(SparseMap<int> distmap, Cluster c, Stack<Point> path, Point dest, ref int minmoves, ref Cluster cluster)
-			{
-				var data = path.Peek();
-
-				if (distmap != null && path.Count() + distmap[data] >= minmoves)
+				void MoveTo(Stack<Point> path, Point moveto)
 				{
-					return;
-				}
-				if (path.Count() >= minmoves)
-				{
-					return;
-				}
-
-				if (c.CanMoveDataToDestination(data, dest))
-				{
-					// yes we can
-					var c2 = c.Copy();
-					foreach (var p in path)
-					{
-						c2.MoveDataToDestination(p, dest);
-						dest = p;
-					}
+					// The path is all the discs that will have to be moved
+					var movefrom = path.Peek();
 					var moves = path.Count();
-					if (moves < minmoves)
+
+					// If can't do any better than the moves found for the best next
+					// cluster then don't examine this path any further
+					if (moves + (distField?[movefrom] ?? 0) >= nextCluster?.Moves)
 					{
-						cluster = c2;
-						minmoves = moves;	
-						var map = new CharMap();
-						var i = 0;
-						for (var x = 0; x < 34; x++)
+						return;
+					}
+
+					// If we can move the content then we know it will be the sortest
+					// path found so far (see above) so move the entire centipede of
+					// disc contents all the way back to the original goal+destination.
+					if (c.CanMoveContentTo(movefrom, moveto))
+					{
+						// yes we can
+						nextCluster = c.Copy();
+						foreach (var p in path)
 						{
-							for (var y = 0; y < 15; y++)
-							{
-								map[x][y] = '.';
-							}
+							nextCluster.MoveContent(p, moveto);
+							moveto = p;
 						}
-						foreach (var p in path.Reverse())
-						{
-							map[p] = (char)('0' + (i++%10));
-						}
-						// Console.WriteLine($"Found new minimum at {moves} moves: {string.Join(" ", path.Reverse())}:");
-						// map.ConsoleWrite();
-						// Console.WriteLine();
+						return;
 					}
-					return;
-				}
 
-				var needed = c.Disks[data].Used;
-				var neighborsWithEnoughSize = dest.LookAround().Where(p => !path.Contains(p) && c.Disks[p] != null && c.Disks[p].Size >= needed).ToArray();
-
-
-				path.Push(dest);
-				if (distmap != null)
-				{
-					foreach (var n in neighborsWithEnoughSize.OrderBy(n => distmap[n]))
+					// No room on this disc. Examine all neighbors that has a disc that
+					// would fit the data if it was empty. If there's a distance-field
+					// (only for the first move) then visit the closest ones first; if
+					// this optimization isn't done then it'll take forever.
+					var sizeNeeded = c.Disks[movefrom].Used;
+					var neighborsWithEnoughSize = moveto
+						.LookAround()
+						.Where(p => !path.Contains(p) && c.Disks?[p]?.Size >= sizeNeeded)
+						.ToArray();
+					path.Push(moveto);
+					foreach (var n in neighborsWithEnoughSize.OrderBy(n => distField?[n] ?? 0))
 					{
-						Walk(distmap, c, path, n, ref minmoves, ref cluster);
+						MoveTo(path, n);
 					}
+					path.Pop();
 				}
-				else
-				{
-					foreach (var n in neighborsWithEnoughSize)
-					{
-						Walk(distmap, c, path, n, ref minmoves, ref cluster);
-					}
-				}
-				path.Pop();
 			}
-
-
-			// var clustersSeen = new HashSet<ulong>();
-			// clustersSeen.Add(cluster0.Id);
-			
-			// var queue = new SimplePriorityQueue<Cluster>();
-			// queue.Enqueue(cluster0, cluster0.NumberOfMoves);
-			// while (queue.Any())
-			// {
-			// 	var cluster = queue.Dequeue();
-			// 	cluster.WriteToConsole();
-
-			// 	if (cluster.Goal == Point.Origin)
-			// 	{
-			// 		Console.WriteLine($"BAM! Found");
-			// 		return cluster.NumberOfMoves;
-			// 	}
-
-			// 	var seen = new HashSet<Point>();
-			// 	//var nextClusters = PushAway(cluster, cluster.Goal, seen).Where(c => !clustersSeen.Contains(c.Id)).ToArray();
-			// 	var nextClusters = PushAway(cluster, cluster.Goal, seen).ToArray();
-			// 	Console.WriteLine($"Enqueue {nextClusters.Length} clusters");
-			// 	foreach (var c in nextClusters)
-			// 	{
-			// 		//clustersSeen.Add(c.Id);
-			// 		queue.Enqueue(c, c.NumberOfMoves);
-			// 	}
-			// }
-			// throw new Exception("Not found");
-
-
 		}
 
 
@@ -267,11 +159,9 @@ namespace AdventOfCode.Y2016.Day22
 		private class Cluster
 		{
 			public SparseMap<Disk> Disks { get; private set; }
-	//		public HashSet<ulong> Movements { get; private set; }
-			public int NumberOfMoves { get; set; }
-			
-	//		public ulong Id { get; private set; }
-			public Point Data { get; set; }
+		
+			public Point Goal { get; set; }
+			public int Moves { get; set; }
 
 			public Cluster(string[] input)
 			{
@@ -290,89 +180,47 @@ namespace AdventOfCode.Y2016.Day22
 						Used = used
 					};
 				}
-				Data = Point.From(Disks.Area().Item2.X, 0);
-
-	//			Id = 0;
-	//			Movements = new HashSet<ulong>();
+				Goal = Point.From(Disks.Area().Item2.X, 0);
 			}
-
-			// public void MoveFrom(Cluster c0)
-			// {
-			// 	var ids = Disks.AllValues().Select(x => x.Item2.Used).ToArray();
-			// 	Id = Hashing.KnuthHash(ids);
-
-			// 	Moves = 
-			// 	 = new HashSet<ulong>()
-
-			// }
 
 			private Cluster() {}
 
-			public bool CanMoveDataToDestination(Point data, Point dest)
+			public bool CanMoveContentTo(Point movefrom, Point moveto)
 			{
-				var needed = Disks[data].Used;
-				var available = Disks[dest].Avail;
+				var needed = Disks[movefrom].Used;
+				var available = Disks[moveto].Avail;
 				return needed <= available;
 			}
 
-			public void MoveDataToDestination(Point data, Point dest)
+			public void MoveContent(Point movefrom, Point moveto)
 			{
-				if (!CanMoveDataToDestination(data, dest))
-					throw new Exception();
-				Disks[dest].Used += Disks[data].Used;
-				Disks[data].Used = 0;
+				Disks[moveto].Used += Disks[movefrom].Used;
+				Disks[movefrom].Used = 0;
+				if (movefrom == Goal)
+				{
+					Goal = moveto; // Update Data if it was moved
+				}
+				Moves++;
 			}
 
 			public Cluster Copy()
 			{
 				var copy = new Cluster();
 				copy.Disks = new SparseMap<Disk>();
-				foreach (var (p, disk) in Disks.AllValues())
+				foreach (var (p, disk) in Disks.All())
 				{
 					copy.Disks[p] = new Disk { Size = disk.Size, Used = disk.Used };
 				}
+				copy.Goal = Goal;
 				return copy;
 			}
 
-			public Cluster OldMaybeMoveDataToDestination(Point data, Point dest)
-			{
-				var needed = Disks[data].Used;
-				var available = Disks[dest].Avail;
-				if (available < needed)
-				{
-					return null;
-				}
-
-				var copy = new Cluster();
-
-				copy.Disks = new SparseMap<Disk>();
-				foreach (var (p, disk) in Disks.AllValues())
-				{
-					copy.Disks[p] = new Disk { Size = disk.Size, Used = disk.Used };
-				}
-				copy.Disks[dest].Used += copy.Disks[data].Used;
-				copy.Disks[data].Used = 0;
-				// copy.Data = data == Data ? dest : Data;
-
-	//			var ids = copy.Disks.AllValues().Select(x => x.Item2.Used).ToArray();
-				// copy.Id = Hashing.KnuthHash(ids);
-
-				// if (Movements.Contains(copy.Id))
-				// {
-				// 	return null;
-				// }
-
-	//			copy.Movements = Movements.ToHashSet();
-//				copy.Movements.Add(Id);
-				// copy.NumberOfMoves = NumberOfMoves + 1;
-				return copy;
-			}
 			public void WriteToConsole()
 			{
 				Console.WriteLine();
 				Disks.ConsoleWrite((p, disk) =>
 				{
-					if (p == Data)
+					if (p == Goal)
 						return 'G';
 					if (p == Point.Origin)
 						return 'H';
@@ -380,116 +228,15 @@ namespace AdventOfCode.Y2016.Day22
 						return '_';
 					if (disk.Used > 100)
 						return '#';
-					if (disk.Avail >= Disks[Data].Used)
+					if (disk.Avail >= Disks[Goal].Used)
 						return '+';
 					return '.';
 				});				
-				foreach (var (p,d) in Disks.AllValues())
-				{
-					Console.WriteLine($"At {p}: [{d.Used}/{d.Size}]");
-				}
+				// foreach (var (p,d) in Disks.AllValues())
+				// {
+				// 	Console.WriteLine($"At {p}: [{d.Used}/{d.Size}]");
+				// }
 			}
 		}
 	}
-
 }
-
-
-
-			// // var goal = Point.From(cluster.Disks.Area().Item2.X, 0);
-			// // var home = disks[0][0];
-			
-			// // var (min, max) = cluster0.Disks.Area();
-			// // return Enumerable.Range(min.Y, max.Y- min.Y + 1)
-			// // 	.Select(y => Enumerable.Range(min.X, max.X - min.X + 1)
-			// // 		.Select(x => rendering(Point.From(x, y), this[x][y]))
-			// // 		.ToArray()
-			// // 	)
-			// // 	.Select(ch => new string(ch))
-			// // 	.ToArray();
-
-
-
-
-
-			// var c = cluster0;
-			// while (c.Goal != Point.Origin)
-			// {
-
-			// 	c = MakeWay(c, c.Goal, null);
-			// }
-
-
-			// // var goaldisk = disks[goal];
-
-			// var seen = new HashSet<ulong>();
-			// var queue = new Queue<(Cluster, int)>();
-			// queue.Enqueue((cluster0, 0));
-			// var round = 0;
-			// while (true)
-			// {
-			// 	// if what, stop
-			// 	var (cluster, steps) = queue.Dequeue();
-
-			// 	if (seen.Contains(cluster.Id))
-			// 		continue;
-			// 	seen.Add(cluster.Id);
-
-			// 	//cluster.Disks.ConsoleWrite((p, disk) =>
-			// 	//{
-			// 	//	if (p == cluster.Goal)
-			// 	//		return 'G';
-			// 	//	if (p == Point.Origin)
-			// 	//		return 'H';
-			// 	//	if (disk.Used == 0)
-			// 	//		return '_';
-			// 	//	//if (disk.Avail >= cluster.Disks[cluster.Goal].Used)
-			// 	//	//	return '+';
-			// 	//	return '.';
-			// 	//});
-
-			// 	if (cluster.Goal == Point.Origin)
-			// 	{
-			// 		Console.WriteLine($"#### BAM2! Found at steps={steps}");
-			// 		return steps;
-			// 	}
-
-			// 	if (round++ % 10000 == 0)
-			// 	{
-			// 		Console.Write($"[{steps}]");
-			// 		//Console.Clear();
-			// 		//Console.WriteLine();
-			// 		//Console.WriteLine($"Steps: {steps}");
-			// 		//cluster.Disks.ConsoleWrite((p, disk) =>
-			// 		//{
-			// 		//	var moves = p.LookAround().Count(x => disk.Used > 0 && cluster.Disks[x] != null && cluster.Disks[x].Avail >= disk.Used);
-			// 		//	return moves == 0 ? '.' : moves.ToString().First();
-			// 		//});
-			// 		//Console.Out.Flush();
-			// 		//System.Threading.Thread.Sleep(300);
-			// 	}
-
-			// 	//var nextsteps = new List<Cluster>();
-			// 	foreach (var (p, disk) in cluster.Disks.AllValues())
-			// 	{
-			// 		var used = disk.Used;
-			// 		if (used == 0)
-			// 			continue;
-			// 		foreach (var dest in p.LookAround().Where(m => cluster.Disks[m] != null && cluster.Disks[m].Avail >= used))
-			// 		{
-			// 			if (p == cluster.Goal)
-			// 			{
-			// 				Console.WriteLine($"Found goal at steps={steps}");
-			// 			}
-
-			// 			var cluster2 = cluster.MoveFrom(p, dest);
-			// 			if (!seen.Contains(cluster2.Id))
-			// 			{
-			// 				//Console.WriteLine($"Step {steps} can copy size={used} from {p} to {dest}");
-			// 				queue.Enqueue((cluster2, steps + 1));
-			// 			}
-			// 		}
-			// 	}
-			// }
-
-			//return 0;
