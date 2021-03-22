@@ -14,6 +14,22 @@ namespace AdventOfCode.Helpers
 			_defaultValue = defaultValue;
 		}
 
+		public IEnumerable<(Point, T)> All(Func<T, bool> predicate = null)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					if (predicate == null || predicate(value))
+					{
+						yield return (Point.From(x, y), value);
+					}
+				}
+			}
+		}
+
 		public IEnumerable<Point> AllPoints(Func<T, bool> predicate = null)
 		{
 			foreach (var x in _column.Keys)
@@ -29,19 +45,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public IEnumerable<Point> AllArea()
-		{
-			var (min, max) = Area();
-			for (var x = min.X; x <= max.X; x++)
-			{
-				for (var y = min.Y; y <= max.Y; y++)
-				{
-					yield return Point.From(x, y);
-				}
-			}
-		}
-
-		public IEnumerable<(Point, T)> AllValues(Func<T, bool> predicate = null)
+		public IEnumerable<T> AllValues(Func<T, bool> predicate = null)
 		{
 			foreach (var x in _column.Keys)
 			{
@@ -51,8 +55,20 @@ namespace AdventOfCode.Helpers
 					var value = column.Row[y];
 					if (predicate == null || predicate(value))
 					{
-						yield return (Point.From(x, y), value);
+						yield return value;
 					}
+				}
+			}
+		}
+
+		public IEnumerable<Point> AllArea()
+		{
+			var (min, max) = Area();
+			for (var x = min.X; x <= max.X; x++)
+			{
+				for (var y = min.Y; y <= max.Y; y++)
+				{
+					yield return Point.From(x, y);
 				}
 			}
 		}

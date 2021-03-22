@@ -60,7 +60,7 @@ namespace AdventOfCode.Y2017.Day22
 			var map = new char[xyOffset*2, xyOffset*2];
 
 			// Populate the map with all known infections
-			foreach (var (p, ch) in inputMap.AllValues(c => c == '#'))
+			foreach (var (p, ch) in inputMap.All(c => c == '#'))
 			{
 				map[p.X + xyOffset, p.Y + xyOffset] = '#';
 			}

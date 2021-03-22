@@ -50,7 +50,7 @@ namespace AdventOfCode.Y2015.Day18
 			for (var i = 0; i < rounds; i++)
 			{
 				var nextlights = new SparseMap<bool>();
-				foreach (var (p, on) in lights.AllValues())
+				foreach (var (p, on) in lights.All())
 				{
 					if (cornersAreStuck && corners.Any(corner => p == corner))
 					{
