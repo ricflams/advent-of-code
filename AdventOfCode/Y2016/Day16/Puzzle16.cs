@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day16
 {
-	internal class Puzzle : Puzzle<string, string>
+	internal class Puzzle : PuzzleWithParam<(string, int, int), string, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Dragon Checksum";
@@ -13,21 +13,19 @@ namespace AdventOfCode.Y2016.Day16
 
 		public void Run()
 		{
-			Run("test1").Part1("01100");
-			Run("input").Part1("00100111000101111").Part2("11101110011100110");
+			RunParamOnly("test1", ("10000", 20, 0)).Part1("01100");
+			RunParamOnly("input", ("01111010110010011", 272, 35651584)).Part1("00100111000101111").Part2("11101110011100110");
 		}
 
-		protected override string Part1(string[] input)
+		protected override string Part1(string[] _)
 		{
-			int length = int.Parse(input[0]);
-			var state = input[1];
+			var (state, length, _) = Param;
 			return Checksum(state, length);
 		}
 
-		protected override string Part2(string[] input)
+		protected override string Part2(string[] _)
 		{
-			int length = 35651584;
-			var state = input[1];
+			var (state, _, length) = Param;
 			return Checksum(state, length);
 		}
 

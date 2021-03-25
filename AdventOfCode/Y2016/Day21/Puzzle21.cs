@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day21
 {
-	internal class Puzzle : Puzzle<string, string>
+	internal class Puzzle : PuzzleWithParam<(string, string), string, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Scrambled Letters and Hash";
@@ -15,14 +15,14 @@ namespace AdventOfCode.Y2016.Day21
 
 		public void Run()
 		{
-			Run("test1").Part1("decab");
-			Run("input").Part1("hcdefbag").Part2("fbhaegdc");
+			Run("test1", ("abcde", null)).Part1("decab");
+			Run("input", ("abcdefgh", "fbgdceah")).Part1("hcdefbag").Part2("fbhaegdc");
 		}
 
 		protected override string Part1(string[] input)
 		{
-			var password = input[0];
-			var operations = input[2..];
+			var operations = input;
+			var (password, _) = Param;
 			var scrambler = new Scrambler(operations);
 			var scrambled = scrambler.Scramble(password);
 			return scrambled;
@@ -30,8 +30,8 @@ namespace AdventOfCode.Y2016.Day21
 
 		protected override string Part2(string[] input)
 		{
-			var scrambled = input[1];
-			var operations = input[2..];
+			var operations = input;
+			var (_, scrambled) = Param;
 			var scrambler = new Scrambler(operations);
 			var password = scrambler.Scramble(scrambled, true);
 			return password;

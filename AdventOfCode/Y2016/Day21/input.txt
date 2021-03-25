@@ -1,5 +1,3 @@
-abcdefgh
-fbgdceah
 rotate right 3 steps
 swap letter b with letter a
 move position 3 to position 4

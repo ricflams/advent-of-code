@@ -18,14 +18,14 @@ namespace AdventOfCode.Y2018.Day07
 
 		public void Run()
 		{
-			Run("test1").Part1("CABDFE");
-			Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			// Run("test1").Part1("CABDFE");
+			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 
-			Run("test1").Part1("CABDFE");
-			Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			// Run("test1").Part1("CABDFE");
+			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 
-			Run("test1").Part1("CABDFE");
-			Run("input", (5, 1)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			Run("test1", (1,  0)).Part1("CABDFE").Part2(15);
+			Run("input", (5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 	//		RunParamOnly("input", (5, 1)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 
 			// RunWithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
@@ -63,13 +63,13 @@ namespace AdventOfCode.Y2018.Day07
 
 		protected override int Part2(string[] input)
 		{
-			Console.WriteLine(Param);
 			var work = ReadWorks(input);
+			var (workers, extraSeconds) = Param;
 			
 			var order = "";
 
 			var ongoing = new Dictionary<char, int>();
-			var N = 6;
+			var N = 1 + workers;
 
 			var seconds = 0;
 
@@ -104,7 +104,7 @@ namespace AdventOfCode.Y2018.Day07
 						.FirstOrDefault();
 					if (w == null)
 						break;
-					ongoing[w.Letter] = 60 + w.Letter - 'A' + 1;
+					ongoing[w.Letter] = extraSeconds + w.Letter - 'A' + 1;
 				}
 
 				seconds++;

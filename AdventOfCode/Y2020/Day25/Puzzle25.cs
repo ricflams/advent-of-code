@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace AdventOfCode.Y2020.Day25
 {
-	internal class Puzzle : Puzzle<uint, bool>
+	internal class Puzzle : PuzzleWithParam<(uint, uint), uint, bool>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Combo Breaker";
@@ -12,14 +12,13 @@ namespace AdventOfCode.Y2020.Day25
 
 		public void Run()
 		{
-			Run("test1").Part1(14897079U);
-			Run("input").Part1(11288669U);
+			Run("test1", (5764801, 17807724)).Part1(14897079U);
+			Run("input", (5099500,  7648211)).Part1(11288669U);
 		}
 
-		protected override uint Part1(string[] input)
+		protected override uint Part1(string[] _)
 		{
-			var cardPub = uint.Parse(input[0]);
-			var doorPub = uint.Parse(input[1]);
+			var (cardPub, doorPub) = Param;
 
 			//To transform a subject number, start with the value 1. Then, a number of times called the loop size, perform the following steps:
 			//Set the value to itself multiplied by the subject number.
