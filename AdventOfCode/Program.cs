@@ -16,7 +16,7 @@ namespace AdventOfCode
 			// PuzzleOptions.RunOnly(2015, 19);
 			PuzzleOptions.RunOnly(2018, 7);
 
-			PuzzleOptions.RunOnly(2020, 9);
+			PuzzleOptions.RunOnly(2020, 25);
 
 			Y2015Puzzles();
 			Y2016Puzzles();

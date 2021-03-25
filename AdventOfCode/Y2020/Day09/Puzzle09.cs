@@ -13,8 +13,8 @@ namespace AdventOfCode.Y2020.Day09
 
 		public void Run()
 		{
-			Run("test1",  5).Part1(127).Part2(62);
-			Run("input", 25).Part1(217430975).Part2(28509180);
+			Run("test1").WithParam( 5).Part1(127).Part2(62);
+			Run("input").WithParam(25).Part1(217430975).Part2(28509180);
 		}
 
 		protected override long Part1(string[] input)

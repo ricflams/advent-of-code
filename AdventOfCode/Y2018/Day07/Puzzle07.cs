@@ -18,29 +18,10 @@ namespace AdventOfCode.Y2018.Day07
 
 		public void Run()
 		{
-			// Run("test1").Part1("CABDFE");
-			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-
-			// Run("test1").Part1("CABDFE");
-			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-
-			Run("test1", (1,  0)).Part1("CABDFE").Part2(15);
-			Run("input", (5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-	//		RunParamOnly("input", (5, 1)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-
-			// RunWithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// RunWithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
-			// RunWithParam((2, 15)).Part2(920);
-			// Run("input", "GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
-			// Run("input").WithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
-			// Run("input").Part2(920);
-
-			// For("input").Run("GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
-
-			// , (2, 6)
-			// RunFor("input").WithParams().Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(, 920).Run();
+			// For test: 1 helper and +0 sec
+			// For real input: 5 helpers and +60 sec
+			Run("test1").WithParam((1,  0)).Part1("CABDFE").Part2(15);
+			Run("input").WithParam((5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 		}
 
 		protected override string Part1(string[] input)

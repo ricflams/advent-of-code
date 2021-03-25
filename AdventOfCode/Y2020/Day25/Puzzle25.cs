@@ -12,8 +12,8 @@ namespace AdventOfCode.Y2020.Day25
 
 		public void Run()
 		{
-			Run("test1", (5764801, 17807724)).Part1(14897079U);
-			Run("input", (5099500,  7648211)).Part1(11288669U);
+			Run("test1").WithParam((5764801, 17807724)).WithNoInput().Part1(14897079U);
+			Run("input").WithParam((5099500,  7648211)).WithNoInput().Part1(11288669U);
 		}
 
 		protected override uint Part1(string[] _)

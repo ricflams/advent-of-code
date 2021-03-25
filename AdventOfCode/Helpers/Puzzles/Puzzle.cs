@@ -9,17 +9,49 @@ namespace AdventOfCode.Helpers.Puzzles
 	{
 		protected TP Param { get; set; }
 
-		public PuzzleRunner Run(string testname, TP param)
+		public new PuzzleRunnerWithParam Run(string testname)
 		{
-			Param = param;
-			return new PuzzleRunner(this, testname, testname);
+			return new PuzzleRunnerWithParam(this, testname, testname);
 		}
 
-		public PuzzleRunner RunParamOnly(string testname, TP param)
+		public PuzzleRunner RunParamOnly(string testname)
 		{
-			Param = param;
 			return new PuzzleRunner(this, testname, null);
 		}
+
+		internal class PuzzleRunnerWithParam
+		{
+
+			private readonly PuzzleWithParam<TP, T1, T2> _puzzle;
+			private readonly string _testname;
+			private string _filename;			
+			public PuzzleRunnerWithParam(PuzzleWithParam<TP, T1, T2> puzzle, string testname, string filename) =>
+				(_puzzle, _testname, _filename) = (puzzle, testname, filename);
+
+			public PuzzleRunnerWithParam WithParam(TP param)
+			{
+				_puzzle.Param = param;
+				return this;
+			}
+
+			public PuzzleRunnerWithParam WithNoInput()
+			{
+				_filename = null;
+				return this;
+			}
+
+			public PuzzleRunnerWithParam Part1(T1 expectedResult)
+			{
+				_puzzle.RunPart(_testname, _filename, 1, _puzzle.Part1, expectedResult);
+				return this;
+			}
+			public PuzzleRunnerWithParam Part2(T2 expectedResult)
+			{
+				_puzzle.RunPart(_testname, _filename, 2, _puzzle.Part2, expectedResult);
+				return this;
+			}			
+		}
+
 
 	}
 
@@ -64,21 +96,21 @@ namespace AdventOfCode.Helpers.Puzzles
 
 
 
-		protected void RunFor(string filename, T1 expectedResult1, T2 expectedResult2)
-		{
-			RunPart1For(filename, expectedResult1);
-			RunPart2For(filename, expectedResult2);
-		}
+		// protected void RunFor(string filename, T1 expectedResult1, T2 expectedResult2)
+		// {
+		// 	RunPart1For(filename, expectedResult1);
+		// 	RunPart2For(filename, expectedResult2);
+		// }
 
-		public void RunPart1For(string filename, T1 expectedResult)
-		{
-			RunPart(filename, filename, 1, Part1, expectedResult);
-		}
+		// public void RunPart1For(string filename, T1 expectedResult)
+		// {
+		// 	RunPart(filename, filename, 1, Part1, expectedResult);
+		// }
 
-		public void RunPart2For(string filename, T2 expectedResult)
-		{
-			RunPart(filename, filename, 2, Part2, expectedResult);
-		}
+		// public void RunPart2For(string filename, T2 expectedResult)
+		// {
+		// 	RunPart(filename, filename, 2, Part2, expectedResult);
+		// }
 
 		private string[] ReadInput(string filename) =>
 			filename == null ? null : File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");

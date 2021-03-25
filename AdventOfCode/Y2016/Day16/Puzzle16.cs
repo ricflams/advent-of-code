@@ -13,8 +13,15 @@ namespace AdventOfCode.Y2016.Day16
 
 		public void Run()
 		{
-			RunParamOnly("test1", ("10000", 20, 0)).Part1("01100");
-			RunParamOnly("input", ("01111010110010011", 272, 35651584)).Part1("00100111000101111").Part2("11101110011100110");
+			Run("test1")
+				.WithParam(("10000", 20, 0))
+				.WithNoInput()
+				.Part1("01100");
+			Run("input")
+				.WithParam(("01111010110010011", 272, 35651584))
+				.WithNoInput()
+				.Part1("00100111000101111")
+				.Part2("11101110011100110");
 		}
 
 		protected override string Part1(string[] _)
