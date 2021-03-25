@@ -2,10 +2,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2018.Day07
 {
@@ -28,58 +25,64 @@ namespace AdventOfCode.Y2018.Day07
 		{
 			var work = ReadWorks(input);
 			
-			var order = "";
+			// Pick the first letter (alphabetically) that is available, add it to the
+			// result and remove it from the work-set, and then countdown each of the
+			// letters it enables so they too eventually wil become eligible for picking
+			var result = "";
 			while (work.Any())
 			{
-				var w = work.Values.Where(w => w.ReadyIn == 0).OrderBy(w => w.Letter).First();
-				order += w.Letter;
+				var w = work.Values.Where(w => w.CountdownForReady == 0).OrderBy(w => w.Letter).First();
+				result += w.Letter;
 				work.Remove(w.Letter);
-				foreach (var dep in w.WillMakeAvailable)
+				foreach (var dep in w.WillEnable)
 				{
-					work[dep].ReadyIn--;
+					work[dep].CountdownForReady--;
 				}
 			}
-			return order;
+			return result;
 		}
 
 		protected override int Part2(string[] input)
 		{
 			var work = ReadWorks(input);
-			var (workers, extraSeconds) = Param;
+			var (helpers, extraSeconds) = Param;
 			
-			var order = "";
-
+			// Keep track of the ongoing work,time here
 			var ongoing = new Dictionary<char, int>();
-			var N = 1 + workers;
+			var workers = 1 + helpers;
 
+			// Let the seconds tick by. For each second, process any ongoing work and
+			// get rid of it once its time has elapsed; meaning remove it from the ongoing
+			// tasks, countdown the work that it enables, and remove it from the work-set.
 			var seconds = 0;
-
 			while (true)
 			{
-				foreach (var o in ongoing.Keys.ToArray()) // todo - this is annoying
+				foreach (var o in ongoing.Keys.ToArray())
 				{
-					if (--ongoing[o] == 0)
+					if (--ongoing[o] == 0) // time's up
 					{
-						order += o;
 						ongoing.Remove(o);
-						var w = work[o];
-						foreach (var dep in w.WillMakeAvailable)
+						foreach (var c in work[o].WillEnable)
 						{
-							work[dep].ReadyIn--;
+							work[c].CountdownForReady--;
 						}						
-						work.Remove(w.Letter);
+						work.Remove(o);
 					}
 				}
 
+				// If there's no more work then we're done, so bail before checking for more
+				// work to do and before counting up the seconds
 				if (!work.Any())
 				{
 					break;
 				}
 				
-				while (ongoing.Count < N)
+				// As long as there is room for more workers and there are letters ready that
+				// are not yet being worked on then keep on taking up new ongoing work
+				while (ongoing.Count < workers)
 				{
 					var w = work.Values
-						.Where(w => w.ReadyIn == 0)
+						.Where(w => w.CountdownForReady == 0)
 						.Where(w => !ongoing.ContainsKey(w.Letter))
 						.OrderBy(w => w.Letter)
 						.FirstOrDefault();
@@ -88,41 +91,43 @@ namespace AdventOfCode.Y2018.Day07
 					ongoing[w.Letter] = extraSeconds + w.Letter - 'A' + 1;
 				}
 
+				// Pass the time
 				seconds++;
 			}
+
 			return seconds;
 		}
 
 		internal class Work
 		{
-			public Work(char letter, char[] canBegin) => (Letter, WillMakeAvailable) = (letter, canBegin);
+			public Work(char letter, char[] willEnable) => (Letter, WillEnable) = (letter, willEnable);
 			public char Letter { get; }
-			public int ReadyIn { get; set; }
-			public char[] WillMakeAvailable { get; }
+			public int CountdownForReady { get; set; }
+			public char[] WillEnable { get; }
 		}
 
 		public static Dictionary<char, Work> ReadWorks(string[] input)
 		{
+			// Read all the work-items and add the missing leafs (there seem to just be one
+			// for both test and real input, but let's just do it right)
 			var works = input
 				.Select(line => line.RxMatch("Step %c must be finished before step %c can begin").Get<char, char>())
 				.GroupBy(x => x.Item1)
 				.ToDictionary(x => x.Key, x => new Work(x.Key, x.Select(z => z.Item2).ToArray()));
-
-			var produces = works.Values.SelectMany(w => w.WillMakeAvailable).Distinct();
-			var missing = produces.Except(works.Keys).ToArray();
-			foreach (var leaf in missing)
+			var willEnable = works.Values.SelectMany(w => w.WillEnable).Distinct();
+			var leafs = willEnable.Except(works.Keys).ToArray();
+			foreach (var letter in leafs)
 			{
-				works[leaf] = new Work(leaf, new char[0]);
+				works[letter] = new Work(letter, new char[0]); // will enable nothing`
 			}
 
+			// Count how many "enablings" it takes for each work-node to be fully enabled
 			foreach (var (c, work) in works)
 			{
-				work.ReadyIn = works.Count(x => x.Value.WillMakeAvailable.Contains(c));
+				work.CountdownForReady = works.Count(x => x.Value.WillEnable.Contains(c));
 			}
 
 			return works;
 		}
-
-
 	}
 }
