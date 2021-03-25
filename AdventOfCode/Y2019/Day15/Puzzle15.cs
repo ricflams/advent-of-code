@@ -16,7 +16,7 @@ namespace AdventOfCode.Y2019.Day15
 
 		public void Run()
 		{
-			RunFor("input", 300, 312);
+			Run("input").Part1(300).Part2(312);
 		}
 
 		private const int MoveNone = 0;

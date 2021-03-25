@@ -11,15 +11,15 @@ namespace AdventOfCode.Y2017.Day09
 
 		public void Run()
 		{
-			RunPart1For("test1", 1);
-			RunPart1For("test2", 6);
-			RunPart1For("test3", 5);
-			RunPart1For("test4", 16);
-			RunPart1For("test5", 1);
-			RunPart1For("test6", 9);
-			RunPart1For("test7", 9);
-			RunPart1For("test8", 3);
-			RunFor("input", 10050, 4482);
+			Run("test1").Part1(1);
+			Run("test2").Part1(6);
+			Run("test3").Part1(5);
+			Run("test4").Part1(16);
+			Run("test5").Part1(1);
+			Run("test6").Part1(9);
+			Run("test7").Part1(9);
+			Run("test8").Part1(3);
+			Run("input").Part1(10050).Part2(4482);
 		}
 
 		protected override int Part1(string[] input)

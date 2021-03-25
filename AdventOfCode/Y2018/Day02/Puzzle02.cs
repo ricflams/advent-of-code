@@ -14,13 +14,13 @@ namespace AdventOfCode.Y2018.Day02
 
 		public void Run()
 		{
-			RunFor("test1", 12, "abcde");
+			Run("test1").Part1(12).Part2("abcde");
 
  			// https://www.reddit.com/r/adventofcode/comments/a2rt9s/2018_day_2_part_2_here_are_some_big_inputs_to/
 			// Input with 100,000 strings runs in 850ms
-			RunPart2For("test2", "imobgvpsuafxboeufbjpmstiw");
+			Run("test2").Part2("imobgvpsuafxboeufbjpmstiw");
 
-			RunFor("input", 6150, "rteotyxzbodglnpkudawhijsc");
+			Run("input").Part1(6150).Part2("rteotyxzbodglnpkudawhijsc");
 		}
 
 		protected override int Part1(string[] input)

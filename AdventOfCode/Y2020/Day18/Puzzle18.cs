@@ -13,13 +13,13 @@ namespace AdventOfCode.Y2020.Day18
 
 		public void Run()
 		{
-			RunFor("test1", 71, 231);
-			RunFor("test2", 51, 51);
-			RunFor("test3", 26, 46);
-			RunFor("test4", 437, 1445);
-			RunFor("test5", 12240, 669060);
-			RunFor("test6", 13632, 23340);
-			RunFor("input", 69490582260, 362464596624526);
+			Run("test1").Part1(71).Part2(231);
+			Run("test2").Part1(51).Part2(51);
+			Run("test3").Part1(26).Part2(46);
+			Run("test4").Part1(437).Part2(1445);
+			Run("test5").Part1(12240).Part2(669060);
+			Run("test6").Part1(13632).Part2(23340);
+			Run("input").Part1(69490582260).Part2(362464596624526);
 		}
 
 		protected override ulong Part1(string[] input)

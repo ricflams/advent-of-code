@@ -15,7 +15,7 @@ namespace AdventOfCode.Y2015.Day23
  
 		public void Run()
 		{
-			RunFor("input", 184, 231);
+			Run("input").Part1(184).Part2(231);
 		}
 
 		private class Ins

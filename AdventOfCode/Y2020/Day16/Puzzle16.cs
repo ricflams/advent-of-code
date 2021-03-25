@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2020.Day16
 
 		public void Run()
 		{
-			RunPart1For("test1", 71);
-			RunFor("input", 20048, 4810284647569);
+			Run("test1").Part1(71);
+			Run("input").Part1(20048).Part2(4810284647569);
 		}
 
 		internal class TicketField

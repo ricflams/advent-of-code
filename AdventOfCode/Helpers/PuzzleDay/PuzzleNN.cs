@@ -18,9 +18,9 @@ namespace AdventOfCode.Y2020.Day00
 
 		public void Run()
 		{
-			RunFor("test1", 0, 0);
-			//RunFor("test2", 0, 0);
-			//RunFor("input", 0, 0);
+			Run("test1").Part1(0).Part2(0);
+			//Run("test2").Part1(0).Part2(0);
+			//Run("input").Part1(0).Part2(0);
 		}
 
 		protected override int Part1(string[] input)
@@ -56,9 +56,9 @@ namespace AdventOfCode.Y2020.Day00
 	//  
 	//  	public void Run()
 	//  	{
-	//  		RunFor("test1", null, null);
-	//  		//RunFor("test2", null, null);
-	//  		//RunFor("input", null, null);
+	//  		Run("test1").Part1(null).Part2(null);
+	//  		//Run("test2").Part1(null).Part2(null);
+	//  		//Run("input").Part1(null).Part2(null);
 	//  	}
 	//  
 	//  	protected override (int, int) Part1And2(string[] input)

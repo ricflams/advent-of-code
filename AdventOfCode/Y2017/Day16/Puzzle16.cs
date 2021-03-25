@@ -15,7 +15,7 @@ namespace AdventOfCode.Y2017.Day16
 
 		public void Run()
 		{
-			RunFor("input", "namdgkbhifpceloj", "ibmchklnofjpdeag");
+			Run("input").Part1("namdgkbhifpceloj").Part2("ibmchklnofjpdeag");
 		}
 
 		protected override string Part1(string[] input)

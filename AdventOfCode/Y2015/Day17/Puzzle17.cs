@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2015.Day17
 
 		public void Run()
 		{
-			// TODO, doesn't work: RunFor("test1", 4, 3);
-			RunFor("input", 4372, 4);
+			// TODO, doesn't work: Run("test1").Part1(4).Part2(3);
+			Run("input").Part1(4372).Part2(4);
 		}
 
 		protected override int Part1(string[] input)

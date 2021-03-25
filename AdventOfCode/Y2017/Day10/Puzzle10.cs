@@ -14,7 +14,7 @@ namespace AdventOfCode.Y2017.Day10
 
 		public void Run()
 		{
-			RunFor("input", 1980, "899124dac21012ebc32e2f4d11eaec55");
+			Run("input").Part1(1980).Part2("899124dac21012ebc32e2f4d11eaec55");
 		}
 
 		protected override int Part1(string[] input)

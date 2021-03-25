@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2019.Day08
 
 		public void Run()
 		{
-			RunFor("input", 2356, "PZEKB");
+			Run("input").Part1(2356).Part2("PZEKB");
 		}
 
 		const int Width = 25;

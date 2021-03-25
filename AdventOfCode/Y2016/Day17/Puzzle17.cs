@@ -16,10 +16,10 @@ namespace AdventOfCode.Y2016.Day17
 
 		public void Run()
 		{
-			RunFor("test1", "DDRRRD", 370);
-			RunFor("test2", "DDUDRLRRUDRD", 492);
-			RunFor("test3", "DRURDRUDDLLDLUURRDULRLDUUDDDRR", 830);
-			RunFor("input", "DUDRDLRRRD", 502);
+			Run("test1").Part1("DDRRRD").Part2(370);
+			Run("test2").Part1("DDUDRLRRUDRD").Part2(492);
+			Run("test3").Part1("DRURDRUDDLLDLUURRDULRLDUUDDDRR").Part2(830);
+			Run("input").Part1("DUDRDLRRRD").Part2(502);
 		}
 
 		protected override string Part1(string[] input)

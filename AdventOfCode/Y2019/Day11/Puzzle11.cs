@@ -14,7 +14,7 @@ namespace AdventOfCode.Y2019.Day11
 
 		public void Run()
 		{
-			RunFor("input", 2343, "JFBERBUH");
+			Run("input").Part1(2343).Part2("JFBERBUH");
 		}
 
 		const int ColorBlack = 0;

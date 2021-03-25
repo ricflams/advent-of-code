@@ -13,8 +13,8 @@ namespace AdventOfCode.Y2016.Day06
 
 		public void Run()
 		{
-			RunFor("test1", "easter", "advent");
-			RunFor("input", "mshjnduc", "apfeeebz");
+			Run("test1").Part1("easter").Part2("advent");
+			Run("input").Part1("mshjnduc").Part2("apfeeebz");
 		}
 
 		protected override string Part1(string[] input)

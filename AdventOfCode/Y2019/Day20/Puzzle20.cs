@@ -14,10 +14,10 @@ namespace AdventOfCode.Y2019.Day20
 
 		public void Run()
 		{
-			// TODO, fail: RunPart1For("test1", 23);
-			RunPart1For("test2", 58);
-			RunPart2For("test3", 396);
-			RunFor("input", 608, 6706);
+			// TODO, fail: Run("test1").Part1(23);
+			Run("test2").Part1(58);
+			Run("test3").Part2(396);
+			Run("input").Part1(608).Part2(6706);
 		}
 
 		const int Infinite = 10000000;

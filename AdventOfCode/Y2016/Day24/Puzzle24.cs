@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2016.Day24
 
 		public void Run()
 		{
-			RunPart1For("test1", 14);
-			RunFor("input", 456, 704);
+			Run("test1").Part1(14);
+			Run("input").Part1(456).Part2(704);
 		}
 
 		class DuctGraph : Graph<HashSet<uint>> {}

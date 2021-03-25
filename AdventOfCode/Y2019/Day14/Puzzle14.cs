@@ -15,12 +15,12 @@ namespace AdventOfCode.Y2019.Day14
 
 		public void Run()
 		{
-			RunPart1For("test1", 31);
-			RunPart1For("test2", 165);
-			RunFor("test3", 13312, 82892753);
-			RunFor("test4", 180697, 5586022);
-			RunFor("test5", 2210736, 460664);
-			RunFor("input", 397771, 3126714);
+			Run("test1").Part1(31);
+			Run("test2").Part1(165);
+			Run("test3").Part1(13312).Part2(82892753);
+			Run("test4").Part1(180697).Part2(5586022);
+			Run("test5").Part1(2210736).Part2(460664);
+			Run("input").Part1(397771).Part2(3126714);
 		}
 
 		protected override long Part1(string[] input)

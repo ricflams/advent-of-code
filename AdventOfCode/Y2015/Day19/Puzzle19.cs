@@ -17,10 +17,10 @@ namespace AdventOfCode.Y2015.Day19
 
 		public void Run()
 		{
-			//RunFor("test1", 4, 0);
-			//RunPart2For("test1", 3);
-			RunPart2For("test2", 6);
-			RunFor("input", 535, 0);
+			//Run("test1").Part1(4).Part2(0);
+			//Run("test1").Part2(3);
+			Run("test2").Part2(6);
+			Run("input").Part1(535).Part2(0);
 		}
 
 

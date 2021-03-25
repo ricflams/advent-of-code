@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AdventOfCode.Y2018.Day07
 {
-	internal class Puzzle : Puzzle<string, int>
+	internal class Puzzle : PuzzleWithParam<(int,int), string, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "The Sum of Its Parts";
@@ -18,20 +18,24 @@ namespace AdventOfCode.Y2018.Day07
 
 		public void Run()
 		{
-			RunPart1For("test1", "CABDFE");
-			RunFor("input", "GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
+			Run("test1").Part1("CABDFE");
+			Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 
-			// For("test1").ExceptForPart1("CABDFE");
-			// RunFor("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2WithParam((2, 15), 920);
-			// RunWithParam((2, 15), "GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
+			Run("test1").Part1("CABDFE");
+			Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 
-			// RunForParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// RunForParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
-			// RunForParam((2, 15)).Part2(920);
-			// RunFor("input").WithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// RunFor("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
-			// RunFor("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
-			// RunFor("input").Part2(920);
+			Run("test1").Part1("CABDFE");
+			Run("input", (5, 1)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+	//		RunParamOnly("input", (5, 1)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+
+			// RunWithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			// RunWithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
+			// RunWithParam((2, 15)).Part2(920);
+			// Run("input", "GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
+			// Run("input").WithParam((2, 15)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			// Run("input").Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ");
+			// Run("input").Part2(920);
 
 			// For("input").Run("GKPTSLUXBIJMNCADFOVHEWYQRZ", 920);
 
@@ -59,7 +63,7 @@ namespace AdventOfCode.Y2018.Day07
 
 		protected override int Part2(string[] input)
 		{
-
+			Console.WriteLine(Param);
 			var work = ReadWorks(input);
 			
 			var order = "";

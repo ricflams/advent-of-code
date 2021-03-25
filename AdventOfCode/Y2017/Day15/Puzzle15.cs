@@ -12,8 +12,8 @@ namespace AdventOfCode.Y2017.Day15
 
 		public void Run()
 		{
-			RunFor("test1", 588, 309);
-			RunFor("input", 619, 290);
+			Run("test1").Part1(588).Part2(309);
+			Run("input").Part1(619).Part2(290);
 		}
 
 		private const ulong N = 0x7fffffff;

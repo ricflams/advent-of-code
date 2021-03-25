@@ -21,8 +21,8 @@ namespace AdventOfCode.Y2020.Day12
 			//Action R means to turn right the given number of degrees.
 			//Action F means to move forward by the given value in the direction the ship is currently facing.
 
-			RunFor("test1", 25, 286);
-			RunFor("input", 2297, 89984);
+			Run("test1").Part1(25).Part2(286);
+			Run("input").Part1(2297).Part2(89984);
 		}
 
 		protected override int Part1(string[] input)

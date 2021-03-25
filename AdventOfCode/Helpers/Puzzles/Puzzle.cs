@@ -1,10 +1,28 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.IO;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
+
+	internal abstract class PuzzleWithParam<TP, T1,T2> : Puzzle<T1, T2>
+	{
+		protected TP Param { get; set; }
+
+		public PuzzleRunner Run(string testname, TP param)
+		{
+			Param = param;
+			return new PuzzleRunner(this, testname, testname);
+		}
+
+		public PuzzleRunner RunParamOnly(string testname, TP param)
+		{
+			Param = param;
+			return new PuzzleRunner(this, testname, null);
+		}
+
+	}
+
 	internal abstract class Puzzle<T1,T2> : IPuzzle
 	{
 		private static readonly string TimingBar = new string('#', 10);
@@ -13,10 +31,38 @@ namespace AdventOfCode.Helpers.Puzzles
 		public abstract int Year { get; }
 		public abstract int Day { get; }
 
+		
+
 		protected abstract T1 Part1(string[] input);
 		protected abstract T2 Part2(string[] input);
-		protected virtual T1 Part1Optimized(string[] input) => default(T1);
-		protected virtual T2 Part2Optimized(string[] input) => default(T2);
+
+
+		internal class PuzzleRunner
+		{
+			private readonly Puzzle<T1,T2> _puzzle;
+			private readonly string _testname;
+			private readonly string _filename;
+			public PuzzleRunner(Puzzle<T1,T2> puzzle, string testname, string filename) =>
+				(_puzzle, _testname, _filename) = (puzzle, testname, filename);
+			public PuzzleRunner Part1(T1 expectedResult)
+			{
+				_puzzle.RunPart(_testname, _filename, 1, _puzzle.Part1, expectedResult);
+				return this;
+			}
+			public PuzzleRunner Part2(T2 expectedResult)
+			{
+				_puzzle.RunPart(_testname, _filename, 2, _puzzle.Part2, expectedResult);
+				return this;
+			}
+		}
+
+		public PuzzleRunner Run(string testname)
+		{
+			return new PuzzleRunner(this, testname, testname);
+		}
+
+
+
 
 		protected void RunFor(string filename, T1 expectedResult1, T2 expectedResult2)
 		{
@@ -26,38 +72,22 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		public void RunPart1For(string filename, T1 expectedResult)
 		{
-			if (PuzzleOptions.ShouldRun(this, filename))
-			{
-				var elapsed = RunPart(filename, 1, Part1, expectedResult);
-				Console.WriteLine();
-				if (ShouldRunOptimizedPart(nameof(Part1Optimized)))
-				{
-					var optimized = RunPart(filename, 1, Part1Optimized, expectedResult);
-					WriteSpeedup(elapsed, optimized);
-					Console.WriteLine();
-				}
-			}
+			RunPart(filename, filename, 1, Part1, expectedResult);
 		}
 
 		public void RunPart2For(string filename, T2 expectedResult)
 		{
-			if (PuzzleOptions.ShouldRun(this, filename))
-			{
-				var elapsed = RunPart(filename, 2, Part2, expectedResult);
-				Console.WriteLine();
-				if (ShouldRunOptimizedPart(nameof(Part2Optimized)))
-				{
-					var optimized = RunPart(filename, 2, Part2Optimized, expectedResult);
-					WriteSpeedup(elapsed, optimized);
-					Console.WriteLine();
-				}
-			}
+			RunPart(filename, filename, 2, Part2, expectedResult);
 		}
 
-		private string[] ReadInput(string filename) => File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
+		private string[] ReadInput(string filename) =>
+			filename == null ? null : File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
 
-		private TimeSpan RunPart<T>(string filename, int part, Func<string[],T> solution, T expectedResult)
+		internal void RunPart<T>(string testname, string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
+			if (!PuzzleOptions.ShouldRun(this, testname))
+				return;
+
 			var loops = 1;
 			var sw = Stopwatch.StartNew();
 			var input = ReadInput(filename);
@@ -78,20 +108,9 @@ namespace AdventOfCode.Helpers.Puzzles
 				loops = PuzzleOptions.TimingLoops;
 			}
 			var elapsed = sw.Elapsed / loops;
-			WriteName(elapsed, filename, part);
+			WriteName(elapsed, testname, part);
 			WriteResult(result, expectedResult);
-			return elapsed;
-		}
-
-		private bool ShouldRunOptimizedPart(string methodName)
-		{
-			if (PuzzleOptions.TimingLoops == 0)
-			{
-				return false;
-			}
-			var flags = BindingFlags.NonPublic | BindingFlags.Instance;
-			var method = GetType()?.GetMethod(methodName, flags);
-			return method != null && method.DeclaringType != typeof(Puzzle<T1,T2>);
+			Console.WriteLine();
 		}
 
 		private void WriteName(TimeSpan elapsed, string filename, int part)

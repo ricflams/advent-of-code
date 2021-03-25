@@ -12,9 +12,10 @@ namespace AdventOfCode
 			var sw = Stopwatch.StartNew();
 
 			//PuzzleOptions.OnlyRunForInputs = true;
-			PuzzleOptions.TimingLoops = 5;
-			PuzzleOptions.RunOnly(2015, 19);
-			PuzzleOptions.RunOnly(2018, 7);
+			//PuzzleOptions.TimingLoops = 5;
+			// PuzzleOptions.RunOnly(2015, 19);
+			// PuzzleOptions.RunOnly(2018, 7);
+			// PuzzleOptions.RunOnly(2017);
 
 			Y2015Puzzles();
 			Y2016Puzzles();

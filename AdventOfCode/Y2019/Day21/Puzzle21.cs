@@ -17,7 +17,7 @@ namespace AdventOfCode.Y2019.Day21
 
 		public void Run()
 		{
-			RunFor("input", 19354083, 1143499964);
+			Run("input").Part1(19354083).Part2(1143499964);
 		}
 
 

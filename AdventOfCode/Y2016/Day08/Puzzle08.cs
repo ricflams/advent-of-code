@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2016.Day08
 
 		public void Run()
 		{
-			RunFor("input", 115, "EFEYKFRFIJ");
+			Run("input").Part1(115).Part2("EFEYKFRFIJ");
 		}
 
 		private const int Width = 50;

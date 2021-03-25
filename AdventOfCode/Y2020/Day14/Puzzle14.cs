@@ -15,9 +15,9 @@ namespace AdventOfCode.Y2020.Day14
 
 		public void Run()
 		{
-			RunPart1For("test1", 165);
-			RunPart2For("test2", 208);
-			RunFor("input", 14553106347726, 2737766154126);
+			Run("test1").Part1(165);
+			Run("test2").Part2(208);
+			Run("input").Part1(14553106347726).Part2(2737766154126);
 		}
 
 		protected override ulong Part1(string[] input)

@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2016.Day21
 
 		public void Run()
 		{
-			RunPart1For("test1", "decab");
-			RunFor("input", "hcdefbag", "fbhaegdc");
+			Run("test1").Part1("decab");
+			Run("input").Part1("hcdefbag").Part2("fbhaegdc");
 		}
 
 		protected override string Part1(string[] input)

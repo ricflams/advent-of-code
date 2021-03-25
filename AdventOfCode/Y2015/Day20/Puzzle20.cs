@@ -12,7 +12,7 @@ namespace AdventOfCode.Y2015.Day20
 
 		public void Run()
 		{
-			RunFor("input", 831600, 884520);
+			Run("input").Part1(831600).Part2(884520);
 		}
 
 		protected override int Part1(string[] input)

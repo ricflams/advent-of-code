@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2020.Day21
 
 		public void Run()
 		{
-			RunFor("test1", 5, "mxmxvkd,sqjhc,fvjkl");
-			RunFor("input", 2423, "jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp");
+			Run("test1").Part1(5).Part2("mxmxvkd,sqjhc,fvjkl");
+			Run("input").Part1(2423).Part2("jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp");
 		}
 
 		internal class Food
