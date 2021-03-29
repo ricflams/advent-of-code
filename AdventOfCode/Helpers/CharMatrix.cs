@@ -220,6 +220,11 @@ namespace AdventOfCode.Helpers
 			return true;
 		}
 
+		public static bool Match(this char[,] mx, char[,] other)
+		{
+			return Match(mx, 0, 0, other);
+		}
+
 		public static int CountChar(this char[,] mx, char searched)
 		{
 			var count = 0;
