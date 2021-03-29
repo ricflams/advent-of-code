@@ -33,6 +33,8 @@ namespace AdventOfCode.Helpers
 
 		public static Point operator -(Point p) => Point.From(-p.X, -p.Y);
 		public static Point operator +(Point p1, Point p2) => Point.From(p1.X + p2.X, p1.Y + p2.Y);
+		public static Point operator *(Point p, int n) => Point.From(p.X * n, p.Y * n);
+		public static Point operator *(int n, Point p) => Point.From(p.X * n, p.Y * n);
 
 		public Point Up => new Point(X, Y - 1);
 		public Point Right => new Point(X + 1, Y);
