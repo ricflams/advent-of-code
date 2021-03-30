@@ -15,8 +15,8 @@ namespace AdventOfCode.Y2018.Day10
 
 		public void Run()
 		{
-			Run("test1").WithParam(8).Part1("HI");
-			Run("input").WithParam(10).Part1("PHLGRNFK").Part2(10407);
+			Run("test1").Part1("HI");
+			Run("input").Part1("PHLGRNFK").Part2(10407);
 		}
 
 		protected override string Part1(string[] input)
@@ -33,16 +33,18 @@ namespace AdventOfCode.Y2018.Day10
 
 		private (string, int) GetMessageAndSeconds(string[] input)
 		{
-			// The height varies from test to real input
-			var messageHeight = Param;
+			const int MaxHeight = 10;
 
 			// Read all positions and velocities
 			var points = input
-				.Select(l => l.RxMatch("position=<%D,%D> velocity=<%D,%D>").Get<int, int, int, int>())
-				.Select(x => new
+				.Select(line =>
 				{
-					P = Point.From(x.Item1, x.Item2),
-					V = Point.From(x.Item3, x.Item4),
+					var (px, py, vx, vy) = line.RxMatch("position=<%D,%D> velocity=<%D,%D>").Get<int, int, int, int>();
+					return new
+					{
+						P = Point.From(px, py),
+						V = Point.From(vx, vy)
+					};
 				})
 				.ToArray();
 			var N = points.Length;
@@ -64,13 +66,13 @@ namespace AdventOfCode.Y2018.Day10
 			// We now know the second that two points will align. Explore the vicinity of that
 			// time to find the exact second where the message is precisely 9 chars tall; that's
 			// the time of the message.
-			for (var sec = alignedAt - messageHeight; sec < alignedAt + messageHeight; sec++)
+			for (var sec = alignedAt - MaxHeight; sec < alignedAt + MaxHeight; sec++)
 			{
 				var image = Enumerable.Range(0, N).Select(i => points[i].P + points[i].V * sec).ToArray();
 				var miny = image.Min(p => p.Y);
 				var maxy = image.Max(p => p.Y);
 				var height = maxy - miny + 1;
-				if (height == messageHeight && TryParseMessage(image, out var message))
+				if (height <= MaxHeight && TryParseMessage(image, out var message))
 				{
 					return (message, sec);
 				}				
@@ -80,8 +82,8 @@ namespace AdventOfCode.Y2018.Day10
 
 		private static bool TryParseMessage(Point[] points, out string message)
 		{
-			// Don't "parrse" but just do a crude sanity-check to verify that
-			// the found points do in fact spell out the expected message.
+			// Don't "parse" as such, but just do a crude check for well-known
+			// message patterns.
 			var (minx, maxx) = (points.Min(p => p.X), points.Max(p => p.X));
 			var (miny, maxy) = (points.Min(p => p.Y), points.Max(p => p.Y));
 			var (width, height) = (maxx - minx + 1, maxy - miny + 1);
