@@ -2,10 +2,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2018.Day13
 {
@@ -19,8 +16,94 @@ namespace AdventOfCode.Y2018.Day13
 		public void Run()
 		{
 			Run("test1").Part1("7,3");
-			//Run("test2").Part1(0).Part2(0); 3679 too low,  3797 too high
-			Run("input").Part1("139,65").Part2("");
+			Run("input").Part1("139,65").Part2("40,77");
+		}
+
+		protected override string Part1(string[] input)
+		{
+			var (map, cars) = ReadMapAndCars(input);
+
+			var crash = FirstCollision();
+			return crash.Position;
+
+			Car FirstCollision()
+			{
+				while (true)
+				{
+					cars = cars.OrderBy(c => c.Pose.Point.Y).ThenBy(c => c.Pose.Point.X).ToArray();
+					foreach (var c in cars)
+					{
+						c.Move(map);
+						if (c.CollidedWithAny(cars, out var _))
+						{
+							return c;
+						}
+					}
+				}
+			}
+		}
+
+		protected override string Part2(string[] input)
+		{
+			var (map, cars) = ReadMapAndCars(input);
+
+			// Keep on driving until there's just one car left. At every tick, move
+			// the cars (in order) and check for collisions and remove those that
+			// have collided. It's a bit tricky to do nicely, because the colliding
+			// car may already have taken its turn or have yet to take it.
+			while (cars.Count() > 1)
+			{
+				cars = cars.OrderBy(c => c.Pose.Point.Y).ThenBy(c => c.Pose.Point.X).ToArray();
+				var crashed = new HashSet<Car>();
+				foreach (var c in cars)
+				{
+					if (crashed.Contains(c))
+						continue;
+					c.Move(map);
+					if (c.CollidedWithAny(cars, out var crash))
+					{
+						crashed.Add(c);
+						crashed.Add(crash);
+					}
+				}
+				if (crashed.Any())
+				{
+					cars = cars.Where(c => !crashed.Contains(c)).ToArray();
+				}
+			}
+
+			return cars.First().Position;
+		}
+
+		private static (CharMap, Car[]) ReadMapAndCars(string[] input)
+		{
+			var map = CharMap.FromArray(input);
+
+			var cars = map
+				.AllPoints(c => "v^<>".Contains(c))
+				.Select(p =>
+				{
+					var direction = map[p] switch 
+					{
+						'>' => Direction.Right,
+						'v' => Direction.Down,
+						'<' => Direction.Left,
+						'^' => Direction.Up,
+						_ => throw new Exception("Unknown direction")
+					};
+					var pose = Pose.From(p, direction);
+					return new Car(pose);
+				})
+				.ToArray();
+			
+			// Use the map as-is for driving the cars, so wipe the actual
+			// car-symbols away from it.
+			foreach (var c in cars)
+			{
+				map[c.Pose.Point] = c.Pose.Direction == Direction.Up || c.Pose.Direction == Direction.Down ? '|' : '-';
+			}
+
+			return (map, cars);
 		}
 
 		internal class Car
@@ -28,192 +111,57 @@ namespace AdventOfCode.Y2018.Day13
 			public Car(Pose pose) => (Pose, NextTurn) = (pose, Direction.Left);
 			public Pose Pose { get; }
 			public Direction NextTurn  { get; set; }
-			public bool IsCrashed { get; set; }
-		}
 
-		protected override string Part1(string[] input)
-		{
-			var map = CharMap.FromArray(input);
+			public string Position => $"{Pose.Point.X},{Pose.Point.Y}";
 
-			var cars = map
-				.AllPoints(c => "v^<>".Contains(c))
-				.Select(p =>
-				{
-					var direction = map[p] switch 
-					{
-						'>' => Direction.Right,
-						'v' => Direction.Down,
-						'<' => Direction.Left,
-						'^' => Direction.Up,
-						_ => throw new Exception("Unknown direction")
-					};
-					var pose = Pose.From(p, direction);
-					return new Car(pose);
-				})
-				.ToArray();
-			
-			foreach (var c in cars)
+			public bool CollidedWithAny(IEnumerable<Car> cars, out Car crash)
 			{
-				map[c.Pose.Point] = c.Pose.Direction == Direction.Up || c.Pose.Direction == Direction.Down ? '|' : '-';
+				crash = cars.FirstOrDefault(c => c != this && c.Pose.Point == Pose.Point);
+				return crash != null;
 			}
 
-			var crashpoint = "";
-			while (crashpoint == "")
+			public void Move(CharMap map)
 			{
-				cars = cars.OrderBy(c => c.Pose.Point.Y).ThenBy(c => c.Pose.Point.X).ToArray();
-				foreach (var c in cars)
+				Pose.Move(1);
+				switch (map[Pose.Point])
 				{
-					c.Pose.Move(1);
-
-					if (cars.Any(c2 => c2 != c && c2.Pose.Point == c.Pose.Point))
-					{
-						crashpoint = $"{c.Pose.Point.X},{c.Pose.Point.Y}";
+					case '+':
+						// Time to turn
+						switch (NextTurn)
+						{
+							case Direction.Up: // Up means "go straight" in this puzzle
+								NextTurn = Direction.Right;
+								break;
+							case Direction.Right:
+								Pose.TurnRight();
+								NextTurn = Direction.Left;
+								break;
+							case Direction.Left:
+								Pose.TurnLeft();
+								NextTurn = Direction.Up;
+								break;
+						}
 						break;
-					}
-
-					switch (map[c.Pose.Point])
-					{
-						case '+':
-							// Time to turn
-							switch (c.NextTurn)
-							{
-								case Direction.Up:
-									c.NextTurn = Direction.Right;
-									break;
-								case Direction.Right:
-									c.Pose.TurnRight();
-									c.NextTurn = Direction.Left;
-									break;
-								case Direction.Left:
-									c.Pose.TurnLeft();
-									c.NextTurn = Direction.Up;
-									break;
-							}
-							break;
-						case '/':
-							switch (c.Pose.Direction)
-							{
-								case Direction.Up: c.Pose.TurnRight(); break;
-								case Direction.Right: c.Pose.TurnLeft(); break;
-								case Direction.Down: c.Pose.TurnRight(); break;
-								case Direction.Left: c.Pose.TurnLeft(); break;
-							}
-							break;
-						case '\\':
-							switch (c.Pose.Direction)
-							{
-								case Direction.Up: c.Pose.TurnLeft(); break;
-								case Direction.Right: c.Pose.TurnRight(); break;
-								case Direction.Down: c.Pose.TurnLeft(); break;
-								case Direction.Left: c.Pose.TurnRight(); break;
-							}
-							break;
-					}
+					case '/':
+						switch (Pose.Direction)
+						{
+							case Direction.Up: Pose.TurnRight(); break;
+							case Direction.Right: Pose.TurnLeft(); break;
+							case Direction.Down: Pose.TurnRight(); break;
+							case Direction.Left: Pose.TurnLeft(); break;
+						}
+						break;
+					case '\\':
+						switch (Pose.Direction)
+						{
+							case Direction.Up: Pose.TurnLeft(); break;
+							case Direction.Right: Pose.TurnRight(); break;
+							case Direction.Down: Pose.TurnLeft(); break;
+							case Direction.Left: Pose.TurnRight(); break;
+						}
+						break;
 				}
 			}
-
-
-			return crashpoint;
-		}
-
-		protected override string Part2(string[] input)
-		{
-
-
-			var map = CharMap.FromArray(input);
-
-			var cars = map
-				.AllPoints(c => "v^<>".Contains(c))
-				.Select(p =>
-				{
-					var direction = map[p] switch 
-					{
-						'>' => Direction.Right,
-						'v' => Direction.Down,
-						'<' => Direction.Left,
-						'^' => Direction.Up,
-						_ => throw new Exception("Unknown direction")
-					};
-					var pose = Pose.From(p, direction);
-					return new Car(pose);
-				})
-				.ToArray();
-			
-			foreach (var c in cars)
-			{
-				map[c.Pose.Point] = c.Pose.Direction == Direction.Up || c.Pose.Direction == Direction.Down ? '|' : '-';
-			}
-
-			var crashpoint = "";
-			while (crashpoint == "")
-			{
-				cars = cars.Where(c => !c.IsCrashed).OrderBy(c => c.Pose.Point.Y).ThenBy(c => c.Pose.Point.X).ToArray();
-
-				if (cars.Count(c => !c.IsCrashed) == 1)
-				{
-					var c  = cars.First(c => !c.IsCrashed);
-					crashpoint = $"{c.Pose.Point.X},{c.Pose.Point.Y}";
-					break;
-				}
-
-				foreach (var c in cars)
-				{
-					if (c.IsCrashed)
-						continue;
-					c.Pose.Move(1);
-
-					var crashedwith = cars.FirstOrDefault(c2 => c2 != c && c2.Pose.Point == c.Pose.Point);
-					if (crashedwith != null)
-					{
-						c.IsCrashed = true;
-						crashedwith.IsCrashed = true;
-						//crashpoint = $"{c.Pose.Point.X},{c.Pose.Point.Y}";
-						continue;
-					}
-
-					switch (map[c.Pose.Point])
-					{
-						case '+':
-							// Time to turn
-							switch (c.NextTurn)
-							{
-								case Direction.Up:
-									c.NextTurn = Direction.Right;
-									break;
-								case Direction.Right:
-									c.Pose.TurnRight();
-									c.NextTurn = Direction.Left;
-									break;
-								case Direction.Left:
-									c.Pose.TurnLeft();
-									c.NextTurn = Direction.Up;
-									break;
-							}
-							break;
-						case '/':
-							switch (c.Pose.Direction)
-							{
-								case Direction.Up: c.Pose.TurnRight(); break;
-								case Direction.Right: c.Pose.TurnLeft(); break;
-								case Direction.Down: c.Pose.TurnRight(); break;
-								case Direction.Left: c.Pose.TurnLeft(); break;
-							}
-							break;
-						case '\\':
-							switch (c.Pose.Direction)
-							{
-								case Direction.Up: c.Pose.TurnLeft(); break;
-								case Direction.Right: c.Pose.TurnRight(); break;
-								case Direction.Down: c.Pose.TurnLeft(); break;
-								case Direction.Left: c.Pose.TurnRight(); break;
-							}
-							break;
-					}
-				}
-			}
-
-
-			return crashpoint;
 		}
 	}
 }
