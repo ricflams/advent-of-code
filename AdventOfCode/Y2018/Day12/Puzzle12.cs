@@ -186,6 +186,7 @@ namespace AdventOfCode.Y2018.Day12
 				}
 			}
 
+			return 0;
 			return plants;
 
 		}
