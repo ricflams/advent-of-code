@@ -12,9 +12,10 @@ namespace AdventOfCode
 			var sw = Stopwatch.StartNew();
 
 			//PuzzleOptions.OnlyRunForInputs = true;
-	//		PuzzleOptions.TimingLoops = 5;
+			//PuzzleOptions.TimingLoops = 5;
 			// PuzzleOptions.RunOnly(2015, 19);
-			PuzzleOptions.RunOnly(2018, 9);
+			PuzzleOptions.RunOnly(2018, 12);
+			PuzzleOptions.RunOnly(2018, 14);
 
 
 			Y2015Puzzles();
@@ -124,9 +125,9 @@ namespace AdventOfCode
 			Y2018.Day09.Puzzle.Instance.Run();
 			Y2018.Day10.Puzzle.Instance.Run();
 			Y2018.Day11.Puzzle.Instance.Run();
-			//Y2018.Day12.Puzzle.Instance.Run();
-			//Y2018.Day13.Puzzle.Instance.Run();
-			//Y2018.Day14.Puzzle.Instance.Run();
+			Y2018.Day12.Puzzle.Instance.Run();
+			Y2018.Day13.Puzzle.Instance.Run();
+			Y2018.Day14.Puzzle.Instance.Run();
 			//Y2018.Day15.Puzzle.Instance.Run();
 			//Y2018.Day16.Puzzle.Instance.Run();
 			//Y2018.Day17.Puzzle.Instance.Run();
