@@ -4,15 +4,15 @@ using System.Diagnostics;
 
 namespace AdventOfCode
 {
-	internal class Program
+	public class Program
 	{
-		private static void Main()
+		static void Main(string[] args)
 		{
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2018);
 			var sw = Stopwatch.StartNew();
 
 			//PuzzleOptions.OnlyRunForInputs = true;
-			//PuzzleOptions.TimingLoops = 5;
+			//PuzzleOptions.TimingLoops = 3;
 			// PuzzleOptions.RunOnly(2015, 19);
 			PuzzleOptions.RunOnly(2018, 12);
 			PuzzleOptions.RunOnly(2018, 15);
