@@ -2,7 +2,7 @@
 
 namespace AdventOfCode.Helpers
 {
-    internal static class Guess
+    public static class Guess
     {
 		public enum ValueIs
 		{
@@ -64,6 +64,38 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public static int FindLowest(int start, Func<int, bool> function)
+		{
+			return (int)FindLowest(start, (long x) => function((int)x));
+		}
+
+		public static long FindLowest(long start, Func<long, bool> function)
+		{
+			while (true)
+			{
+				if (function(start))
+					break;
+				start *= 2;
+			}
+
+			var highEnough = start;
+			var tooLow = start / 2;
+			while (true)
+			{
+				var v = (highEnough + tooLow) / 2;
+				if (function(v))
+				{
+					highEnough = v;
+				}
+				else
+				{
+					tooLow = v;
+				}
+				if (tooLow + 1 == highEnough)
+					break;
+			}
+			return highEnough;
+		}
 
 	}
 }
