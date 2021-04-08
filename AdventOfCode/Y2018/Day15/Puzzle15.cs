@@ -198,6 +198,8 @@ namespace AdventOfCode.Y2018.Day15
 			private readonly CharMap _map;
 			public Unit[] _units;
 			private readonly int _initialElfCount;
+			private readonly int _width;
+			private readonly int _height;
 
 			public Combat(string[] input, int elfAttack)
 			{
@@ -215,8 +217,9 @@ namespace AdventOfCode.Y2018.Day15
 
 				_initialElfCount = _units.Count(u => u.Kind == 'E');
 
-
-
+				var (_, max) = _map.Area();
+				_width = max.X + 1;
+				_height = max.Y + 1;
 
 
 				Completed = false;
@@ -309,7 +312,7 @@ namespace AdventOfCode.Y2018.Day15
 							// 	.Where(p => _map[p] == enemy)
 							// 	.Select(p => targets.Single(t => t.Position == p))
 							// 	.ToArray();
-							_distancesCache.Clear();
+//							_distancesCache.Clear();
 							moves++;
 						}
 						else
@@ -329,21 +332,21 @@ namespace AdventOfCode.Y2018.Day15
 						if (weakest.IsDead)
 						{
 							_map[weakest.Position] = '.';
-							_distancesCache.Clear();
+//							_distancesCache.Clear();
 						}
 					}
 				}
 
 				_rounds++;
 //				Console.WriteLine($"Round {_rounds}: units:{_units.Count()} moves:{moves} cantmoves:{cantmoves}");
-				//ConsoleWrite();
+//				ConsoleWrite();
 			}
 
 
 
 			public int _frontierCount = 0;
 
-			private Dictionary<Point, Dictionary<Point, Dictionary<Point, int>>> _distancesCache = new Dictionary<Point, Dictionary<Point, Dictionary<Point, int>>>();
+			// private Dictionary<Point, Dictionary<Point, Dictionary<Point, int>>> _distancesCache = new Dictionary<Point, Dictionary<Point, Dictionary<Point, int>>>();
 
 			private Point Move(Unit unit, Unit[] targets)
 			{
@@ -354,53 +357,71 @@ namespace AdventOfCode.Y2018.Day15
 					.Distinct()
 					.ToHashSet();
 
-				if (!_distancesCache.TryGetValue(unit.Position, out var distances))
-				{
+				// if (!_distancesCache.TryGetValue(unit.Position, out var distances))
+				// {
 					// Calculate at once distancefield from the unit
-					var lookAround = new Dictionary<Point, Point[]>();
+					//var lookAround = new Dictionary<Point, Point[]>();
+					var lookAround = new List<(int,int)>[_width,_height];
+					var inrange2 = new bool[_width,_height];
+					foreach (var p in inrange)
+					{
+						inrange2[p.X, p.Y] = true;
+					}
 					int minDistance = int.MaxValue;
-					distances = unit.Position
+					var distances = unit.Position
 						.LookAround()
 						.Where(p => _map[p] == '.')
 						.ToDictionary(p => p, p => CalcDistanceField(p));
-					_distancesCache[unit.Position] = distances;
+
+					//_distancesCache[unit.Position] = distances;
 
 					Dictionary<Point, int> CalcDistanceField(Point start)
 					{
-						var frontier = new Queue<Point>();
-						var distance = new Dictionary<Point, int>();
-						distance[start] = 0;
-						frontier.Enqueue(start);
+						//var frontier = new Queue<(int, int)>();
+						var frontier = new Queue<(int, int)>();
+						var distance = new int[_width,_height];
+						distance[start.X, start.Y] = 1;
+						frontier.Enqueue((start.X, start.Y));
 						while (frontier.Any())
 						{
-							var current = frontier.Dequeue();
-							if (distance[current] > minDistance)
+							var (x, y) = frontier.Dequeue();
+							var dist = distance[x, y];
+							if (dist >= minDistance)
 								break;
-							if (!lookAround.TryGetValue(current, out var adjacent))
+							var adjacent = lookAround[x, y];
+							if (adjacent == null)
 							{
-								adjacent = lookAround[current] = current.LookAround().Where(p => _map[p] == '.').ToArray();
+								adjacent = lookAround[x, y] = new List<(int, int)>();
+								if (_map[x-1][y] == '.') adjacent.Add((x-1, y));
+								if (_map[x+1][y] == '.') adjacent.Add((x+1, y));
+								if (_map[x][y-1] == '.') adjacent.Add((x, y-1));
+								if (_map[x][y+1] == '.') adjacent.Add((x, y+1));
 							}
-							var currentDistance = distance[current];
-							foreach (var p in adjacent)
+							foreach (var (nx, ny) in adjacent)
 							{
-								if (distance.ContainsKey(p))
+								if (distance[nx, ny] > 0)
 									continue;
-								distance[p] = currentDistance + 1;
-								if (inrange.Contains(p))
+								distance[nx, ny] = dist + 1;
+								if (inrange2[nx, ny])
 								{
-									minDistance = distance[p];
+									minDistance = dist + 1;
 									break;
 								}
-								frontier.Enqueue(p);
-								_frontierCount++;
+								frontier.Enqueue((nx, ny));
+								//_frontierCount++;
 							}
 						}
-						return distance;
+
+						var distdict = inrange
+							.Where(p => distance[p.X, p.Y] > 0)
+							.ToDictionary(p => p, p => distance[p.X, p.Y]);
+
+						return distdict;
 					}
 
-				}
-				// else
-				// 	Console.Write(".");
+				// }
+				// // else
+				// // 	Console.Write(".");
 
 
 				var reachables3 = inrange
@@ -458,21 +479,23 @@ namespace AdventOfCode.Y2018.Day15
 
 			private void ConsoleWrite()
 			{
+				Console.Clear();
 				Console.WriteLine($"After {_rounds} rounds:");
 				_map.ConsoleWrite();
-				var (min, max) = _map.Area();
-				for (var y = min.Y; y <= max.Y; y++)
-				{
-					for (var x = min.X; x <= max.X; x++)
-					{
-						var u = _units.Where(u => u.IsAlive && u.Position == Point.From(x, y)).FirstOrDefault();
-						if (u != null)
-						{
-							Console.Write($"{u.Kind}({u.Hitpoints}) ");
-						}
-					}
-					Console.WriteLine();
-				}
+				// var (min, max) = _map.Area();
+				// for (var y = min.Y; y <= max.Y; y++)
+				// {
+				// 	for (var x = min.X; x <= max.X; x++)
+				// 	{
+				// 		var u = _units.Where(u => u.IsAlive && u.Position == Point.From(x, y)).FirstOrDefault();
+				// 		if (u != null)
+				// 		{
+				// 			Console.Write($"{u.Kind}({u.Hitpoints}) ");
+				// 		}
+				// 	}
+				// 	Console.WriteLine();
+				// }
+				Console.ReadKey();
 			}
 
 			// struct PathInfo
