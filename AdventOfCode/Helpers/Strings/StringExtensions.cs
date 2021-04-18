@@ -6,7 +6,7 @@ namespace AdventOfCode.Helpers.String
 {
     public static class Extensions
     {
-        public static IEnumerable<string> Replacements(this string str, string oldValue, string newValue)
+        public static IEnumerable<string> AllReplacements(this string str, string oldValue, string newValue)
 		{
 			// The length of a replaced string is fixed
 			var replacedLength = str.Length - oldValue.Length + newValue.Length;

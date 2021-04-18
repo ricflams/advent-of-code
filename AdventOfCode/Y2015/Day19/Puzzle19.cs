@@ -19,8 +19,9 @@ namespace AdventOfCode.Y2015.Day19
 		{
 			//Run("test1").Part1(4).Part2(0);
 			//Run("test1").Part2(3);
-			Run("test2").Part2(6);
-			Run("input").Part1(535).Part2(0);
+			//Run("test2").Part2(6);
+			//Run("input").Part1(535).Part2(0);
+			Run("input").Part2(0);
 		}
 
 
@@ -45,7 +46,7 @@ namespace AdventOfCode.Y2015.Day19
 			var molecules = new HashSet<string>();
 			foreach (var r in reductions)
 			{
-				foreach (var m in molecule.Replacements(r.From, r.To))
+				foreach (var m in molecule.AllReplacements(r.From, r.To))
 				{
 					molecules.Add(m);
 				}
@@ -155,8 +156,9 @@ namespace AdventOfCode.Y2015.Day19
 				.Distinct()
 				.ToArray();
 
-			var terminals = allredux.Where(x => !reductions.ContainsKey(x)).ToList();
+			var terminals = allredux.Where(x => !reductions.ContainsKey(x)).OrderBy(x => x).ToList();
 			Console.WriteLine("Terminals: " + string.Join(" ", terminals));
+			Console.WriteLine("Molecule with terminals: " + string.Join(" ", molecule.Select(x => terminals.Contains(x) ? $"({x})" : x.ToString())));
 
 			Console.WriteLine("Can be reduced to: ");
 			for (var i = 0; i < mols.Count(); i++)
