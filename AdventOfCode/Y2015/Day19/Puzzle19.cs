@@ -158,7 +158,9 @@ namespace AdventOfCode.Y2015.Day19
 
 			var terminals = allredux.Where(x => !reductions.ContainsKey(x)).OrderBy(x => x).ToList();
 			Console.WriteLine("Terminals: " + string.Join(" ", terminals));
-			Console.WriteLine("Molecule with terminals: " + string.Join(" ", molecule.Select(x => terminals.Contains(x) ? $"({x})" : x.ToString())));
+			Console.WriteLine($"Terminals: {molecule.Count(x=>terminals.Contains(x))} of {molecule.Count()}");
+			//Console.WriteLine("Molecule with terminals1: " + string.Join(" ", molecule.Select(x => terminals.Contains(x) ? $"({x})" : x.ToString())));
+			Console.WriteLine("Molecule with terminals2: " + string.Join(" ", molecule.Select(x => terminals.Contains(x) ? x.ToString() : "_")));
 
 			Console.WriteLine("Can be reduced to: ");
 			for (var i = 0; i < mols.Count(); i++)
@@ -243,13 +245,7 @@ namespace AdventOfCode.Y2015.Day19
 				return seen;
 			}
 
-return 0;
-
-
-			foreach (var x in MathHelper.AllCombinations<int>(new [] { new int[]{1, 2, 3, 4}, new int[]{10, 11, 12}, new int[]{99}, new int[]{33,44} } ))
-			{
-				System.Console.WriteLine(string.Join(" ", x));
-			}
+			return 0;
 
 			var molredux = new Dictionary<int[], int>();
 			var molq = new Queue<(int[], int)>();
