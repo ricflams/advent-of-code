@@ -23,6 +23,8 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public static char[,] FromArray(this string[] arrays) => ToCharMatrix(arrays);
+
 		public static char[,] ToCharMatrix(this string[] arrays)
 		{
 			var w = arrays[0].Length;
@@ -112,6 +114,32 @@ namespace AdventOfCode.Helpers
 				}
 			}
 			return flipped;
+		}
+
+		public static char[,] Transform(this char[,] mx, Func<char, char[], char> transform)
+		{
+			var (w, h) = mx.Dim();
+
+			var transformed = new char[w, h];
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					var adjacents = new char[8]
+					{
+						y > 0 ? mx[x, y-1] : (char)0,
+						y > 0 && x > 0 ? mx[x-1, y-1] : (char)0,
+						y > 0 && x < w-1 ? mx[x+1, y-1] : (char)0,
+						x > 0 ? mx[x-1, y] : (char)0,
+						x < w-1 ? mx[x+1, y] : (char)0,
+						y < h-1 ? mx[x, y+1] : (char)0,
+						y < h-1 && x > 0 ? mx[x-1, y+1] : (char)0,
+						y < h-1 && x < w-1 ? mx[x+1, y+1] : (char)0
+					};
+					transformed[x, y] = transform(mx[x, y], adjacents);
+				}
+			}
+			return transformed;
 		}
 
 		public static void ShiftRowRight(this char[,] mx, int row, int n)
@@ -237,6 +265,25 @@ namespace AdventOfCode.Helpers
 			}
 			return count;
 		}
+
+		public static T Hash<T>(this char[,] mx, Func<IEnumerable<byte>, T> hashing)
+		{
+			var (w, h) = mx.Dim();
+
+			return hashing(AsStream());
+
+			IEnumerable<byte> AsStream()
+			{
+				for (var x = 0; x < w; x++)
+				{
+					for (var y = 0; y < h; y++)
+					{
+						yield return (byte)mx[x, y];
+					}
+				}
+			}
+		}
+
 
 		public static IEnumerable<Point> PositionsOf(this char[,] mx, char searchFor)
 		{

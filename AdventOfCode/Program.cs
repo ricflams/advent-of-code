@@ -12,8 +12,8 @@ namespace AdventOfCode
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
 
 			//PuzzleOptions.OnlyRunForInputs = true;
-			//PuzzleOptions.TimingLoops = 2;
-			PuzzleOptions.RunOnly(2018, 17);
+			//PuzzleOptions.TimingLoops = 5;
+			PuzzleOptions.RunOnly(2018, 18);
 
 
 			Y2015Puzzles();
@@ -135,7 +135,7 @@ namespace AdventOfCode
 			Y2018.Day15.Puzzle.Instance.Run();
 			Y2018.Day16.Puzzle.Instance.Run();
 			Y2018.Day17.Puzzle.Instance.Run();
-			//Y2018.Day18.Puzzle.Instance.Run();
+			Y2018.Day18.Puzzle.Instance.Run();
 			//Y2018.Day19.Puzzle.Instance.Run();
 			//Y2018.Day20.Puzzle.Instance.Run();
 			//Y2018.Day21.Puzzle.Instance.Run();
