@@ -27,11 +27,11 @@ namespace AdventOfCode
 			Y2021Puzzles();
 
 			Console.WriteLine($"Elapsed: {(int)(sw.ElapsedMilliseconds / (1 + PuzzleOptions.TimingLoops))} ms");
-			if (Debugger.IsAttached)
-			{
-				Console.Write("Press any key to close ");
-				Console.ReadKey();
-			}
+			//if (Debugger.IsAttached)
+			//{
+			//	Console.Write("Press any key to close ");
+			//	Console.ReadKey();
+			//}
 		}
 
 		private static void Y2015Puzzles()

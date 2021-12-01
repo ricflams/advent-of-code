@@ -7,7 +7,7 @@ using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2018.Day19
 {
-	internal class Puzzle : Puzzle<int, int>
+	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Go With The Flow";
@@ -16,11 +16,12 @@ namespace AdventOfCode.Y2018.Day19
 
 		public void Run()
 		{
-			Run("test1").Part1(6);
-			Run("input").Part1(1056).Part2(0);
+			//Run("test1").Part1(6);
+			//Run("input").Part1(1056).Part2(0);
+			Run("input").Part2(0);
 		}
 
-		protected override int Part1(string[] input)
+		protected override long Part1(string[] input)
 		{
 			var computer = new Computer(input);
 
@@ -30,11 +31,23 @@ namespace AdventOfCode.Y2018.Day19
 			return reg0;
 		}
 
-		protected override int Part2(string[] input)
+		protected override long Part2(string[] input)
 		{
 			var computer = new Computer(input);
 
 			computer.Regs[0] = 1;
+
+			//computer._ins[3] = new Computer.Ins { Opcode = Computer.Opcode.addr, A = 5, B = 0, C = 0 };
+
+			computer._ins[3] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[4] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[5] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[6] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			//computer._ins[7] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[8] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[9] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[10] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
+			computer._ins[11] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 0, B = 0, C = 1 };
 			computer.Run();
 			var reg0 = computer.Regs[0];
 
@@ -43,11 +56,11 @@ namespace AdventOfCode.Y2018.Day19
 
 		internal class Computer
 		{
-			private readonly Ins[] _ins;
+			public Ins[] _ins;
 			private readonly int _ipreg;
 			private int _ip;
 
-			public readonly int[] Regs;
+			public readonly long[] Regs;
 
 			public enum Opcode
 			{
@@ -74,8 +87,10 @@ namespace AdventOfCode.Y2018.Day19
 						};
 					})
 					.ToArray();
-				Regs = new int[6];
+				Regs = new long[6];
 				_ip = 0;
+
+				IpSeen = new int[_ins.Length];
 			}
 
 			public class Ins
@@ -84,6 +99,7 @@ namespace AdventOfCode.Y2018.Day19
 				public int A { get; init; }
 				public int B { get; init; }
 				public int C { get; init; }
+				public override string ToString() => $"{Opcode} {A} {B} {C}";
 			}
 
 			public void Run()
@@ -95,8 +111,14 @@ namespace AdventOfCode.Y2018.Day19
 				}
 			}
 
+			private int[] IpSeen;
+
 			private void Step()
 			{
+				IpSeen[_ip]++;
+
+				Console.WriteLine(string.Join(" ", IpSeen.Select(x => x.ToString("D3"))));
+
 				var ins = _ins[_ip];
 				var (opcode, a, b, c) = (ins.Opcode, ins.A, ins.B, ins.C);
 
@@ -126,7 +148,7 @@ namespace AdventOfCode.Y2018.Day19
 						throw new Exception($"Unknown opcode {opcode}");
 				}
 
-				_ip = Regs[_ipreg];
+				_ip = (int)Regs[_ipreg];
 				_ip++;
 
 				//Console.WriteLine($" [{string.Join(",", _regs.Select(x => x.ToString()))}]");
