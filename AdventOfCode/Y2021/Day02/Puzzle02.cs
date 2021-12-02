@@ -1,11 +1,5 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2021.Day02
 {
@@ -19,13 +13,13 @@ namespace AdventOfCode.Y2021.Day02
 		public void Run()
 		{
 			Run("test1").Part1(150).Part2(900);
-			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(1648020).Part2(1759818555);
 		}
 
 		protected override int Part1(string[] input)
 		{
 			var p = Point.Origin;
+
 			foreach (var line in input)
 			{
 				var (dir, len) = line.RxMatch("%s %d").Get<string, int>();
@@ -38,17 +32,11 @@ namespace AdventOfCode.Y2021.Day02
 				}
 			}
 
-			var x = p.X * p.Y;
-
-
-
-
-			return x;
+			return p.X * p.Y;
 		}
 
 		protected override int Part2(string[] input)
 		{
-
 			var p = Point.Origin;
 			var aim = 0;
 
@@ -64,14 +52,7 @@ namespace AdventOfCode.Y2021.Day02
 				}
 			}
 
-			var x = p.X * p.Y;
-
-
-
-
-			return x;
-
-
+			return p.X * p.Y;
 		}
 	}
 }
