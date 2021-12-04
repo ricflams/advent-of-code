@@ -28,13 +28,10 @@ namespace AdventOfCode.Y2021.Day04
 		{
 			var numbers = input.First().ToIntArray();
 
-			var raw = input.Skip(2).GroupByEmptyLine().ToArray();
-			var boards = raw
-				.Select(lines => lines.Select(line => {
-					var parts = line.Split().Where(x => x.Length > 0).ToArray();
-					var ss = parts.Select(int.Parse).ToArray();
-					return ss;
-				}).ToArray())
+			var boards = input
+				.Skip(1)
+				.GroupByEmptyLine()
+				.Select(lines => lines.Select(x => x.ToIntArray()).ToArray())
 				.ToArray();
 
 			foreach (var n in numbers)

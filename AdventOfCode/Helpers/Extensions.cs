@@ -35,13 +35,19 @@ namespace AdventOfCode.Helpers
 			{
 				if (line.Length == 0)
 				{
-					yield return group.ToArray();
-					group.Clear();
+					if (group.Any())
+					{
+						yield return group.ToArray();
+						group.Clear();
+					}
 					continue;
 				}
 				group.Add(line);
 			}
-			yield return group.ToArray();
+			if (group.Any())
+			{
+				yield return group.ToArray();
+			}
 		}
 
 		public static ulong Sum(this IEnumerable<ulong> values)
