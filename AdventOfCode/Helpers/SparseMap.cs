@@ -122,7 +122,28 @@ namespace AdventOfCode.Helpers
 			yield return Point.From(min.X, max.Y);
 		}
 
-		
+		public void WalkLine(Point p1, Point p2, Action<Point> action)
+		{
+			WalkLine(p1.X, p1.Y, p2.X, p2.Y, action);
+		}
+
+		public void WalkLine(int x1, int y1, int x2, int y2, Action<Point> action)
+		{
+			var dx = x2 - x1;
+			var dy = y2 - y1;
+			var lenx = Math.Abs(dx);
+			var leny = Math.Abs(dy);
+			var steps = Math.Max(lenx, leny);
+
+			for (var i = 0; i <= steps; i++)
+			{
+				var x = x1 + i * dx / steps;
+				var y = y1 + i * dy / steps;
+				var p = Point.From(x, y);
+				action(p);
+			}
+		}
+
 		public string[] Render(Func<Point, T, char> rendering)
 		{
 			var (min, max) = Area();
