@@ -55,9 +55,6 @@ namespace AdventOfCode.Y2021.Day03
 		{
 			var w = input.First().Length;
 
-			var gamma = 0;
-			var eps = 0;
-
 			var input2 = input.Select(x => x).ToArray();
 
 			for (var i = 0; i < w && input2.Length > 1; i++)
