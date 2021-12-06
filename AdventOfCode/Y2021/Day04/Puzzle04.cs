@@ -7,12 +7,13 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using AdventOfCode.Helpers.String;
+using System.Collections;
 
 namespace AdventOfCode.Y2021.Day04
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
-		public static Puzzle Instance = new Puzzle();
+		public static Puzzle Instance = new();
 		public override string Name => "Giant Squid";
 		public override int Year => 2021;
 		public override int Day => 4;
@@ -20,129 +21,153 @@ namespace AdventOfCode.Y2021.Day04
 		public void Run()
 		{
 			Run("test1").Part1(4512).Part2(1924);
-			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(50008).Part2(17408);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var numbers = input.First().ToIntArray();
+			var (numbers, boards) = ReadBoards(input);
+			foreach (var n in numbers)
+			{
+				foreach (var b in boards)
+				{
+					if (b.MarkAndCheckForWin(n))
+					{
+						return n * b.SumUnmarked;
+					}
+				}
+			}
+			throw new Exception("No winning board");
+		}
 
-			var boards = input
-				.Skip(1)
-				.GroupByEmptyLine()
-				.Select(lines => lines.Select(x => x.ToIntArray()).ToArray())
-				.ToArray();
+		protected override int Part2(string[] input)
+		{
+			var (numbers, boards) = ReadBoards(input);
 
 			foreach (var n in numbers)
 			{
 				foreach (var b in boards)
 				{
-					for (var x = 0; x < 5; x++)
+					if (b.MarkAndCheckForWin(n))
 					{
-						for (var y = 0; y < 5; y++)
+						if (boards.Length == 1)
 						{
-							if (b[x][y] == n)
-							{
-								b[x][y] = -1;
-
-								var coln = 0;
-								for (var yy = 0; yy < 5; yy++)
-								{
-									if (b[x][yy] == -1)
-										coln++;
-								}
-
-								if (coln == 5 || b[x].All(v => v == -1))
-								{
-									// found board!
-									var unmarked = b.Sum(line => line.Where(x => x != -1).Sum());
-									var score = n * unmarked;
-
-									return score;
-								}
-
-								x = 10;
-								y = 10;
-								break;
-							}
+							return n * b.SumUnmarked;
 						}
+						boards.Purge(b);
 					}
-
 				}
 			}
-
-
-			return 0;
+			throw new Exception("No winning board");
 		}
 
-		protected override int Part2(string[] input)
+		private static (int[], PurgeableArray<Board>) ReadBoards(string[] input)
 		{
 			var numbers = input.First().ToIntArray();
+			var boards = input
+				.Skip(1)
+				.GroupByEmptyLine()
+				.Select(lines => new Board(lines))
+				.ToPurgeableArray();
+			return (numbers, boards);
+		}
 
-			var raw = input.Skip(2).GroupByEmptyLine().ToArray();
-			var boards = raw
-				.Select(lines => lines.Select(line => {
-					var parts = line.Split().Where(x => x.Length > 0).ToArray();
-					var ss = parts.Select(int.Parse).ToArray();
-					return ss;
-				}).ToArray())
-				.ToArray();
+		internal class Board
+		{
+			private readonly int[][] _grid;
+			private readonly int _cols, _rows;
 
-
-			foreach (var n in numbers)
+			public Board(string[] lines)
 			{
-				//foreach (var b in boards)
-				for (var bi = 0; bi < boards.Length; bi++)
-				{
-					var b = boards[bi];
-					if (b == null)
-						continue;
-					for (var x = 0; x < 5; x++)
-					{
-						for (var y = 0; y < 5; y++)
-						{
-							if (b[x][y] == n)
-							{
-								b[x][y] = -1;
-
-					//			Console.WriteLine($"Board {bi}: mark {n}");
-
-								var coln = 0;
-								for (var xx = 0; xx < 5; xx++)
-								{
-									if (b[xx][y] == -1)
-										coln++;
-								}
-
-								if (coln == 5 || b[x].All(v => v == -1))
-								{
-	//								Console.WriteLine($"Board {bi}: DONE #########");
-									if (boards.Count(x => x != null) == 1)
-									{
-										// found last board!
-										var unmarked = b.Sum(line => line.Where(x => x != -1).Sum());
-										var score = n * unmarked;
-										return score;
-									}
-									boards[bi] = null;
-
-									x = 10;
-									y = 10;
-
-									//bi = boards.Length;
-								}
-							}
-						}
-					}
-
-				}
+				_grid = lines.Select(x => x.ToIntArray()).ToArray();
+				_cols = _grid.First().Length;
+				_rows = _grid.Length;
 			}
 
+			public int SumUnmarked => +_grid.Sum(row => row.Where(x => x != -1).Sum());
 
-
-
-			return 0;
+			public bool MarkAndCheckForWin(int n)
+			{
+				for (var x = 0; x < _cols; x++)
+				{
+					for (var y = 0; y < _rows; y++)
+					{
+						if (_grid[y][x] == n)
+						{
+							_grid[y][x] = -1;
+							return Enumerable.Range(0, _rows).All(yy => _grid[yy][x] == -1)
+								|| _grid[y].All(v => v == -1);
+						}
+					}
+				}
+				return false;
+			}
 		}
 	}
+
+	public static class Extensions
+	{
+		public static PurgeableArray<T> ToPurgeableArray<T>(this IEnumerable<T> enumerable)
+		{
+			return new PurgeableArray<T>(enumerable.ToArray());
+		}
+	}
+
+
+	public class PurgeableArray<T> : IEnumerable
+	{
+		private readonly T[] _array;
+
+		public PurgeableArray(T[] array) => _array = array;
+
+		public IEnumerator<T> GetEnumerator() => new PurgeableArrayEnumerator(_array);
+		IEnumerator IEnumerable.GetEnumerator() => 
+			throw new Exception();
+//			_enumerator;
+
+		public void Purge(T item)
+		{
+			var index = Array.FindIndex(_array, x => item.Equals(x));
+			if (index != -1)
+			{
+				_array[index] = default;
+			}
+		}
+
+		public int Length => _array.Count(x => x != null);
+
+		public class PurgeableArrayEnumerator : IEnumerator<T>
+		{
+			private readonly T[] _array;
+			private int _index = -1;
+
+			public PurgeableArrayEnumerator(T[] array) => _array = array;
+
+			public T Current => _array[_index];
+
+			object IEnumerator.Current => Current;
+
+			public void Dispose()
+			{
+				//throw new NotImplementedException();
+			}
+
+			public bool MoveNext()
+			{
+				do
+				{
+					_index++;
+					if (_index >= _array.Length)
+						return false;
+				} while (_array[_index] == null);
+				return true;
+			}
+
+			public void Reset()
+			{
+				_index = -1;
+			}
+		}
+	}
+
 }
