@@ -247,48 +247,48 @@ namespace AdventOfCode.Y2015.Day19
 
 			return 0;
 
-			var molredux = new Dictionary<int[], int>();
-			var molq = new Queue<(int[], int)>();
-			molq.Enqueue((new int[] { mols.IndexOf("e") }, 0));
-			while (molq.Any())
-			{
-				var (seq, redux) = molq.Dequeue();
-				if (seq.Length == molecule.Length)
-				{
-					if (seq.SequenceEqual(molecule))
-					{
-						Console.WriteLine("Found it!!!!!!!!!!!! " + redux);
-						break;
-					}
-					continue;
-				}
-				molredux[seq] = redux;
+			//var molredux = new Dictionary<int[], int>();
+			//var molq = new Queue<(int[], int)>();
+			//molq.Enqueue((new int[] { mols.IndexOf("e") }, 0));
+			//while (molq.Any())
+			//{
+			//	var (seq, redux) = molq.Dequeue();
+			//	if (seq.Length == molecule.Length)
+			//	{
+			//		if (seq.SequenceEqual(molecule))
+			//		{
+			//			Console.WriteLine("Found it!!!!!!!!!!!! " + redux);
+			//			break;
+			//		}
+			//		continue;
+			//	}
+			//	molredux[seq] = redux;
 
-				var reduxtions = seq
-					.Select(s =>
-					{
-						if (!reductions.ContainsKey(s) || !reductions[s].Any())
-							return new int[][] { new [] {s} };
-						return reductions[s];
+			//	var reduxtions = seq
+			//		.Select(s =>
+			//		{
+			//			if (!reductions.ContainsKey(s) || !reductions[s].Any())
+			//				return new int[][] { new [] {s} };
+			//			return reductions[s];
 
-					})
-					.ToArray();
+			//		})
+			//		.ToArray();
 				
-				foreach (var x in MathHelper.AllCombinations(reduxtions))
-				{
-					var mol2 = x.SelectMany(x => x).ToArray();
-					if (molredux.ContainsKey(mol2))
-						continue;
-					var redux2 = mol2.Zip(seq, (x1, x2) => x1 == x2 ? 0 : 1).Count();
-					molq.Enqueue((mol2, redux + redux2));
-					System.Console.WriteLine(string.Join(" ", mol2));
-				}
-				//foreach (var reduc in mols[seq.Last()])
-			};
+			//	foreach (var x in MathHelper.AllCombinations(reduxtions))
+			//	{
+			//		var mol2 = x.SelectMany(x => x).ToArray();
+			//		if (molredux.ContainsKey(mol2))
+			//			continue;
+			//		var redux2 = mol2.Zip(seq, (x1, x2) => x1 == x2 ? 0 : 1).Count();
+			//		molq.Enqueue((mol2, redux + redux2));
+			//		System.Console.WriteLine(string.Join(" ", mol2));
+			//	}
+			//	//foreach (var reduc in mols[seq.Last()])
+			//};
 
 
 
-			return 0;
+			//return 0;
 		
 		}
 
