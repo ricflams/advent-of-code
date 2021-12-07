@@ -42,7 +42,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public string[] Render(Func<Point, char, char> rendering = null)
+		public new string[] Render(Func<Point, char, char> rendering = null)
 		{
 			var (min, max) = Area();
 			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
