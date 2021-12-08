@@ -48,5 +48,10 @@ namespace AdventOfCode.Helpers.String
 		{
 			return s.Split(IntArraySep, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
 		}
+
+		public static string[] SplitSpace(this string s)
+		{
+			return s.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+		}
     }
 }

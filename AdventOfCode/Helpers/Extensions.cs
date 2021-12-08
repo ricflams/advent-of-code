@@ -68,5 +68,19 @@ namespace AdventOfCode.Helpers
 			}
 			return value;
 		}
+
+		public static int IndexOf<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate)
+		{
+			var index = 0;
+			foreach (var item in enumerable)
+			{
+				if (predicate(item))
+				{
+					return index;
+				}
+				index++;
+			}
+			throw new Exception("No match");
+		}
 	}
 }
