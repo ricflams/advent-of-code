@@ -13,149 +13,101 @@ namespace AdventOfCode.Y2021.Day09
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 9";
+		public override string Name => "Smoke Basin";
 		public override int Year => 2021;
 		public override int Day => 9;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(15).Part2(1134);
+			Run("input").Part1(585).Part2(827904);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var map = CharMap.FromArray(input);
 
+			var n = 0;
+			var (min, max) = map.Area();
+			foreach (var p in map.AllPoints())
+			{
+				var islow = true;
+				foreach (var pp in p.LookAround().Within(min, max))
+				{
+					if (map[pp] <= map[p])
+						islow = false;
+				}
+				if (islow)
+				{
+					//Console.WriteLine(p);
+					n += map[p] - '0' + 1;
+				}
+			}
 
-			return 0;
+			return n;
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var map = CharMap.FromArray(input);
 
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
+			var (min, max) = map.Area();
+			var basins = new List<int>();
+			var all = new HashSet<Point>();
+			foreach (var p in map.AllPoints())
 			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				var islow = true;
+				foreach (var pp in p.LookAround().Within(min, max))
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
+					if (map[pp] <= map[p])
+						islow = false;
+				}
+				if (islow)
+				{
+					//Console.WriteLine(p);
+					//n += map[p] - '0' + 1;
+					var seen = new HashSet<Point>();
+					seen.Add(p);
+					//Console.WriteLine(p);
+					CalcBasin(seen, p);
+					var basin = seen.Count;
+					basins.Add(basin);
+
+					all.UnionWith(seen);
 				}
 			}
+
+			foreach (var p in map.AllPoints())
 			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
+				if (!all.Contains(p))
 				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
+					if (map[p] != '9')
+						Console.WriteLine(p);
+				}
+			}
+
+			var biggest = basins.OrderByDescending(x => x).Take(3).ToArray();
+			var n = biggest.Prod();
+
+			return n;
+
+			void CalcBasin(HashSet<Point> seen, Point low)
+			{
+				//var n = 1;
+				foreach (var pp in low.LookAround().Within(min, max))
+				{
+					if (map[pp] == '9')
 						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					if (map[pp] > map[low])
 					{
+						//Console.WriteLine(pp);
+						seen.Add(pp);
+						CalcBasin(seen, pp);
+					}
+				}
+				//return n;
+			}
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
-			}
 		}
 
 	}

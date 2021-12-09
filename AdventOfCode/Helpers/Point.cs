@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
@@ -181,5 +182,13 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+	}
+
+	internal static class PointExtensions
+	{
+		public static IEnumerable<Point> Within(this IEnumerable<Point> points, Point min, Point max)
+		{
+			return points.Where(p => p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y);
+		}
 	}
 }
