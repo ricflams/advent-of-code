@@ -11,9 +11,10 @@ namespace AdventOfCode
 			var sw = Stopwatch.StartNew();
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
 
-			//PuzzleOptions.OnlyRunForInputs = true;
+			PuzzleOptions.OnlyRunForInputs = true;
 			//PuzzleOptions.TimingLoops = 5;
-			PuzzleOptions.RunOnly(2021, 10);
+			//PuzzleOptions.RunOnly(2021, 10);
+			PuzzleOptions.RunOnly(2021);
 
 			Y2015Puzzles();
 			Y2016Puzzles();
@@ -211,21 +212,21 @@ namespace AdventOfCode
 			Y2021.Day08.Puzzle.Instance.Run();
 			Y2021.Day09.Puzzle.Instance.Run();
 			Y2021.Day10.Puzzle.Instance.Run();
-			Y2021.Day11.Puzzle.Instance.Run();
-			Y2021.Day12.Puzzle.Instance.Run();
-			Y2021.Day13.Puzzle.Instance.Run();
-			Y2021.Day14.Puzzle.Instance.Run();
-			Y2021.Day15.Puzzle.Instance.Run();
-			Y2021.Day16.Puzzle.Instance.Run();
-			Y2021.Day17.Puzzle.Instance.Run();
-			Y2021.Day18.Puzzle.Instance.Run();
-			Y2021.Day19.Puzzle.Instance.Run();
-			Y2021.Day20.Puzzle.Instance.Run();
-			Y2021.Day21.Puzzle.Instance.Run();
-			Y2021.Day22.Puzzle.Instance.Run();
-			Y2021.Day23.Puzzle.Instance.Run();
-			Y2021.Day24.Puzzle.Instance.Run();
-			Y2021.Day25.Puzzle.Instance.Run();
+			//Y2021.Day11.Puzzle.Instance.Run();
+			//Y2021.Day12.Puzzle.Instance.Run();
+			//Y2021.Day13.Puzzle.Instance.Run();
+			//Y2021.Day14.Puzzle.Instance.Run();
+			//Y2021.Day15.Puzzle.Instance.Run();
+			//Y2021.Day16.Puzzle.Instance.Run();
+			//Y2021.Day17.Puzzle.Instance.Run();
+			//Y2021.Day18.Puzzle.Instance.Run();
+			//Y2021.Day19.Puzzle.Instance.Run();
+			//Y2021.Day20.Puzzle.Instance.Run();
+			//Y2021.Day21.Puzzle.Instance.Run();
+			//Y2021.Day22.Puzzle.Instance.Run();
+			//Y2021.Day23.Puzzle.Instance.Run();
+			//Y2021.Day24.Puzzle.Instance.Run();
+			//Y2021.Day25.Puzzle.Instance.Run();
 		}
 	}
 }

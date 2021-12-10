@@ -85,14 +85,14 @@ namespace AdventOfCode.Y2021.Day03
 				}
 			}
 
-			Console.WriteLine(input.First());
-			Console.WriteLine(input2.First());
+			//Console.WriteLine(input.First());
+			//Console.WriteLine(input2.First());
 
 			var xx = Convert.ToInt32(input.First(), 2);
 			var yy = Convert.ToInt32(input2.First(), 2);
 
-			Console.WriteLine(xx);
-			Console.WriteLine(yy);
+			//Console.WriteLine(xx);
+			//Console.WriteLine(yy);
 
 			var xxx = xx * yy;
 
