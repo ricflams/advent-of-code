@@ -13,149 +13,104 @@ namespace AdventOfCode.Y2021.Day10
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 10";
+		public override string Name => "Syntax Scoring";
 		public override int Year => 2021;
 		public override int Day => 10;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
+			Run("test1").Part1(26397).Part2(288957);
+			//Run("test1").Part2(288957);
 
 			//Run("test2").Part1(0).Part2(0);
 
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(215229).Part2(1105996483);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var n = 0;
+			foreach (var s in input)
+			{
+				var expect = new Stack<char>();
+				var x = FirstIllegal(s, ref expect);
+				//if (x != 0)
+				//	Console.WriteLine(x);
+				n += x;
+			}
+			//var n = input
+			//	.Select(FirstIllegal)
+			//	.Sum();
 
+			return n;
+		}
 
+		private static int FirstIllegal(string s, ref Stack<char> expect)
+		{
+			foreach (var ch in s)
+			{
+				switch (ch)
+				{
+					case '(': expect.Push(')'); break;
+					case '[': expect.Push(']'); break;
+					case '{': expect.Push('}'); break;
+					case '<': expect.Push('>'); break;
+					default:
+						{
+							var e = expect.Peek();
+							if (e != ch)
+							{
+								if (ch == ')') return 3;
+								if (ch == ']') return 57;
+								if (ch == '}') return 1197;
+								if (ch == '>') return 25137;
+								return 0;
+							}
+							expect.Pop();
+						}
+						break;
+				}
+			}
 			return 0;
 		}
 
 		protected override long Part2(string[] input)
 		{
-
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+			var lines = input
+				.Select(s =>
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					var expect = new Stack<char>();
+					var x = FirstIllegal(s, ref expect);
+					if (x == 0)
 					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
+				//		Console.Write($"{s}: ");
+						var add = "";
+						//expect.Pop();
+						//expect.Pop();
+						var score = 0L;
+						while (expect.Count > 0)
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							var ch = expect.Pop();
+							score *= 5;
+							if (ch == ')') score += 1;
+							if (ch == ']') score += 2;
+							if (ch == '}') score += 3;
+							if (ch == '>') score += 4;
+
+							//add += expect.Pop();
 						}
-						return ch;
-					});
-				}
-			}
+				//		Console.WriteLine(add);
+						return score;
+					}
+					return 0;
+				})
+				.Where(x => x != 0)
+				.OrderBy(x => x)
+				.ToArray();
+			var score = lines[lines.Length / 2];
+
+
+			return score;
 		}
 
 	}
