@@ -84,7 +84,7 @@ namespace AdventOfCode.Y2021.Day04
 				_rows = _grid.Length;
 			}
 
-			public int SumUnmarked => +_grid.Sum(row => row.Where(x => x != -1).Sum());
+			public int SumUnmarked => _grid.Sum(row => row.Where(x => x != -1).Sum());
 
 			public bool MarkAndCheckForWin(int n)
 			{
