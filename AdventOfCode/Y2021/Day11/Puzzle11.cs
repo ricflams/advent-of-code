@@ -53,12 +53,11 @@ namespace AdventOfCode.Y2021.Day11
 			// Flash all points now above 9, but only once
 			var doFlash = new HashSet<Point>(map.AllPoints(ch => ch > '9'));
 			var hasFlashed = new HashSet<Point>();
-
 			while (doFlash.Count > 0)
 			{
 				var p = doFlash.First();
 				hasFlashed.Add(p);
-				foreach (var n in p.LookDiagonallyAround().Within(map).Where(p => !hasFlashed.Contains(p)))
+				foreach (var n in p.LookDiagonallyAround().Within(map).Where(x => !hasFlashed.Contains(x)))
 				{
 					if (++map[n.X, n.Y] > '9')
 					{
