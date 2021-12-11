@@ -64,6 +64,22 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public void Map(Func<Point, char, char> transform)
+		{
+			foreach (var p in AllPoints())
+			{
+				this[p] = transform(p, this[p]);
+			}
+		}
+
+		public void Map(Func<char, char> transform)
+		{
+			foreach (var p in AllPoints())
+			{
+				this[p] = transform(this[p]);
+			}
+		}
+
 		public CharMap Transform(Func<Point, char, char> transform)
 		{
 			var map = new CharMap(_defaultValue);

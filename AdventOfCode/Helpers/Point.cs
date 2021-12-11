@@ -190,5 +190,11 @@ namespace AdventOfCode.Helpers
 		{
 			return points.Where(p => p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y);
 		}
+
+		public static IEnumerable<Point> Within(this IEnumerable<Point> points, char[,] mx)
+		{
+			var (w, h) = mx.Dim();
+			return points.Where(p => p.X >= 0 && p.X < w && p.Y >= 0 && p.Y < w);
+		}
 	}
 }

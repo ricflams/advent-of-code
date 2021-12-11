@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day11
 {
@@ -20,77 +15,17 @@ namespace AdventOfCode.Y2021.Day11
 		public void Run()
 		{
 			Run("test1").Part1(1656).Part2(195);
-
-			//Run("test2").Part1(0).Part2(0);
-
 			Run("input").Part1(1735).Part2(400);
 		}
 
 		protected override long Part1(string[] input)
 		{
-			var map = CharMap.FromArray(input);
-
+			var map = CharMatrix.FromArray(input);
 
 			var flashes = 0;
-			var (min, max) = map.Area();
-			//var w = area.Item2.X;
-			//var h = area.Item2.Y;
-
 			for (var i = 0; i < 100; i++)
 			{
-				//map.ConsoleWrite();
-				//Console.WriteLine();
-
-				map = map.Transform((p, ch) => (char)(ch + 1));
-
-				var seen = new SparseMap<bool>();
-
-				var nines = map.AllPoints(ch => ch > '9').ToArray();
-				foreach (var p in nines)
-				{
-					//Flash(p);
-					flashes++;
-					seen[p] = true;
-				}
-
-				foreach (var p in nines)
-				{
-					Flash(p);
-				}
-
-				void Flash(Point p)
-				{
-					if (!seen[p])
-						flashes++;
-					seen[p] = true;
-					foreach (var n in p.LookDiagonallyAround().Within(min, max).Where(p => !seen[p]))
-					{
-						map[n] = (char)(map[n] + 1);
-						if (map[n] > '9')
-							Flash(n);
-					}
-				}
-
-				foreach (var p in map.AllPoints(ch => ch > '9'))
-				{
-					map[p] = '0';
-				}
-
-				//map = map.Transform((ch, adjacents) =>
-				//{
-				//	if (ch == '9')
-				//	{
-				//		flashes++;
-				//		foreach (var c in adjacents)
-				//		{
-				//			if (c == '|' && ++n >= 3)
-				//				return '|';
-				//		}
-				//	}
-
-				//	return ch+1;
-				//});
-
+				flashes += Step(map);
 			}
 
 			return flashes;
@@ -98,81 +33,48 @@ namespace AdventOfCode.Y2021.Day11
 
 		protected override long Part2(string[] input)
 		{
-			var map = CharMap.FromArray(input);
+			var map = CharMatrix.FromArray(input);
+			var N = map.Width() * map.Height();
 
-
-			var flashes = 0;
-			var (min, max) = map.Area();
-			//var w = area.Item2.X;
-			//var h = area.Item2.Y;
-			var N = (max.X+1) * (max.Y+1);
-
-			var step = 0;
-			while (true)
+			var step = 1;
+			while (Step(map) != N)
 			{
-				//map.ConsoleWrite();
-				//Console.WriteLine();
-
-				map = map.Transform((p, ch) => (char)(ch + 1));
-
-				var seen = new SparseMap<bool>();
-
-				var flashes0 = flashes;
-				var nines = map.AllPoints(ch => ch > '9').ToArray();
-				foreach (var p in nines)
-				{
-					//Flash(p);
-					flashes++;
-					seen[p] = true;
-				}
-
-				foreach (var p in nines)
-				{
-					Flash(p);
-				}
-
-				void Flash(Point p)
-				{
-					if (!seen[p])
-						flashes++;
-					seen[p] = true;
-					foreach (var n in p.LookDiagonallyAround().Within(min, max).Where(p => !seen[p]))
-					{
-						map[n] = (char)(map[n] + 1);
-						if (map[n] > '9')
-							Flash(n);
-					}
-				}
-
-				foreach (var p in map.AllPoints(ch => ch > '9'))
-				{
-					map[p] = '0';
-				}
-
 				step++;
-				if (flashes0 + N == flashes)
-				{
-					return step;
-				}
-
-				//map = map.Transform((ch, adjacents) =>
-				//{
-				//	if (ch == '9')
-				//	{
-				//		flashes++;
-				//		foreach (var c in adjacents)
-				//		{
-				//			if (c == '|' && ++n >= 3)
-				//				return '|';
-				//		}
-				//	}
-
-				//	return ch+1;
-				//});
-
 			}
 
-			return flashes;
+			return step;
+		}
+
+		private static int Step(char[,] map)
+		{
+			// Increase energy level by 1
+			map.Map(ch => (char)(ch + 1));
+
+			// Flash all points now above 9, but only once
+			var doFlash = new HashSet<Point>(map.AllPoints(ch => ch > '9'));
+			var hasFlashed = new HashSet<Point>();
+
+			while (doFlash.Count > 0)
+			{
+				var p = doFlash.First();
+				hasFlashed.Add(p);
+				foreach (var n in p.LookDiagonallyAround().Within(map).Where(p => !hasFlashed.Contains(p)))
+				{
+					if (++map[n.X, n.Y] > '9')
+					{
+						doFlash.Add(n);
+					}
+				}
+				doFlash.Remove(p);
+			}
+
+			// Reset all points that have flashed
+			foreach (var p in hasFlashed)
+			{
+				map[p.X, p.Y] = '0';
+			}
+
+			return hasFlashed.Count;
 		}
 	}
 }

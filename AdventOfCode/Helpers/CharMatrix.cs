@@ -142,6 +142,36 @@ namespace AdventOfCode.Helpers
 			return transformed;
 		}
 
+		public static void Map(this char[,] mx, Func<char, char> transform)
+		{
+			var (w, h) = mx.Dim();
+
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					mx[x, y] = transform(mx[x, y]);
+				}
+			}
+		}
+
+
+		public static IEnumerable<Point> AllPoints(this char[,] mx, Func<char, bool> predicate = null)
+		{
+			var (w, h) = mx.Dim();
+
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					if (predicate == null || predicate(mx[x, y]))
+					{
+						yield return Point.From(x, y);
+					}
+				}
+			}
+		}
+
 		public static void ShiftRowRight(this char[,] mx, int row, int n)
 		{
 			var (w, h) = mx.Dim();
