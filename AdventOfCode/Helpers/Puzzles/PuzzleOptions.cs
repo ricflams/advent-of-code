@@ -8,7 +8,8 @@ namespace AdventOfCode.Helpers.Puzzles
 		private static int? _year;
 		private static HashSet<int> _days = new HashSet<int>();
 		static public bool OnlyRunForInputs { get; set; } = false;
-		static public int TimingLoops { get; set; } = 0;
+		static public bool Silent { get; set; } = false;
+		static public int Iterations { get; set; } = 1;
 		static public void RunOnly(int year, params int[] days)
 		{
 			_year = year;

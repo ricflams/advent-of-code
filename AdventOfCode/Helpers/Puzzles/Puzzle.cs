@@ -93,64 +93,39 @@ namespace AdventOfCode.Helpers.Puzzles
 			return new PuzzleRunner(this, testname, testname);
 		}
 
-
-
-
-		// protected void RunFor(string filename, T1 expectedResult1, T2 expectedResult2)
-		// {
-		// 	RunPart1For(filename, expectedResult1);
-		// 	RunPart2For(filename, expectedResult2);
-		// }
-
-		// public void RunPart1For(string filename, T1 expectedResult)
-		// {
-		// 	RunPart(filename, filename, 1, Part1, expectedResult);
-		// }
-
-		// public void RunPart2For(string filename, T2 expectedResult)
-		// {
-		// 	RunPart(filename, filename, 2, Part2, expectedResult);
-		// }
-
-		private string[] ReadInput(string filename) =>
-			filename == null ? null : File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
+		private string[] ReadInput(string filename)
+		{
+			return filename == null
+				? null
+				: File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
+		}
 
 		internal void RunPart<T>(string testname, string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
 			if (!PuzzleOptions.ShouldRun(this, testname))
 				return;
 
-			var loops = 1;
-			var sw = Stopwatch.StartNew();
+			T result = default;
 			var input = ReadInput(filename);
-			var result = solution(input);
-			if (PuzzleOptions.TimingLoops > 0)
+			var sw = Stopwatch.StartNew();
+			for (var i = 0; i < PuzzleOptions.Iterations; i++)
 			{
-				sw.Restart();
-				for (var i = 0; i < PuzzleOptions.TimingLoops; i++)
-				{
-					input = ReadInput(filename);
-					result = solution(input);
-					if (!expectedResult.Equals(result))
-					{
-						WriteResult(result, expectedResult);
-						Console.WriteLine();
-					}
-				}
-				loops = PuzzleOptions.TimingLoops;
+				result = solution(input);
 			}
-			var elapsed = sw.Elapsed / loops;
-			WriteName(elapsed, testname, part);
-			WriteResult(result, expectedResult);
-			Console.WriteLine();
+			if (!PuzzleOptions.Silent)
+			{
+				WriteName(sw.Elapsed, testname, part);
+				WriteResult(result, expectedResult);
+				Console.WriteLine();
+			}
 		}
 
 		private void WriteName(TimeSpan elapsed, string filename, int part)
 		{
 			var units = Math.Round(elapsed / TimingBarUnit, MidpointRounding.AwayFromZero);
 			var bars = (int)Math.Min(units, TimingBar.Length);
-			var t = (int)Math.Ceiling(elapsed.TotalMilliseconds);
-			Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,4} ms: ");
+			var t = 1000.0 * elapsed.Ticks / Stopwatch.Frequency / PuzzleOptions.Iterations;
+			Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,7:F2} ms: ");
 			if (!PuzzleOptions.OnlyRunForInputs)
 			{
 				Console.Write($"[{filename}] ");
@@ -158,7 +133,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			Console.Write($"{Year} Day {Day,2} Part {part} of {Name}: ");
 		}
 
-		protected void WriteResult<T>(T result, T expectedResult)
+		protected static void WriteResult<T>(T result, T expectedResult)
 		{
 			Console.Write(result);
 			if (!expectedResult.Equals(result))
@@ -167,16 +142,6 @@ namespace AdventOfCode.Helpers.Puzzles
 				Console.Write($"  ****FAIL**** expected {expectedResult}");
 		        Console.ResetColor();
 			}
-		}
-
-		protected void WriteSpeedup(TimeSpan elapsed, TimeSpan optimized)
-		{
-			var speed =
-				elapsed.TotalMilliseconds == 0 ? "(???)" :
-				(optimized / elapsed).ToString(".#%");
-	        Console.ForegroundColor = ConsoleColor.DarkGreen;
-			Console.Write($"  Optimized runtime: {speed}");
-	        Console.ResetColor();
 		}
 	}
 }

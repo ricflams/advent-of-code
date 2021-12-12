@@ -6,15 +6,45 @@ namespace AdventOfCode
 {
 	public class Program
 	{
-		static void Main(string[] args)
+		static void Main(string[] _)
 		{
-			var sw = Stopwatch.StartNew();
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
 
-			//PuzzleOptions.OnlyRunForInputs = true;
-			//PuzzleOptions.TimingLoops = 5;
 			PuzzleOptions.RunOnly(2021, 12);
 
+			var iterations = 1;
+			//iterations = 10;
+
+			if (iterations == 1)
+			{
+				PuzzleOptions.Iterations = 1;
+				var sw = Stopwatch.StartNew();
+				AllPuzzles();
+				Console.WriteLine($"Elapsed: {sw.ElapsedMilliseconds} ms");
+			}
+			else
+			{
+				PuzzleOptions.OnlyRunForInputs = true;
+				PuzzleOptions.Silent = true;
+				PuzzleOptions.Iterations = 1;
+				AllPuzzles();
+				PuzzleOptions.Silent = false;
+				PuzzleOptions.Iterations = iterations;
+				var sw = Stopwatch.StartNew();
+				AllPuzzles();
+				var elapsedMsec = 1000.0 * sw.ElapsedTicks / Stopwatch.Frequency;
+				Console.WriteLine($"Elapsed: {elapsedMsec / iterations:F2} ms");
+			}
+
+			//if (Debugger.IsAttached)
+			//{
+			//	Console.Write("Press any key to close ");
+			//	Console.ReadKey();
+			//}
+		}
+
+		private static void AllPuzzles()
+		{
 			Y2015Puzzles();
 			Y2016Puzzles();
 			Y2017Puzzles();
@@ -22,13 +52,6 @@ namespace AdventOfCode
 			Y2019Puzzles();
 			Y2020Puzzles();
 			Y2021Puzzles();
-
-			Console.WriteLine($"Elapsed: {(int)(sw.ElapsedMilliseconds / (1 + PuzzleOptions.TimingLoops))} ms");
-			//if (Debugger.IsAttached)
-			//{
-			//	Console.Write("Press any key to close ");
-			//	Console.ReadKey();
-			//}
 		}
 
 		private static void Y2015Puzzles()
