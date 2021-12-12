@@ -13,150 +13,129 @@ namespace AdventOfCode.Y2021.Day12
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 12";
+		public override string Name => "Passage Pathing";
 		public override int Year => 2021;
 		public override int Day => 12;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
+			Run("test1").Part1(10).Part2(36);
 
-			//Run("test2").Part1(0).Part2(0);
+			Run("test2").Part1(19).Part2(103);
+			Run("test3").Part1(226).Part2(3509);
 
-			//Run("input").Part1(0).Part2(0);
+
+			Run("input").Part1(3713).Part2(91292);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var graph = new Graph(input);
+
+			var start = graph.Vertices.Single(x => x.Key == "start").Value;
+			var end = graph.Vertices.Single(x => x.Key == "end").Value;
+
+			var seenpaths = new HashSet<string>();
+			var seensmallcaves = new HashSet<string>();
+
+			VisitFrom(start, seensmallcaves, start.Value);
+
+			void VisitFrom(Graph.Vertex v, HashSet<string> seensmallcaves, string path)
+			{
+				if (v == end)
+					return;
+				foreach (var e in v.Edges)
+				{
+					if (e == start)
+						continue;
+					var name = e.Value;
+					var seensmallcaves2 = new HashSet<string>(seensmallcaves);
+					if (name.All(char.IsLower))
+					{
+						if (seensmallcaves2.Contains(name))
+							continue;
+						seensmallcaves2.Add(name);
+					}
+					var path2 = $"{path},{name}";
+					if (seenpaths.Contains(path2))
+						continue;
+					seenpaths.Add(path2);
+					//Console.WriteLine(path2);
+					VisitFrom(e, seensmallcaves2, path2);
+				}
+			}
 
 
-			return 0;
+			return seenpaths.Count(x => x.EndsWith("end"));
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var graph = new Graph(input);
 
+			var start = graph.Vertices.Single(x => x.Key == "start").Value;
+			var end = graph.Vertices.Single(x => x.Key == "end").Value;
 
-			return 0;
-		}
+			var seenpaths = new HashSet<string>();
+			var seensmallcaves = new Dictionary<string, int>();
 
+			VisitFrom(start, seensmallcaves, start.Value);
+			var paths = seenpaths.Where(x => x.EndsWith(",end")).ToArray();
+			//Console.WriteLine();
+			//foreach (var x in paths)
+			//	Console.WriteLine(x);
+			return paths.Length;
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
+			void VisitFrom(Graph.Vertex v, Dictionary<string, int> seensmallcaves, string path)
 			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				if (v == end)
+					return;
+				foreach (var e in v.Edges)
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
+					if (e == start)
 						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					var name = e.Value;
+					var seensmallcaves2 = new Dictionary<string, int>(seensmallcaves);
+					if (name.All(char.IsLower))
 					{
+						var seentwice = seensmallcaves2.Values.Any(x => x > 1);
+						if (!seensmallcaves2.TryGetValue(name, out var cv))
+						{
+							cv = seensmallcaves2[name] = 0;
+						}
+						else if (seentwice)
+						{
+							continue;
+						}
 
+						seensmallcaves2[name] = seensmallcaves2[name]+1;
+						//if (seensmallcaves2[name] > 2)
+						//	continue;
+						//if (seensmallcaves2.Contains(name))
+						//	continue;
+						//seensmallcaves2.Add(name);
 					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
+					var path2 = $"{path},{name}";
+					if (seenpaths.Contains(path2))
+						continue;
+					seenpaths.Add(path2);
+					//Console.WriteLine(path2);
+					VisitFrom(e, seensmallcaves2, path2);
 				}
 			}
+		}
+
+
+		internal class Graph : BaseUnitGraph<string>
+		{
+			public Graph(string[] input)
 			{
-				var ship = new Pose(Point.Origin, Direction.Right);
 				foreach (var line in input)
 				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
+					var (from, to) = line.RxMatch("%s-%s").Get<string, string>();
+					AddEdge(from, to);
 				}
 			}
 		}
-
 	}
 }
