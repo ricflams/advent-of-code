@@ -80,7 +80,7 @@ namespace AdventOfCode.Helpers
             {
                 Console.WriteLine($"{nameof(Scan)} failed: {ex.Message}");
                 ConsoleWrite(raw);
-                return null;
+                throw;
             }
 
             // Parse into string
@@ -93,7 +93,7 @@ namespace AdventOfCode.Helpers
                 var id = lines.Aggregate(0U, (sum, line) => sum = (sum << 5) + ReadLineVal(line, index * 5));
                 return LetterMap[id];
                 static uint ReadLineVal(string s, int x) => Dot(s[x], 16) + Dot(s[x + 1], 8) + Dot(s[x + 2], 4) + Dot(s[x + 3], 2) + Dot(s[x + 4], 1);
-                static uint Dot(char ch, uint val) => ch != ' ' ? val : 0;
+                static uint Dot(char ch, uint val) => ch == '#' ? val : 0;
             }
         }
 
