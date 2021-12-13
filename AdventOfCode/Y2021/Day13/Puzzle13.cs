@@ -10,153 +10,182 @@ using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day13
 {
-	internal class Puzzle : Puzzle<long, long>
+	internal class Puzzle : Puzzle<int, string>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 13";
+		public override string Name => "Transparent Origami";
 		public override int Year => 2021;
 		public override int Day => 13;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
+			Run("test1").Part1(17);
 
 			//Run("test2").Part1(0).Part2(0);
 
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(716).Part2("RPCKFBLR");
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
+			var things = input
+				.GroupByEmptyLine()
+				.ToArray();
 
-
-			return 0;
-		}
-
-		protected override long Part2(string[] input)
-		{
-
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+			var coords0 = things[0]
+				.Select(s =>
 					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
+						var xx = s.Split(',');
+						return Point.From(int.Parse(xx[0]), int.Parse(xx[1]));
 					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
+				.ToArray();
+
+			var minx = coords0.Select(x => x.X).Min();
+			var miny = coords0.Select(x => x.Y).Min();
+
+			var coords = coords0.Select(p => Point.From(p.X - minx, p.Y - miny)).ToArray();
+
+			var w = coords.Select(x => x.X).Max() + 1;
+			var h = coords.Select(x => x.Y).Max() + 1;
+
+			var map = CharMatrix.Create(w, h, '.');
+			foreach (var p in coords)
 			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
+				map[p.X, p.Y] = '#';
 			}
+			//map.ConsoleWrite();
+
+			var folds = things[1].Select(s =>
+			{
+				var (axis, n) = s.RxMatch("fold along %c=%d").Get<char, int>();
+				return new
+				{
+					Axis = axis,
+					N = n
+				};
+			})
+			.ToArray();
+
+			//foreach (var f in folds)
+			//{
+			//	map = Fold(map, f.Axis, f.N);
+			//	Console.WriteLine();
+			//	map.ConsoleWrite();
+			//}
+
+			var fold0 = folds.First();
+
+			map = Fold(map, fold0.Axis, fold0.N);
+
+
+			return map.CountChar('#');
 		}
 
+		private static char[,] Fold(char[,] map, char axis, int n)
+		{
+			if (axis == 'x')
+			{
+				var h = map.Height();
+				//var w = Math.Max(map.Width() - n + 1, n);
+
+				var folded = map.CopyPart(n + 1, 0, map.Width() - n - 1, h).FlipV();
+				var remain = map.CopyPart(0, 0, n, h);
+				if (folded.Width() > remain.Width())
+				{
+					var tmp = folded;
+					folded = remain;
+					remain = tmp;
+				}
+
+				var dx = remain.Width() - folded.Width();
+				for (var x = 0; x < folded.Width(); x++)
+				{
+					for (var y = 0; y < h; y++)
+					{
+						remain[x+dx, y] = remain[x + dx, y] == '#' || folded[x, y] == '#' ? '#' : '.';
+					}
+				}
+				return remain;
+			}
+
+			if (axis == 'y')
+			{
+				var w = map.Width();
+				//var h = Math.Max(map.Height() - n, n);
+
+				var folded = map.CopyPart(0, n + 1, w, map.Height() - n - 1).FlipH();
+				var remain = map.CopyPart(0, 0, w, n);
+				if (folded.Width() > remain.Width())
+				{
+					var tmp = folded;
+					folded = remain;
+					remain = tmp;
+				}
+
+				var dy = remain.Width() - folded.Width();
+				for (var x = 0; x < w; x++)
+				{
+					for (var y = 0; y < folded.Height(); y++)
+					{
+						remain[x, y + dy] = remain[x, y + dy] == '#' || folded[x, y] == '#' ? '#' : '.';
+					}
+				}
+				return remain;
+			}
+
+			return null;
+		}
+
+		protected override string Part2(string[] input)
+		{
+			var things = input
+				.GroupByEmptyLine()
+				.ToArray();
+
+			var coords0 = things[0]
+				.Select(s =>
+				{
+					var xx = s.Split(',');
+					return Point.From(int.Parse(xx[0]), int.Parse(xx[1]));
+				})
+				.ToArray();
+
+			var minx = coords0.Select(x => x.X).Min();
+			var miny = coords0.Select(x => x.Y).Min();
+
+			var coords = coords0.Select(p => Point.From(p.X - minx, p.Y - miny)).ToArray();
+
+			var w = coords.Select(x => x.X).Max() + 1;
+			var h = coords.Select(x => x.Y).Max() + 1;
+
+			var map = CharMatrix.Create(w, h, '.');
+			foreach (var p in coords)
+			{
+				map[p.X, p.Y] = '#';
+			}
+			//map.ConsoleWrite();
+
+			var folds = things[1].Select(s =>
+			{
+				var (axis, n) = s.RxMatch("fold along %c=%d").Get<char, int>();
+				return new
+				{
+					Axis = axis,
+					N = n
+				};
+			})
+			.ToArray();
+
+			foreach (var f in folds)
+			{
+				map = Fold(map, f.Axis, f.N);
+			}
+
+			//map.ConsoleWrite();
+
+			var code = LetterScanner.Scan(map.ToStringArray());
+
+			return code;
+		}
 	}
 }
