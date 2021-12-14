@@ -19,143 +19,115 @@ namespace AdventOfCode.Y2021.Day14
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
+			Run("test1").Part1(1588).Part2(2188189693529);
 
 			//Run("test2").Part1(0).Part2(0);
 
-			//Run("input").Part1(0).Part2(0);
+			// 2158894777815 not right
+			Run("input").Part1(2068).Part2(2158894777814);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var template = input.First();
 
+			var rules = new Dictionary<string, string>();
+			foreach (var s in input.Skip(2))
+			{
+				var (a, b) = s.RxMatch("%s -> %s").Get<string, string>();
+				rules.Add(a, b);
+			}
 
-			return 0;
+			for (var i = 0; i < 10; i++)
+			{
+			//	Console.WriteLine(template);
+				var result = new StringBuilder();
+				result.Append(template[0]);
+				for (var p = 0; p < template.Length - 1; p++)
+				{
+					var pp = template.Substring(p, 2);
+					//result.Append(pp[0]);
+					result.Append(rules[pp]);
+					result.Append(pp[1]);
+				}
+				template = result.ToString();
+			}
+
+			var occ = template.GroupBy(x => x);
+			var xx = occ.OrderBy(x => x.Count()).ToArray();
+			var aa = xx.First().Count();
+			var bb = xx.Last().Count();
+
+			return bb - aa;
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var template = input.First();
 
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
+			var rules = new Dictionary<string, string>();
+			foreach (var s in input.Skip(2))
 			{
+				var (a, b) = s.RxMatch("%s -> %s").Get<string, string>();
+				rules.Add(a, b);
 			}
-		}
 
-		class SomeGraph : Graph<HashSet<uint>> { }
+			var pairs = new SafeDictionary<string, long>();
+			for (var p = 0; p < template.Length - 1; p++)
+			{
+				var pp = template.Substring(p, 2);
+				pairs[pp]++;
+			}
 
-		internal void Sample(string[] input)
-		{
+
+			for (var i = 0; i < 40; i++)
 			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				var pairs2 = new SafeDictionary<string, long>();
+				foreach (var k in pairs)
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
+					pairs2[k.Key] = k.Value;
+				}	
+				foreach (var pp in pairs)
 				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
+					if (pp.Value == 0)
 						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+					pairs2[pp.Key] -= pairs[pp.Key];
+					var reduc = rules[pp.Key];
+					var sb = new StringBuilder();
+					sb.Append(pp.Key[0]);
+					sb.Append(reduc[0]);
+					var name1 = sb.ToString();
+					pairs2[name1] += pp.Value;
+					sb.Clear();
+					sb.Append(reduc[0]);
+					sb.Append(pp.Key[1]);
+					var name2 = sb.ToString();
+					pairs2[name2] += pp.Value;
+				}
+				pairs = pairs2;
+			}
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
+			var occur = new SafeDictionary<char, long>();
+			foreach (var kk in pairs)
 			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
+				occur[kk.Key[0]] += kk.Value;
+				occur[kk.Key[1]] += kk.Value;
+			}
+			var ord = occur
+				.Select(x => 
 				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
-			}
+					var n = x.Value;
+					if (x.Key == template.First()) n++;
+					if (x.Key == template.Last()) n++;
+					return n / 2;
+				})
+				.OrderBy(x => x).ToArray();
+
+			var aa = ord.First();
+			var bb = ord.Last();
+			var uniq = bb - aa;
+
+			return uniq;
 		}
 
 	}
