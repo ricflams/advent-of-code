@@ -22,6 +22,8 @@ namespace AdventOfCode.Y2021.Day07
 			Run("test1").Part1(37).Part2(168);
 			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(344535).Part2(95581659);
+
+			// todo: clean
 		}
 
 		protected override int Part1(string[] input)

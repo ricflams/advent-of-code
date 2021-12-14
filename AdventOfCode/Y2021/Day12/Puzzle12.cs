@@ -26,6 +26,8 @@ namespace AdventOfCode.Y2021.Day12
 
 
 			Run("input").Part1(3713).Part2(91292);
+
+			// todo: clean
 		}
 
 		protected override long Part1(string[] input)
