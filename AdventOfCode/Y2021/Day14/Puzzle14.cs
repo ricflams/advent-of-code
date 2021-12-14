@@ -101,7 +101,8 @@ namespace AdventOfCode.Y2021.Day14
 					sb.Clear();
 					sb.Append(reduc[0]);
 					sb.Append(pp.Key[1]);
-					var name2 = sb.ToString();
+					//var name2 = sb.ToString();
+					var name2 = $"{reduc[0]}{pp.Key[1]}";
 					pairs2[name2] += pp.Value;
 				}
 				pairs = pairs2;
