@@ -44,7 +44,7 @@ namespace AdventOfCode.Helpers
 
 		public new string[] Render(Func<Point, char, char> rendering = null)
 		{
-			var (min, max) = Area();
+			var (min, max) = MinMax();
 			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
 				.Select(y => Enumerable.Range(min.X, max.X - min.X + 1)
 					.Select(x => rendering != null ? rendering(Point.From(x, y), this[x][y]) : this[x][y])

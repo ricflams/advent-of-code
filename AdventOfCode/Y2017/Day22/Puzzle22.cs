@@ -20,7 +20,7 @@ namespace AdventOfCode.Y2017.Day22
 		{
 			var map = CharMap.FromArray(input, '.');
 
-			var (_, p2) = map.Area();
+			var (_, p2) = map.MinMax();
 			var p = Pose.From(p2.X/2, p2.Y/2, Direction.Up);
 
 			var infections = 0;
@@ -66,7 +66,7 @@ namespace AdventOfCode.Y2017.Day22
 			}
 
 			// Initial x,y is at the centre of the map
-			var (_, size) = inputMap.Area();
+			var (_, size) = inputMap.MinMax();
 			var x = (uint)size.X/2 + xyOffset;
 			var y = (uint)size.Y/2 + xyOffset;
 

@@ -60,7 +60,7 @@ namespace AdventOfCode.Y2018.Day17
 					}
 				}
 			}
-			(_min, _max) = _map.Area();
+			(_min, _max) = _map.MinMax();
 
 			_map[_spring] = '+';
 		}

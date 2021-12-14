@@ -180,7 +180,7 @@ namespace AdventOfCode.Y2016.Day22
 						Used = used
 					};
 				}
-				Goal = Point.From(Disks.Area().Item2.X, 0);
+				Goal = Point.From(Disks.MinMax().Item2.X, 0);
 			}
 
 			private Cluster() {}

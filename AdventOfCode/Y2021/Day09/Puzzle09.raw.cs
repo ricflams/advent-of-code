@@ -28,7 +28,7 @@ namespace AdventOfCode.Y2021.Day09.Raw
 			var map = CharMap.FromArray(input);
 
 			var n = 0;
-			var (min, max) = map.Area();
+			var (min, max) = map.MinMax();
 			foreach (var p in map.AllPoints())
 			{
 				var islow = true;
@@ -51,7 +51,7 @@ namespace AdventOfCode.Y2021.Day09.Raw
 		{
 			var map = CharMap.FromArray(input);
 
-			var (min, max) = map.Area();
+			var (min, max) = map.MinMax();
 			var basins = new List<int>();
 			var all = new HashSet<Point>();
 			foreach (var p in map.AllPoints())

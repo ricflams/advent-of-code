@@ -77,7 +77,7 @@ namespace AdventOfCode.Y2018.Day15
 					.AllPoints(c => c == 'E' || c == 'G')
 					.Select(p => new Unit(p, _map[p], _map[p] == 'E' ? elfAttack : 3))
 					.ToArray();
-				var (_, max) = _map.Area();
+				var (_, max) = _map.MinMax();
 				_width = max.X + 1;
 				_height = max.Y + 1;
 

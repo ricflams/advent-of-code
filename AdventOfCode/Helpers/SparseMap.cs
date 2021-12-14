@@ -63,7 +63,7 @@ namespace AdventOfCode.Helpers
 
 		public IEnumerable<Point> AllArea()
 		{
-			var (min, max) = Area();
+			var (min, max) = MinMax();
 			for (var x = min.X; x <= max.X; x++)
 			{
 				for (var y = min.Y; y <= max.Y; y++)
@@ -101,7 +101,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public (Point, Point) Area()
+		public (Point, Point) MinMax()
 		{
 			var points = AllPoints().ToArray();
 			if (points.Length == 0)
@@ -115,7 +115,7 @@ namespace AdventOfCode.Helpers
 
 		public IEnumerable<Point> Span()
 		{
-			var (min, max) = Area();
+			var (min, max) = MinMax();
 			yield return min;
 			yield return Point.From(max.X, min.Y);
 			yield return max;
@@ -146,7 +146,7 @@ namespace AdventOfCode.Helpers
 
 		public string[] Render(Func<Point, T, char> rendering)
 		{
-			var (min, max) = Area();
+			var (min, max) = MinMax();
 			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
 				.Select(y => Enumerable.Range(min.X, max.X - min.X + 1)
 					.Select(x => rendering(Point.From(x, y), this[x][y]))

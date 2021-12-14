@@ -199,7 +199,7 @@ namespace AdventOfCode.Y2019.Day24
 
 		private static uint BioDiversity(CharMap map)
 		{
-			var (min, max) = map.Area();
+			var (min, max) = map.MinMax();
 			var width = max.Y - min.Y + 1;
 			uint val = 0;
 			foreach (var pos in map.AllPoints(c => c == '#'))

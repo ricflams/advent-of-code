@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 
 
 			var flashes = 0;
-			var (min, max) = map.Area();
+			var (min, max) = map.MinMax();
 			//var w = area.Item2.X;
 			//var h = area.Item2.Y;
 
@@ -102,7 +102,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 
 
 			var flashes = 0;
-			var (min, max) = map.Area();
+			var (min, max) = map.MinMax();
 			//var w = area.Item2.X;
 			//var h = area.Item2.Y;
 			var N = (max.X + 1) * (max.Y + 1);

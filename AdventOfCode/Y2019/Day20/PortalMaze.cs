@@ -72,7 +72,7 @@ namespace AdventOfCode.Y2019.Day20
 			ExternalMapPoints = new Point[] { Exit };
 
 			Portals = new SparseMap<Portal>();
-			var area = Map.Area();
+			var area = Map.MinMax();
 			foreach (var pair in portalsByName.Where(p => p.Key != "AA" && p.Key != "ZZ"))
 			{
 				var p1 = pair.Value[0];
