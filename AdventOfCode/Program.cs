@@ -10,10 +10,10 @@ namespace AdventOfCode
 		{
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
 
-			PuzzleOptions.RunOnly(2021, 14);
+			PuzzleOptions.RunOnly(2021, 9);
 
 			var iterations = 1;
-			iterations = 10;
+			iterations = 3;
 
 			if (iterations == 1)
 			{
@@ -24,7 +24,7 @@ namespace AdventOfCode
 			}
 			else
 			{
-				PuzzleOptions.OnlyRunForInputs = true;
+				//PuzzleOptions.OnlyRunForInputs = true;
 				PuzzleOptions.Silent = true;
 				PuzzleOptions.Iterations = 1;
 				AllPuzzles();

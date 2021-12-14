@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day09
 {
@@ -25,22 +20,18 @@ namespace AdventOfCode.Y2021.Day09
 
 		protected override long Part1(string[] input)
 		{
-			var map = CharMap.FromArray(input);
+			var area = CharMatrix.FromArray(input);
+			var (w, h) = area.Dim();
 
+			// Count risks (height+1) of all low-points, ie points that are all
+			// surrounded by higher heights
 			var n = 0;
-			var (min, max) = map.Area();
-			foreach (var p in map.AllPoints())
+			foreach (var p in area.AllPoints())
 			{
-				var islow = true;
-				foreach (var pp in p.LookAround().Within(min, max))
-				{
-					if (map[pp] <= map[p])
-						islow = false;
-				}
-				if (islow)
-				{
-					//Console.WriteLine(p);
-					n += map[p] - '0' + 1;
+				var height = area[p.X, p.Y];
+				if (p.LookAround().Within(w, h).All(x => area[x.X, x.Y] > height))
+				{ 
+					n += height - '0' + 1;
 				}
 			}
 
@@ -49,66 +40,41 @@ namespace AdventOfCode.Y2021.Day09
 
 		protected override long Part2(string[] input)
 		{
-			var map = CharMap.FromArray(input);
+			var area = CharMatrix.FromArray(input);
+			var (w, h) = area.Dim();
 
-			var (min, max) = map.Area();
-			var basins = new List<int>();
-			var all = new HashSet<Point>();
-			foreach (var p in map.AllPoints())
+			var basinSizes = new List<int>();
+
+			// Count basin-size of all low-points, ie points that are all
+			// surrounded by higher heights. A basin is found by following
+			// all neightbors to the low-point.
+			foreach (var p in area.AllPoints())
 			{
-				var islow = true;
-				foreach (var pp in p.LookAround().Within(min, max))
+				var height = area[p.X, p.Y];
+				if (p.LookAround().Within(w, h).All(x => area[x.X, x.Y] > height))
 				{
-					if (map[pp] <= map[p])
-						islow = false;
-				}
-				if (islow)
-				{
-					//Console.WriteLine(p);
-					//n += map[p] - '0' + 1;
-					var seen = new HashSet<Point>();
-					seen.Add(p);
-					//Console.WriteLine(p);
-					CalcBasin(seen, p);
-					var basin = seen.Count;
-					basins.Add(basin);
-
-					all.UnionWith(seen);
+					var basin = new HashSet<Point>() { p };
+					CalcBasinSize(basin, p);
+					basinSizes.Add(basin.Count);
 				}
 			}
 
-			foreach (var p in map.AllPoints())
-			{
-				if (!all.Contains(p))
-				{
-					if (map[p] != '9')
-						Console.WriteLine(p);
-				}
-			}
-
-			var biggest = basins.OrderByDescending(x => x).Take(3).ToArray();
-			var n = biggest.Prod();
-
+			var n = basinSizes.OrderByDescending(x => x).Take(3).Prod();
 			return n;
 
-			void CalcBasin(HashSet<Point> seen, Point low)
+			void CalcBasinSize(HashSet<Point> basin, Point p)
 			{
-				//var n = 1;
-				foreach (var pp in low.LookAround().Within(min, max))
+				var height = area[p.X, p.Y];
+				foreach (var adj in p.LookAround().Within(w, h))
 				{
-					if (map[pp] == '9')
-						continue;
-					if (map[pp] > map[low])
+					var neighborHeight = area[adj.X, adj.Y];
+					if (neighborHeight < '9' && neighborHeight > height)
 					{
-						//Console.WriteLine(pp);
-						seen.Add(pp);
-						CalcBasin(seen, pp);
+						basin.Add(adj);
+						CalcBasinSize(basin, adj);
 					}
 				}
-				//return n;
 			}
-
 		}
-
 	}
 }
