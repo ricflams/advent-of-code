@@ -43,7 +43,7 @@ namespace AdventOfCode.Y2015.Day18
 
 		private static int CountLightsOnAfter(SparseMap<bool> lights, int rounds, bool cornersAreStuck)
 		{
-			var corners = lights.Span().ToList();
+			var corners = lights.Corners().ToList();
 
 			// A light which is on stays on when 2 or 3 neighbors are on, and turns off otherwise.
 			// A light which is off turns on if exactly 3 neighbors are on, and stays off otherwise.
