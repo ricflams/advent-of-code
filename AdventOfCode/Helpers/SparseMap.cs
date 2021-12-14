@@ -114,6 +114,12 @@ namespace AdventOfCode.Helpers
 		}
 
 		public IEnumerable<Point> Span()
+		public (Point, Point) Range()
+		{
+			var (min, max) = MinMax();
+			return (min, max.DiagonalDownRight);
+		}
+
 		{
 			var (min, max) = MinMax();
 			yield return min;
