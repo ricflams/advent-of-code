@@ -155,6 +155,18 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public static void Visit(this char[,] mx, Action<int, int> action)
+		{
+			var (w, h) = mx.Dim();
+
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					action(x, y);
+				}
+			}
+		}
 
 		public static IEnumerable<Point> AllPoints(this char[,] mx, Func<char, bool> predicate = null)
 		{
