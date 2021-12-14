@@ -18,7 +18,9 @@ namespace AdventOfCode.Helpers
 			Y = y;
 		}
 
-		static public Point From(int x, int y) => new Point(x, y);
+		static public Point From(int x, int y) => new(x, y);
+		static public Point From((int x, int y) coords) => new(coords.x, coords.y);
+
 		static public Point Parse(string s)
 		{
 			var v = s.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -186,9 +188,19 @@ namespace AdventOfCode.Helpers
 
 	internal static class PointExtensions
 	{
+		public static IEnumerable<Point> Within(this IEnumerable<Point> points, int maxX, int maxY)
+		{
+			return points.Where(p => p.X >= 0 && p.X < maxX && p.Y >= 0 && p.Y < maxY);
+		}
+
+		public static IEnumerable<Point> Within(this IEnumerable<Point> points, Point max)
+		{
+			return points.Where(p => p.X >= 0 && p.X < max.X && p.Y >= 0 && p.Y < max.Y);
+		}
+
 		public static IEnumerable<Point> Within(this IEnumerable<Point> points, Point min, Point max)
 		{
-			return points.Where(p => p.X >= min.X && p.X <= max.X && p.Y >= min.Y && p.Y <= max.Y);
+			return points.Where(p => p.X >= min.X && p.X < max.X && p.Y >= min.Y && p.Y < max.Y);
 		}
 
 		public static IEnumerable<Point> Within(this IEnumerable<Point> points, char[,] mx)
