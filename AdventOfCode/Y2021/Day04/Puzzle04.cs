@@ -1,13 +1,8 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers.String;
-using System.Collections;
 
 namespace AdventOfCode.Y2021.Day04
 {
