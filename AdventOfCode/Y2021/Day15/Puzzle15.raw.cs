@@ -173,8 +173,8 @@ namespace AdventOfCode.Y2021.Day15.Raw
 					{
 						for (var y = 0; y < h; y++)
 						{
-							if (xf == 4 && yf == 0 && y == 0 && x == 7)
-								;
+							//if (xf == 4 && yf == 0 && y == 0 && x == 7)
+							//	;
 							var xx = x + xf * w;
 							var yy = y + yf * h;
 							var v0 = map[x][y] - '0';
