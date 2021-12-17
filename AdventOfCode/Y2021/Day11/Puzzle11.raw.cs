@@ -172,7 +172,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 
 			}
 
-			return flashes;
+			//return flashes;
 		}
 	}
 }
