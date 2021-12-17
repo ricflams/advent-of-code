@@ -1,162 +1,104 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day17
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 17";
+		public override string Name => "Trick Shot";
 		public override int Year => 2021;
 		public override int Day => 17;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(45).Part2(112);
+			Run("input").Part1(17766).Part2(1733);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var (xMin, xMax, yMin, yMax) = input[0].RxMatch("target area: x=%d..%d, y=%d..%d").Get<int, int, int, int>();
 
-
-			return 0;
+			return MaxHeightsHittingTarget(xMin, xMax, yMin, yMax).Max();
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var (xMin, xMax, yMin, yMax) = input[0].RxMatch("target area: x=%d..%d, y=%d..%d").Get<int, int, int, int>();
 
-
-			return 0;
+			return MaxHeightsHittingTarget(xMin, xMax, yMin, yMax).Count();
 		}
 
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		private static IEnumerable<int> MaxHeightsHittingTarget(int xMin, int xMax, int yMin, int yMax)
 		{
-			//private readonly 
-			public Thing(string[] lines)
+			// Try all x-velocities that may hit within the target
+			for (var vx0 = 0; vx0 <= xMax; vx0++)
 			{
+				// Skip those velocities that won't even reach the target
+				if (!CanVelocityXReachTargetAtAll(vx0))
+					continue;
+				// Console.WriteLine($"{vx0}");
+
+				// Try all y-velocities from pointing straight at the target's bottom
+				// and to - well, just pick a high number (not very satisfying)
+				for (var vy0 = yMin; vy0 < 200; vy0++)
+				{
+					var h = MaxHeightHittingTarget(vx0, vy0);
+					if (h.HasValue)
+						yield return h.Value;
+				}
+			}
+
+			bool CanVelocityXReachTargetAtAll(int vx)
+			{
+				// Check if x will ever hit the target for this velocity
+				for (var x = vx; vx-- > 0; x += vx)
+				{
+					if (x >= xMin && x <= xMax)
+						return true;
+				}
+				return false;
+			}
+
+			int? MaxHeightHittingTarget(int vx, int vy)
+			{
+				var x = 0;
+				var y = 0;
+				var highest = 0;
+
+				while (true)
+				{
+					x += vx;
+					y += vy;
+					//	Console.WriteLine($"{x},{y}");
+
+					// If y goes below target or x goes beyond then it will never reach
+					if (y < yMin || x > xMax)
+						break;
+
+					if (vx > 0) vx--;
+					else if (vx < 0) vx++;
+					vy--;
+
+					// Register highest point
+					if (y > highest)
+						highest = y;
+
+					// If x,y hits inside target then we're done
+					if (x >= xMin && x <= xMax && y >= yMin && y <= yMax)
+					{
+						return highest;
+					}
+				}
+
+				// Velocities did not cause a target-hit
+				return null;
 			}
 		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
-			}
-		}
-
 	}
 }
