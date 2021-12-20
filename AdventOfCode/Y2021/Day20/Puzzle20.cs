@@ -1,162 +1,86 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day20
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 20";
+		public override string Name => "Trench Map";
 		public override int Year => 2021;
 		public override int Day => 20;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(35).Part2(3351);
+			Run("input").Part1(5229).Part2(17009);
 		}
 
 		protected override long Part1(string[] input)
 		{
-
-
-			return 0;
+			return LitPixelsAfterEnhancement(input, 2);
 		}
 
 		protected override long Part2(string[] input)
 		{
-
-
-			return 0;
+			return LitPixelsAfterEnhancement(input, 50);
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		private int LitPixelsAfterEnhancement(string[] input, int n)
 		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
+			var algorithm = input[0].ToCharArray();
+			var image = CharMatrix.FromArray(input.Skip(2).ToArray());
+			return LitPixelsAfterEnhancement(algorithm, image, n);
 		}
 
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
+		private static int LitPixelsAfterEnhancement(char[] algorithm, char[,] image, int n)
 		{
+			// Create two scratchpad images to do the transformations on.
+			// Init them to the final size plus 1, so even the last transformation
+			// has a border to work on.
+			// Take pixel-reversal into account by looking at algorithm 0.
+			// The approach only works for even transformations.
+			Debug.Assert(n % 2 == 0);
+			var padding = n + 1;
+			var images = new[]
 			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+				image.ExpandBy(padding, '.'),
+				image.ExpandBy(padding, algorithm[0] == '.' ? '.' : '#')
+			};
+			var (w, h) = images[0].Dim();
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
+			// Transform the inner parts repeatedly, alternating between images
+			// for doing read/write and increasing the area at every loop (by
+			// decreasing the padding)
+			for (var i = 0; i < n; i++)
 			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
+				var src = images[i % 2];
+				var dst = images[(i + 1) % 2];
+				padding--;
+
+				for (var x = padding; x < w - padding; x++)
 				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
+					for (var y = padding; y < h - padding; y++)
 					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
+						var idx = 0;
+						if (src[x + 1, y + 1] == '#') idx += 1;
+						if (src[x, y + 1] == '#') idx += 2;
+						if (src[x - 1, y + 1] == '#') idx += 4;
+						if (src[x + 1, y] == '#') idx += 8;
+						if (src[x, y] == '#') idx += 16;
+						if (src[x - 1, y] == '#') idx += 32;
+						if (src[x + 1, y - 1] == '#') idx += 64;
+						if (src[x, y - 1] == '#') idx += 128;
+						if (src[x - 1, y - 1] == '#') idx += 256;
+						dst[x, y] = algorithm[idx];
 					}
 				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
 			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
-			}
+
+			// The resulting image always ends up in position 0
+			return images[0].CountChar('#');
 		}
-
 	}
 }
