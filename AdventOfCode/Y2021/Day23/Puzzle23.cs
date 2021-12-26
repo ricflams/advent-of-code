@@ -23,7 +23,8 @@ namespace AdventOfCode.Y2021.Day23
 
 			//Run("test2").Part1(0).Part2(0);
 
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(0).Part2(0);
+			// 14540 too low
 		}
 
 		private static int[] EnergyPerMove = new int[] { 1, 10, 100, 1000};
@@ -34,30 +35,38 @@ namespace AdventOfCode.Y2021.Day23
         }
 		class State
         {
-			private static readonly string Dest =
-				new State
-				{
-					Pods = new[]
-					{
-						new Amphipod { Type = 0, Pos = Point.From(3, 3) },
-						new Amphipod { Type = 0, Pos = Point.From(3, 4) },
-						new Amphipod { Type = 1, Pos = Point.From(5, 3) },
-						new Amphipod { Type = 1, Pos = Point.From(5, 4) },
-						new Amphipod { Type = 2, Pos = Point.From(7, 3) },
-						new Amphipod { Type = 2, Pos = Point.From(7, 4) },
-						new Amphipod { Type = 3, Pos = Point.From(9, 3) },
-						new Amphipod { Type = 3, Pos = Point.From(9, 4) },
-					}
-				}.Key;
+			private static string[] EmptyMap =
+			{
+				"#############",
+				"#...........#",
+				"###.#.#.#.###",
+				"  #.#.#.#.#  ",
+				"  #########  ",
+			};
+			private static string[] FinalMap =
+			{
+				"#############",
+				"#...........#",
+				"###A#B#C#D###",
+				"  #A#B#C#D#  ",
+				"  #########  ",
+			};
+            private static readonly string FinalKey =
+                new State
+                {
+                    Map = CharMap.FromArray(FinalMap)
+                }.Key;
 
-			public Amphipod[] Pods;
+            //public Amphipod[] Pods = ;
+            public CharMap Map;
+			public Point[] Pods => Map.AllPoints(char.IsUpper).ToArray();
 			public int Energy;
 
 			public State Copy()
             {
 				return new State
 				{
-					Pods = Pods,
+					Map = Map.Copy(),
 					Energy = Energy
 				};
             }
@@ -66,74 +75,76 @@ namespace AdventOfCode.Y2021.Day23
 				get
                 {
 					var sb = new StringBuilder();
-					foreach (var p in Pods.OrderBy(x => x.Type).OrderBy(x => x.Pos.X).ThenBy(x => x.Pos.Y))
+					foreach (var p in Pods.OrderBy(p => Map[p]).ThenBy(x => x.X).ThenBy(x => x.Y))
                     {
 						sb.Append(p);
                     }
 					return sb.ToString();
 				}
 			}
-			public bool IsDone => Key == Dest;
+			public bool IsDone => Key == FinalKey;
 
 			public static int HallwayY = 1;
-			public static int[] RoomX = new int[] { 3, 5, 7, 9 };
 
 			public IEnumerable<State> NextMoves()
             {
-				foreach (var x in RoomX)
+				foreach (var pod in Pods)
                 {
-					foreach (var move in CanMove(x)) yield return move;
+					foreach (var move in CanMove(pod)) yield return move;
 				}
-				yield break;
             }
 
-			private IEnumerable<State> CanMove(int roomX)
+			private IEnumerable<State> CanMove(Point pod)
             {
-				// Can move out of room
-				foreach (var pod in Pods.Where(p => p.Pos.X == roomX && p.Pos.Y > HallwayY))
+				//0123456789012
+				//#############
+				//#...........#
+				//###D#A#D#C###
+				//  #C#A#B#B#
+				//  #########
+
+				State MoveTo(Point moveto)
                 {
-					var ydist = HallwayY - pod.Pos.Y;
-					var occupadoLeft = Pods.Any(p => p.Pos.Y == HallwayY && (p.Pos.X == pod.Pos.X || p.Pos.X == pod.Pos.X - 1));
-					if (!occupadoLeft)
-					{
-						var moveleft = Copy();
-						moveleft.Energy += (1 + ydist) * EnergyPerMove[pod.Type];
-						var mover = moveleft.Pods.First(x => x.Pos == pod.Pos);
-						mover.Pos = Point.From(mover.Pos.X - 1, HallwayY);
-						yield return moveleft;
+				//	Console.WriteLine($"Move {Map[pod]} from {pod} to {moveto}");
+					var move = Copy();
+					var type = move.Map[pod];
+					move.Map[pod] = '.';
+					move.Map[moveto] = type;
+					move.Energy += EnergyPerMove[type - 'A'] * pod.ManhattanDistanceTo(moveto);
+					return move;
+				}
+
+				// Can move out of room
+				if (pod.Y == 2 && Map[pod.Up] == '.' ||
+					pod.Y == 3 && Map[pod.Up] == '.' && Map[pod.Up] == '.')
+				{
+					for (var moveto = Point.From(pod.X - 1, HallwayY); Map[moveto] == '.'; moveto = moveto.Left)
+                    {
+						yield return MoveTo(moveto);
 					}
-					var occupadoRight = Pods.Any(p => p.Pos.Y == HallwayY && (p.Pos.X == pod.Pos.X || p.Pos.X == pod.Pos.X + 1));
-					if (!occupadoRight)
+					for (var moveto = Point.From(pod.X + 1, HallwayY); Map[moveto] == '.'; moveto = moveto.Right)
 					{
-						var moveleft = Copy();
-						moveleft.Energy += 2 * EnergyPerMove[pod.Type];
-						var mover = moveleft.Pods.First(x => x.Pos == pod.Pos);
-						mover.Pos = Point.From(mover.Pos.X + 1, HallwayY);
-						yield return moveleft;
+						yield return MoveTo(moveto);
 					}
 				}
 
-				// Can move into a room
-				foreach (var pod in Pods.Where(p => p.Pos.X == roomX && p.Pos.Y == HallwayY))
-				{
-					// Is sitting outside room
-					if (RoomX.Any(x => x == pod.Pos.X))
-                    {
-						var occ1 = Pods.FirstOrDefault(p => p.Pos.X == pod.Pos.X && p.Pos.Y == HallwayY + 1);
-						var occ2 = Pods.FirstOrDefault(p => p.Pos.X == pod.Pos.X && p.Pos.Y == HallwayY + 2);
-						if (occ1 == null && occ2 == null)
-                        {
-							var movedown = Copy();
-							movedown.Energy += EnergyPerMove[pod.Type];
-							var mover1 = movedown.Pods.First(x => x.Pos == pod.Pos);
-							mover1.Pos = Point.From(mover1.Pos.X, HallwayY + 1);
-							yield return movedown;
+				// Can move into room
+				if (pod.Y == HallwayY)
+                {
+					var destX = 3 + 2 * (Map[pod] - 'A');
 
-							var movefullydown = Copy();
-							movefullydown.Energy += 2 * EnergyPerMove[pod.Type];
-							var mover2 = movefullydown.Pods.First(x => x.Pos == pod.Pos);
-							mover2.Pos = Point.From(mover2.Pos.X, HallwayY + 2);
-							yield return movefullydown;
+					var freeHallway =
+						pod.X < destX ? Enumerable.Range(pod.X + 1, destX - pod.X).All(x => Map[x][HallwayY] == '.') :
+						destX < pod.X ? Enumerable.Range(destX, pod.X - 1 - destX).All(x => Map[x][HallwayY] == '.') :
+						true;
+					if (freeHallway)
+                    {
+						if (Map[destX][2] == '.')
+                        {
+							if (Map[destX][3] == '.')
+								yield return MoveTo(Point.From(destX, 3));
+							else if (Map[destX][3] == Map[pod])
+								yield return MoveTo(Point.From(destX, 2));
 						}
 					}
 				}
@@ -141,56 +152,38 @@ namespace AdventOfCode.Y2021.Day23
 
 		}
 
-
-		class SomeGraph : Graph<State> { }
-
-
 		protected override long Part1(string[] input)
 		{
 			var map = CharMap.FromArray(input);
-
-			//var maze = new Maze(map);
-
-			var A = map.AllPoints(ch => ch == 'A').ToArray();
-			var B = map.AllPoints(ch => ch == 'B').ToArray();
-			var C = map.AllPoints(ch => ch == 'C').ToArray();
-			var D = map.AllPoints(ch => ch == 'D').ToArray();
-
 			var state0 = new State
 			{
-				Pods = new[]
-					{
-						new Amphipod { Type = 0, Pos = A[0] },
-						new Amphipod { Type = 0, Pos = A[1] },
-						new Amphipod { Type = 1, Pos = B[0] },
-						new Amphipod { Type = 1, Pos = B[1] },
-						new Amphipod { Type = 2, Pos = C[0] },
-						new Amphipod { Type = 2, Pos = C[1] },
-						new Amphipod { Type = 3, Pos = D[0] },
-						new Amphipod { Type = 3, Pos = D[1] },
-					},
+				Map = map,
 				Energy = 0
 			};
-//
-		//	var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
 
 			var seen = new HashSet<string>();
-			var queue = new Queue<State>();
-			queue.Enqueue(state0);
-			while (queue.Any())
+			var queue = new PriorityQueue<State,int>();
+			queue.Enqueue(state0, state0.Energy);
+			while (queue.TryDequeue(out var state, out var _))
 			{
-				var state = queue.Dequeue();
 				if (seen.Contains(state.Key))
 					continue;
 				seen.Add(state.Key);
+
+				if (seen.Count % 10000 == 0)
+					Console.WriteLine($"{seen.Count}: {state.Energy}");
+
+				//Console.WriteLine(state.Key);
+				//state.Map.ConsoleWrite();
+				//Console.WriteLine();
 
 				if (state.IsDone)
 				{
 					return state.Energy;
 				}
-				foreach (var f in state.NextMoves().Where(x => !seen.Contains(x.Key)))
+				foreach (var s in state.NextMoves().Where(x => !seen.Contains(x.Key)))
 				{
-					queue.Enqueue(f);
+					queue.Enqueue(s, s.Energy);
 				}
 			}
 

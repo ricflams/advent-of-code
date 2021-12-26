@@ -10,7 +10,7 @@ namespace AdventOfCode
 		{
 			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
 
-			PuzzleOptions.RunOnly(2021, 23);
+			PuzzleOptions.RunOnly(2021, 24);
 
 			var iterations = 1;
 			//iterations = 5;
