@@ -50,6 +50,20 @@ namespace AdventOfCode.Helpers
 		}
 
         public static char[,] RotateClockwise(this char[,] mx, int angle)
+		public static char[,] Copy(this char[,] mx)
+		{
+			var (w, h) = mx.Dim();
+			var map = new char[w, h];
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					map[x, y] = mx[x, y];
+				}
+			}
+			return map;
+		}
+
 		{
 			var (w, h) = mx.Dim();
 
