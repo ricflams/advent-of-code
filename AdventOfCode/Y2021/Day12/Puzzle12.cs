@@ -83,9 +83,7 @@ namespace AdventOfCode.Y2021.Day12
 
 			VisitFrom(start, seensmallcaves, start.Value);
 			var paths = seenpaths.Where(x => x.EndsWith(",end")).ToArray();
-			//Console.WriteLine();
-			//foreach (var x in paths)
-			//	Console.WriteLine(x);
+
 			return paths.Length;
 
 			void VisitFrom(Graph.Vertex v, Dictionary<string, int> seensmallcaves, string path)
@@ -111,11 +109,6 @@ namespace AdventOfCode.Y2021.Day12
 						}
 
 						seensmallcaves2[name] = seensmallcaves2[name]+1;
-						//if (seensmallcaves2[name] > 2)
-						//	continue;
-						//if (seensmallcaves2.Contains(name))
-						//	continue;
-						//seensmallcaves2.Add(name);
 					}
 					var path2 = $"{path},{name}";
 					if (seenpaths.Contains(path2))
