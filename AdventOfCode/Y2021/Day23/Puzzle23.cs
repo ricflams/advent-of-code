@@ -10,6 +10,9 @@ using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day23
 {
+
+
+
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
@@ -19,301 +22,370 @@ namespace AdventOfCode.Y2021.Day23
 
 		public void Run()
 		{
-			Run("test1").Part1(12521).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			Run("input").Part1(0).Part2(0);
-			// 14540 too low
+			Run("test1").Part1(12521).Part2(44169);
+			Run("input").Part1(14546).Part2(42308);
 		}
 
-		private static int[] EnergyPerMove = new int[] { 1, 10, 100, 1000};
-		class Amphipod
-        {
-			public int Type;
-			public Point Pos;
-        }
-		class State
-        {
-			private static string[] EmptyMap =
-			{
-				"#############",
-				"#...........#",
-				"###.#.#.#.###",
-				"  #.#.#.#.#  ",
-				"  #########  ",
-			};
-			private static string[] FinalMap =
-			{
-				"#############",
-				"#...........#",
-				"###A#B#C#D###",
-				"  #A#B#C#D#  ",
-				"  #########  ",
-			};
-            private static readonly string FinalKey =
-                new State
-                {
-                    Map = CharMap.FromArray(FinalMap)
-                }.Key;
-
-            //public Amphipod[] Pods = ;
-            public CharMap Map;
-			public Point[] Pods => Map.AllPoints(char.IsUpper).ToArray();
-			public int Energy;
-
-			public State Copy()
-            {
-				return new State
-				{
-					Map = Map.Copy(),
-					Energy = Energy
-				};
-            }
-			public string Key
-            {
-				get
-                {
-					var sb = new StringBuilder();
-					foreach (var p in Pods.OrderBy(p => Map[p]).ThenBy(x => x.X).ThenBy(x => x.Y))
-                    {
-						sb.Append(p);
-                    }
-					return sb.ToString();
-				}
-			}
-			public bool IsDone => Key == FinalKey;
-
-			public static int HallwayY = 1;
-
-			public IEnumerable<State> NextMoves()
-            {
-				foreach (var pod in Pods)
-                {
-					foreach (var move in CanMove(pod)) yield return move;
-				}
-            }
-
-			private IEnumerable<State> CanMove(Point pod)
-            {
-				//0123456789012
-				//#############
-				//#...........#
-				//###D#A#D#C###
-				//  #C#A#B#B#
-				//  #########
-
-				State MoveTo(Point moveto)
-                {
-				//	Console.WriteLine($"Move {Map[pod]} from {pod} to {moveto}");
-					var move = Copy();
-					var type = move.Map[pod];
-					move.Map[pod] = '.';
-					move.Map[moveto] = type;
-					move.Energy += EnergyPerMove[type - 'A'] * pod.ManhattanDistanceTo(moveto);
-					return move;
-				}
-
-				// Can move out of room
-				if (pod.Y == 2 && Map[pod.Up] == '.' ||
-					pod.Y == 3 && Map[pod.Up] == '.' && Map[pod.Up] == '.')
-				{
-					for (var moveto = Point.From(pod.X - 1, HallwayY); Map[moveto] == '.'; moveto = moveto.Left)
-                    {
-						yield return MoveTo(moveto);
-					}
-					for (var moveto = Point.From(pod.X + 1, HallwayY); Map[moveto] == '.'; moveto = moveto.Right)
-					{
-						yield return MoveTo(moveto);
-					}
-				}
-
-				// Can move into room
-				if (pod.Y == HallwayY)
-                {
-					var destX = 3 + 2 * (Map[pod] - 'A');
-
-					var freeHallway =
-						pod.X < destX ? Enumerable.Range(pod.X + 1, destX - pod.X).All(x => Map[x][HallwayY] == '.') :
-						destX < pod.X ? Enumerable.Range(destX, pod.X - 1 - destX).All(x => Map[x][HallwayY] == '.') :
-						true;
-					if (freeHallway)
-                    {
-						if (Map[destX][2] == '.')
-                        {
-							if (Map[destX][3] == '.')
-								yield return MoveTo(Point.From(destX, 3));
-							else if (Map[destX][3] == Map[pod])
-								yield return MoveTo(Point.From(destX, 2));
-						}
-					}
-				}
-			}
-
-		}
-
-		protected override long Part1(string[] input)
+        protected override long Part1(string[] input)
 		{
+			return Cost(input);
+		}
+
+		protected override long Part2(string[] input)
+		{
+			var lines = input.ToList();
+			lines.InsertRange(3, new string[]
+			{
+              "  #D#C#B#A#  ",
+              "  #D#B#A#C#  "
+            });
+			return Cost(lines.ToArray());
+		}
+
+		private static int Cost(string[] input)
+        {
 			var map = CharMap.FromArray(input);
-			var state0 = new State
-			{
-				Map = map,
-				Energy = 0
-			};
+			var map2 = new Burrow(map);
+			//map2.Render().ConsoleWrite();
 
-			var seen = new HashSet<string>();
-			var queue = new PriorityQueue<State,int>();
-			queue.Enqueue(state0, state0.Energy);
-			while (queue.TryDequeue(out var state, out var _))
+            var seen = new HashSet<ulong>();
+			var queue = new PriorityQueue<(ulong, int), int>();
+			queue.Enqueue((map2.State, 0), 0);
+			var seenhits = 0;
+			while (queue.TryDequeue(out var item, out var _))
 			{
-				if (seen.Contains(state.Key))
+				var (state9, energy) = item;
+				if (seen.Contains(state9))
+				{
+					seenhits++;
 					continue;
-				seen.Add(state.Key);
+				}
+				seen.Add(state9);
 
-				if (seen.Count % 10000 == 0)
-					Console.WriteLine($"{seen.Count}: {state.Energy}");
+				map2.State = state9;
+
+				if (seen.Count % 100000 == 0)
+					Console.WriteLine($"{seen.Count}: {energy}");
 
 				//Console.WriteLine(state.Key);
 				//state.Map.ConsoleWrite();
 				//Console.WriteLine();
 
-				if (state.IsDone)
+				if (state9 == map2.FinalState)
 				{
-					return state.Energy;
+					return energy;
 				}
-				foreach (var s in state.NextMoves().Where(x => !seen.Contains(x.Key)))
+
+                foreach (var (s, e, minE) in map2.NextMoves().Where(x => !seen.Contains(x.Item1)))
+                {
+                    queue.Enqueue((s, energy + e), energy + e + minE);
+                }
+            }
+
+			throw new Exception();
+		}
+	}
+
+
+	internal class Burrow
+	{
+		public readonly int RoomHeight;
+		public readonly char[] Hallway = new char[11];
+		public readonly Room[] Rooms;
+		private readonly Burrow _copy;
+		public readonly ulong FinalState;
+
+		internal class Room
+		{
+			public Room(int height, int x, int[] left, int[] right)
+			{
+				X = x;
+				Pods = new char[height];
+				HallwayVicinity = new int[][] { left, right };
+			}
+			public int X { get; private set; }
+			public char[] Pods { get; private set; }
+			public int[][] HallwayVicinity { get; private set; }
+		}
+
+		public Burrow(CharMap map)
+		{
+			var y0 = 2;
+			RoomHeight = map.Max().Y - y0;
+			Rooms = new Room[]
+			{
+				new Room(RoomHeight, 2, new int[] { 1, 0 }, new int[] { 3, 5, 7, 9, 10 }),
+				new Room(RoomHeight, 4, new int[] { 3, 1, 0 }, new int[] { 5, 7, 9, 10 }),
+				new Room(RoomHeight, 6, new int[] { 5, 3, 1, 0 }, new int[] { 7, 9, 10 }),
+				new Room(RoomHeight, 8, new int[] { 7, 5, 3, 1, 0 }, new int[] { 9, 10 }),
+			};
+			for (var x = 0; x < 11; x++)
+			{
+				Hallway[x] = map[x + 1][1];
+			}
+			foreach (var room in Rooms)
+			{
+				for (var i = 0; i < RoomHeight; i++)
 				{
-					queue.Enqueue(s, s.Energy);
+					room.Pods[i] = map[room.X + 1][y0 + i];
+				}
+			}
+			_copy = new Burrow(RoomHeight);
+
+			for (var i = 0; i < Rooms.Length; i++)
+			{
+				for (var j = 0; j < RoomHeight; j++)
+				{
+					_copy.Rooms[i].Pods[j] = (char)('A' + i);
+				}
+			}
+			FinalState = _copy.State;
+		}
+
+		public Burrow(int roomHeight)
+		{
+			RoomHeight = roomHeight;
+			Array.Fill(Hallway, '.');
+			Rooms = new Room[]
+			{
+				new Room(RoomHeight, 2, new int[] { 1, 0 }, new int[] { 3, 5, 7, 9, 10 }),
+				new Room(RoomHeight, 4, new int[] { 3, 1, 0 }, new int[] { 5, 7, 9, 10 }),
+				new Room(RoomHeight, 6, new int[] { 5, 3, 1, 0 }, new int[] { 7, 9, 10 }),
+				new Room(RoomHeight, 8, new int[] { 7, 5, 3, 1, 0 }, new int[] { 9, 10 }),
+			};
+		}
+
+		public Burrow Copy()
+		{
+			var copy = _copy;
+			Array.Copy(Hallway, copy.Hallway, Hallway.Length);
+			for (var i = 0; i < Rooms.Length; i++)
+			{
+				var dst = copy.Rooms[i].Pods;
+				var src = Rooms[i].Pods;
+				for (var j = 0; j < RoomHeight; j++)
+				{
+					dst[j] = src[j];
+				}
+			}
+			return copy;
+		}
+
+		public int DestinationRoomIndex(char ch) => ch - 'A';
+		public Room DestinationRoom(char ch) => Rooms[DestinationRoomIndex(ch)];
+
+		public static int EnergyPerMove(char pod)
+		{
+			return pod switch
+			{
+				'A' => 1,
+				'B' => 10,
+				'C' => 100,
+				'D' => 1000,
+				_ => throw new Exception($"Unknown pod {pod}")
+			};
+		}
+
+		public int MinRemainingEnergy
+		{
+			get
+			{
+				var e = 0;
+				foreach (var room in Rooms)
+				{
+					for (var j = 0; j < RoomHeight; j++)
+					{
+						var pod = room.Pods[j];
+						if (pod == '.')
+							continue;
+						var destRoom = DestinationRoom(pod);
+						if (destRoom == room)
+						{
+							e += EnergyPerMove(pod) * (RoomHeight - (j + 1));
+						}
+						else
+						{
+							e += EnergyPerMove(pod) * ((j + 1) + Math.Abs(room.X - destRoom.X) + RoomHeight);
+						}
+					}
+				}
+				for (var x = 0; x < Hallway.Length; x++)
+				{
+					var pod = Hallway[x];
+					if (pod == '.')
+						continue;
+					var destX = DestinationRoom(pod).X;
+					e += EnergyPerMove(pod) * (Math.Abs(x - destX) + RoomHeight);
+				}
+				var tooMuch = RoomHeight * (RoomHeight - 1) / 2;
+				e -= 1111 * tooMuch;
+				//if (e < 0)
+				//	;
+				return e;
+			}
+		}
+
+		public CharMap Render()
+		{
+			var map = RoomHeight == 2
+				? CharMap.FromArray(new[]
+					{
+						"#############",
+						"#...........#",
+						"###.#.#.#.###",
+						"  #.#.#.#.#  ",
+						"  #########  ",
+					})
+				: CharMap.FromArray(new[]
+					{
+						"#############",
+						"#...........#",
+						"###.#.#.#.###",
+						"  #.#.#.#.#  ",
+						"  #.#.#.#.#  ",
+						"  #.#.#.#.#  ",
+						"  #########  ",
+					});
+			for (var x = 0; x < Hallway.Length; x++)
+			{
+				map[x + 1][1] = Hallway[x];
+			}
+			foreach (var room in Rooms)
+			{
+				for (var j = 0; j < RoomHeight; j++)
+				{
+					map[room.X + 1][2 + j] = room.Pods[j];
+				}
+			}
+			return map;
+		}
+
+		public ulong State
+		{
+			get
+			{
+				var v = 0UL;
+				for (var x = 0; x < Hallway.Length; x++)
+				{
+					v = v * 5 + Serialize(Hallway[x]);
+				}
+				for (var i = 0; i < Rooms.Length; i++)
+				{
+					for (var j = 0; j < RoomHeight; j++)
+					{
+						v = v * 5 + Serialize(Rooms[i].Pods[j]);
+					}
+				}
+				return v;
+				static uint Serialize(char ch) => (uint)(ch == '.' ? 0 : ch - 'A' + 1);
+			}
+			set
+			{
+				for (var i = Rooms.Length; i-- > 0;)
+				{
+					for (var j = RoomHeight; j-- > 0;)
+					{
+						var vv = value;
+						value /= 5;
+						Rooms[i].Pods[j] = Deserialize(vv - value * 5);
+					}
+				}
+				for (var x = Hallway.Length; x-- > 0;)
+				{
+					var vv = value;
+					value /= 5;
+					Hallway[x] = Deserialize(vv - value * 5);
+				}
+				static char Deserialize(ulong v) => (char)(v == 0 ? '.' : 'A' + v - 1);
+			}
+		}
+
+		public IEnumerable<(ulong, int, int)> NextMoves()
+		{
+			// Check if any pods can move from hallway into their destination room
+			for (var x = 0; x < 11; x++)
+			{
+				// Only act on pods, not empty spaces
+				var pod = Hallway[x];
+				if (pod == '.')
+					continue;
+				// Bail if pod won't fit in its destination room
+				var rn = DestinationRoomIndex(pod);
+				var room = Rooms[rn];
+
+				if (room.Pods[0] != '.')
+					continue;
+
+				// Check if path to destination is all clear
+				var roomX = room.X;
+				var (xmin, xmax) = x < roomX ? (x + 1, roomX - 1) : (roomX + 1, x - 1);
+				var canMove = true;
+				for (var hx = xmin; hx <= xmax && canMove; hx++)
+				{
+					canMove &= Hallway[hx] == '.';
+				}
+				if (canMove)
+				{
+					var noBlockers = room.Pods.All(p => p == '.' || p == pod);
+
+					if (noBlockers)
+					{
+						// Okay, pod may move to its room - pick the lowest vacant spot
+						for (var i = RoomHeight; i-- > 0;)
+						{
+							if (room.Pods[i] == '.')
+							{
+								var move = Copy();
+								move.Hallway[x] = '.';
+								move.Rooms[rn].Pods[i] = pod;
+								var energy = EnergyPerMove(pod) * (Math.Abs(roomX - x) + i + 1);
+								yield return (move.State, energy, move.MinRemainingEnergy);
+							}
+						}
+					}
 				}
 			}
 
-			return 0;
+			// Check if any pods can (should) move out of their room
+			for (var n = 0; n < Rooms.Length; n++)
+			{
+				var room = Rooms[n];
+				for (var i = 0; i < RoomHeight; i++)
+				{
+					var pod = room.Pods[i];
+					if (pod == '.')
+						continue;
+					var destination = DestinationRoom(pod);
+					if (destination == room)
+					{
+						// it's in the right room, but is it blocking any others?
+						var isBlocking = false;
+						for (var j = i + 1; j < RoomHeight; j++)
+						{
+							isBlocking |= room.Pods[j] != pod;
+						}
+						if (!isBlocking)
+							continue;
+					}
+					foreach (var vicinity in room.HallwayVicinity)
+					{
+						foreach (var x in vicinity)
+						{
+							var p = Hallway[x];
+							if (p != '.')
+								break;
+							var move = Copy();
+							move.Hallway[x] = pod;
+							move.Rooms[n].Pods[i] = '.';
+							var energy = EnergyPerMove(pod) * (i + 1 + Math.Abs(room.X - x));
+							yield return (move.State, energy, move.MinRemainingEnergy);
+						}
+					}
+					break;
+				}
+			}
+
 		}
-
-		protected override long Part2(string[] input)
-		{
-
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//	internal class Thing
-	//	{
-	//		//private readonly 
-	//		public Thing(string[] lines)
-	//		{
-	//		}
-	//	}
-
-	////	class SomeGraph : Graph<HashSet<uint>> { }
-
-	//	internal void Sample(string[] input)
-	//	{
-	//		{
-	//			var v = input.Select(int.Parse).ToArray();
-	//		}
-	//		{
-	//			var v = input[0].ToIntArray();
-	//		}
-	//		{
-	//			var things = input
-	//				.Skip(1)
-	//				.GroupByEmptyLine()
-	//				.Select(lines => new Thing(lines))
-	//				.ToMutableArray();
-	//		}
-	//		{
-	//			var map = new SparseMap<int>();
-	//			foreach (var s in input)
-	//			{
-	//				var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-	//			}
-	//		}
-	//		{
-	//			var map = CharMap.FromArray(input);
-	//			var maze = new Maze(map)
-	//				.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-	//			var dest = Point.From(2, 3);
-	//			var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-	//			var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-	//		}
-	//		{
-	//			var map = new CharMap('#');
-	//			var maze = new Maze(map).WithEntry(Point.From(1, 1));
-	//			var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-	//			var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-	//			queue.Enqueue((graph.Root, 0U, 0));
-	//			while (queue.Any())
-	//			{
-	//				var (node, found, steps) = queue.Dequeue();
-	//				if (node.Value.Contains(found))
-	//					continue;
-	//				node.Value.Add(found);
-	//				var ch = map[node.Pos];
-	//				if (char.IsDigit(ch))
-	//				{
-
-	//				}
-	//				foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-	//				{
-	//					queue.Enqueue((n, found, steps + 1));
-	//				}
-	//			}
-	//		}
-	//		{
-	//			var ship = new Pose(Point.Origin, Direction.Right);
-	//			foreach (var line in input)
-	//			{
-	//				var n = int.Parse(line.Substring(1));
-	//				switch (line[0])
-	//				{
-	//					case 'N': ship.MoveUp(n); break;
-	//					case 'S': ship.MoveDown(n); break;
-	//					case 'E': ship.MoveRight(n); break;
-	//					case 'W': ship.MoveLeft(n); break;
-	//					case 'L': ship.RotateLeft(n); break;
-	//					case 'R': ship.RotateRight(n); break;
-	//					case 'F': ship.Move(n); break;
-	//					default:
-	//						throw new Exception($"Unknown action in {line}");
-	//				}
-	//			}
-	//			var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-	//		}
-	//		{
-	//			var departure = int.Parse(input[0]);
-	//			var id = input[1]
-	//				.Replace(",x", "")
-	//				.Split(",")
-	//				.Select(int.Parse)
-	//				.Select(id => new
-	//				{
-	//					Id = id,
-	//					Time = id - departure % id
-	//				})
-	//				.OrderBy(x => x.Time)
-	//				.First();
-	//		}
-	//		{
-	//			var map = CharMatrix.FromArray(input);
-	//			for (var i = 0; i < 100; i++)
-	//			{
-	//				map = map.Transform((ch, adjacents) =>
-	//				{
-	//					var n = 0;
-	//					foreach (var c in adjacents)
-	//					{
-	//						if (c == '|' && ++n >= 3)
-	//							return '|';
-	//					}
-	//					return ch;
-	//				});
-	//			}
-	//		}
-	//	}
-
 	}
+
 }
