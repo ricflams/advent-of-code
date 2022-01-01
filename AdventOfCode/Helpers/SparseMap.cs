@@ -101,12 +101,32 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public Point Min()
+		{
+			var points = AllPoints().ToArray();
+			if (points.Length == 0)
+			{
+				return Point.Origin;
+			}
+			return Point.From(points.Min(z => z.X), points.Min(z => z.Y));
+		}
+
+		public Point Max()
+		{
+			var points = AllPoints().ToArray();
+			if (points.Length == 0)
+			{
+				return Point.Origin;
+			}
+			return Point.From(points.Max(z => z.X), points.Max(z => z.Y));
+		}
+
 		public (Point, Point) MinMax()
 		{
 			var points = AllPoints().ToArray();
 			if (points.Length == 0)
 			{
-				return (Point.From(0, 0), Point.From(0, 0));
+				return (Point.Origin, Point.Origin);
 			}
 			var min = Point.From(points.Min(z => z.X), points.Min(z => z.Y));
 			var max = Point.From(points.Max(z => z.X), points.Max(z => z.Y));
@@ -117,6 +137,12 @@ namespace AdventOfCode.Helpers
 		{
 			var (min, max) = MinMax();
 			return (min, max.DiagonalDownRight);
+		}
+
+		public (int, int) Size()
+		{
+			var (top, bot) = Range();
+			return (bot.X - top.X, bot.Y - top.Y);
 		}
 
 		public IEnumerable<Point> Corners()
