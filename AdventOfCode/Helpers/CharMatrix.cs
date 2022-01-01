@@ -10,6 +10,18 @@ namespace AdventOfCode.Helpers
         public static int Height(this char[,] mx) => mx.GetLength(1);
         public static (int, int) Dim(this char[,] mx) => (mx.Width(), mx.Height());
 
+		public static (Point, Point) MinMax(this char[,] mx)
+		{
+			var (w, h) = mx.Dim();
+			return (Point.Origin, Point.From(w - 1, h - 1));
+		}
+
+		public static (Point, Point) Range(this char[,] mx)
+		{
+			var (w, h) = mx.Dim();
+			return (Point.Origin, Point.From(w, h));
+		}
+
 		public static char[,] Create(int w, int h, char defaultChar)
 		{
 			var map = new char[w, h];
@@ -49,7 +61,6 @@ namespace AdventOfCode.Helpers
 				.ToArray();
 		}
 
-        public static char[,] RotateClockwise(this char[,] mx, int angle)
 		public static char[,] Copy(this char[,] mx)
 		{
 			var (w, h) = mx.Dim();
@@ -64,6 +75,7 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public static char[,] RotateClockwise(this char[,] mx, int angle)
 		{
 			var (w, h) = mx.Dim();
 
@@ -244,14 +256,28 @@ namespace AdventOfCode.Helpers
 		{
 			var (w, h) = mx.Dim();
 
-			var expanded = new char[w + 2*n, h + 2*n];
-			for (var x = 0; x < w + 2*n; x++)
+			var (w2, h2) = (w + 2*n, h + 2*n);
+			var expanded = new char[w2, h2];
+
+			// Fill the expanded area
+			for (var x = 0; x < w2; x++)
 			{
-				for (var y = 0; y < h + 2*n; y++)
+				for (var y0 = 0; y0 < n; y0++)
 				{
-					expanded[x, y] = defaultChar;
+					expanded[x, y0] = defaultChar;
+					expanded[x, h2 - 1 - y0] = defaultChar;
 				}
 			}
+			for (var x0 = 0; x0 < n; x0++)
+			{
+				for (var y = n; y < h2 - n; y++)
+				{
+					expanded[x0, y] = defaultChar;
+					expanded[w2 - 1 - x0, y] = defaultChar;
+				}
+			}
+
+			// Copy the middle part
 			for (var x = 0; x < w; x++)
 			{
 				for (var y = 0; y < h; y++)
@@ -259,6 +285,7 @@ namespace AdventOfCode.Helpers
 					expanded[x + n, y + n] = mx[x, y];
 				}
 			}
+
 			return expanded;
 		}
 
