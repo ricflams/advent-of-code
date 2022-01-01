@@ -1,162 +1,93 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day15
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 15";
+		public override string Name => "Chiton";
 		public override int Year => 2021;
 		public override int Day => 15;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(40).Part2(315);
+			Run("input").Part1(613).Part2(2899);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var map = CharMatrix.FromArray(input);
 
+			var (start, end) = map.MinMax();
+			var risk = LowestRisk(map, start, end);
 
-			return 0;
+			return risk;
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var N = 5;
 
+			var map0 = CharMatrix.FromArray(input);
+			var (w, h) = map0.Dim();
 
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
+			var map = new char[w * N, h * N];
+			for (var xf = 0; xf < N; xf++)
 			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				for (var yf = 0; yf < N; yf++)
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					for (var x = 0; x < w; x++)
 					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
+						for (var y = 0; y < h; y++)
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							var v = map0[x, y] - '0' + xf + yf;
+							while (v > 9)
+								v -= 9;
+							map[x + xf * w, y + yf * h] = (char)('0' + v);
 						}
-						return ch;
-					});
+					}
 				}
 			}
+			// map.ConsoleWrite();
+
+			var (start, end) = map.MinMax();
+			var risk = LowestRisk(map, start, end);
+
+			return risk;
 		}
 
+		private static int LowestRisk(char[,] map, Point start, Point end)
+		{
+			var (w, h) = map.Dim();
+
+			var frontier = new PriorityQueue<Point, int>();
+			frontier.Enqueue(start, 0);
+
+			var costSoFarMap = new int[w, h];
+			costSoFarMap[start.X, start.Y] = 0;
+
+			while (frontier.TryDequeue(out var current, out var _))
+			{
+				var costSoFar = costSoFarMap[current.X, current.Y];
+				foreach (var next in current.LookAround().Within(w, h))
+				{
+					var (x, y) = (next.X, next.Y);
+					var newCost = costSoFar + map[x, y] - '0';
+					var costSoFarForNext = costSoFarMap[x, y];
+					if (costSoFarForNext == 0 || newCost < costSoFarForNext)
+					{
+						costSoFarMap[x, y] = newCost;
+						var priority = newCost + next.ManhattanDistanceTo(end);
+						frontier.Enqueue(next, priority);
+					}
+				}
+			}
+
+			var risk = costSoFarMap[end.X, end.Y];
+			return risk;
+		}
 	}
 }
