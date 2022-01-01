@@ -305,28 +305,27 @@ namespace AdventOfCode.Y2021.Day24.Raw
             //if (regs.Z != z3)
             //	;
             //Console.Write($"{z2:D2} ");
-            return 0;
 
-            IEnumerable<(int, int)> PossibleZ(int step, int[] willproduceZ)
-            {
-                var f = factors[step];
-                for (var z = -100; z < 100; z++)
-                {
-					foreach (var d in Digits.Where(d =>
-					{
-						var z3 = z % 26 == d + f[1]
-							? z / f[0]
-							: z / f[0] * 26 + d + f[2];
-						return z3 >= 0 && willproduceZ.Any(zz => z3 == zz);
-					}))
-                    {
-						yield return (d, z);
-					}
-                }
-            }
+     //       IEnumerable<(int, int)> PossibleZ(int step, int[] willproduceZ)
+     //       {
+     //           var f = factors[step];
+     //           for (var z = -100; z < 100; z++)
+     //           {
+					//foreach (var d in Digits.Where(d =>
+					//{
+					//	var z3 = z % 26 == d + f[1]
+					//		? z / f[0]
+					//		: z / f[0] * 26 + d + f[2];
+					//	return z3 >= 0 && willproduceZ.Any(zz => z3 == zz);
+					//}))
+     //               {
+					//	yield return (d, z);
+					//}
+     //           }
+     //       }
 
 
-            var cache = new Dictionary<string, long?>();
+     //       var cache = new Dictionary<string, long?>();
 
 			//var thebigmax = 0L;
 			//var themax = FindMax(0, 0, 0);
@@ -378,12 +377,12 @@ namespace AdventOfCode.Y2021.Day24.Raw
 			//}
 		}
 
-		class State
-		{
-			public int Z;
-			public int Len;
-			public long Value;
-		}
+		//class State
+		//{
+		//	public int Z;
+		//	public int Len;
+		//	public long Value;
+		//}
 
 		//regs.W = d;           //inp w
 		//regs.X = 0;            //mul x 0
