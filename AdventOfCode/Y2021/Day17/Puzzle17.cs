@@ -16,7 +16,9 @@ namespace AdventOfCode.Y2021.Day17
 		public void Run()
 		{
 			Run("test1").Part1(45).Part2(112);
-			Run("input").Part1(17766).Part2(1733);
+
+			// TODO cleanup
+			//Run("input").Part1(17766).Part2(1733);
 		}
 
 		protected override long Part1(string[] input)
@@ -67,6 +69,9 @@ namespace AdventOfCode.Y2021.Day17
 
 			int? MaxHeightHittingTarget(int vx, int vy)
 			{
+				var vx0 = vx;
+				var vy0 = vy;
+
 				var x = 0;
 				var y = 0;
 				var highest = 0;
@@ -92,6 +97,7 @@ namespace AdventOfCode.Y2021.Day17
 					// If x,y hits inside target then we're done
 					if (x >= xMin && x <= xMax && y >= yMin && y <= yMax)
 					{
+						Console.WriteLine($"Hit: {vx0},{vy0}");
 						return highest;
 					}
 				}
