@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -188,6 +189,36 @@ namespace AdventOfCode.Helpers
 					indexes[pos] = 0;
 				}
 			}
+		}
+
+
+		public static IEnumerable<T[]> Combinations<T>(IEnumerable<T> set, int size)
+		{
+			Debug.Assert(size > 0);
+
+			var elements = set.ToArray();
+			var data = new T[size];
+			foreach (var combination in Combination(0, elements.Length, 0))
+            {
+				yield return combination;
+			}
+
+			IEnumerable<T[]> Combination(int start, int end, int index)
+            {
+				if (index == size)
+                {
+					yield return data;
+					yield break;
+				}
+				for (int i = start; i < end && size - index < end - i + 1; i++)
+				{
+					data[index] = elements[i];
+					foreach (var x in Combination(i + 1, end, index + 1))
+                    {
+						yield return x;
+					}
+				}
+            }
 		}
 
 		private static Random Random = new Random();
