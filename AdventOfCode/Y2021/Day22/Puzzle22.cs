@@ -82,8 +82,8 @@ namespace AdventOfCode.Y2021.Day22
 		{
 			public Cube(int x1, int x2, int y1, int y2, int z1, int z2)
 			{
-				Top = new Point3D(x1, y1, z1);
-				Bot = new Point3D(x2, y2, z2);
+				Bot = new Point3D(x1, y1, z1);
+				Top = new Point3D(x2, y2, z2);
 				Corners = new Point3D[]
 				{
 					new Point3D(x1, y1, z1),
@@ -96,11 +96,11 @@ namespace AdventOfCode.Y2021.Day22
 					new Point3D(x2, y2, z2)
 				};
 			}
-			public readonly Point3D Top;
 			public readonly Point3D Bot;
+			public readonly Point3D Top;
 			public readonly Point3D[] Corners;
 			public List<Cube> Holes = new List<Cube>();
-			public long Size => (long)(Bot.X - Top.X + 1) * (Bot.Y - Top.Y + 1) * (Bot.Z - Top.Z + 1);
+			public long Size => (long)(Top.X - Bot.X + 1) * (Top.Y - Bot.Y + 1) * (Top.Z - Bot.Z + 1);
 			//public long Size => (long)(Bot.X - Top.X + 1) * (Bot.Y - Top.Y + 1) * (Bot.Z - Top.Z + 1) - Cardinality(1, Holes);
 
 			public override string ToString() => $"size={Size} #holes={Holes.Count}";
@@ -114,9 +114,9 @@ namespace AdventOfCode.Y2021.Day22
 
 			public bool Contains(Point3D p)
 			{
-				if (p.X < Top.X || p.X > Bot.X) return false;
-				if (p.Y < Top.Y || p.Y > Bot.Y) return false;
-				if (p.Z < Top.Z || p.Z > Bot.Z) return false;
+				if (p.X < Bot.X || p.X > Top.X) return false;
+				if (p.Y < Bot.Y || p.Y > Top.Y) return false;
+				if (p.Z < Bot.Z || p.Z > Top.Z) return false;
 				return true;
 			}
 
@@ -133,12 +133,12 @@ namespace AdventOfCode.Y2021.Day22
 
 			public Cube Overlap(Cube other)
 			{
-				var x1 = Math.Max(Top.X, other.Top.X);
-				var x2 = Math.Min(Bot.X, other.Bot.X);
-				var y1 = Math.Max(Top.Y, other.Top.Y);
-				var y2 = Math.Min(Bot.Y, other.Bot.Y);
-				var z1 = Math.Max(Top.Z, other.Top.Z);
-				var z2 = Math.Min(Bot.Z, other.Bot.Z);
+				var x1 = Math.Max(Bot.X, other.Bot.X);
+				var x2 = Math.Min(Top.X, other.Top.X);
+				var y1 = Math.Max(Bot.Y, other.Bot.Y);
+				var y2 = Math.Min(Top.Y, other.Top.Y);
+				var z1 = Math.Max(Bot.Z, other.Bot.Z);
+				var z2 = Math.Min(Top.Z, other.Top.Z);
 				return new Cube(x1, x2, y1, y2, z1, z2);
 			}
 		}
