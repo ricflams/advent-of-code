@@ -79,7 +79,7 @@ namespace AdventOfCode.Y2021.Day23
 		public Burrow(CharMap map)
 		{
 			var y0 = 2; // Rooms start at y==2
-			RoomSize = map.Max().Y - y0;
+			RoomSize = map.MinMax().Item2.Y - y0;
 			Rooms = new Room[]
 			{
 				new Room(RoomSize, 'A', 2, new int[] { 1, 0 }, new int[] { 3, 5, 7, 9, 10 }),
@@ -234,10 +234,12 @@ namespace AdventOfCode.Y2021.Day23
 						var destination = DestinationRoom(pod);
 						if (destination == room)
 						{
+							// Move to bottom of room
 							e += EnergyPerMove(pod) * (RoomSize - (i + 1));
 						}
 						else
 						{
+							// Move out of the wrong room, down the hallway, to bottom of right room
 							e += EnergyPerMove(pod) * (i + 1 + Math.Abs(room.X - destination.X) + RoomSize);
 						}
 					}
@@ -251,7 +253,7 @@ namespace AdventOfCode.Y2021.Day23
 					e += EnergyPerMove(pod) * (Math.Abs(x - destination.X) + RoomSize);
 				}
 
-				// The energy needed was for moving all pods to the bottom of their
+				// The calculated energy is for moving all pods to the bottom of their
 				// destination room. But that's more than what's needed; it's 1+2+3+...
 				// more moves than needed. Subtract that many moves for each of the
 				// 4 types of pods, ie for 1+10+100+1000 = 1111 energies.

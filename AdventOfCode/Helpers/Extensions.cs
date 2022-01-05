@@ -60,6 +60,11 @@ namespace AdventOfCode.Helpers
 			return sum;
 		}
 
+		public static (long, long) Plus(this (long, long) sum, (long, long) v)
+		{
+			return (sum.Item1 + v.Item1, sum.Item2 + v.Item2);
+		}
+
 		public static Tv GetOrAdd<Tk,Tv>(this IDictionary<Tk,Tv> dict, Tk key, Func<Tv> producer)
 		{
 			if (!dict.TryGetValue(key, out var value))
