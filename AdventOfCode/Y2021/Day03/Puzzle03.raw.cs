@@ -55,8 +55,8 @@ namespace AdventOfCode.Y2021.Day03.Raw
 		{
 			var w = input.First().Length;
 
-			var gamma = 0;
-			var eps = 0;
+			//var gamma = 0;
+			//var eps = 0;
 
 			var input2 = input.Select(x => x).ToArray();
 

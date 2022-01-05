@@ -84,7 +84,7 @@ namespace AdventOfCode.Y2021.Day10.Raw
 					if (x == 0)
 					{
 						//		Console.Write($"{s}: ");
-						var add = "";
+						//var add = "";
 						//expect.Pop();
 						//expect.Pop();
 						var score = 0L;
