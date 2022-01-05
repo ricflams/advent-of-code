@@ -49,7 +49,6 @@ namespace AdventOfCode.Helpers
 				.ToArray();
 		}
 
-        public static char[,] RotateClockwise(this char[,] mx, int angle)
 		public static char[,] Copy(this char[,] mx)
 		{
 			var (w, h) = mx.Dim();
@@ -64,6 +63,7 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
+		public static char[,] RotateClockwise(this char[,] mx, int angle)
 		{
 			var (w, h) = mx.Dim();
 
