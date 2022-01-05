@@ -123,17 +123,12 @@ namespace AdventOfCode.Y2021.Day22
 			public bool HasOverlap(Cube other, out Cube overlap)
 			{
 				overlap = other.Corners.Any(p => Contains(p)) ? Overlap(other) : null;
-				if (overlap != null)
-                {
-					foreach (var h in other.Holes)
-					{
-						if (overlap.HasOverlap(h, out var overlap2))
-						{
-							overlap.Holes.Add(overlap2);
-						}
-					}
-				}
 				return overlap != null;
+			}
+
+			public Cube MaybeOverlap(Cube other)
+			{
+				return other.Corners.Any(p => Contains(p)) ? Overlap(other) : null;
 			}
 
 			public Cube Overlap(Cube other)
@@ -146,51 +141,71 @@ namespace AdventOfCode.Y2021.Day22
 				var z2 = Math.Min(Bot.Z, other.Bot.Z);
 				return new Cube(x1, x2, y1, y2, z1, z2);
 			}
-			//public void OverlapWith(Cube other, bool on)
-			//{
-			//	if (HasOverlap(other, out var overlap))
-			//	{
-			//		foreach (var (o, on2) in Overlaps)
-			//		{
-			//			if (on != on2)
-			//				o.OverlapWith(overlap, !on);
-			//		}
-			//		Overlaps.Add((overlap, on));
-			//	}
-			//}
+		}
+
+		internal class Mod
+        {
+			public Cube Chunk { get; set; }
+			public bool On { get; set; }
+			public int Time;
 		}
 
 		protected override long Part2(string[] input)
 		{
-			var cubes = new List<Cube>();
-//			var extras = new List<Cube>();
+			//var allcubes = input
+			//	.Select(s =>
+			//	{
+			//		var (set, x1, x2, y1, y2, z1, z2) = s.RxMatch("%s x=%d..%d,y=%d..%d,z=%d..%d").Get<string, int, int, int, int, int, int>();
+			//		var on = set == "on";
+			//		return (new Cube(x1, x2, y1, y2, z1, z2), on);
+			//	})
+			//	.ToArray();
 
+			//var minx = allcubes.Select(c => c.Item1.Bot.X).Min();
+			//var miny = allcubes.Select(c => c.Item1.Bot.Y).Min();
+			//var minz = allcubes.Select(c => c.Item1.Bot.Z).Min();
+			//var maxx = allcubes.Select(c => c.Item1.Bot.X).Max();
+			//var maxy = allcubes.Select(c => c.Item1.Bot.Y).Max();
+			//var maxz = allcubes.Select(c => c.Item1.Bot.Z).Max();
+
+			//var kube = new Cube(minx, maxx, miny, maxy, minz, maxz);
+			//var size = kube.Size;
+			//var space = new bool[maxx-minx+1, maxy-miny+1, maxz-minz+1];
+
+			//var sets = Enumerable.Range(0, 1000).Select(_ => new List<Cube>()).ToArray();
+			//var cubes = new List<Cube>();
+
+			//void InstallCubeOn(Cube cube, int level)
+			//         {
+			//	var cubes = new[] { cube };
+			//	while (cubes.Any())
+			//             {
+			//		Console.WriteLine($"Install {cubes.Length} at level {level}");
+			//		var cubes2 = sets[level]
+			//			.SelectMany(c => cubes.Select(cs => cs.MaybeOverlap(c)))
+			//			.Where(c => c != null)
+			//			.ToArray();
+			//		sets[level].AddRange(cubes);
+			//		cubes = cubes2;
+			//		level++;
+			//	}
+			//         }
+
+			var cubes = new List<Cube>();
+			var holes = new List<Cube>();
+			var time = 0;
 			foreach (var s in input)
 			{
+				time++;
 				// on x=10..12,y=10..12,z=10..12
 				var (set, x1, x2, y1, y2, z1, z2) = s.RxMatch("%s x=%d..%d,y=%d..%d,z=%d..%d").Get<string, int, int, int, int, int, int>();
 				var on = set == "on";
 				var cube = new Cube(x1, x2, y1, y2, z1, z2);
-
+				//Console.WriteLine(on ? "##### CUBE" : "----- hole");
 				if (on)
-				{
-					//foreach (var c in cubes.Concat(extras).ToArray())
-					//{
-					//	if (cube.HasOverlap(c, out var newUnion))
-					//	{
-					//		//// If c has any holes then they're not part of this union
-					//		//foreach (var hc in c.Holes)
-					//		//{
-					//		//	if (newUnion.HasOverlap(hc, out var holeoverlap))
-					//		//	{
-					//		//		newUnion.Holes.Add(holeoverlap);
-					//		//	}
-					//		//}
-					//		extras.Add(newUnion);
-					//	}
-					//}
+                {
 					cubes.Add(cube);
-				}
+                }
 				else
                 {
 					foreach (var c in cubes)//.Concat(extras))
@@ -201,681 +216,185 @@ namespace AdventOfCode.Y2021.Day22
 						}
 					}
 				}
-
-
 			}
 
-			//var values = Enumerable.Range(1, 8);
-			//foreach (var x in MathHelper.Combinations(values, 1))
-   //         {
-			//	Console.WriteLine(string.Join(" ", x));
-   //         }
-
-			var grandtotal = Cardinality(1, cubes);
-			var grandtotal2 = Cardinality2(cubes);
-            if (grandtotal != grandtotal2)
-                throw new Exception();
-            return grandtotal;
-
-			var allholes = cubes.SelectMany(c => c.Holes).ToList();
-			var dots = cubes.Select(c => Cardinality(1, c.Holes)).Sum();
-
-			//var dots = 0L;
-			//foreach (var cube in cubes)
-			//{
-			//	//	Console.Write($"holes={cube.Holes.Count} size={cube.Size}");
-			//	var holecount = Cardinality(1, cube.Holes);
-			//	dots += holecount;
+			//for (var r = 1; r < 10; r++)
+			//         {
+			//	var values = Enumerable.Range(1, 42);
+			//	var combos = MathHelper.Combinations(values, r).Count();
+			//	Console.WriteLine($"{r}: {combos}");
 			//}
 
-			//var n = grandtotal - CountDots(extras);
-			var n = grandtotal - dots;
-			return n;
-		}
 
-		//private static long CountDots(List<Cube> cubes)
-		//{
-		//	//var overlapcounts = new List<int>();
-		//	//for (var i = 0; i < cubes.Count; i++)
-		//	//{
-		//	//	var overlaps = 0;
-		//	//	for (var j = i + 1; j < cubes.Count; j++)
-		//	//	{
-		//	//		if (cubes[i].HasOverlap(cubes[j], out var o))
-		//	//		{
-		//	//			overlaps++;
-		//	//		}
-		//	//	}
-		//	//	overlapcounts.Add(overlaps);
-		//	//}
-		//	//foreach (var o in overlapcounts.OrderBy(o => o))
-		//	//         {
-		//	//	Console.WriteLine($"  overlapcount={o}");
-		//	//}
 
-		//	var dots = 0L;
-		//	foreach (var cube in cubes.OrderBy(x => x.Holes.Count))
-		//	{
-		//		//	Console.Write($"holes={cube.Holes.Count} size={cube.Size}");
-		//		var holecount = Cardinality(1, cube.Holes);
-		//		var dotcount = cube.Size - holecount;
-		//		if (holecount < 0)
-		//			;
-		//		Console.WriteLine($"  #holes={holecount} dots={dotcount}");
-		//		dots += dotcount;
-		//	}
-		//	return dots;
-		//}
+			//var grandtotal2 = OldCardinality(cubes);
+			var grandtotal = Cardinality(cubes);
+			//if (grandtotal != grandtotal2)
+			//	;// throw new Exception();
 
-		//private static IEnumerable<Cube> Unions(IEnumerable<Cube> unions, IEnumerable<Cube> set)
-		//      {
-		//	var overlaps = unions
-		//		.SelectMany((s1,i) => set
-		//			.Skip(i)
-		//			.Select(s2 => s1.HasOverlap(s2, out var o) ? o : null)
-		//			.Where(o => o != null)
-		//		);
-		//	return overlaps;
-		//}
+			var fit = (double)grandtotal / 2758514936282235;
+			Console.WriteLine($"Fit: {fit*100:F0}%");
 
-		//private static long UnionCardinality(List<Cube> set)
-		//      {
-		//	var unions = set.SelectMany((s1, i) => set.Skip(i + 1).Select(s2 => s1.HasOverlap(s2, out var o) ? o : null).Where(o => o != null)).ToList();
-		//	var sum = unions.Select(o => o.Size).Sum();
-		//	return sum == 0 ? 0 : sum - UnionCardinality(unions);
-		//}
 
-		private static long Cardinality2(IEnumerable<Cube> cubes)
-        {
-			var set = cubes.ToArray();
-			var allcubes = Enumerable.Range(0, set.Length);
-			return Cardinality(1);
-
-			long Cardinality(int depth)
-			{
-				var sum = 0L;
-				foreach (var indexes in MathHelper.Combinations(allcubes, depth))
-				{
-					var union = set[indexes.First()];
-					foreach (var c in indexes.Skip(1).Select(i => set[i]))
-					{
-						if (!union.HasOverlap(c, out union))
-							break;
-					}
-					sum += union?.Size ?? 0;
-				}
-				return sum == 0 ? 0 : sum - Cardinality(depth + 1);
-			}
+			return grandtotal;
 		}
 
 
-
-
-		private static long Cardinality(int lookat, List<Cube> set)
+		private static long Cardinality(IEnumerable<Cube> cubes0)
 		{
-			if (lookat == 1)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					sum += set[i].Size;
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
-			if (lookat == 2)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							sum += o.Size;
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
-			if (lookat == 3)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									sum += o2.Size;
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
-			if (lookat == 4)
-			{
-				var sum = 0L;
-				int os1 = 0, os2 = 0, os3 = 0;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							os1++;
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									os2++;
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											os3++;
-											sum += o3.Size;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
-			if (lookat == 5)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													sum += o4.Size;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+			if (!cubes0.Any())
+            {
+				return 0;
+            }
 
-			if (lookat == 6)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
+			var set0 = cubes0.Select((c, i) =>
 				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															sum += o5.Size;
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+					var index = new int[] { i };
+					return (c, index);
+				})
+				.ToArray();
 
-			if (lookat == 7)
+			var excessHoles = 0L;
+
+			var sum0 = 0L;
+			foreach (var c in cubes0)
+            {
+				sum0 += c.Size;// - Puzzle.Cardinality(c.Holes);
+			}
+			var card = Cardinality(2, set0);
+			return sum0 - card - excessHoles;
+
+			long Cardinality(int setlengh, (Cube cube,int[] indexes)[] set)
 			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	sum += o6.Size;
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+				if (set.Length == 1)
+                {
+					var excessHoles2 = Puzzle.Cardinality(set[0].cube.Holes);
+					return set[0].cube.Size - excessHoles2;
+                }
 
-			if (lookat == 8)
-			{
+				var allIndexes = Enumerable.Range(0, set.Length);
+				var unions = new Dictionary<string, (Cube, int[])>();
 				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
+				foreach (var indexes in MathHelper.Combinations(allIndexes, 2))
 				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	for (var k6 = k5 + 1; k6 < set.Count; k6++)
-																	{
-																		if (o6.HasOverlap(set[k6], out var o7))
-																		{
-																			sum += o7.Size;
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+					var subset = indexes.Select(i => set[i]).ToArray();
+					var (c1, c2) = (subset[0], subset[1]);
+					var covers = c1.indexes.Concat(c2.indexes).Distinct().OrderBy(x => x).ToArray();
+					if (covers.Length > setlengh)
+						continue;
+					var key = string.Join("-", covers);
+					if (unions.ContainsKey(key))
+						continue;
+					if (c1.cube.HasOverlap(c2.cube, out var overlap))
+                    {
+						unions[key] = (overlap, covers);
 
-			if (lookat == 9)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	for (var k6 = k5 + 1; k6 < set.Count; k6++)
-																	{
-																		if (o6.HasOverlap(set[k6], out var o7))
-																		{
-																			for (var k7 = k6 + 1; k7 < set.Count; k7++)
-																			{
-																				if (o7.HasOverlap(set[k7], out var o8))
-																				{
-																					sum += o8.Size;
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+                        var uholes = new List<Cube>();
+                        foreach (var hole in c1.cube.Holes.Concat(c2.cube.Holes))
+                        {
+                            if (overlap.HasOverlap(hole, out var uhole))
+                            {
+                                uholes.Add(uhole);
+                            }
+                        }
+						//			overlap.Holes = uholes;
 
-			if (lookat == 10)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	for (var k6 = k5 + 1; k6 < set.Count; k6++)
-																	{
-																		if (o6.HasOverlap(set[k6], out var o7))
-																		{
-																			for (var k7 = k6 + 1; k7 < set.Count; k7++)
-																			{
-																				if (o7.HasOverlap(set[k7], out var o8))
-																				{
-																					for (var k8 = k7 + 1; k8 < set.Count; k8++)
-																					{
-																						if (o8.HasOverlap(set[k8], out var o9))
-																						{
-																							sum += o9.Size;
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+						sum += overlap.Size;
+						excessHoles += Puzzle.Cardinality(uholes);
 
-			if (lookat == 11)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	for (var k6 = k5 + 1; k6 < set.Count; k6++)
-																	{
-																		if (o6.HasOverlap(set[k6], out var o7))
-																		{
-																			for (var k7 = k6 + 1; k7 < set.Count; k7++)
-																			{
-																				if (o7.HasOverlap(set[k7], out var o8))
-																				{
-																					for (var k8 = k7 + 1; k8 < set.Count; k8++)
-																					{
-																						if (o8.HasOverlap(set[k8], out var o9))
-																						{
-																							for (var k9 = k8 + 1; k9 < set.Count; k9++)
-																							{
-																								if (o9.HasOverlap(set[k9], out var o10))
-																								{
-																									sum += o10.Size;
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+						////sum -= Puzzle.Cardinality(uholes);
+						////excessHoles += Puzzle.Cardinality(uholes);
 
-			if (lookat == 12)
-			{
-				var sum = 0L;
-				for (var i = 0; i < set.Count; i++)
-				{
-					for (var j = i + 1; j < set.Count; j++)
-					{
-						if (set[i].HasOverlap(set[j], out var o))
-						{
-							for (var k = j + 1; k < set.Count; k++)
-							{
-								if (o.HasOverlap(set[k], out var o2))
-								{
-									for (var k2 = k + 1; k2 < set.Count; k2++)
-									{
-										if (o2.HasOverlap(set[k2], out var o3))
-										{
-											for (var k3 = k2 + 1; k3 < set.Count; k3++)
-											{
-												if (o3.HasOverlap(set[k3], out var o4))
-												{
-													for (var k4 = k3 + 1; k4 < set.Count; k4++)
-													{
-														if (o4.HasOverlap(set[k4], out var o5))
-														{
-															for (var k5 = k4 + 1; k5 < set.Count; k5++)
-															{
-																if (o5.HasOverlap(set[k5], out var o6))
-																{
-																	for (var k6 = k5 + 1; k6 < set.Count; k6++)
-																	{
-																		if (o6.HasOverlap(set[k6], out var o7))
-																		{
-																			for (var k7 = k6 + 1; k7 < set.Count; k7++)
-																			{
-																				if (o7.HasOverlap(set[k7], out var o8))
-																				{
-																					for (var k8 = k7 + 1; k8 < set.Count; k8++)
-																					{
-																						if (o8.HasOverlap(set[k8], out var o9))
-																						{
-																							for (var k9 = k8 + 1; k9 < set.Count; k9++)
-																							{
-																								if (o9.HasOverlap(set[k9], out var o10))
-																								{
-																									for (var k10 = k9 + 1; k10 < set.Count; k10++)
-																									{
-																										if (o10.HasOverlap(set[k10], out var o11))
-																										{
-																											sum += o11.Size;
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				return sum == 0 ? 0 : sum - Cardinality(lookat + 1, set);
-			}
+						//var uholes1 = new List<Cube>();
+      //                  foreach (var hole in c1.cube.Holes)
+      //                  {
+      //                      if (overlap.HasOverlap(hole, out var uhole))
+      //                      {
+      //                          uholes1.Add(uhole);
+      //                      }
+      //                  }
+      //                  var uholes2 = new List<Cube>();
+      //                  foreach (var hole in c2.cube.Holes)
+      //                  {
+      //                      if (overlap.HasOverlap(hole, out var uhole))
+      //                      {
+      //                          uholes2.Add(uhole);
+      //                      }
+      //                  }
+						//sum -= Puzzle.Cardinality(uholes1);
+						//sum -= Puzzle.Cardinality(uholes2);
 
-			return 0;
+
+						//                        overlap.Holes = uholes;
+						//excessHoles += Puzzle.Cardinality(c1.cube.Holes);
+						//excessHoles += Puzzle.Cardinality(c2.cube.Holes);
+
+						//sum -= Puzzle.Cardinality(c1.cube.Holes);
+						//sum -= Puzzle.Cardinality(c2.cube.Holes);
+					}
+					else
+                    {
+						unions[key] = (null,null); // to indicate it's been seen and has no overlaps
+                    }
+				}
+				var nextSets = unions.Values.Where(x => x.Item1 != null).ToArray();
+				return sum == 0 ? 0 : sum - Cardinality(setlengh + 1, nextSets);
+			}
 		}
 
 
-		//for (var i = 0; i < cube.Overlaps.Count; i++)
-		//{
-		//	var (overlap, on) = cube.Overlaps[i];
-		//	if (on)
-		//	{
-		//		overlappedDots += overlap.Size;
-		//	}
-		//	else
-		//	{
-		//		dots -= overlap.Size;
-		//		for (var j = 0; j < i; j++)
-		//		{
-		//			var (o2, on2) = cube.Overlaps[j];
-		//			if (o2.OverlapsWith(overlap))
-		//			{
-		//				if (on2)
-		//				{
-		//					overlappedDots -= o2.Overlap(overlap).Size;
-		//				}
-		//				else
-		//				{
-		//					for (var k = 0; k < j; k++)
-		//					{
-		//						var (o3, on3) = cube.Overlaps[k];
-		//						if (o3.OverlapsWith(o2))
-		//						{
-		//							if (!on2)
-		//							{
-		//								overlappedDots -= o3.Overlap(o2).Size;
-		//							}
-		//							else
-		//							{
+        private static long OldCardinality(IEnumerable<Cube> cubes)
+        {
+            var set = cubes.ToArray();
+            var allIndexes = Enumerable.Range(0, set.Length);
 
-		//								//overlappedDots += o2.Overlap(overlap).Size;
-		//							}
-		//						}
-		//					}
+            var excessHoles = 0L;
+            var card = OldCardinality(1);
+            return card - excessHoles;
 
-		//					//overlappedDots += o2.Overlap(overlap).Size;
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-	}
+            long OldCardinality(int depth)
+            {
+                Console.WriteLine($"{depth}");
+                var sum = 0L;
+                foreach (var indexes in MathHelper.Combinations(allIndexes, depth))
+                {
+                    var subset = indexes.Select(i => set[i]);
+                    var union = subset.First();
+                    foreach (var c in subset.Skip(1))
+                    {
+                        if (!union.HasOverlap(c, out union))
+                            break;
+                    }
+                    if (union == null)
+                        continue;
+
+                    sum += union.Size;
+                    //var uholes = new List<Cube>();
+                    //foreach (var hole in subset.SelectMany(i => i.Holes))
+                    //               {
+                    //	if (union.HasOverlap(hole, out var uhole))
+                    //                   {
+                    //		//excessHoles += uhole.Size;
+                    //		uholes.Add(uhole);
+                    //                   }
+                    //               }
+                    //excessHoles += Puzzle.Cardinality(uholes);
+
+                    //var mods = subset
+                    //	.SelectMany(i => i.Mods)
+                    //	.Where(m => union.HasOverlap(m.Chunk, out var _))
+                    //	.OrderBy(m => m.Time)
+                    //	.ToArray();
+                    //Console.WriteLine($"{subset.Count()} {mods.Count()}");
+                    ////foreach (var mod in subset.SelectMany(i => i.Mods).OrderBy(m => m.Time))
+                    ////               {
+
+                    ////               }
+
+                }
+                return sum == 0 ? 0 : sum - OldCardinality(depth + 1);
+            }
+        }
+
+    }
 }
