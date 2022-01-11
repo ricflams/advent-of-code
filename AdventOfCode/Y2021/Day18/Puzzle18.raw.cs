@@ -9,7 +9,7 @@ using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 using System.Text.RegularExpressions;
 
-namespace AdventOfCode.Y2021.Day18
+namespace AdventOfCode.Y2021.Day18.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -26,7 +26,7 @@ namespace AdventOfCode.Y2021.Day18
 			//Run("test3").Part1(4140).Part2(0);
 			//Run("test4").Part1(0).Part2(0);
 
-			Run("input").Part1(3869).Part2(4671);
+			Run("input").Part1(3869).Part2(0);
 			// 4708 not it
 
 
