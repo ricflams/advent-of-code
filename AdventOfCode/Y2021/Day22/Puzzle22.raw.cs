@@ -551,8 +551,8 @@ namespace AdventOfCode.Y2021.Day22.Raw
 				//	}
 				//}
 
-				if (step.Size == 43605)
-					;
+				//if (step.Size == 43605)
+				//	;
 
 				////CheckOverlappingCubes(cubes);
 				//if (IsOverlapping(step, out var result))
@@ -609,7 +609,7 @@ namespace AdventOfCode.Y2021.Day22.Raw
 						//	}
 						//}
 
-						var en = 0;
+						//var en = 0;
 						foreach (var e in otherExploded)
 						{
 							cubes.Add(e.Copy());
