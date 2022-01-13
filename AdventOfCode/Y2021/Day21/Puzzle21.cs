@@ -75,9 +75,6 @@ namespace AdventOfCode.Y2021.Day21
 			};
 
 			var wins = RollDiracDie(reality);
-			//var wins = worlds[reality.Key];
-
-			//var maxWins = Math.Max(reality.Players[0].Wins, reality.Players[1].Wins);
 			var maxWins = Math.Max(wins.Item1, wins.Item2);
 
 			return maxWins;
