@@ -17,7 +17,7 @@ namespace AdventOfCode.Y2021.Day17
 		{
 			Run("test1").Part1(45).Part2(112);
 
-			// TODO cleanup
+			// TODO clean
 			//Run("input").Part1(17766).Part2(1733);
 		}
 

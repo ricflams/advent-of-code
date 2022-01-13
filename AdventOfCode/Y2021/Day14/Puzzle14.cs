@@ -25,6 +25,8 @@ namespace AdventOfCode.Y2021.Day14
 
 			// 2158894777815 not right
 			Run("input").Part1(2068).Part2(2158894777814);
+
+			// todo: clean
 		}
 
 		protected override long Part1(string[] input)

@@ -32,6 +32,7 @@ namespace AdventOfCode.Y2021.Day18
 
 			// 1666865644
 			// 279395733
+			// todo: clean
 		}
 
 		protected override long Part1(string[] input)
