@@ -45,7 +45,7 @@ namespace AdventOfCode.Y2021.Day16
 			public int Version { get; init; }
 			public int TypeId { get; init; }
 			public long? Literal { get; init; }
-			public Packet[] SubPackets { get; init; }
+			public List<Packet> SubPackets { get; init; }
 
 			public int VersionSum => Version + SubPackets.Sum(p => p.VersionSum);
 
@@ -96,17 +96,17 @@ namespace AdventOfCode.Y2021.Day16
 						Version = version,
 						TypeId = typeId,
 						Literal = value,
-						SubPackets = Array.Empty<Packet>()
+						SubPackets = new List<Packet>()
 					};
 				}
 				if (bits[offset++])
 				{
 					// Read n sub-packets
 					var n = ParseBits(bits, ref offset, 11);
-					var subPackets = new Packet[n];
+					var subPackets = new List<Packet>();
 					for (var i = 0; i < n; i++)
 					{
-						subPackets[i] = ParsePacket(bits, ref offset);
+						subPackets.Add(ParsePacket(bits, ref offset));
 					}
 					return new Packet
 					{
@@ -129,7 +129,7 @@ namespace AdventOfCode.Y2021.Day16
 					{
 						Version = version,
 						TypeId = typeId,
-						SubPackets = subPackets.ToArray()
+						SubPackets = subPackets
 					};
 				}
 
