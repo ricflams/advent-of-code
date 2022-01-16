@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdventOfCode.Helpers;
@@ -16,9 +15,7 @@ namespace AdventOfCode.Y2021.Day17
 		public void Run()
 		{
 			Run("test1").Part1(45).Part2(112);
-
-			// TODO clean
-			//Run("input").Part1(17766).Part2(1733);
+			Run("input").Part1(17766).Part2(1733);
 		}
 
 		protected override long Part1(string[] input)
@@ -69,9 +66,6 @@ namespace AdventOfCode.Y2021.Day17
 
 			int? MaxHeightHittingTarget(int vx, int vy)
 			{
-				var vx0 = vx;
-				var vy0 = vy;
-
 				var x = 0;
 				var y = 0;
 				var highest = 0;
@@ -80,14 +74,16 @@ namespace AdventOfCode.Y2021.Day17
 				{
 					x += vx;
 					y += vy;
-					//	Console.WriteLine($"{x},{y}");
 
 					// If y goes below target or x goes beyond then it will never reach
 					if (y < yMin || x > xMax)
 						break;
 
-					if (vx > 0) vx--;
-					else if (vx < 0) vx++;
+					// Velocity vx always go to 0, while vy always increase downwards
+					if (vx > 0)
+						vx--;
+					else if (vx < 0)
+						vx++;
 					vy--;
 
 					// Register highest point
@@ -97,7 +93,6 @@ namespace AdventOfCode.Y2021.Day17
 					// If x,y hits inside target then we're done
 					if (x >= xMin && x <= xMax && y >= yMin && y <= yMax)
 					{
-						Console.WriteLine($"Hit: {vx0},{vy0}");
 						return highest;
 					}
 				}
