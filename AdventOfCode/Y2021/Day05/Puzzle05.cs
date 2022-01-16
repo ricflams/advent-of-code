@@ -6,7 +6,7 @@ namespace AdventOfCode.Y2021.Day05
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
-		public static Puzzle Instance = new Puzzle();
+		public static Puzzle Instance = new();
 		public override string Name => "Hydrothermal Venture";
 		public override int Year => 2021;
 		public override int Day => 5;
