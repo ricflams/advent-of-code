@@ -1,106 +1,70 @@
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2021.Day03
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
-		public static Puzzle Instance = new Puzzle();
-		public override string Name => "DAY3";
+		public static Puzzle Instance = new();
+		public override string Name => "Binary Diagnostic";
 		public override int Year => 2021;
 		public override int Day => 3;
 
 		public void Run()
 		{
 			Run("test1").Part1(198).Part2(230);
-			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(1131506).Part2(7863147);
-
-			// todo: clean
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var w = input.First().Length;
+			var width = input.First().Length;
 
 			var gamma = 0;
-			var eps = 0;
-			for (var i = 0; i < w; i++)
+			var epsilon = 0;
+
+			var bit = 1 << (width-1);
+			for (var i = 0; i < width; i++, bit >>= 1)
 			{
-				var on = input.Where(x => x[w - i - 1] == '1').Count();
+				var on = input.Count(x => x[i] == '1');
 				if (on > input.Length / 2)
 				{
-					gamma += 1<<i;
+					gamma += bit;
 				}
 				else
 				{
-					eps += 1 << i;
+					epsilon += bit;
 				}
 			}
 
-			var cons = gamma * eps;
-
-
-
-
-
-			return cons;
+			var consumption = gamma * epsilon;
+			return consumption;
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var w = input.First().Length;
+			var oxygen = CalcRating(input, true);
+			var co2 = CalcRating(input, false);
+			var lifeSupportRating = oxygen * co2;
+			return lifeSupportRating;
 
-			var input2 = input.Select(x => x).ToArray();
-
-			for (var i = 0; i < w && input2.Length > 1; i++)
+			static int CalcRating(string[] input, bool keepMostCommonValue)
 			{
-				var on = input2.Where(x => x[i] == '1').Count();
-				var off = input2.Length - on;
-				if (on >= off)
+				var bitmasks = input.ToArray();
+				var width = bitmasks.First().Length;
+
+				for (var i = 0; i < width && bitmasks.Length > 1; i++)
 				{
-					input2 = input2.Where(x => x[i] == '1').ToArray();
+					var bit0 = bitmasks.Count(x => x[i] == '0');
+					var bit1 = bitmasks.Length - bit0;
+					var keep = keepMostCommonValue
+						? (bit1 >= bit0 ? '1' : '0')
+						: (bit1 >= bit0 ? '0' : '1');
+					bitmasks = bitmasks.Where(x => x[i] == keep).ToArray();
 				}
-				else
-				{
-					input2 = input2.Where(x => x[i] == '0').ToArray();
-				}
+				return Convert.ToInt32(bitmasks.Single(), 2);
 			}
-
-			for (var i = 0; i < w && input.Length > 1; i++)
-			{
-				var on = input.Where(x => x[i] == '1').Count();
-				var off = input.Length - on;
-				if (on >= off)
-				{
-					input = input.Where(x => x[i] == '0').ToArray();
-				}
-				else
-				{
-					input = input.Where(x => x[i] == '1').ToArray();
-				}
-			}
-
-			//Console.WriteLine(input.First());
-			//Console.WriteLine(input2.First());
-
-			var xx = Convert.ToInt32(input.First(), 2);
-			var yy = Convert.ToInt32(input2.First(), 2);
-
-			//Console.WriteLine(xx);
-			//Console.WriteLine(yy);
-
-			var xxx = xx * yy;
-
-
-
-			return xxx;
 		}
 	}
 }
