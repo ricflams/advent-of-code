@@ -2,67 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Y2021.Day18
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 18";
+		public override string Name => "Snailfish";
 		public override int Year => 2021;
 		public override int Day => 18;
 
 		public void Run()
 		{
-			//Run("test1").Part1(0).Part2(0);
-
-			Run("test2").Part1(4140).Part2(3993);
-			//Run("test3").Part1(4140).Part2(0);
-			//Run("test4").Part1(0).Part2(0);
-
+			Run("test1").Part1(4140).Part2(3993);
 			Run("input").Part1(3869).Part2(4671);
-			// 4708 not it
-
-
-			// 1666865644
-			// 279395733
-			// todo: clean
 		}
 
 		protected override long Part1(string[] input)
 		{
-			var fishes = input
+			var fish = input
 				.Select(Snailfish.Parse)
 				.ToArray();
 
-			//Console.WriteLine();
-
-			var sum = fishes[0];
-			foreach (var f in fishes.Skip(1))
+			// Sum up all the snailfish numbers and take the final magnitude
+			var sum = fish.First();
+			foreach (var f in fish.Skip(1))
 			{
-				var fish = new Snailfish {/* Level = 0,*/ Parent = null };
-				fish.Left = sum;
-				fish.Right = f;
-				f.Parent = fish;
-				sum.Parent = fish;
-				//sum.Increaselevels();
-				//f.Increaselevels();
-				//Console.WriteLine($"Added:   {fish.Dump()}");
-				fish.ReduceIt();
-				//Console.WriteLine($"Reduced: {fish.Dump()}");
-				//Console.WriteLine();
-				sum = fish;
+				sum = new Snailfish(sum, f).Reduce();
 			}
 
-			var magnitude = sum.Magnitude;
-
-			return magnitude;
+			return sum.Magnitude;
 		}
 
 		protected override long Part2(string[] input)
@@ -71,345 +41,239 @@ namespace AdventOfCode.Y2021.Day18
 				.Select(Snailfish.Parse)
 				.ToArray();
 
-			//Console.WriteLine();
-
-			var largest = 0;
-
-			foreach (var fish1 in fishes)
+			// Check the sum of every pair of numbers and grab the max magnitude
+			var largestMagnitude = 0;
+			foreach (var f1 in fishes)
 			{
-				foreach (var fish2 in fishes)
+				foreach (var f2 in fishes)
 				{
-					if (fish1 == fish2)
+					if (f1 == f2)
 						continue;
-
-					var f1 = Snailfish.Parse(fish1.Dump());
-					var f2 = Snailfish.Parse(fish2.Dump());
-
-					var fish = new Snailfish {/* Level = 0,*/ Parent = null };
-					fish.Left = f1;
-					fish.Right = f2;
-					f1.Parent = fish;
-					f2.Parent = fish;
-					fish.ReduceIt();
-					var mag = fish.Magnitude;
-					if (mag > largest)
-						largest = mag;
+					var magnitude = new Snailfish(f1, f2).Reduce().Magnitude;
+					if (magnitude > largestMagnitude)
+					{
+						largestMagnitude = magnitude;
+					}
 				}
 			}
 
-			return largest;
+			return largestMagnitude;
 		}
-
 
 		internal class Snailfish
 		{
-			//public int Level;
 			public Snailfish Parent;
-			public Snailfish Left;
-			public int LeftValue;
-			public Snailfish Right;
-			public int RightValue;
+			public SnailfishValue Left;
+			public SnailfishValue Right;
 
-			//[DebuggerDisplay]
-			//public override string ToString() => $"[{GetHashCode()} leftval={LeftValue} rightval={RightValue} left={Left?.GetHashCode()} right={Right?.GetHashCode()}";
-			public override string ToString() => $"[{GetHashCode()} {Dump()}";
-//			public override string ToString() => Dump();
-			public string Dump()
+			public class SnailfishValue
 			{
-				//if (Level == 0)
-				//	return $"{Left.Dump()}";
-				var v1 = Left != null ? Left.Dump() : LeftValue.ToString();
-				var v2 = Right != null ? Right.Dump() : RightValue.ToString();
-				return $"[{v1},{v2}]";
+				public Snailfish Fish;
+				public int Value;
+				public bool IsFish => Fish != null;
+				public bool IsValue => Fish == null;
+
+				public SnailfishValue Copy(Snailfish parent) =>
+					IsFish
+					? new SnailfishValue { Fish = Fish.Copy(parent) }
+					: new SnailfishValue { Value = Value };
+				public int Magnitude => IsFish ? Fish.Magnitude : Value;
+				public override string ToString() => IsFish ? Fish.ToString() : Value.ToString();
 			}
 
-			public int Magnitude =>
-				3 * (Left != null ? Left.Magnitude : LeftValue) +
-				2 * (Right != null ? Right.Magnitude : RightValue);
-
-			//public Smallfish Reduce()
-			//{
-			//	var s = Dump();
-			//	while (true)
-			//	{
-			//		var s2 = DoAnySplit(s);
-			//		var s3 = DoAnyExplode(s2);
-			//		if (s == s3)
-			//		{
-			//			return Parse(s);
-			//		}
-			//	}
-			//}
-
-			//private string DoAnySplit(string s)
-			//{
-			//	var match = Regex.Match(s, @"\d{2,}");
-
-			//	if (!match.Success)
-			//	{
-			//		val = null;
-			//		return false;
-			//	}
-
-			//	val = match.Groups.Values.Skip(1).Select(g => g.Value).ToArray();
-			//}
-
-			//private string DoAnyExplode(string s)
-			//{
-
-			//}
-
-
-			//public void Increaselevels()
-			//{
-			//	Level++;
-			//	Left?.Increaselevels();
-			//	Right?.Increaselevels();
-			//}
-
-
-
-			private static Snailfish FindRoot(Snailfish f)
+			private Snailfish()
 			{
+			}
+
+			public Snailfish(Snailfish left, Snailfish right)
+			{
+				Parent = null;
+				Left = new SnailfishValue { Fish = left.Copy() };
+				Right = new SnailfishValue { Fish = right.Copy() };
+				Left.Fish.Parent = Right.Fish.Parent = this;
+			}
+
+			public Snailfish(Snailfish parent, int leftValue, int rightValue)
+			{
+				Parent = parent;
+				Left = new SnailfishValue { Value = leftValue };
+				Right = new SnailfishValue { Value = rightValue };
+			}
+
+			public int Magnitude => 3 * Left.Magnitude + 2 * Right.Magnitude;
+
+			public Snailfish Reduce()
+			{
+				// Reduce for as long as there are reductions to make. Only split
+				// if no explosions are possible.
+				while (true)
+				{
+					if (ReduceExplode())
+						continue;
+					if (ReduceSplit())
+						continue;
+					break;
+				}
+				return this;
+			}
+
+			private bool ReduceExplode()
+			{
+				if (Left.Fish?.ReduceExplode() ?? false)
+					return true;
+
+				// Any pair nested inside four pairs shall explode
+				if (Parent?.Parent?.Parent?.Parent != null)
+				{
+					// Find the left and right neighbors, if any, and add the exploding
+					// values to them. Then remove this exploded fish from its parent.
+					var (left, right) = FindNeighbors();
+					if (left != null)
+					{
+						var side = left.Right.IsValue ? left.Right : left.Left;
+						side.Value += Left.Value;
+					}
+					if (right != null)
+					{
+						var side = right.Left.IsValue ? right.Left : right.Right;
+						side.Value += Right.Value;
+					}
+					var explodee = this == Parent.Left.Fish ? Parent.Left : Parent.Right;
+					explodee.Fish = null;
+					explodee.Value = 0;
+					return true;
+				}
+
+				if (Right.Fish?.ReduceExplode() ?? false)
+					return true;
+
+				return false;
+
+				(Snailfish, Snailfish) FindNeighbors()
+				{
+					Snailfish left = null;
+					Snailfish right = null;
+					Snailfish prev = null;
+					bool foundSelf = false;
+					var fishWithValue = FindRoot().GetAll().Where(f => f.Left.IsValue || f.Right.IsValue);
+					foreach (var f in fishWithValue)
+					{
+						if (f == this)
+						{
+							left = prev;
+							foundSelf = true;
+						}
+						else if (foundSelf)
+						{
+							right = f;
+							break;
+						}
+						prev = f;
+					}
+					return (left, right);
+				}
+			}
+
+			private bool ReduceSplit()
+			{
+				if (Left.Fish?.ReduceSplit() ?? false)
+					return true;
+
+				if (Split(ref Left) || Split(ref Right))
+					return true;
+
+				if (Right.Fish?.ReduceSplit() ?? false)
+					return true;
+
+				return false;
+
+				bool Split(ref SnailfishValue val)
+				{
+					// Any regular number >= 10 shall split into a new Snailfish
+					if (val.IsValue && val.Value >= 10)
+					{
+						var leftval = val.Value / 2;
+						var rightval = val.Value - leftval;
+						val.Fish = new Snailfish(this, leftval, rightval);
+						val.Value = 0;
+						return true;
+					}
+					return false;
+				}
+			}
+
+			public override string ToString() => $"[{Left},{Right}]";
+
+			private Snailfish Copy(Snailfish parent = null)
+			{
+				var copy = new Snailfish
+				{
+					Parent = parent
+				};
+				copy.Left = Left.Copy(copy);
+				copy.Right = Right.Copy(copy);
+				return copy;
+			}
+
+			private Snailfish FindRoot()
+			{
+				var f = this;
 				while (f.Parent != null)
 					f = f.Parent;
 				return f;
 			}
 
-			private static IEnumerable<Snailfish> GetAll(Snailfish root)
+			private IEnumerable<Snailfish> GetAll()
 			{
-				if (root.Left != null)
+				if (Left.IsFish)
 				{
-					foreach (var f in GetAll(root.Left))
+					foreach (var f in Left.Fish.GetAll())
 						yield return f;
 				}
-				yield return root;
-				if (root.Right != null)
+				yield return this;
+				if (Right.IsFish)
 				{
-					foreach (var f in GetAll(root.Right))
+					foreach (var f in Right.Fish.GetAll())
 						yield return f;
 				}
-			}
-
-			public void Exploded(Snailfish fish)
-			{
-				var root = FindRoot(fish);
-				var fishes = GetAll(root)
-					.Where(f => f.Left == null || f.Right == null)
-					.ToArray();
-
-
-				var leftval = fish.LeftValue;
-				var prev = fishes.TakeWhile(f => f != fish).LastOrDefault();
-				if (prev != null)
-				{
-					if (prev.Right == null)
-					{
-						prev.RightValue += leftval;
-					//	prev.Explode(ref prev.Right, ref prev.RightValue);
-					}
-					else if (prev.Left == null)
-					{
-						prev.LeftValue += leftval;
-					//	prev.Explode(ref prev.Left, ref prev.LeftValue);
-					}
-					else
-						throw new Exception();
-				}
-
-				var rightval = fish.RightValue;
-				var next = fishes.SkipWhile(f => f != fish).Skip(1).FirstOrDefault();
-				if (next != null)
-				{
-					if (next.Left == null)
-					{
-						next.LeftValue += rightval;
-					//	next.Explode(ref next.Left, ref next.LeftValue);
-					}
-					else if (next.Right == null)
-					{
-						next.RightValue += rightval;
-					//	next.Explode(ref next.Right, ref next.RightValue);
-					}
-					else
-						throw new Exception();
-				}
-
-				if (fish == Left)
-				{
-					Left = null;
-					LeftValue = 0;
-				}
-				else
-				{
-					Right = null;
-					RightValue = 0;
-				}
-
-			}
-
-			public void ReduceIt()
-			{
-				var changed = false;
-				do
-				{
-					changed = false;
-					while (ReduceExplode())
-						changed = true;
-					if (ReduceSplit())
-						changed = true;
-				}
-				while (changed);
-			}
-
-			public bool ReduceExplode()
-			{
-				if (Left?.ReduceExplode() ?? false)
-					return true;
-
-				if (Parent?.Parent?.Parent?.Parent != null && Left == null && Right == null)
-				{
-					Debug.Assert(Left == null);
-					Debug.Assert(Right == null);
-					//Console.WriteLine($"before explode: {FindRoot(this).Dump()}");
-					Parent.Exploded(this);
-					//Console.WriteLine($"after explode: {FindRoot(this).Dump()}");
-					return true;
-				}
-
-				if (Right?.ReduceExplode() ?? false)
-					return true;
-
-				return false;
-			}
-
-			public bool ReduceSplit()
-			{
-				if (Left?.ReduceSplit() ?? false)
-					return true;
-
-				if (Split(ref Left, ref LeftValue))
-					return true;
-				if (Split(ref Right, ref RightValue))
-					return true;
-
-				if (Right?.ReduceSplit() ?? false)
-					return true;
-
-				return false;
-			}
-
-			private bool Split(ref Snailfish child, ref int childval)
-			{
-				if (child == null && childval >= 10)
-				{
-					// split left value
-					var leftval = childval / 2;
-					var rightval = childval - leftval;
-					childval = 0;
-					child = new Snailfish
-					{
-						Parent = this,
-						//Level = Level + 1,
-						LeftValue = leftval,
-						RightValue = rightval
-					};
-					//Console.WriteLine($"after split:   {FindRoot(this).Dump()}");
-					return true;
-				}
-				return false;
 			}
 
 			public static Snailfish Parse(string s)
 			{
 				var index = 1;
-				var input = s.ToCharArray();
-				var fish = Parse(input, null, 0, ref index);
-				//Console.WriteLine($"Parse fish: {fish.Dump()}");
-				return fish;
+				return Parse(s.ToCharArray(), null);
+
+				Snailfish Parse(char[] s, Snailfish parent)
+				{
+					var fish = new Snailfish(parent, 0, 0);
+
+					if (s[index] == '[')
+					{
+						index++;
+						fish.Left.Fish = Parse(s, fish);
+					}
+					else
+					{
+						fish.Left.Value = s[index++] - '0';
+					}
+					if (s[index++] != ',')
+						throw new Exception();
+					if (s[index] == '[')
+					{
+						index++;
+						fish.Right.Fish = Parse(s, fish);
+					}
+					else
+					{
+						fish.Right.Value = s[index++] - '0';
+					}
+					if (s[index++] != ']')
+						throw new Exception();
+
+					return fish;
+				}
 			}
-
-			private static Snailfish Parse(char[] s, Snailfish parent, int level, ref int index)
-			{
-				var fish = new Snailfish
-				{
-					Parent = parent,
-					//Level = level,
-				};
-
-				if (s[index] == '[')
-				{
-					index++;
-					fish.Left = Parse(s, fish, level + 1, ref index);
-				}
-				else
-				{
-					fish.Left = null;
-					fish.LeftValue = s[index++] - '0';
-				}
-
-				if (s[index++] != ',')
-					throw new Exception();
-				if (s[index] == '[')
-				{
-					index++;
-					fish.Right = Parse(s, fish, level + 1, ref index);
-				}
-				else
-				{
-					fish.Right = null;
-					fish.RightValue = s[index++] - '0';
-				}
-
-				if (s[index++] != ']')
-					throw new Exception();
-
-				return fish;
-			}
-
 		}
-
-
-
-
-		//private int Parse(char[] s, int nesting, int index, out Explode explode)
-		//{
-		//	if (s[index++] != '[')
-		//		throw new Exception();
-
-		//	Explode ex1 = new Explode(), ex2 = new Explode();
-		//	int v1, v2;
-
-		//	if (s[index] == '[')
-		//	{
-		//		v1 = Parse(s, nesting + 1, index, out ex1);
-		//	}
-		//	else
-		//	{
-		//		v1 = s[index++] - '0';
-		//	}
-		//	if (s[index++] != ',')
-		//		throw new Exception();
-		//	if (s[index] == '[')
-		//	{
-		//		v2 = Parse(s, nesting + 1, index, out ex2);
-		//	}
-		//	else
-		//	{
-		//		v2 = s[index++] - '0';
-		//	}
-
-		//	if (s[index++] != ']')
-		//		throw new Exception();
-
-		//	v1 += ex1.Left + ex2.Left;
-
-		//	if (nesting == 4)
-		//	{
-		//		explode = new Explode { }
-		//		}
-
-		//}
 
 	}
 }
