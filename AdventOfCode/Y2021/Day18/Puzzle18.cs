@@ -103,16 +103,10 @@ namespace AdventOfCode.Y2021.Day18
 
 			public Snailfish Reduce()
 			{
-				// Reduce for as long as there are reductions to make. Only split
-				// if no explosions are possible.
-				while (true)
-				{
-					if (ReduceExplode())
-						continue;
-					if (ReduceSplit())
-						continue;
-					break;
-				}
+				// Reduce for as long as there are reductions to make.
+				// Only split if no explosions are possible.
+				while (ReduceExplode() || ReduceSplit())
+					;
 				return this;
 			}
 
