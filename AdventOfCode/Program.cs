@@ -8,9 +8,8 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			//Helpers.PuzzleDay.GeneratePuzzles.Generate(2021);
-
-			PuzzleOptions.RunOnly(2021, 22);
+			//PuzzleOptions.RunOnly(2021, 22);
+			//PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
 			//iterations = 5;
@@ -45,13 +44,14 @@ namespace AdventOfCode
 
 		private static void AllPuzzles()
 		{
-			Y2015Puzzles();
-			Y2016Puzzles();
-			Y2017Puzzles();
-			Y2018Puzzles();
-			Y2019Puzzles();
-			Y2020Puzzles();
-			Y2021Puzzles();
+			// Y2015Puzzles();
+			// Y2016Puzzles();
+			// Y2017Puzzles();
+			// Y2018Puzzles();
+			// Y2019Puzzles();
+			// Y2020Puzzles();
+			// Y2021Puzzles();
+			Y2022Puzzles();
 		}
 
 		private static void Y2015Puzzles()
@@ -242,13 +242,41 @@ namespace AdventOfCode
 			Y2021.Day16.Puzzle.Instance.Run();
 			Y2021.Day17.Puzzle.Instance.Run();
 			Y2021.Day18.Puzzle.Instance.Run();
-			Y2021.Day19.Puzzle.Instance.Run();
+	//		Y2021.Day19.Puzzle.Instance.Run();
 			Y2021.Day20.Puzzle.Instance.Run();
 			Y2021.Day21.Puzzle.Instance.Run();
 			Y2021.Day22.Puzzle.Instance.Run();
 			Y2021.Day23.Puzzle.Instance.Run();
 			Y2021.Day24.Puzzle.Instance.Run();
 			Y2021.Day25.Puzzle.Instance.Run();
+		}
+		private static void Y2022Puzzles()
+		{
+			Y2022.Day01.Puzzle.Instance.Run();
+			Y2022.Day02.Puzzle.Instance.Run();
+			Y2022.Day03.Puzzle.Instance.Run();
+			Y2022.Day04.Puzzle.Instance.Run();
+			Y2022.Day05.Puzzle.Instance.Run();
+			Y2022.Day06.Puzzle.Instance.Run();
+			Y2022.Day07.Puzzle.Instance.Run();
+			Y2022.Day08.Puzzle.Instance.Run();
+			Y2022.Day09.Puzzle.Instance.Run();
+			Y2022.Day10.Puzzle.Instance.Run();
+			Y2022.Day11.Puzzle.Instance.Run();
+			Y2022.Day12.Puzzle.Instance.Run();
+			Y2022.Day13.Puzzle.Instance.Run();
+			Y2022.Day14.Puzzle.Instance.Run();
+			Y2022.Day15.Puzzle.Instance.Run();
+			Y2022.Day16.Puzzle.Instance.Run();
+			Y2022.Day17.Puzzle.Instance.Run();
+			Y2022.Day18.Puzzle.Instance.Run();
+			Y2022.Day19.Puzzle.Instance.Run();
+			Y2022.Day20.Puzzle.Instance.Run();
+			Y2022.Day21.Puzzle.Instance.Run();
+			Y2022.Day22.Puzzle.Instance.Run();
+			Y2022.Day23.Puzzle.Instance.Run();
+			Y2022.Day24.Puzzle.Instance.Run();
+			Y2022.Day25.Puzzle.Instance.Run();
 		}
 	}
 }
