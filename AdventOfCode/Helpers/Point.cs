@@ -39,6 +39,11 @@ namespace AdventOfCode.Helpers
 		public static Point operator *(Point p, int n) => Point.From(p.X * n, p.Y * n);
 		public static Point operator *(int n, Point p) => Point.From(p.X * n, p.Y * n);
 
+		public Point N => Up;
+		public Point E => Right;
+		public Point S => Down;
+		public Point W => Left;
+
 		public Point Up => new Point(X, Y - 1);
 		public Point Right => new Point(X + 1, Y);
 		public Point Down => new Point(X, Y + 1);
