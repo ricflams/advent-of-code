@@ -8,7 +8,7 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			//PuzzleOptions.RunOnly(2021, 22);
+			PuzzleOptions.RunOnly(2022, 1);
 			//PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
@@ -47,7 +47,7 @@ namespace AdventOfCode
 			// Y2015Puzzles();
 			// Y2016Puzzles();
 			// Y2017Puzzles();
-			// Y2018Puzzles();
+			Y2018Puzzles();
 			// Y2019Puzzles();
 			// Y2020Puzzles();
 			// Y2021Puzzles();
@@ -159,8 +159,8 @@ namespace AdventOfCode
 			Y2018.Day17.Puzzle.Instance.Run();
 			Y2018.Day18.Puzzle.Instance.Run();
 			Y2018.Day19.Puzzle.Instance.Run();
-			//Y2018.Day20.Puzzle.Instance.Run();
-			//Y2018.Day21.Puzzle.Instance.Run();
+			Y2018.Day20.Puzzle.Instance.Run();
+			Y2018.Day21.Puzzle.Instance.Run();
 			//Y2018.Day22.Puzzle.Instance.Run();
 			//Y2018.Day23.Puzzle.Instance.Run();
 			//Y2018.Day24.Puzzle.Instance.Run();
