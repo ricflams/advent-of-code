@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode.Helpers
@@ -13,6 +14,16 @@ namespace AdventOfCode.Helpers
 			{
 				yield return v[i..(i + windowSize)];
 			}
+		}
+
+		public static IEnumerable<T> IntersectMany<T>(this IEnumerable<IEnumerable<T>> sets)
+		{
+			return sets
+				.Skip(1)
+				.Aggregate(
+					sets.First(),
+					(intersection, set) => intersection.Intersect(set)
+				);
 		}
 	}
 }
