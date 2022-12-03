@@ -13,7 +13,7 @@
                 "moduleLoad": false
 			},
 			"preLaunchTask": "build",
-			"program": "${workspaceFolder}/AdventOfCode/bin/Debug/netcoreapp3.1/AdventOfCode.dll",
+			"program": "${workspaceFolder}/AdventOfCode/bin/Debug/net6.0/AdventOfCode.dll",
 			"args": [],
 			"cwd": "${workspaceFolder}/AdventOfCode",
 			"console": "integratedTerminal",
