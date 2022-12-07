@@ -52,11 +52,12 @@ namespace AdventOfCode.Y2022.Day07
 		{
 			public int Size;
 			public List<Dir> Subdirs = new List<Dir>();
+			public void AddSubdir(Dir d) { Subdirs.Add(d); Size += d.Size; }
 		}
 
 		private static Dir ReadFilesystem(string[] input)
 		{
-			var pos = 1;
+			var pos = 1; // skip "$ cd /"
 			return ReadDir();
 
 			Dir ReadDir()
@@ -68,12 +69,13 @@ namespace AdventOfCode.Y2022.Day07
 					var line = input[pos++];
 					if (line == "$ cd ..")
 						break;
-					if (line.StartsWith("$ cd "))
-						dir.Subdirs.Add(ReadDir()); // don't care about the name
-					else if (!line.StartsWith("dir "))
+					if (line.StartsWith("$ cd"))
+						dir.AddSubdir(ReadDir());
+					else if (line.StartsWith("dir"))
+						{} // do nothing, they're visited by the cd
+					else
 						dir.Size += int.Parse(line.Split()[0]);
 				}
-				dir.Size += dir.Subdirs.Sum(d => d.Size);
 				return dir;
 			}
 		}
