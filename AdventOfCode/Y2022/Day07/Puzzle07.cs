@@ -1,162 +1,81 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day07
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 7";
+		public override string Name => "No Space Left On Device";
 		public override int Year => 2022;
 		public override int Day => 7;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(95437).Part2(24933642);
+			Run("input").Part1(1444896).Part2(404395);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var root = ReadFilesystem(input);
+			return SumOfSmallSizes(root);
 
-
-			return 0;
+			static int SumOfSmallSizes(Dir dir) =>
+				(dir.Size <= 100000 ? dir.Size : 0) + dir.Subdirs.Sum(SumOfSmallSizes);
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var root = ReadFilesystem(input);
 
+			var disksize = 70000000;
+			var free = 30000000;
+			var needed = root.Size + free - disksize;
 
-			return 0;
+			return Flatten(root)
+				.OrderBy(d => d.Size)
+				.First(d => d.Size >= needed)
+				.Size;
+
+			static IEnumerable<Dir> Flatten(Dir dir)
+			{
+				yield return dir;
+				foreach (var subdir in dir.Subdirs.SelectMany(Flatten))
+					yield return subdir;
+			}
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		private class Dir
 		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
+			public int Size;
+			public List<Dir> Subdirs = new List<Dir>();
 		}
 
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
+		private static Dir ReadFilesystem(string[] input)
 		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+			var pos = 1;
+			return ReadDir();
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
+			Dir ReadDir()
 			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
+				pos++; // skip "$ ls"
+				var dir = new Dir();
+				while (pos < input.Length)
 				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
+					var line = input[pos++];
+					if (line == "$ cd ..")
+						break;
+					if (line.StartsWith("$ cd "))
+						dir.Subdirs.Add(ReadDir()); // don't care about the name
+					else if (!line.StartsWith("dir "))
+						dir.Size += int.Parse(line.Split()[0]);
 				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
+				dir.Size += dir.Subdirs.Sum(d => d.Size);
+				return dir;
 			}
 		}
-
 	}
 }
