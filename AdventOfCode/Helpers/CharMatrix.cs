@@ -6,9 +6,9 @@ namespace AdventOfCode.Helpers
 {
     public static class CharMatrix
     {
-        public static int Width(this char[,] mx) => mx.GetLength(0);
-        public static int Height(this char[,] mx) => mx.GetLength(1);
-        public static (int, int) Dim(this char[,] mx) => (mx.Width(), mx.Height());
+        public static int Width<T>(this T[,] mx) => mx.GetLength(0);
+        public static int Height<T>(this T[,] mx) => mx.GetLength(1);
+        public static (int, int) Dim<T>(this T[,] mx) => (mx.Width(), mx.Height());
 
 		public static (Point, Point) MinMax(this char[,] mx)
 		{
@@ -22,14 +22,14 @@ namespace AdventOfCode.Helpers
 			return (Point.Origin, Point.From(w, h));
 		}
 
-		public static char[,] Create(int w, int h, char defaultChar)
+		public static T[,] Create<T>(int w, int h, T defaultValue)
 		{
-			var map = new char[w, h];
+			var map = new T[w, h];
 			for (var x = 0; x < w; x++)
 			{
 				for (var y = 0; y < h; y++)
 				{
-					map[x, y] = defaultChar;
+					map[x, y] = defaultValue;
 				}
 			}
 			return map;
@@ -75,7 +75,7 @@ namespace AdventOfCode.Helpers
 			return map;
 		}
 
-		public static char[,] RotateClockwise(this char[,] mx, int angle)
+		public static T[,] RotateClockwise<T>(this T[,] mx, int angle)
 		{
 			var (w, h) = mx.Dim();
 
@@ -85,18 +85,18 @@ namespace AdventOfCode.Helpers
 			switch (angle % 360)
 			{
 				case 0:
-					rotated = new char[w, h];
+					rotated = new T[w, h];
 					break;
 				case 90:
-					rotated = new char[h, w];
+					rotated = new T[h, w];
 					rotate = (int x, int y) => (h - 1 - y, x);
 					break;
 				case 180:
-					rotated = new char[w, h];
+					rotated = new T[w, h];
 					rotate = (int x, int y) => (w - 1 - x, h - 1 - y);
 					break;
 				case 270:
-					rotated = new char[h, w];
+					rotated = new T[h, w];
 					rotate = (int x, int y) => (y, w - 1 - x);
 					break;
 			}
@@ -181,7 +181,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public static void Visit(this char[,] mx, Action<int, int> action)
+		public static void Visit<T>(this T[,] mx, Action<int, int> action)
 		{
 			var (w, h) = mx.Dim();
 
@@ -190,6 +190,19 @@ namespace AdventOfCode.Helpers
 				for (var y = 0; y < h; y++)
 				{
 					action(x, y);
+				}
+			}
+		}
+
+		public static IEnumerable<T> AllValues<T>(this T[,] mx)
+		{
+			var (w, h) = mx.Dim();
+
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = 0; y < h; y++)
+				{
+					yield return mx[x, y];
 				}
 			}
 		}
