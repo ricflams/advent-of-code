@@ -21,7 +21,7 @@ namespace AdventOfCode.Y2022.Day01
 		{
 			var max = input
 				.GroupByEmptyLine()
-				.Select(x => x.Select(int.Parse).Sum())
+				.Select(x => x.Sum(int.Parse))
 				.Max();
 
 			return max;
@@ -31,7 +31,7 @@ namespace AdventOfCode.Y2022.Day01
 		{
 			var max = input
 				.GroupByEmptyLine()
-				.Select(x => x.Select(int.Parse).Sum())
+				.Select(x => x.Sum(int.Parse))
 				.OrderByDescending(x => x)
 				.Take(3)
 				.Sum();

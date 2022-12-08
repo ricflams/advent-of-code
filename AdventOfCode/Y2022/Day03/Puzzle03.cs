@@ -34,8 +34,7 @@ namespace AdventOfCode.Y2022.Day03
 		{
 			var sum = input
 				.Chunk(3)
-				.Select(FindPriority)
-				.Sum();
+				.Sum(FindPriority);
 			return sum;
 		}
 
