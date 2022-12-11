@@ -34,7 +34,7 @@ namespace AdventOfCode.Y2022.Day11.Raw
 			public int TestDivisor;
 			public int DestIfTrue;
 			public int DestIfFalse;
-			public int WorryLevel;
+			//public int WorryLevel;
 
 			public Monkey(string[] lines)
 			{
@@ -114,11 +114,11 @@ namespace AdventOfCode.Y2022.Day11.Raw
 						var worry = m.Items.Dequeue();
 						var factor = m.Factor == "old" ? worry : long.Parse(m.Factor);
 
-						if (m.Operator == '*')
-						{
-							if (worry * factor < 0)
-								;
-						}
+						// if (m.Operator == '*')
+						// {
+						// 	if (worry * factor < 0)
+						// 		;
+						// }
 
 						var level = m.Operator switch
 						{

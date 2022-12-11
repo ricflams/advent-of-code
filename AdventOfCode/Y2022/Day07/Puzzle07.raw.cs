@@ -44,7 +44,7 @@ namespace AdventOfCode.Y2022.Day07.Raw
 		}
 		class Dir
 		{
-			public string Name;
+			//public string Name;
 			public List<File> Files = new List<File>();
 			public Dictionary<string, Dir> Subdirs = new Dictionary<string, Dir>();
 			public int Size => Files.Sum(x => x.Size) + Subdirs.Sum(d => d.Value.Size);

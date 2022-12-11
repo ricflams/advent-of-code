@@ -139,12 +139,12 @@ namespace AdventOfCode.Y2018.Day21.Raw
 
 			return 0;
 
-			var desiredReg0 = 0;
-			computer.Run(ref desiredReg0);
+			// var desiredReg0 = 0;
+			// computer.Run(ref desiredReg0);
 
 // 254 too low
 
-			return desiredReg0;
+			// return desiredReg0;
 
 			// computer = new Computer(input);
 			// computer.Regs[0] = desiredReg0;
@@ -262,7 +262,7 @@ namespace AdventOfCode.Y2018.Day21.Raw
 			public bool Run(ref int desiredA)
 			{
 				var dseen = new HashSet<int>();
-				var lastd = 0;
+				//var lastd = 0;
 
 				for (var ip = 0; ip >= 0 && ip < Instructions.Length; ip++)
 				{
