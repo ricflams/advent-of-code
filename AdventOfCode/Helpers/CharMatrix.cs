@@ -406,12 +406,12 @@ namespace AdventOfCode.Helpers
 			Console.Write('\\');
 			for (var x = 0; x < w; x++)
 			{
-				Console.Write(Legend(x+1));
+				Console.Write(Legend(x+1, '|'));
 			}
 			Console.WriteLine();
 			for (var y = 0; y < h; y++)
 			{
-				Console.Write(Legend(y+1));
+				Console.Write(Legend(y+1, '-'));
 				for (var x = 0; x < w; x++)
 				{
 					Console.Write(mx[x,y]);
@@ -419,10 +419,10 @@ namespace AdventOfCode.Helpers
 				Console.WriteLine();
 			}
 
-			static char Legend(int x) =>
+			static char Legend(int x, char fivemark) =>
 				x % 10 == 0 ? (x/10).ToString().Last() :
-				x % 5 == 0 ? ',' :
-				'.';
+				x % 5 == 0 ? fivemark :
+				' ';
 		}
     }
 }
