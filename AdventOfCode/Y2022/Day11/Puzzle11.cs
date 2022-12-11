@@ -35,7 +35,7 @@ namespace AdventOfCode.Y2022.Day11
 		{
 			public Queue<int> Items;
 			public char Operator;
-			public string Factor;
+			public int? Factor;
 			public int TestDivisor;
 			public int DestIfTrue;
 			public int DestIfFalse;
@@ -43,7 +43,8 @@ namespace AdventOfCode.Y2022.Day11
 			public Monkey(string[] lines)
 			{
 				Items = new Queue<int>(lines[1].TrimStart().RxMatch("Starting items: %*").Get<string>().ToIntArray());
-				(Operator, Factor) = lines[2].TrimStart().RxMatch("Operation: new = old %c %s").Get<char, string>();
+				(Operator, var f) = lines[2].TrimStart().RxMatch("Operation: new = old %c %s").Get<char, string>();
+				Factor = f == "old" ? null : int.Parse(f);
 				TestDivisor = lines[3].TrimStart().RxMatch("Test: divisible by %d").Get<int>();
 				DestIfTrue = lines[4].TrimStart().RxMatch("If true: throw to monkey %d").Get<int>();
 				DestIfFalse = lines[5].TrimStart().RxMatch("If false: throw to monkey %d").Get<int>();
@@ -60,7 +61,7 @@ namespace AdventOfCode.Y2022.Day11
 			var inspections = new long[monkeys.Length];
 
 			// Really only needed for part 2, but harmless to always do
-			var gcd = (int)MathHelper.LeastCommonMultiple(monkeys.Select(m => (long)m.TestDivisor).ToArray());
+			var lcd = (int)MathHelper.LeastCommonMultiple(monkeys.Select(m => (long)m.TestDivisor).ToArray());
 
 			for (var round = 0; round < rounds; round++)
 			{
@@ -70,17 +71,15 @@ namespace AdventOfCode.Y2022.Day11
 					while (m.Items.Any())
 					{
 						inspections[i]++;
-						var worry = m.Items.Dequeue();
-						var factor = m.Factor == "old" ? worry : int.Parse(m.Factor);
+						var worry = (long)m.Items.Dequeue();
 						var level = m.Operator switch
 						{
-							'+' => (long)worry + factor,
-							'*' => (long)worry * factor,
+							'*' => worry * (m.Factor ?? worry),
+							'+' => worry + (m.Factor ?? worry),
 							_ => throw new Exception()
 						} / relief;
 						var dest = level % m.TestDivisor == 0 ? m.DestIfTrue : m.DestIfFalse;
-						worry = (int)(level % gcd);
-						monkeys[dest].Items.Enqueue(worry);
+						monkeys[dest].Items.Enqueue((int)(level % lcd));
 					}
 				}
 			}
