@@ -22,6 +22,15 @@ namespace AdventOfCode.Helpers
 			return (Point.Origin, Point.From(w, h));
 		}
 
+		public static bool InRange(this char[,] mx, Point p)
+		{
+			var (w, h) = mx.Dim();
+			return p.X >= 0 && p.Y >= 0 && p.X < w && p.Y < h;
+		}
+
+		public static char Get(this char[,] mx, Point pos) => mx[pos.X, pos.Y];
+		public static void Set(this char[,] mx, Point pos, char ch) => mx[pos.X, pos.Y] = ch;
+
 		public static T[,] Create<T>(int w, int h, T defaultValue)
 		{
 			var map = new T[w, h];
