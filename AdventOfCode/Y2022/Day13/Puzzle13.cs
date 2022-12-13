@@ -16,7 +16,7 @@ namespace AdventOfCode.Y2022.Day13
 		public void Run()
 		{
 			Run("test1").Part1(13).Part2(140);
-		//	Run("input").Part1(6623).Part2(23049);
+			Run("input").Part1(6623).Part2(23049);
 		}
 
 		protected override long Part1(string[] input)
@@ -51,11 +51,11 @@ namespace AdventOfCode.Y2022.Day13
 			return i1 * i2;
 		}
 
-		private class Packet
-		{
-			public int? Value;
-			public Packet[] List;
+		internal record Number(int Val) : Packet;
+		internal record List(Packet[] Items) : Packet;
 
+		internal record Packet
+		{
 			public static Packet Read(string s)
 			{
 				var pos = 0;
@@ -63,23 +63,14 @@ namespace AdventOfCode.Y2022.Day13
 
 				Packet ReadPacket()
 				{
-					var ch = s[pos++];
-					if (Char.IsDigit(ch))
+					if (s[pos] == '[')
 					{
-						var v = ch - '0';
-						while (Char.IsDigit(s[pos]))
-						{
-							v = v*10 + s[pos++] - '0';
-						}
-						return new Packet { Value = v };
-					}
-					if (ch == '[')
-					{
+						pos++;
 						var list = new List<Packet>();
 						while (true)
 						{
 							var p = ReadPacket();
-							if (p == null)
+							if (p == null) // nothing to read - that's okay
 								break;
 							list.Add(p);
 							var next = s[pos++];
@@ -89,51 +80,44 @@ namespace AdventOfCode.Y2022.Day13
 								break;
 							throw new Exception("Unexpected state");
 						}
-						return new Packet { List = list.ToArray() };
+						return new List(list.ToArray());
+					}
+					else if (Char.IsDigit(s[pos]))
+					{
+						var v = 0;
+						while (Char.IsDigit(s[pos]))
+						{
+							v = v*10 + s[pos++] - '0';
+						}
+						return new Number(v);
 					}
 					return null;
 				}
 			}
 
-			public override string ToString() =>
-				Value.HasValue
-					? $"{Value}"
-					: $"[{string.Join(',', List.Select(x => x.ToString()))}]";
-
 			public static int Compare(Packet p1, Packet p2)
 			{
-				var (v1, v2) = (p1.Value, p2.Value);
-				if (v1.HasValue && v2.HasValue)
+				return (p1, p2) switch
 				{
-					if (v1 < v2)
-						return -1;
-					if (v1 > v2)
-						return 1;
-					return 0;
-				}
-				if (p1.Value.HasValue && !p2.Value.HasValue)
-				{
-					return Compare(new Packet { List = new [] { p1 }}, p2);
-				}
-				if (!p1.Value.HasValue && p2.Value.HasValue)
-				{
-					return Compare(p1, new Packet { List = new [] { p2 }});
-				}
+					(Number a, Number b) => Math.Sign(a.Val - b.Val),
+					(Number a, List b) => Compare(new List(new [] { a }), b),
+					(List a, Number b) => Compare(a, new List(new [] { b })),
+					(List a, List b) => CompareLists(a, b),
+					(_, _) => throw new Exception()
+				};
 
-				var list1 = p1.List;
-				var list2 = p2.List;
-				for (var pos = 0;; pos++)
+				int CompareLists(List a, List b)
 				{
-					if (pos == list1.Length && pos == list2.Length)
-						return 0;
-					if (pos == list1.Length && pos < list2.Length) // left ran out => ok
-						return -1;
-					if (pos == list2.Length && pos < list1.Length) // right ran out => not ok
-						return 1;
-				
-					var compared = Compare(list1[pos], list2[pos]);
-					if (compared != 0)
+					for (var pos = 0;; pos++)
+					{
+						var (eol1, eol2) = (pos == a.Items.Length, pos == b.Items.Length);
+						if (eol1 || eol2)
+							return !eol2 ? -1 : !eol1 ? 1 : 0;
+						var compared = Compare(a.Items[pos], b.Items[pos]);
+						if (compared == 0)
+							continue;
 						return compared;
+					}
 				}
 			}
 		}
