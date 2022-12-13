@@ -1,162 +1,141 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day13
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 13";
+		public override string Name => "Distress Signal";
 		public override int Year => 2022;
 		public override int Day => 13;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(13).Part2(140);
+		//	Run("input").Part1(6623).Part2(23049);
 		}
 
 		protected override long Part1(string[] input)
 		{
-
-
-			return 0;
+			var sum = input
+				.GroupByEmptyLine()
+				.Select((s, idx) =>
+				{
+					var p1 = Packet.Read(s[0]);
+					var p2 = Packet.Read(s[1]);
+					return Packet.Compare(p1, p2) <= 0 ? idx+1 : 0;
+				})
+				.Sum();
+			return sum;
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var div1 = Packet.Read("[[2]]");
+			var div2 = Packet.Read("[[6]]");
 
+			var packets = input
+				.Where(s => s.Any())
+				.Select(Packet.Read)
+				.Append(div1)
+				.Append(div2)
+				.ToList();
+			packets.Sort(Packet.Compare);
 
-			return 0;
+			var i1 = packets.IndexOf(div1) + 1;
+			var i2 = packets.IndexOf(div2) + 1;
+			return i1 * i2;
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		private class Packet
 		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
+			public int? Value;
+			public Packet[] List;
 
-		class SomeGraph : Graph<HashSet<uint>> { }
+			public static Packet Read(string s)
+			{
+				var pos = 0;
+				return ReadPacket();
 
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				Packet ReadPacket()
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					var ch = s[pos++];
+					if (Char.IsDigit(ch))
 					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
+						var v = ch - '0';
+						while (Char.IsDigit(s[pos]))
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							v = v*10 + s[pos++] - '0';
 						}
-						return ch;
-					});
+						return new Packet { Value = v };
+					}
+					if (ch == '[')
+					{
+						var list = new List<Packet>();
+						while (true)
+						{
+							var p = ReadPacket();
+							if (p == null)
+								break;
+							list.Add(p);
+							var next = s[pos++];
+							if (next == ',') // move onto next item
+								continue;
+							if (next == ']') // done with this list
+								break;
+							throw new Exception("Unexpected state");
+						}
+						return new Packet { List = list.ToArray() };
+					}
+					return null;
+				}
+			}
+
+			public override string ToString() =>
+				Value.HasValue
+					? $"{Value}"
+					: $"[{string.Join(',', List.Select(x => x.ToString()))}]";
+
+			public static int Compare(Packet p1, Packet p2)
+			{
+				var (v1, v2) = (p1.Value, p2.Value);
+				if (v1.HasValue && v2.HasValue)
+				{
+					if (v1 < v2)
+						return -1;
+					if (v1 > v2)
+						return 1;
+					return 0;
+				}
+				if (p1.Value.HasValue && !p2.Value.HasValue)
+				{
+					return Compare(new Packet { List = new [] { p1 }}, p2);
+				}
+				if (!p1.Value.HasValue && p2.Value.HasValue)
+				{
+					return Compare(p1, new Packet { List = new [] { p2 }});
+				}
+
+				var list1 = p1.List;
+				var list2 = p2.List;
+				for (var pos = 0;; pos++)
+				{
+					if (pos == list1.Length && pos == list2.Length)
+						return 0;
+					if (pos == list1.Length && pos < list2.Length) // left ran out => ok
+						return -1;
+					if (pos == list2.Length && pos < list1.Length) // right ran out => not ok
+						return 1;
+				
+					var compared = Compare(list1[pos], list2[pos]);
+					if (compared != 0)
+						return compared;
 				}
 			}
 		}
-
 	}
 }
