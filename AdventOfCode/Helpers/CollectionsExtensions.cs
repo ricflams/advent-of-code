@@ -16,6 +16,14 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public static IEnumerable<(T,T)> Windowed2<T>(this IEnumerable<T> collection)
+		{
+			foreach (var v in collection.Windowed(2))
+			{
+				yield return (v[0], v[1]);
+			}
+		}
+
 		public static IEnumerable<T> IntersectMany<T>(this IEnumerable<IEnumerable<T>> sets)
 		{
 			return sets

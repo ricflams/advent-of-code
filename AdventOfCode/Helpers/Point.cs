@@ -189,6 +189,28 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public IEnumerable<Point> LineTo(Point p)
+		{
+			if (X == p.X)
+			{
+				var (miny, maxy) = (Math.Min(Y, p.Y), Math.Max(Y, p.Y));
+				for (var y = miny; y <= maxy; y++)
+				{
+					yield return Point.From(X, y);
+				}
+				yield break;
+			}
+			if (Y == p.Y)
+			{
+				var (minx, maxx) = (Math.Min(X, p.X), Math.Max(X, p.X));
+				for (var x = minx; x <= maxx; x++)
+				{
+					yield return Point.From(x, Y);
+				}
+				yield break;
+			}
+			throw new Exception($"{this} -> {p} is not straight");
+		}
 	}
 
 	internal static class PointExtensions
