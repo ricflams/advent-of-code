@@ -8,7 +8,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
-namespace AdventOfCode.Y2022.Day15
+namespace AdventOfCode.Y2022.Day15.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -102,7 +102,7 @@ namespace AdventOfCode.Y2022.Day15
 
 			for (var y0 = 0; y0 <= maxw; y0++)
 			{
-				//var map = new HashSet<int>();
+				var map = new HashSet<int>();
 				var ranges = new List<Range>();
 
 				foreach (var (s, dist) in sensors)
@@ -115,39 +115,9 @@ namespace AdventOfCode.Y2022.Day15
 					ranges.Add(range);
 				}
 
-				// ranges.Sort((a, b) => a.Start.Value < b.Start.Value ? -1 : a.Start.Value > b.Start.Value ? 1 : 0);
-				// while (ranges.Count > 1 && ranges[0].Overlaps(ranges[1]))
-				// {
-				// 	ranges[0] = ranges[0].Combine(ranges[1]);
-				// 	ranges.RemoveAt(1);
-				// }
 
-				//ranges.Sort((a, b) => a.Start.Value < b.Start.Value ? -1 : a.Start.Value > b.Start.Value ? 1 : 0);
-
-				
-				while (ranges.Count > 1)
-				{
-					var r0 = ranges[0];
-					var empties = new List<int>();
-					for (var i = 1; i < ranges.Count; i++)
-					{
-						if (r0.Overlaps(ranges[i]))
-						{
-							ranges[0] = r0 = r0.Combine(ranges[i]);
-							empties.Add(i);
-						}
-					}
-					empties.Reverse();
-					foreach (var i in empties)
-						ranges.RemoveAt(i);
-					if (empties.Count == 0)
-						break;
-				}
-
-
-
-				// while (Reduce())
-				// 	{}
+				while (Reduce())
+					{}
 
 				if (ranges.Count > 1)
 				{
@@ -160,26 +130,27 @@ namespace AdventOfCode.Y2022.Day15
 					return freq;
 				}
 
-				// bool Reduce()
-				// {
-				// 	for (var i = 0; i < ranges.Count; i++)
-				// 	{
-				// 		for (var j = i+1; j < ranges.Count; j++)
-				// 		{
-				// 			var (a, b) = (ranges[i], ranges[j]);
-				// 			// var (a1, a2, b1, b2) = line.RxMatch("%d-%d,%d-%d").Get<int, int, int, int>();
-				// 			// return a1 <= b2 && b1 <= a2;							
-				// 			if (a.Overlaps(b))
-				// 			{
-				// 				// overlap; reduce
-				// 				ranges[i] = a.Combine(b);
-				// 				ranges.RemoveAt(j);
-				// 				return true;
-				// 			}
-				// 		}
-				// 	}
-				// 	return false;
-				// }
+				bool Reduce()
+				{
+					for (var i = 0; i < ranges.Count; i++)
+					{
+						for (var j = i+1; j < ranges.Count; j++)
+						{
+							var (a, b) = (ranges[i], ranges[j]);
+							// var (a1, a2, b1, b2) = line.RxMatch("%d-%d,%d-%d").Get<int, int, int, int>();
+							// return a1 <= b2 && b1 <= a2;							
+							if (a.Start.Value < b.End.Value && b.Start.Value < a.End.Value)
+							{
+								// overlap; reduce
+								var combined = new Range(Math.Min(a.Start.Value, b.Start.Value), Math.Max(a.End.Value, b.End.Value));
+								ranges[i] = combined;
+								ranges.RemoveAt(j);
+								return true;
+							}
+						}
+					}
+					return false;
+				}
 
 				// 841265410 not right
 
@@ -188,18 +159,5 @@ namespace AdventOfCode.Y2022.Day15
 
 		}
 
-	}
-
-	public static class Extention
-	{
-		public static bool Overlaps(this Range a, Range b)
-		{
-			return a.Start.Value < b.End.Value && b.Start.Value < a.End.Value;
-		}
-
-		public static Range Combine(this Range a, Range b)
-		{
-			return new Range(Math.Min(a.Start.Value, b.Start.Value), Math.Max(a.End.Value, b.End.Value));
-		}
 	}
 }
