@@ -19,144 +19,310 @@ namespace AdventOfCode.Y2022.Day16
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
+		Run("test1").Part1(1651).Part2(1707);
 			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(1915).Part2(0); // 1331 too low, 2582 wrong
+			// 649 not right
+			
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var valves = input
+				.Select(s =>
+				{
+					var (name, flow, _, __, ___, dir) = s.RxMatch("Valve %s has flow rate=%d; %s %s to %s %*").Get<string, int, string, string, string, string>();
+					return new Valve
+					{
+						Name = name,
+						Flow = flow,
+						TunnelNames = dir.Split(", ").ToArray()				
+					};
+				})
+				.ToArray();
+			var n = 0;
+			var bit = 1U;
+			foreach (var v in valves)
+			{
+				v.Number = n++;
+				if (v.Flow > 0)
+				{
+					v.OpenBit = bit;
+					bit <<= 1;
+				}
+				v.Tunnels = v.TunnelNames.Select(x => valves.Single(v => v.Name == x)).ToArray();
+			}
+			var valvesWithFlow = valves.Count(x => x.Flow > 0);
+
+			// Console.WriteLine(valves.Count());
+			Console.WriteLine(valves.Count(x => x.Flow > 0));
+			// Console.WriteLine("digraph {");
+			// foreach (var v in valves)
+			// {
+			// 	foreach (var e in v.Tunnels)
+			// 	{
+			// 		Console.WriteLine($"  \"{v.Name}\" -> \"{e.Name}\"");
+			// 	}
+			// }
+			// Console.WriteLine("}");
+
+			var minutes = 30;
+
+			var seen = new Dictionary<ulong, (int Time, long Released)>();
+			var start = valves.Single(x => x.Name == "AA");
+
+			var maxpressure = 0L;
+			var queue = new Queue<(Valve, int, long, long, int, uint)>();
+			queue.Enqueue((start, 0, 0L, 0L, 0, 0));
+			while (queue.Any())
+			{
+				var (v, time, flowrate, released, openvalves, openbits) = queue.Dequeue();
+			//	Console.WriteLine($"{v.Name} t={time} flow={flowrate} rel={released} open={openvalves} bits={openbits} #q={queue.Count()}");
+
+				var key = (ulong)v.Number<<32 | openbits;
+				if (seen.TryGetValue(key, out var xx))
+				{
+					var (time2, released2) = xx;
+					//Console.WriteLine($"  dt={time - time2}");
+					// if (time >= time2)
+					// {
+						Debug.Assert(time >= time2);
+						if (released <= released2 + (time - time2) * flowrate)
+							continue;
+					// }
+					// else
+					// 	;
+		
+					// else if (time2 > time)
+					// {
+					// 	if (released + (time2 - time) * flowrate <= released2)
+					// 		continue;
+					// }
+					// else if (time == time2)
+					// {
+					// 	if (released <= released2)
+					// 		continue;
+					// }
+				}
+				seen[key] = (time, released);
+
+				if (time == minutes)
+				{
+					if (released > maxpressure)
+						maxpressure = released;
+					continue;
+				}
+
+				if (openvalves == valvesWithFlow)
+				{
+					var fullrelease = released + flowrate * (minutes - time);
+					Console.WriteLine(fullrelease);
+					if (fullrelease > maxpressure)
+						maxpressure = fullrelease;
+					//queue.Enqueue((v, time+1, flowrate, released + flowrate, openvalves, openbits)); // just stay
+				}
+				else
+				{
+					if (v.Flow > 0 && (openbits & v.OpenBit) == 0) // open it
+					{
+						var nextopenvalves = openvalves + 1;
+						var nextopenbits = openbits | v.OpenBit;
+						var nextflowrate = flowrate + v.Flow;
+						queue.Enqueue((v, time+1, nextflowrate, released + flowrate, nextopenvalves, nextopenbits)); // go and open
+					}
+					foreach (var next in v.Tunnels)
+					{
+						queue.Enqueue((next, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
+					}
+
+				}
+			}
 
 
-			return 0;
+			return maxpressure;
 		}
+
+		internal class Valve
+		{
+			public int Number;
+			public uint OpenBit;
+			public string Name;
+			public int Flow;
+			public Valve[] Tunnels;
+			public string[] TunnelNames;
+
+		}
+
 
 		protected override long Part2(string[] input)
 		{
-
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+			var valves = input
+				.Select(s =>
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
+					var (name, flow, _, __, ___, dir) = s.RxMatch("Valve %s has flow rate=%d; %s %s to %s %*").Get<string, int, string, string, string, string>();
+					return new Valve
+					{
+						Name = name,
+						Flow = flow,
+						TunnelNames = dir.Split(", ").ToArray()				
+					};
+				})
+				.ToArray();
+			var n = 0;
+			var bit = 1U;
+			foreach (var v in valves)
+			{
+				v.Number = n++;
+				if (v.Flow > 0)
+				{
+					v.OpenBit = bit;
+					bit <<= 1;
 				}
+				v.Tunnels = v.TunnelNames.Select(x => valves.Single(v => v.Name == x)).ToArray();
 			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+			var valvesWithFlow = valves.Count(x => x.Flow > 0);
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
+			// Console.WriteLine(valves.Count());
+			Console.WriteLine(valves.Count(x => x.Flow > 0));
+			// Console.WriteLine("digraph {");
+			// foreach (var v in valves)
+			// {
+			// 	foreach (var e in v.Tunnels)
+			// 	{
+			// 		Console.WriteLine($"  \"{v.Name}\" -> \"{e.Name}\"");
+			// 	}
+			// }
+			// Console.WriteLine("}");
+
+			var minutes = 26;
+
+			var seen = new Dictionary<ulong, (int Time, long Released)>();
+			var start = valves.Single(x => x.Name == "AA");
+
+			var maxpressure = 0L;
+			var queue = new Queue<(Valve, Valve, int, long, long, int, uint)>();
+			queue.Enqueue((start, start, 0, 0L, 0L, 0, 0));
+			while (queue.Any())
 			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
+				var (you, ele, time, flowrate, released, openvalves, openbits) = queue.Dequeue();
+			//	Console.WriteLine($"{v.Name} t={time} flow={flowrate} rel={released} open={openvalves} bits={openbits} #q={queue.Count()}");
+
+				if (you.Number > ele.Number)
+					(you, ele) = (ele, you);
+
+				var key = (ulong)(((ulong)you.Number)<<24) | (ulong)(((ulong)ele.Number)<<16) | openbits;
+				if (seen.TryGetValue(key, out var xx))
 				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
+					var (time2, released2) = xx;
+					//Console.WriteLine($"  dt={time - time2}");
+					// if (time >= time2)
+					// {
+						Debug.Assert(time >= time2);
+						if (released <= released2 + (time - time2) * flowrate)
+							continue;
+					// }
+					// else
+					// 	;
+		
+					// else if (time2 > time)
+					// {
+					// 	if (released + (time2 - time) * flowrate <= released2)
+					// 		continue;
+					// }
+					// else if (time == time2)
+					// {
+					// 	if (released <= released2)
+					// 		continue;
+					// }
 				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
+				seen[key] = (time, released);
+
+				if (time == minutes)
 				{
-					map = map.Transform((ch, adjacents) =>
+					if (released > maxpressure)
+						maxpressure = released;
+					continue;
+				}
+
+				if (openvalves == valvesWithFlow)
+				{
+					var fullrelease = released + flowrate * (minutes - time);
+					Console.WriteLine(fullrelease);
+					if (fullrelease > maxpressure)
+						maxpressure = fullrelease;
+					//queue.Enqueue((v, time+1, flowrate, released + flowrate, openvalves, openbits)); // just stay
+				}
+				else
+				{
+					var youCanOpen = you.Flow > 0 && (openbits & you.OpenBit) == 0;
+					var eleCanOpen = ele.Flow > 0 && (openbits & ele.OpenBit) == 0;
+
+					if (you == ele)
 					{
-						var n = 0;
-						foreach (var c in adjacents)
+						if (youCanOpen) // both can open; just let you do it
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							var nextopenvalves = openvalves + 1;
+							var nextopenbits = openbits | you.OpenBit;
+							var nextflowrate = flowrate + you.Flow;
+							foreach (var nextele in ele.Tunnels)
+							{
+								queue.Enqueue((you, nextele, time+1, nextflowrate, released + flowrate,  nextopenvalves, nextopenbits)); // go there
+							}
 						}
-						return ch;
-					});
+						
+					}
+					else
+					{
+						if (youCanOpen && eleCanOpen)
+						{
+							var nextopenvalves = openvalves + 2;
+							var nextopenbits = openbits | you.OpenBit | ele.OpenBit;
+							var nextflowrate = flowrate + you.Flow + ele.Flow;
+							queue.Enqueue((you, ele, time+1, nextflowrate, released + flowrate, nextopenvalves, nextopenbits)); // go and open
+						}
+						if (youCanOpen && !eleCanOpen)
+						{
+							var nextopenvalves = openvalves + 1;
+							var nextopenbits = openbits | you.OpenBit;
+							var nextflowrate = flowrate + you.Flow;
+							foreach (var nextele in ele.Tunnels)
+							{
+								queue.Enqueue((you, nextele, time+1, nextflowrate, released + flowrate,  nextopenvalves, nextopenbits)); // go there
+							}
+						}
+						if (!youCanOpen && eleCanOpen)
+						{
+							var nextopenvalves = openvalves + 1;
+							var nextopenbits = openbits | ele.OpenBit;
+							var nextflowrate = flowrate + ele.Flow;
+							foreach (var nextyou in you.Tunnels)
+							{
+								queue.Enqueue((nextyou, ele, time+1, nextflowrate, released + flowrate,  nextopenvalves, nextopenbits)); // go there
+							}
+						}
+						// foreach (var nextyou in you.Tunnels)
+						// {
+						// 	foreach (var nextele in ele.Tunnels)
+						// 	{
+						// 		queue.Enqueue((nextyou, nextele, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
+						// 	}
+						// }
+					}
+
+						foreach (var nextyou in you.Tunnels)
+						{
+							foreach (var nextele in ele.Tunnels)
+							{
+								queue.Enqueue((nextyou, nextele, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
+							}
+						}	
 				}
 			}
+
+
+			return maxpressure;
 		}
+
 
 	}
 }
