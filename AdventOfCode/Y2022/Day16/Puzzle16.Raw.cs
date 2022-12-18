@@ -8,7 +8,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
-namespace AdventOfCode.Y2022.Day16
+namespace AdventOfCode.Y2022.Day16.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -19,9 +19,9 @@ namespace AdventOfCode.Y2022.Day16
 
 		public void Run()
 		{
-			Run("test1").Part1(1651).Part2(1707);
+		Run("test1").Part1(1651).Part2(1707);
 			//Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(1915).Part2(2772); // 1331 too low, 2582 wrong
+			Run("input").Part1(1915).Part2(0); // 1331 too low, 2582 wrong
 			// 649 not right
 			
 		}
@@ -55,7 +55,7 @@ namespace AdventOfCode.Y2022.Day16
 			var valvesWithFlow = valves.Count(x => x.Flow > 0);
 
 			// Console.WriteLine(valves.Count());
-			//Console.WriteLine(valves.Count(x => x.Flow > 0));
+			Console.WriteLine(valves.Count(x => x.Flow > 0));
 			// Console.WriteLine("digraph {");
 			// foreach (var v in valves)
 			// {
@@ -116,7 +116,7 @@ namespace AdventOfCode.Y2022.Day16
 				if (openvalves == valvesWithFlow)
 				{
 					var fullrelease = released + flowrate * (minutes - time);
-					//Console.WriteLine(fullrelease);
+					Console.WriteLine(fullrelease);
 					if (fullrelease > maxpressure)
 						maxpressure = fullrelease;
 					//queue.Enqueue((v, time+1, flowrate, released + flowrate, openvalves, openbits)); // just stay
@@ -183,7 +183,7 @@ namespace AdventOfCode.Y2022.Day16
 			var valvesWithFlow = valves.Count(x => x.Flow > 0);
 
 			// Console.WriteLine(valves.Count());
-			//Console.WriteLine(valves.Count(x => x.Flow > 0));
+			Console.WriteLine(valves.Count(x => x.Flow > 0));
 			// Console.WriteLine("digraph {");
 			// foreach (var v in valves)
 			// {
@@ -247,7 +247,7 @@ namespace AdventOfCode.Y2022.Day16
 				if (openvalves == valvesWithFlow)
 				{
 					var fullrelease = released + flowrate * (minutes - time);
-					//Console.WriteLine(fullrelease);
+					Console.WriteLine(fullrelease);
 					if (fullrelease > maxpressure)
 						maxpressure = fullrelease;
 					//queue.Enqueue((v, time+1, flowrate, released + flowrate, openvalves, openbits)); // just stay
@@ -269,13 +269,7 @@ namespace AdventOfCode.Y2022.Day16
 								queue.Enqueue((you, nextele, time+1, nextflowrate, released + flowrate,  nextopenvalves, nextopenbits)); // go there
 							}
 						}
-						foreach (var nextyou in you.Tunnels)
-						{
-							foreach (var nextele in ele.Tunnels)
-							{
-								queue.Enqueue((nextyou, nextele, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
-							}
-						}	
+						
 					}
 					else
 					{
@@ -306,6 +300,15 @@ namespace AdventOfCode.Y2022.Day16
 								queue.Enqueue((nextyou, ele, time+1, nextflowrate, released + flowrate,  nextopenvalves, nextopenbits)); // go there
 							}
 						}
+						// foreach (var nextyou in you.Tunnels)
+						// {
+						// 	foreach (var nextele in ele.Tunnels)
+						// 	{
+						// 		queue.Enqueue((nextyou, nextele, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
+						// 	}
+						// }
+					}
+
 						foreach (var nextyou in you.Tunnels)
 						{
 							foreach (var nextele in ele.Tunnels)
@@ -313,8 +316,6 @@ namespace AdventOfCode.Y2022.Day16
 								queue.Enqueue((nextyou, nextele, time+1, flowrate, released + flowrate, openvalves, openbits)); // go there
 							}
 						}	
-					}
-
 				}
 			}
 
