@@ -21,7 +21,7 @@ namespace AdventOfCode.Y2022.Day19
 		{
 			Run("test1").Part1(33).Part2(0);
 			//Run("test2").Part1(0).Part2(0);
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(0).Part2(0);
 		}
 
 		private const int Ore = 0;
@@ -97,15 +97,16 @@ namespace AdventOfCode.Y2022.Day19
 
 				if (materials[Ore] > 12)
 					continue;
-				if (materials[Clay] > 30)
+				if (materials[Clay] > 40)
 					continue;					
 
-				// var rstate = Key(robots);
-				// if (seenrobots.TryGetValue(rstate, out var geodes2))
-				// {
-				// 	if (geodes2 >= materials[(int)Material.Geo])
-				// 		continue;
-				// }
+				var rstate = Key(robots);
+				if (seenrobots.TryGetValue(rstate, out var geodes2))
+				{
+					if (geodes2 > materials[Geo])
+						continue;
+				}
+				seenrobots[rstate] = materials[Geo];
 
 				if (time > maxtime)
 				{
