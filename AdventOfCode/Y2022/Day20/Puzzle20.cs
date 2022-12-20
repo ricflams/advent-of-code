@@ -19,11 +19,20 @@ namespace AdventOfCode.Y2022.Day20
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
+			Run("test1").Part1(3).Part2(0);
+			Run("input").Part1(0).Part2(0);
 
-			//Run("test2").Part1(0).Part2(0);
+			// 11621 too high
+		}
 
-			//Run("input").Part1(0).Part2(0);
+		protected override long Part1(string[] input)
+		{
+			return SumAfterRounds(input, 1);
+		}
+
+		protected override long Part2(string[] input)
+		{
+			return SumAfterRounds(input, 1);
 		}
 
 		private class Number
@@ -33,7 +42,7 @@ namespace AdventOfCode.Y2022.Day20
 			public int Next;
 		}
 
-		protected override long Part1(string[] input)
+		private static int SumAfterRounds(string[] input, int rounds)
 		{
 			var numbers = input.Select(int.Parse).Select(x => new Number { Value = x }).ToArray();
 			var N = numbers.Length;
@@ -46,189 +55,97 @@ namespace AdventOfCode.Y2022.Day20
 			numbers[^1].Next = 0;
 			numbers[0].Prev = N-1;
 
-			PrintNumbers();
-			Console.WriteLine();
+			//var startpos = 0;
 
-			for (var k = 0; k < N; k++)
+			for (var j = 0; j < N*rounds; j++)
 			{
+				var k = j % N;
 				var cur = numbers[k];
-				var pos = k;
-				if (k == 0)
+				var moveby = cur.Value % N;
+				if (moveby == 0)
 				{
-					Console.WriteLine($"{cur.Value} does not moves");
-					PrintNumbers();
-					Console.WriteLine();
-					continue;
-				}
-				if (k < 0)
-				{
-					for (var i = 0; i < -k; i++)
-					{
-						pos = numbers[pos].Prev;
-					}
+					//Console.WriteLine($"{moveby} does not moves");
 				}
 				else
 				{
-					for (var i = 0; i < k; i++)
+					// if (k == startpos)
+					// {
+					// 	startpos = cur.Next;
+					// 	Console.WriteLine($"New startpos at {startpos}");
+					// }
+					var pos = k;
+					if (moveby < 0)
 					{
-						pos = numbers[pos].Next;
-					}
-				}
-
-				var after = numbers[pos];
-				Console.WriteLine($"{cur.Value} moves between {after.Value} and {numbers[after.Next].Value}");
-
-				numbers[cur.Prev].Next = cur.Next;
-				numbers[cur.Next].Next = cur.Next;
-
-				cur.Next = after.Next;
-				cur.Prev = pos;
-				numbers[after.Next].Prev = pos;
-				after.Next = k;
-
-				PrintNumbers();
-				Console.WriteLine();
-			}
-
-			void PrintNumbers()
-			{
-				var pos = numbers[^1].Next;
-				for (var i = 0; i < N; i++)
-				{
-					Console.Write($"{numbers[pos].Value} ");
-					pos = numbers[pos].Next;
-				}
-				Console.WriteLine();
-			}
-
-
-			return 0;
-		}
-
-		protected override long Part2(string[] input)
-		{
-
-
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
+						for (var i = 0; i < -moveby+1; i++)
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							pos = numbers[pos].Prev;
 						}
-						return ch;
-					});
-				}
-			}
-		}
+					}
+					else
+					{
+						for (var i = 0; i < moveby; i++)
+						{
+							pos = numbers[pos].Next;
+						}
+					}
+					// if (pos == numbers[startpos].Prev)
+					// {
+					// 	Console.WriteLine($"  Move startpos from {startpos} to {pos}");
+					// 	//startpos = pos;
+					// }
 
+					var prev = numbers[pos];
+					//Console.WriteLine($"{cur.Value} moves between {prev.Value} and {numbers[prev.Next].Value}");
+
+					numbers[cur.Prev].Next = cur.Next;
+					numbers[cur.Next].Prev = cur.Prev;
+
+					cur.Prev = pos;
+					cur.Next = prev.Next;
+					numbers[prev.Next].Prev = k;
+					prev.Next = k;
+				}
+
+				// PrintNumbers();
+				// Console.WriteLine();
+			}
+
+			// void PrintNumbers()
+			// {
+			// 	var pos = startpos;
+			// 	for (var i = 0; i < N; i++)
+			// 	{
+			// 		Console.Write($"{numbers[pos].Value} ");
+			// 		pos = numbers[pos].Next;
+			// 	}
+			// 	Console.WriteLine();
+			// 	var reversed = new List<int>();
+			// 	pos = numbers[startpos].Prev;
+			// 	for (var i = 0; i < N; i++)
+			// 	{
+			// 		reversed.Add(numbers[pos].Value);
+			// 		pos = numbers[pos].Prev;
+			// 	}
+			// 	reversed.Reverse();
+			// 	foreach (var v in reversed)
+			// 	{
+			// 		Console.Write($"{v} ");
+			// 	}
+			// 	Console.WriteLine();
+			// }
+
+			var posi = numbers.IndexOf(x => x.Value == 0);
+			var sum = 0;
+			Console.WriteLine($"pos={posi}");
+			for (var i = 0; i < 3; i++)
+			{
+				for (var j = 0; j < 1000; j++)
+					posi = numbers[posi].Next;
+				Console.WriteLine($"  found {numbers[posi].Value} at {posi}");
+				sum += numbers[posi].Value;
+			}
+
+			return sum;			
+		}
 	}
 }
