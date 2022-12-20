@@ -26,8 +26,80 @@ namespace AdventOfCode.Y2022.Day20
 			//Run("input").Part1(0).Part2(0);
 		}
 
+		private class Number
+		{
+			public int Value;
+			public int Prev;
+			public int Next;
+		}
+
 		protected override long Part1(string[] input)
 		{
+			var numbers = input.Select(int.Parse).Select(x => new Number { Value = x }).ToArray();
+			var N = numbers.Length;
+
+			for (var i = 0; i < N; i++)
+			{
+				numbers[i].Prev = i-1;
+				numbers[i].Next = i+1;
+			}
+			numbers[^1].Next = 0;
+			numbers[0].Prev = N-1;
+
+			PrintNumbers();
+			Console.WriteLine();
+
+			for (var k = 0; k < N; k++)
+			{
+				var cur = numbers[k];
+				var pos = k;
+				if (k == 0)
+				{
+					Console.WriteLine($"{cur.Value} does not moves");
+					PrintNumbers();
+					Console.WriteLine();
+					continue;
+				}
+				if (k < 0)
+				{
+					for (var i = 0; i < -k; i++)
+					{
+						pos = numbers[pos].Prev;
+					}
+				}
+				else
+				{
+					for (var i = 0; i < k; i++)
+					{
+						pos = numbers[pos].Next;
+					}
+				}
+
+				var after = numbers[pos];
+				Console.WriteLine($"{cur.Value} moves between {after.Value} and {numbers[after.Next].Value}");
+
+				numbers[cur.Prev].Next = cur.Next;
+				numbers[cur.Next].Next = cur.Next;
+
+				cur.Next = after.Next;
+				cur.Prev = pos;
+				numbers[after.Next].Prev = pos;
+				after.Next = k;
+
+				PrintNumbers();
+				Console.WriteLine();
+			}
+
+			void PrintNumbers()
+			{
+				var pos = numbers[^1].Next;
+				for (var i = 0; i < N; i++)
+				{
+					Console.Write($"{numbers[pos].Value} ");
+					pos = numbers[pos].Next;
+				}
+				Console.WriteLine();
+			}
 
 
 			return 0;
