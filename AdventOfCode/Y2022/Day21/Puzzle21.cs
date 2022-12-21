@@ -120,6 +120,8 @@ namespace AdventOfCode.Y2022.Day21
 			{
 				if (Shout(input, v))
 					return v;
+				if (Shout(input, -v))
+					return -v;
 			}
 			return 0;
 		}
