@@ -19,24 +19,108 @@ namespace AdventOfCode.Y2022.Day21
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
+			Run("test1").Part1(152).Part2(301);
 			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("input").Part1(309248622142100).Part2(0);
 		}
+
+		private record Monkey(string Name);
+		private record MonkeyVal(string Name, long Value) : Monkey(Name);
+		private record MonkeyOp(string Name, string Monkey1, char Op, string Monkey2) : Monkey(Name);
+
 
 		protected override long Part1(string[] input)
 		{
+			var monkeys = input
+				.Select<string, Monkey>(s =>
+				{
+					if (s.IsRxMatch("%s: %d", out var cap1))
+					{
+						var (name, val) = cap1.Get<string, int>();
+						return new MonkeyVal(name, val);
+					}
+					if (s.IsRxMatch("%s: %s %c %s", out var cap2))
+					{
+						var (name, m1, op, m2) = cap2.Get<string, string, char, string>();
+						return new MonkeyOp(name, m1, op, m2);
+					}
+					throw new Exception();
+				})
+				.ToDictionary(x => x.Name, x => x);
+			while (monkeys.Any(m => m.Value is MonkeyOp))
+			{
+				var mon = monkeys.Values
+					.Where(m => m is MonkeyOp)
+					.Cast<MonkeyOp>()
+					.First(m => monkeys[m.Monkey1] is MonkeyVal && monkeys[m.Monkey2] is MonkeyVal);
+				var val1 = (monkeys[mon.Monkey1] as MonkeyVal).Value;
+				var val2 = (monkeys[mon.Monkey2] as MonkeyVal).Value;
+				var val = mon.Op switch
+				{
+					'+' => val1 + val2,
+					'-' => val1 - val2,
+					'*' => val1 * val2,
+					'/' => val1 / val2,
+					_ => throw new Exception()
+				};
+				monkeys[mon.Name] = new MonkeyVal(mon.Name, val);
+			}
 
+			return (monkeys["root"] as MonkeyVal).Value;
+		}
 
-			return 0;
+		private bool Shout(string[] input, int humanvalue)
+		{
+			var monkeys = input
+				.Select<string, Monkey>(s =>
+				{
+					if (s.IsRxMatch("%s: %d", out var cap1))
+					{
+						var (name, val) = cap1.Get<string, int>();
+						return new MonkeyVal(name, val);
+					}
+					if (s.IsRxMatch("%s: %s %c %s", out var cap2))
+					{
+						var (name, m1, op, m2) = cap2.Get<string, string, char, string>();
+						return new MonkeyOp(name, m1, op, m2);
+					}
+					throw new Exception();
+				})
+				.ToDictionary(x => x.Name, x => x);
+
+			monkeys["humn"] = new MonkeyVal("humn", humanvalue);
+
+			while (monkeys.Any(m => m.Value is MonkeyOp))
+			{
+				var mon = monkeys.Values
+					.Where(m => m is MonkeyOp)
+					.Cast<MonkeyOp>()
+					.First(m => monkeys[m.Monkey1] is MonkeyVal && monkeys[m.Monkey2] is MonkeyVal);
+				var val1 = (monkeys[mon.Monkey1] as MonkeyVal).Value;
+				var val2 = (monkeys[mon.Monkey2] as MonkeyVal).Value;
+				var val = mon.Op switch
+				{
+					'+' => val1 + val2,
+					'-' => val1 - val2,
+					'*' => val1 * val2,
+					'/' => val1 / val2,
+					_ => throw new Exception()
+				};
+				monkeys[mon.Name] = new MonkeyVal(mon.Name, val);
+				if (mon.Name == "root")
+					return val1 == val2;
+			}
+			throw new Exception();
+			//return false;
 		}
 
 		protected override long Part2(string[] input)
 		{
-
-
+			for (var v = 0; v < 10000000; v++)
+			{
+				if (Shout(input, v))
+					return v;
+			}
 			return 0;
 		}
 
