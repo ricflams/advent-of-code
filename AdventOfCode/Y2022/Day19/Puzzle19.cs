@@ -19,9 +19,14 @@ namespace AdventOfCode.Y2022.Day19
 
 		public void Run()
 		{
-			Run("test1").Part1(33).Part2(0);
-			//Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(0).Part2(0);
+			//Run("test1").Part1(33);//.Part2(0);
+			Run("test2").Part2(0);
+			//Run("input").Part1(1466).Part2(0);
+			Run("input").Part2(0);
+			// 1670 too high
+			// 1421 too low
+
+			// 4560 too low for part 2
 		}
 
 		private const int Ore = 0;
@@ -52,17 +57,43 @@ namespace AdventOfCode.Y2022.Day19
 				.ToArray();
 
 			var sum = blueprints
-				.Select((b, idx) => FindMaxGeodesOpened(b, 24) * (idx+1))
+				.Select((b, idx) => FindMaxGeodesOpened(b, idx, 24) * (idx+1))
 				.Sum();
 
 			return sum;
 		}
 
-		private static long FindMaxGeodesOpened(RobotDef[] robotdefs, int minutes)
+		protected override long Part2(string[] input)
 		{
-			var seen = new Dictionary<long, int>();
+			// Blueprint 16: Each ore robot costs 4 ore. Each clay robot costs 3 ore. Each obsidian robot costs 4 ore and 11 clay. Each geode robot costs 3 ore and 15 obsidian.
+			var blueprints = input
+				.Take(3)
+				.Select(s =>
+				{
+					var (_, a, b, c, d, e, f) = s.RxMatch("Blueprint %d: Each ore robot costs %d ore. Each clay robot costs %d ore. Each obsidian robot costs %d ore and %d clay. Each geode robot costs %d ore and %d obsidian.").Get<int, int, int, int, int, int, int>();
+					return new RobotDef[]
+					{
+						new RobotDef(new [] { a, 0, 0, 0 }),
+						new RobotDef(new [] { b, 0, 0, 0 }),
+						new RobotDef(new [] { c, d, 0, 0 }),
+						new RobotDef(new [] { e, 0, f, 0 })
+					};
+				})
+				.ToArray();
+
+			var prod = blueprints
+				.Select((b, idx) => (int)FindMaxGeodesOpened(b, idx, 32) * (idx+1))
+				.Prod();
+			return prod;
+		}		
+
+		private static long FindMaxGeodesOpened(RobotDef[] robotdefs, int index, int minutes)
+		{
+			var seen = new Dictionary<long, List<int[]>>();
+			var seenhighest = new Dictionary<int, int[]>();
 			var seenrobots = new Dictionary<long, int>();
 			var seengeodes = new Dictionary<long, int>();
+			var statesseen = new HashSet<string>();
 
 			long Key(int[] x) {
 				var x0 = x[0]<<24;
@@ -75,6 +106,8 @@ namespace AdventOfCode.Y2022.Day19
 			}
 			long State(int[] materials, int[] robots) => (Key(materials) << 32) + Key(robots);
 
+			var highestgeodes = new Dictionary<int, int>();
+
 			var materials0 = new[] { 0, 0, 0, 0}; // 1 ore
 			var robots0 = new[] { 1, 0, 0, 0}; // 1 ore-producing robot
 			var state0 = State(materials0, robots0);
@@ -85,128 +118,333 @@ namespace AdventOfCode.Y2022.Day19
 
 			var maxtime = 0;
 			var maxproduced = 0L;
-			var queue = new Queue<(long State, int[] Materials, int[] Robots, int Time)>();
-			queue.Enqueue((state0, materials0, robots0, 0));
-			while (queue.Any())
+			var queue = new PriorityQueue<(long State, int[] Materials, int[] Robots, int Time), int>();
+			queue.Enqueue((state0, materials0, robots0, 0), 0);
+			while (queue.TryDequeue(out var item, out var _))
 			{
-				var (state, materials, robots, time) = queue.Dequeue();
-
-				if (seen.TryGetValue(state, out var t) && t <= time)
-					continue;
-				seen[state] = time;
-
-				if (materials[Ore] > 12)
-					continue;
-				if (materials[Clay] > 40)
-					continue;					
-
-				var rstate = Key(robots);
-				if (seenrobots.TryGetValue(rstate, out var geodes2))
-				{
-					if (geodes2 > materials[Geo])
-						continue;
-				}
-				seenrobots[rstate] = materials[Geo];
+				var (state, materials, robots, time) = item;
+				//Console.WriteLine($"t={time} #queue={queue.Count} robots={string.Join(' ', robots)} materials={string.Join(' ', materials)}");
 
 				if (time > maxtime)
 				{
 					Console.WriteLine($"time={time}");
 					maxtime = time;
 				}
+				var geodes = materials[Geo];
+				// if (highestgeodes.TryGetValue(time, out var g))
+				// {
+				// 	if (g-1 > geodes)
+				// 		continue;
+				// 	if (g < geodes)
+				// 		highestgeodes[time] = geodes;
+				// }
+				// else
+				// 	highestgeodes[time] = geodes;
 
 				if (time == minutes)
 				{
-					var geodes = materials[Geo];
+					//Console.WriteLine($"t={time} robots={string.Join(' ', robots)} materials={string.Join(' ', materials)}");
 					if (geodes > maxproduced)
+					{
 						maxproduced = geodes;
+						Console.WriteLine($"t={time} #queue={queue.Count} robots={string.Join(' ', robots)} materials={string.Join(' ', materials)} max={maxproduced}");
+					}
 					continue;
 				}
 
-				var oldrobots = robots.ToArray();
-
-				while (CanBuildRobot(Geo))
+				if (maxproduced > 0)// && time > minutes - 4)
 				{
-					BuildNewRobot(Geo);
-				}
-				while (true)
-				{
-					BuildClayAndOreRobots();
-					if (CanBuildRobot(Obs))
-						BuildNewRobot(Obs);
-					else
-						break;
+					if (materials[Geo] + (minutes - time) * robots[Geo] < maxproduced - (minutes-time)*2) // -4 is shady
+						continue;
 				}
 
-				void BuildClayAndOreRobots()
+
+
+				// if (maxproduced > 1 && geodes == 0) // let's just
+				// 	continue;
+
+				var rstate = (long)Key(robots) * 100 + time;
+
+				if (!seen.TryGetValue(rstate, out var mats))
 				{
-					var newrobots = robots.ToArray();
-					var newmaterials = materials.ToArray();
+					mats = seen[rstate] = new List<int[]>();
+				}
+				if (mats.Any(m => IsAllLessThanOrEqual(materials, m)))
+					continue;
+				foreach (var lower in mats.Where(m => IsAllLessThanOrEqual(m, materials)).ToArray())
+				{
+					//Console.Write("-");
+					mats.Remove(lower);
+				}
+				mats.Add(materials);
 
-					var maxClayRobots = materials[Ore] / robotdefs[Clay].Costs[Ore];
-					var maxOreRobots = materials[Ore] / robotdefs[Ore].Costs[Ore];
-					for (var nclays = 0; nclays <= maxClayRobots; nclays++)
-					{
-						for (var nOre = 0; nOre <= maxOreRobots; nOre++)
-						{
-							robots = newrobots.ToArray();
-							materials = newmaterials.ToArray();
-							for (var ic = 0; ic < nclays && CanBuildRobot(Clay); ic++)
-							{
-								BuildNewRobot(Clay);
-							}
-							for (var io = 0; io < nOre && CanBuildRobot(Ore); io++)
-							{
-								BuildNewRobot(Ore);
-							}
-							for (var i = 0; i < N; i++)
-							{
-								materials[i] += oldrobots[i];
-							}
-							queue.Enqueue((State(materials, robots), materials, robots, time + 1));
+				// if (seenhighest.TryGetValue(rstate, out var highest))
+				// {
+				// 	if (IsGreaterThanOrEqual(highest, materials))
+				// 		continue;
+				// }
+				// seenhighest[rstate] = materials;
 
+				// if (seen.TryGetValue(state, out var t) && t <= time)
+				// 	continue;
+				// seen[state] = time;
 
-							robots = newrobots.ToArray();
-							materials = newmaterials.ToArray();
-							for (var io = 0; io < nOre && CanBuildRobot(Ore); io++)
-							{
-								BuildNewRobot(Ore);
-							}
-							for (var ic = 0; ic < nclays && CanBuildRobot(Clay); ic++)
-							{
-								BuildNewRobot(Clay);
-							}
-							for (var i = 0; i < N; i++)
-							{
-								materials[i] += oldrobots[i];
-							}
-							queue.Enqueue((State(materials, robots), materials, robots, time + 1));
-						}
-					}
-					robots = newrobots.ToArray();
-					materials = newmaterials.ToArray();					
+				// if (materials[Ore] > 12)
+				// 	continue;
+				// if (materials[Clay] > 40)
+				// 	continue;					
+
+				// var rstate = Key(robots);
+				// if (seenrobots.TryGetValue(rstate, out var geodes2))
+				// {
+				// 	if (geodes2 > materials[Geo])
+				// 		continue;
+				// }
+				// seenrobots[rstate] = materials[Geo];
+				bool IsAllLessThanOrEqual(int[] a, int[] b)
+				{
+					for (var i = 0; i < N; i++)
+						if (a[i] > b[i])
+							return false;
+					return true;
+				}
+	
+				bool IsGreaterThanOrEqual(int[] a, int[] b)
+				{
+					for (var i = 0; i < N; i++)
+						if (a[i] < b[i])
+							return false;
+					return true;
 				}
 
-				bool CanBuildRobot(int mat)
+
+
+
+				// // Find max number of robots of each kind that these materials could produce
+				// var canbuild = robotdefs
+				// 	.Select(def =>
+				// 	{
+				// 		var max = int.MaxValue;
+				// 		for (var i = 0; i < N; i++)
+				// 		{
+				// 			var available = materials[i];
+				// 			var cost = def.Costs[i];
+				// 			if (cost == 0)
+				// 				continue;
+				// 			var canbuild = available / cost;
+				// 			if (canbuild < max)
+				// 				max = canbuild;
+				// 		}
+				// 		return max == int.MaxValue ? 0 : max;
+				// 	})
+				// 	.ToArray();
+
+
+				bool CanBuildRobot(int[] m2, int material)
 				{
-					var costs = robotdefs[mat].Costs;
+					var costs = robotdefs[material].Costs;
 					for (var i = 0; i < N; i++)
 					{
-						if (materials[i] < costs[i])
+						if (costs[i] > m2[i])
 							return false;
 					}
 					return true;
 				}
 
-				void BuildNewRobot(int mat)
+				void BuildRobot(int[] r2, int[] m2, int material)
 				{
-					var costs = robotdefs[mat].Costs;
+					var costs = robotdefs[material].Costs;
 					for (var i = 0; i < N; i++)
 					{
-						materials[i] -= costs[i];
+						m2[i] -= costs[i];
 					}
-					robots[mat]++;
+					r2[material]++;
+				}	
+
+				for (var material = 0; material < N; material++)
+				{
+					var r2 = robots.ToArray();
+					var m2 = materials.ToArray();
+					if (CanBuildRobot(m2, material))
+					{
+						BuildRobot(r2, m2, material);
+					}
+
+					for (var i = 0; i < N; i++)
+					{
+						m2[i] += robots[i];
+					}
+
+					var s2 = State(m2, r2);
+					if (statesseen.Contains($"{s2}-{time}"))
+						continue;
+					statesseen.Add($"{s2}-{time}");
+
+					var prio = 10000000 - ((r2[Geo]+m2[Geo])*10000 + (r2[Obs]+m2[Obs])*100);
+					queue.Enqueue((s2, m2, r2, time + 1), prio);
 				}
-				
+
+
+				// for (var a = 0; a <= canbuild[3]; a++)
+				// {
+				// 	for (var b = 0; b <= canbuild[2]; b++)
+				// 	{
+				// 		for (var c = 0; c <= canbuild[1]; c++)
+				// 		{
+				// 			for (var d = 0; d <= canbuild[0]; d++)
+				// 			{
+				// 				var r2 = robots.ToArray();
+				// 				var m2 = materials.ToArray();
+				// 				// Try building one of these
+				// 				for (var i = 0; i < a && CanBuildRobot(m2, 3); i++)
+				// 				{
+				// 					BuildRobot(r2, m2, 3);
+				// 				}
+				// 				for (var i = 0; i < b && materials[2] < robotdefs[3].Costs[2]*2 && CanBuildRobot(m2, 2); i++)
+				// 				{
+				// 					BuildRobot(r2, m2, 2);
+				// 				}
+				// 				for (var i = 0; i < c && materials[1] < robotdefs[2].Costs[1]*2 && CanBuildRobot(m2, 1); i++)
+				// 				{
+				// 					BuildRobot(r2, m2, 1);
+				// 				}
+				// 				for (var i = 0; i < d && materials[0] < robotdefs[1].Costs[0]*2 && CanBuildRobot(m2, 0); i++)
+				// 				{
+				// 					BuildRobot(r2, m2, 0);
+				// 				}
+
+				// 				var used = new int[N];
+				// 				for (var i = 0; i < N; i++)
+				// 				{
+				// 					var newbots = r2[i] - robots[i];
+				// 					for (var j = 0; j < N; j++)
+				// 					{
+				// 						used[j] += newbots*robotdefs[i].Costs[j];
+				// 					}
+				// 				}
+				// 				for (var i = 0; i < N; i++)
+				// 				{
+				// 					Debug.Assert(materials[i] == m2[i] + used[i]);
+				// 				}
+
+				// 				for (var i = 0; i < N; i++)
+				// 				{
+				// 					m2[i] += robots[i];
+				// 				}
+
+				// 				if (m2[Geo] == 10 && r2[Geo] == 5)
+				// 					;
+
+				// 				//Console.WriteLine($"  next: t={time+1} robots={string.Join(' ', r2)} materials={string.Join(' ', m2)}");
+				// 				var s2 = State(m2, r2);
+				// 				if (statesseen.Contains(s2))
+				// 					continue;
+				// 				statesseen.Add(s2);
+
+				// 				// var rstate2 = (int)Key(r2);
+				// 				// if (seenhighest.TryGetValue(rstate2, out var highest2))
+				// 				// {
+				// 				// 	if (IsGreaterThanOrEqual(highest2, m2))
+				// 				// 		continue;
+				// 				// }
+
+				// 				var prio = 10000000 - ((r2[Geo]+m2[Geo])*10000 + (r2[Obs]+m2[Obs])*100);
+
+				// 				queue.Enqueue((s2, m2, r2, time + 1), prio);
+
+				// 				bool CanBuildRobot(int[] m2, int material)
+				// 				{
+				// 					var costs = robotdefs[material].Costs;
+				// 					for (var i = 0; i < N; i++)
+				// 					{
+				// 						if (costs[i] > m2[i])
+				// 							return false;
+				// 					}
+				// 					return true;
+				// 				}
+
+				// 				void BuildRobot(int[] r2, int[] m2, int material)
+				// 				{
+				// 					var costs = robotdefs[material].Costs;
+				// 					for (var i = 0; i < N; i++)
+				// 					{
+				// 						m2[i] -= costs[i];
+				// 					}
+				// 					r2[material]++;
+				// 				}	
+				// 			}
+				// 		}
+				// 	}
+				// }
+			}
+
+			Console.WriteLine($"##### {index} max={maxproduced}");
+			Console.WriteLine();
+			return maxproduced;
+
+
+
+
+				// while (CanBuildRobot(Geo))
+				// {
+				// 	BuildNewRobot(Geo);
+				// }
+				// while (true)
+				// {
+				// 	BuildClayAndOreRobots();
+				// 	if (CanBuildRobot(Obs))
+				// 		BuildNewRobot(Obs);
+				// 	else
+				// 		break;
+				// }
+
+				// void BuildClayAndOreRobots()
+				// {
+				// 	var newrobots = robots.ToArray();
+				// 	var newmaterials = materials.ToArray();
+
+				// 	var maxClayRobots = materials[Ore] / robotdefs[Clay].Costs[Ore];
+				// 	var maxOreRobots = materials[Ore] / robotdefs[Ore].Costs[Ore];
+				// 	for (var nclays = 0; nclays <= maxClayRobots; nclays++)
+				// 	{
+				// 		for (var nOre = 0; nOre <= maxOreRobots; nOre++)
+				// 		{
+				// 			robots = newrobots.ToArray();
+				// 			materials = newmaterials.ToArray();
+				// 			for (var ic = 0; ic < nclays && CanBuildRobot(Clay); ic++)
+				// 			{
+				// 				BuildNewRobot(Clay);
+				// 			}
+				// 			for (var io = 0; io < nOre && CanBuildRobot(Ore); io++)
+				// 			{
+				// 				BuildNewRobot(Ore);
+				// 			}
+				// 			for (var i = 0; i < N; i++)
+				// 			{
+				// 				materials[i] += oldrobots[i];
+				// 			}
+				// 			queue.Enqueue((State(materials, robots), materials, robots, time + 1));
+
+
+				// 			robots = newrobots.ToArray();
+				// 			materials = newmaterials.ToArray();
+				// 			for (var io = 0; io < nOre && CanBuildRobot(Ore); io++)
+				// 			{
+				// 				BuildNewRobot(Ore);
+				// 			}
+				// 			for (var ic = 0; ic < nclays && CanBuildRobot(Clay); ic++)
+				// 			{
+				// 				BuildNewRobot(Clay);
+				// 			}
+				// 			for (var i = 0; i < N; i++)
+				// 			{
+				// 				materials[i] += oldrobots[i];
+				// 			}
+				// 			queue.Enqueue((State(materials, robots), materials, robots, time + 1));
+				// 		}
+				// 	}
+				// 	robots = newrobots.ToArray();
+				// 	materials = newmaterials.ToArray();									
 				// void DoBuilds(int[][] builds)
 				// {
 				// 	foreach (var build in builds)
@@ -233,7 +471,7 @@ namespace AdventOfCode.Y2022.Day19
 				// 	queue.Enqueue((State(m2, r2), m2, r2, time + 1));
 				// }
 
-			}
+			//}
 
 
 
@@ -274,17 +512,9 @@ namespace AdventOfCode.Y2022.Day19
 			// 		}
 			// 	}
 			// }
-
-			Console.WriteLine($"max={maxproduced}");
-			return maxproduced;
 		}
 
-		protected override long Part2(string[] input)
-		{
 
-
-			return 0;
-		}
 
 	}
 }
