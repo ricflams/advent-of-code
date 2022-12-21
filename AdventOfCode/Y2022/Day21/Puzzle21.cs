@@ -20,8 +20,9 @@ namespace AdventOfCode.Y2022.Day21
 		public void Run()
 		{
 			Run("test1").Part1(152).Part2(301);
-			//Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(309248622142100).Part2(0);
+			Run("input").Part1(309248622142100).Part2(3757272361782);
+
+			// 5387037868883 too high
 		}
 
 		private record Monkey(string Name);
@@ -69,7 +70,7 @@ namespace AdventOfCode.Y2022.Day21
 			return (monkeys["root"] as MonkeyVal).Value;
 		}
 
-		private bool Shout(string[] input, int humanvalue)
+		private long FindShout(string[] input)
 		{
 			var monkeys = input
 				.Select<string, Monkey>(s =>
@@ -88,160 +89,126 @@ namespace AdventOfCode.Y2022.Day21
 				})
 				.ToDictionary(x => x.Name, x => x);
 
-			monkeys["humn"] = new MonkeyVal("humn", humanvalue);
+			//monkeys["humn"] = new MonkeyVal("humn", humanvalue);
 
-			while (monkeys.Any(m => m.Value is MonkeyOp))
+			// Console.WriteLine("digraph {");
+			// foreach (var m in monkeys.Values)
+			// {
+			// 	// if (m is MonkeyVal mv)
+			// 	// {
+			// 	// 	Console.WriteLine($"  \"{mv.Name}\"");
+			// 	// }
+			// 	if (m is MonkeyOp mo)
+			// 	{
+			// 		Console.WriteLine($"  \"{mo.Name}\" -> \"{mo.Monkey1}\"");
+			// 		Console.WriteLine($"  \"{mo.Name}\" -> \"{mo.Monkey2}\"");
+			// 	}
+			// }
+			// Console.WriteLine("}");
+
+			monkeys["humn"] = new MonkeyOp("humn", null, '\0', null);
+
+			Reduce("root");
+
+			Console.WriteLine("digraph {");
+			foreach (var m in monkeys.Values)
 			{
-				var mon = monkeys.Values
-					.Where(m => m is MonkeyOp)
-					.Cast<MonkeyOp>()
-					.First(m => monkeys[m.Monkey1] is MonkeyVal && monkeys[m.Monkey2] is MonkeyVal);
-				var val1 = (monkeys[mon.Monkey1] as MonkeyVal).Value;
-				var val2 = (monkeys[mon.Monkey2] as MonkeyVal).Value;
-				var val = mon.Op switch
+				// if (m is MonkeyVal mv)
+				// {
+				// 	Console.WriteLine($"  \"{mv.Name}\"");
+				// }
+				if (m is MonkeyOp mo)
 				{
-					'+' => val1 + val2,
-					'-' => val1 - val2,
-					'*' => val1 * val2,
-					'/' => val1 / val2,
-					_ => throw new Exception()
-				};
-				monkeys[mon.Name] = new MonkeyVal(mon.Name, val);
-				if (mon.Name == "root")
-					return val1 == val2;
+					Console.WriteLine($"  \"{mo.Name}\" -> \"{mo.Monkey1}\"");
+					Console.WriteLine($"  \"{mo.Name}\" -> \"{mo.Monkey2}\"");
+				}
 			}
+			Console.WriteLine("}");
+
+
+			void Reduce(string name)
+			{
+				if (name == "humn")
+					return;
+				if (monkeys[name] is MonkeyOp mon)
+				{
+					Reduce(mon.Monkey1);
+					Reduce(mon.Monkey2);
+					if (monkeys[mon.Monkey1] is MonkeyVal mv1 && monkeys[mon.Monkey2] is MonkeyVal mv2)
+					{
+						var val1 = (monkeys[mon.Monkey1] as MonkeyVal).Value;
+						var val2 = (monkeys[mon.Monkey2] as MonkeyVal).Value;
+						var val = mon.Op switch
+						{
+							'+' => val1 + val2,
+							'-' => val1 - val2,
+							'*' => val1 * val2,
+							'/' => val1 / val2,
+							_ => throw new Exception()
+						};
+						monkeys[mon.Name] = new MonkeyVal(mon.Name, val);
+					}
+				}
+			}
+
+			var mon = monkeys["root"] as MonkeyOp;
+			var seek = monkeys[mon.Monkey1] is MonkeyVal ? (monkeys[mon.Monkey1] as MonkeyVal).Value : (monkeys[mon.Monkey2] as MonkeyVal).Value;
+			mon = monkeys[mon.Monkey1] is MonkeyOp ? monkeys[mon.Monkey1] as MonkeyOp : monkeys[mon.Monkey2] as MonkeyOp;
+
+			while (true)
+			{
+				if (mon.Name == "humn")
+				{
+					// done
+					return seek;
+				}
+
+				var mon1 = monkeys[mon.Monkey1];
+				var mon2 = monkeys[mon.Monkey2];
+				if (mon1 is MonkeyVal)
+				{
+					var v = (mon1 as MonkeyVal).Value;
+					var m = mon2 as MonkeyOp;
+					// v op x == seek
+					var seek2 = mon.Op switch
+					{
+						'+' => seek - v,  // v+x=seek  <=>  x=seek-v
+						'-' => v - seek,  // v-x=seek  <=>  x=v-seek
+						'*' => seek / v,  // v*x=seek  <=>  x=seek/v
+						'/' => v / seek,  // v/x=seek  <=>  x=v/seek
+						_ => throw new Exception()
+					};
+					Console.WriteLine($"{v} {mon.Op} {seek2} = {seek}");
+					seek = seek2;
+					mon = m;
+				}
+				else if (mon2 is MonkeyVal)
+				{
+					// x op v == seek
+					var m = mon1 as MonkeyOp;
+					var v = (mon2 as MonkeyVal).Value;
+					var seek2 = mon.Op switch
+					{
+						'+' => seek - v,  // x+v=seek  <=>  x=seek-v
+						'-' => seek + v,  // x-v=seek  <=>  x=seek+v
+						'*' => seek / v,  // x*v=seek  <=>  x=seek/v
+						'/' => seek * v,  // x/v=seek  <=>  x=seek*v
+						_ => throw new Exception()
+					};
+					Console.WriteLine($"{seek2} {mon.Op} {v} = {seek}");
+					seek = seek2;
+					mon = m;
+				}
+				else throw new Exception();
+			}
+
 			throw new Exception();
 			//return false;
 		}
 
 		protected override long Part2(string[] input)
 		{
-			for (var v = 0; v < 10000000; v++)
-			{
-				if (Shout(input, v))
-					return v;
-				if (Shout(input, -v))
-					return -v;
-			}
-			return 0;
-		}
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
-		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
-
-		class SomeGraph : Graph<HashSet<uint>> { }
-
-		internal void Sample(string[] input)
-		{
-			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
-				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
-			}
+			return FindShout(input);
 		}
 
 	}
