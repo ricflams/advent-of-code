@@ -1,162 +1,113 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day23
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 23";
+		public override string Name => "Unstable Diffusion";
 		public override int Year => 2022;
 		public override int Day => 23;
 
 		public void Run()
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(110).Part2(20);
+			Run("input").Part1(4138).Part2(1010);
 		}
 
 		protected override long Part1(string[] input)
 		{
-
-
-			return 0;
+			return EmptySpaces(input, 10);
 		}
 
 		protected override long Part2(string[] input)
 		{
-
-
-			return 0;
+			return EmptySpaces(input);
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		private static int EmptySpaces(string[] input, int rounds = int.MaxValue)
 		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
+			// Fast lookup of coordinates in one int-hashtable; works for x,y of +/-5000
+			int Encode(Point p) => (p.X+5000)*10000 + (p.Y+5000);
+			(int X, int Y) Decode(int v) => (v/10000-5000, (v%10000)-5000);
+			var p0 = Point.Origin;
+			var v0 = Encode(p0);
+			var neighbourhood = Point.Origin.LookDiagonallyAround().Select(p => Encode(p) - v0).ToArray();
 
-		class SomeGraph : Graph<HashSet<uint>> { }
+			var map = CharMap.FromArray(input);
+			var elfs = new HashSet<int>(map.AllPoints(ch => ch == '#').Select(Encode));
 
-		internal void Sample(string[] input)
-		{
+			// Directions to look in are just numbers that can be added to coordinate
+			var directions = new[]
 			{
-				var v = input.Select(int.Parse).ToArray();
+				new[] { Encode(p0.N)-v0, Encode(p0.NE)-v0, Encode(p0.NW)-v0 },
+				new[] { Encode(p0.S)-v0, Encode(p0.SE)-v0, Encode(p0.SW)-v0 },
+				new[] { Encode(p0.W)-v0, Encode(p0.NW)-v0, Encode(p0.SW)-v0 },
+				new[] { Encode(p0.E)-v0, Encode(p0.NE)-v0, Encode(p0.SE)-v0 }
+			};
+
+			// Faster than "!neighbourhood.Any(n => elfs.Contains(e + n)))
+			bool HasNoNeighbors(int elf)
+			{
+				foreach (var n in neighbourhood)
+					if (elfs.Contains(elf + n))
+						return false;
+				return true;
 			}
+
+			var proposals = new Dictionary<int, int>();
+			var collisions = new HashSet<int>();
+			for (var j = 0; j < rounds; j++)
 			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				proposals.Clear();
+				collisions.Clear();
+				foreach (var e in elfs)
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
-				}
-			}
-			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
+					if (HasNoNeighbors(e))
 						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
+					for (var i = 0; i < 4; i++)
 					{
-
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
-					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
-					}
-				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
+						var move = directions[(i + j%4) % 4];
+						if (!elfs.Contains(e + move[0]) && !elfs.Contains(e + move[1]) && !elfs.Contains(e + move[2]))
 						{
-							if (c == '|' && ++n >= 3)
-								return '|';
+							var moveto = e + move[0];
+							if (proposals.ContainsKey(moveto))
+								collisions.Add(moveto);
+							else
+								proposals[moveto] = e;
+							break;
 						}
-						return ch;
-					});
+					}
 				}
-			}
-		}
 
+				if (!proposals.Any()) // For part 2
+					return j+1;
+					
+				var moves = proposals.Where(p => !collisions.Contains(p.Key));
+				foreach (var x in moves)
+				{
+					elfs.Remove(x.Value);
+					elfs.Add(x.Key);
+				}				
+			}
+
+			var (minx, maxx, miny, maxy) = (int.MaxValue, int.MinValue, int.MaxValue, int.MinValue);
+			foreach (var e in elfs)
+			{
+				var (x, y) = Decode(e);
+				minx = Math.Min(minx, x);
+				maxx = Math.Max(maxx, x);
+				miny = Math.Min(miny, y);
+				maxy = Math.Max(maxy, y);
+			}
+			var area = (maxx - minx + 1) * (maxy - miny + 1);
+			var empty = area - elfs.Count;
+
+			return empty; // For part 1
+		}
 	}
 }
