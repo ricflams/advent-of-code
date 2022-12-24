@@ -43,6 +43,10 @@ namespace AdventOfCode.Helpers
 		public Point E => Right;
 		public Point S => Down;
 		public Point W => Left;
+		public Point NE => DiagonalUpRight;
+		public Point NW => DiagonalUpLeft;
+		public Point SE => DiagonalDownRight;
+		public Point SW => DiagonalDownLeft;
 
 		public Point Up => new Point(X, Y - 1);
 		public Point Right => new Point(X + 1, Y);
@@ -211,6 +215,8 @@ namespace AdventOfCode.Helpers
 			}
 			throw new Exception($"{this} -> {p} is not straight");
 		}
+
+		public bool Within(int maxX, int maxY) => X >= 0 && X < maxX && Y >= 0 && Y < maxY;
 	}
 
 	internal static class PointExtensions

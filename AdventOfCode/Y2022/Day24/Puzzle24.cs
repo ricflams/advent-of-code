@@ -1,162 +1,122 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day24
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 24";
+		public override string Name => "Blizzard Basin";
 		public override int Year => 2022;
 		public override int Day => 24;
 
-		public void Run()
+		public void Run() 
 		{
-			Run("test1").Part1(0).Part2(0);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			//Run("input").Part1(0).Part2(0);
+			Run("test1").Part1(18).Part2(54);
+			Run("input").Part1(262).Part2(785);
 		}
 
 		protected override long Part1(string[] input)
 		{
+			var map = new Map(input);
 
-
-			return 0;
+			return map.TimeAtShortestPath(0, map.Start, map.End);
 		}
 
 		protected override long Part2(string[] input)
 		{
+			var map = new Map(input);
 
-
-			return 0;
+			var t = map.TimeAtShortestPath(0, map.Start, map.End);
+			t = map.TimeAtShortestPath(t, map.End, map.Start);
+			t = map.TimeAtShortestPath(t, map.Start, map.End);
+			return t;
 		}
 
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		internal class Thing
+		internal class Map
 		{
-			//private readonly 
-			public Thing(string[] lines)
-			{
-			}
-		}
+			public Point Start;
+			public Point End;
 
-		class SomeGraph : Graph<HashSet<uint>> { }
+			private readonly Wind[] _winds;
+			private readonly int _width;
+			private readonly int _height;
 
-		internal void Sample(string[] input)
-		{
+			public Map(string[] input)
 			{
-				var v = input.Select(int.Parse).ToArray();
-			}
-			{
-				var v = input[0].ToIntArray();
-			}
-			{
-				var things = input
-					.Skip(1)
-					.GroupByEmptyLine()
-					.Select(lines => new Thing(lines))
-					.ToMutableArray();
-			}
-			{
-				var map = new SparseMap<int>();
-				foreach (var s in input)
+				_winds = new []
 				{
-					var (x1, y1, x2, y2) = s.RxMatch("%d,%d -> %d,%d").Get<int, int, int, int>();
+					new Wind(input, '^'),
+					new Wind(input, 'v'),
+					new Wind(input, '<'),
+					new Wind(input, '>')
+				};
+				(_width, _height) = (input[0].Length - 2, input.Length - 2);
+				Start = Point.From(input[0].IndexOf('.')-1, -1);
+				End = Point.From(input[^1].IndexOf('.')-1, _height);
+			}
+
+			private class Wind
+			{
+				public readonly bool[,] On;
+				public readonly Func<Point, int, bool> IsOn;
+				public Wind(string[] input, char blizzard)
+				{
+					var (w, h) = (input[0].Length - 2, input.Length - 2);
+					On = new bool[w, h];
+					IsOn = blizzard switch
+					{
+						'^' => (p, t) => On[p.X, (p.Y + t) % h],
+						'v' => (p, t) => On[p.X, (p.Y - t%h + h) % h],
+						'<' => (p, t) => On[(p.X + t) % w, p.Y],
+						'>' => (p, t) => On[(p.X - t%w + w) % w, p.Y],
+						_ => throw new Exception()
+					};
+					for (var y = 0; y < h; y++)
+						for (var x = 0; x < w; x++)
+							On[x, y] = input[y+1][x+1] == blizzard;
 				}
 			}
+
+			//public bool IsVacant(Point p, int time) => p==Start || p==End || p.Within(Width, Height) && Winds.All(w => !w.IsOn(p, time));
+			public bool IsVacant(Point p, int time) =>
+				p==Start ||
+				p==End ||
+				p.Within(_width, _height) && !_winds[0].IsOn(p, time) && !_winds[1].IsOn(p, time) && !_winds[2].IsOn(p, time) && !_winds[3].IsOn(p, time);
+
+			public int TimeAtShortestPath(int time0, Point start, Point end)
 			{
-				var map = CharMap.FromArray(input);
-				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
-				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
-			}
-			{
-				var map = new CharMap('#');
-				var maze = new Maze(map).WithEntry(Point.From(1, 1));
-				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
+				var cycle = (int)MathHelper.LeastCommonMultiple(_width, _height);
+
+				var seen = new Dictionary<int, int>();
+				var queue = new PriorityQueue<(Point,int), int>();
+				queue.Enqueue((start, time0), 0);
+				while (queue.TryDequeue(out var item, out var _))
 				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
+					var (pos, time) = item;
+
+					var id = (pos.X << 20) + (pos.Y << 10) + (time % cycle);
+					if (seen.TryGetValue(id, out var last) && time >= last)
 						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+					seen[id] = time;
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
+					if (pos == end)
+						return time;
+
+					if (IsVacant(pos, time+1))
 					{
-						queue.Enqueue((n, found, steps + 1));
+						queue.Enqueue((pos, time+1), time+1 + pos.ManhattanDistanceTo(end));
 					}
-				}
-			}
-			{
-				var ship = new Pose(Point.Origin, Direction.Right);
-				foreach (var line in input)
-				{
-					var n = int.Parse(line.Substring(1));
-					switch (line[0])
+					foreach (var p in pos.LookAround().Where(p => IsVacant(p, time+1)))
 					{
-						case 'N': ship.MoveUp(n); break;
-						case 'S': ship.MoveDown(n); break;
-						case 'E': ship.MoveRight(n); break;
-						case 'W': ship.MoveLeft(n); break;
-						case 'L': ship.RotateLeft(n); break;
-						case 'R': ship.RotateRight(n); break;
-						case 'F': ship.Move(n); break;
-						default:
-							throw new Exception($"Unknown action in {line}");
+						queue.Enqueue((p, time+1), time+1 + p.ManhattanDistanceTo(end));
 					}
 				}
-				var dist = ship.Point.ManhattanDistanceTo(Point.Origin);
-			}
-			{
-				var departure = int.Parse(input[0]);
-				var id = input[1]
-					.Replace(",x", "")
-					.Split(",")
-					.Select(int.Parse)
-					.Select(id => new
-					{
-						Id = id,
-						Time = id - departure % id
-					})
-					.OrderBy(x => x.Time)
-					.First();
-			}
-			{
-				var map = CharMatrix.FromArray(input);
-				for (var i = 0; i < 100; i++)
-				{
-					map = map.Transform((ch, adjacents) =>
-					{
-						var n = 0;
-						foreach (var c in adjacents)
-						{
-							if (c == '|' && ++n >= 3)
-								return '|';
-						}
-						return ch;
-					});
-				}
+				throw new Exception("No path found");
 			}
 		}
-
 	}
 }
