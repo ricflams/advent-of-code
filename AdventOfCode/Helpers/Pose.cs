@@ -24,9 +24,13 @@ namespace AdventOfCode.Helpers
 		public Direction Direction { get; private set; }
 
 		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
-		public override string ToString() => $"{Point}{Direction.ToString()[0]}";
+		public override string ToString() => $"{Point}{Direction.AsChar()}";
 
+		public Pose Copy() => Pose.From(Point, Direction);
+
+		public void Move() => Point = Point.Move(Direction, 1);
 		public void Move(int n) => Point = Point.Move(Direction, n);
+		public void MoveBack() => Point = Point.Move(Direction.TurnAround(), 1);
 
 		public void MoveUp(int n) => Point = Point.MoveUp(n);
 		public void MoveRight(int n) => Point = Point.MoveRight(n);

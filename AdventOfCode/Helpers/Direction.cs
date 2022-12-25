@@ -13,6 +13,10 @@ namespace AdventOfCode.Helpers
 
 	public static class DirectionExtensions
 	{
+		private static char[] DirChars = new [] { '^', '>', 'v', '<' };
+
+		public static char AsChar(this Direction direction) => DirChars[(int)direction];
+
 		public static Direction TurnRight(this Direction direction)
 		{
 			switch (direction)

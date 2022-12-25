@@ -84,6 +84,12 @@ namespace AdventOfCode.Helpers
 			set => this[pos.X][pos.Y] = value;
 		}
 
+		public T this[int x, int y]
+		{
+			get => _column.TryGetValue(x, out var col) ? col[y] : _defaultValue;
+			set => this[x][y] = value;
+		}
+
 		public bool Exists(Point pos)
 		{
 			return _column.TryGetValue(pos.X, out var col) && col.Exists(pos.Y);
