@@ -40,27 +40,29 @@ namespace AdventOfCode.Y2021.Day14
 				rules.Add(a, b);
 			}
 
+			// Just do it
 			for (var i = 0; i < 10; i++)
 			{
-			//	Console.WriteLine(template);
 				var result = new StringBuilder();
 				result.Append(template[0]);
 				for (var p = 0; p < template.Length - 1; p++)
 				{
-					var pp = template.Substring(p, 2);
-					//result.Append(pp[0]);
-					result.Append(rules[pp]);
-					result.Append(pp[1]);
+					var pair = template.Substring(p, 2);
+					result.Append(rules[pair]);
+					result.Append(pair[1]);
 				}
 				template = result.ToString();
 			}
 
-			var occ = template.GroupBy(x => x);
-			var xx = occ.OrderBy(x => x.Count()).ToArray();
-			var aa = xx.First().Count();
-			var bb = xx.Last().Count();
+			var elements = template
+				.GroupBy(x => x)
+				.OrderByDescending(x => x.Count())
+				.ToArray();
+			var mostCommon = elements.First().Count();
+			var leastCommon = elements.Last().Count();
+			var quantity = mostCommon - leastCommon;
 
-			return bb - aa;
+			return quantity;
 		}
 
 		protected override long Part2(string[] input)
