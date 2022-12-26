@@ -12,6 +12,7 @@ namespace AdventOfCode.Y2022.Day25
 		public void Run()
 		{
 			Run("test1").Part1("2=-1=0");
+			Run("test9").Part1("2-=12=2-2-2-=0012==2");
 			Run("input").Part1("122-2=200-0111--=200");
 		}
 
