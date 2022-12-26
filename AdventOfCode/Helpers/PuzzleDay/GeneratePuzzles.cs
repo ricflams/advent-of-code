@@ -31,6 +31,7 @@ namespace AdventOfCode.Helpers.PuzzleDay
 				File.WriteAllText($"{folder}/Puzzle{dd}.cs", source);
 				File.Create($"{folder}/test1.txt");
 				File.Create($"{folder}/test2.txt");
+				File.Create($"{folder}/test9.txt");
 				File.Create($"{folder}/input.txt");
 
 				csproj.WriteLine($"    <None Update=\"Y{yyyy}\\Day{dd}\\test1.txt\">");
