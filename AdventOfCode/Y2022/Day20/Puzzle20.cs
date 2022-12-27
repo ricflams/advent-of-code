@@ -15,6 +15,7 @@ namespace AdventOfCode.Y2022.Day20
 		public void Run()
 		{
 			Run("test1").Part1(3).Part2(1623178306);
+			Run("test9").Part1(6640).Part2(11893839037215);
 			Run("input").Part1(9687).Part2(1338310513297);
 		}
 
@@ -50,7 +51,7 @@ namespace AdventOfCode.Y2022.Day20
 
 				// Nothing to move for value 0
 				var value = values[k];
-				if (value == 0)
+				if (value == 0 || (value % (N-1)) == 0)
 					continue;
 
 				// Take k'th number out of the list
