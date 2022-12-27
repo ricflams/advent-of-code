@@ -16,6 +16,7 @@ namespace AdventOfCode.Y2022.Day13
 		public void Run()
 		{
 			Run("test1").Part1(13).Part2(140);
+			Run("test9").Part1(13).Part2(140); // 5543 too high
 			Run("input").Part1(6623).Part2(23049);
 		}
 

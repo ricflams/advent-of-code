@@ -20,6 +20,7 @@ namespace AdventOfCode.Y2022.Day15
 		public void Run()
 		{
 			Run("test1").Part1(26).Part2(56000011);
+			Run("test9").Part1(5564017).Part2(0); // 8360407398893 too low
 			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(5403290).Part2(10291582906626);
 		}

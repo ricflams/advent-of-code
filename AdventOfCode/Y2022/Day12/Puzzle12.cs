@@ -16,6 +16,7 @@ namespace AdventOfCode.Y2022.Day12
 		public void Run()
 		{
 			Run("test1").Part1(31).Part2(29);
+			Run("test9").Part1(408).Part2(399);
 			Run("input").Part1(484).Part2(478);
 		}
 
