@@ -16,7 +16,7 @@ namespace AdventOfCode.Y2022.Day13
 		public void Run()
 		{
 			Run("test1").Part1(13).Part2(140);
-			Run("test9").Part1(13).Part2(140); // 5543 too high
+			Run("test9").Part1(5506).Part2(21756);
 			Run("input").Part1(6623).Part2(23049);
 		}
 
@@ -52,8 +52,14 @@ namespace AdventOfCode.Y2022.Day13
 			return i1 * i2;
 		}
 
-		internal record Number(int Val) : Packet;
-		internal record List(Packet[] Items) : Packet;
+		internal record Number(int Val) : Packet
+		{
+			public override string ToString() => Val.ToString();
+		}
+		internal record List(Packet[] Items) : Packet
+		{
+			public override string ToString() => $"[{string.Join(',', Items.Select(x => x.ToString()))}]";
+		}
 
 		internal record Packet
 		{
@@ -64,9 +70,18 @@ namespace AdventOfCode.Y2022.Day13
 
 				Packet ReadPacket()
 				{
-					if (s[pos] == '[')
+					var ch = s[pos++];
+					if (Char.IsDigit(ch))
 					{
-						pos++;
+						var v = ch - '0';
+						while (Char.IsDigit(s[pos]))
+						{
+							v = v*10 + s[pos++] - '0';
+						}
+						return new Number(v);
+					}
+					if (ch == '[')
+					{
 						var list = new List<Packet>();
 						while (true)
 						{
@@ -82,15 +97,6 @@ namespace AdventOfCode.Y2022.Day13
 							throw new Exception("Unexpected state");
 						}
 						return new List(list.ToArray());
-					}
-					else if (Char.IsDigit(s[pos]))
-					{
-						var v = 0;
-						while (Char.IsDigit(s[pos]))
-						{
-							v = v*10 + s[pos++] - '0';
-						}
-						return new Number(v);
 					}
 					return null;
 				}
