@@ -81,6 +81,23 @@ namespace AdventOfCode.Y2022.Day15
 					return 4000000L * x + y;
 				}				
 
+				//     #D
+				//    ###D   U
+				//   #####D U
+				//  ###S###X
+				//   #####U D
+				//    ###U   D
+				//     #U
+				// For the sensor at S (size 3 in this example) the line between it and
+				// the adjacent sensor either goes "up" (U) if the adjacent sensor is
+				// further "down" (ie has a higher! Y-coordinate (Y goes downwards)) or
+				// it goes "down" (D) if the the adjacent sensor is further "up".
+				// The formulas for up and down are:
+				//     Up: y = -x + (y0 + x0 + dist)
+				//   Down: y =  x + (y0 - x0 - dist)
+				// Sanitycheck: for x==x0 this means
+				//     Up: y = -x0 + (y0 + x0 + dist) = y0 + dist, ie dist higher that y0 at x0 - check
+				//     Up: y =  x0 + (y0 - x0 - dist) = y0 - dist, ie dist lower that y0 at x0 - check
 				static (int, int) Line(Sensor s1, Sensor s2)
 				{
 					(s1, s2) = (s1.P.X < s2.P.X) ? (s1, s2) : (s2, s1);
