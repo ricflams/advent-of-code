@@ -1,206 +1,152 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day15
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 15";
+		public override string Name => "Beacon Exclusion Zone";
 		public override int Year => 2022;
 		public override int Day => 15;
 
 		public void Run()
 		{
 			Run("test1").Part1(26).Part2(56000011);
-			Run("test9").Part1(5564017).Part2(0); // 8360407398893 too low
-			//Run("test2").Part1(0).Part2(0);
+			Run("test9").Part1(5564017).Part2(11558423398893);
 			Run("input").Part1(5403290).Part2(10291582906626);
 		}
 
 		protected override long Part1(string[] input)
 		{
-			// Sensor at x=2557568, y=3759110: closest beacon is at x=2594124, y=3746832
-			var beacons = new List<Point>();
-			var sensors = input
+			var (sensors, beacons) = ReadSensors(input);
+
+			// Find the coverages of all sensors that reach the desired Y-coordinate
+			// and then reduce those coverage-intervals as much as possible
+			var y0 = sensors.Length == 14 ? 10 : 2000000;
+			var coverages = sensors
 				.Select(s =>
 				{
-					var (sx, sy, bx, by) = s.RxMatch("Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d").Get<int, int, int, int>();
-					var beacon = Point.From(bx, by);
-					var sensor = Point.From(sx, sy);
-					beacons.Add(beacon);
-					return (sensor, sensor.ManhattanDistanceTo(beacon));
+					var dy0 = Math.Abs(s.P.Y - y0);
+					var w = s.Size - dy0;
+					return (s.P.X, Width: w);
 				})
-				.ToArray();
+				.Where(s => s.Width >= 0)
+				.Select(s => new Interval(s.X - s.Width, s.X + s.Width + 1))
+				.Reduce();
 
-			// var map2 = new CharMap('.');
-			// foreach (var (s, dist) in sensors)
-			// {
-			// 	map2[s] = 'S';
-			// }
-			// foreach (var b in beacons)
-			// {
-			// 	map2[b] = 'B';
-			// }
-			// map2.ConsoleWrite();
+			// Beacons can't appear in these spots, not counting spots where a beacon already exists
+			var nonBeaconSpots = coverages.Sum(r => r.Length);
+			nonBeaconSpots -= beacons.Count(b => b.Y == y0 && coverages.Any(r => r.Contains(b.X)));
 
-			var map = new HashSet<int>();
-			var y0 = sensors.Length < 15 ? 10 : 2000000;
-			foreach (var (s, dist) in sensors)
-			{
-				var dy0 = Math.Abs(s.Y - y0);
-				var w = dist - dy0;
-				for (var d = 0; d <= w; d++)
-				{
-					map.Add(s.X-d);
-					map.Add(s.X+d);
-				}
-			}
-			foreach (var b in beacons.Where(x => x.Y == y0))
-			{
-				map.Remove(b.X);
-			}
-
-// 4797230 not right
-			return map.Count();	
+			return nonBeaconSpots;	
 		}
 
 		protected override long Part2(string[] input)
 		{
-			// Sensor at x=2557568, y=3759110: closest beacon is at x=2594124, y=3746832
-			var beacons = new List<Point>();
+			var (sensors, _) = ReadSensors(input);
+
+			// Find all sensors that have exactly 1 space between them
+			// Their size is to their edge so the manhattan distance between two sensors
+			// that are right up against eachother is their sizes +1 (+1 to go from one
+			// to the other) so if they are to be exactly one space apart we should look
+			// for sensors where that distance is one more; ie add TWO to their sizes.
+			var neighbors = MathHelper.Combinations(sensors, 2)
+				.Select(x => (S1:x[0], S2:x[1]))
+				.Where(x => x.S1.P.ManhattanDistanceTo(x.S2.P) == x.S1.Size + x.S2.Size + 2)
+				.ToArray();
+
+			// For all combinations of sensor-pairs that are close, calculate the two "lines"
+			// running in between them and see if they intersect. If they do and that spot is
+			// vacant then we've found the answer.
+			// In practice the input has just exactly two such sensor-pairs, ie two lines, ie
+			// just enough to solve the puzzle.
+			foreach (var n in MathHelper.Combinations(neighbors, 2))
+			{
+				var (a1, b1) = Line(n[0].S1, n[0].S2);
+				var (a2, b2) = Line(n[1].S1, n[1].S2);
+
+				if (a1 == a2)
+					continue; // parallel lines
+
+				// Solve y=a1x + b1, y=a2x + b2
+				var x = (b2 - b1) / (a1 - a2);
+				var y = a1*x + b1;
+
+				if (sensors.All(ss => ss.P.ManhattanDistanceTo(Point.From(x, y)) > ss.Size))
+				{
+					return 4000000L * x + y;
+				}				
+
+				static (int, int) Line(Sensor s1, Sensor s2)
+				{
+					(s1, s2) = (s1.P.X < s2.P.X) ? (s1, s2) : (s2, s1);
+					var upwards = s1.P.Y < s2.P.Y;
+					return upwards
+						? (-1, s1.P.Y + s1.P.X + (s1.Size+1))
+						: ( 1, s1.P.Y - s1.P.X - (s1.Size+1));
+				}
+			}
+			throw new Exception("No vacant spot found");
+		}
+
+		// var freq0 = 0L;
+		// foreach (var si in MathHelper.Combinations(sensors, 2))
+		// {
+		// 	var (s1, s2) = (si[0],si[1]);
+		// 	if (s1.sensor.ManhattanDistanceTo(s2.sensor) == s1.Item2 + s2.Item2 + 2)
+		// 	{
+		// 		var smallest = s1.Item2 < s2.Item2 ? s1 : s2;
+		// 		var nearbySensors = sensors
+		// 			.OrderBy(s => s.sensor.ManhattanDistanceTo(smallest.sensor)-s.Item2)
+		// 			.ToArray();
+
+		// 		var (xs, ys) = (smallest.sensor.X, smallest.sensor.Y);
+		// 		var dist = smallest.Item2 + 1;
+		// 		for (var d = 0; d < dist; d++)
+		// 		{
+		// 			Check(xs+d, ys-dist+d);
+		// 			Check(xs+d, ys+dist-d);
+		// 			Check(xs-d, ys-dist+d);
+		// 			Check(xs-d, ys+dist-d);
+		// 		}
+		// 		 if (freq0 > 0)
+		// 		 	return freq0;
+
+		// 		void Check(int xx, int yy)
+		// 		{
+		// 			if (xx < 0 || yy < 0 || xx > maxw || yy > maxw)
+		// 				return;
+		// 			if (nearbySensors.All(ss => ss.sensor.ManhattanDistanceTo(Point.From(xx, yy)) > ss.Item2))
+		// 			{
+		// 				Console.WriteLine($"bingo! at {xx},{yy}");
+		// 				freq0 = 4000000L * xx + yy;
+		// 			}
+		// 		}
+		// 	}
+		// }				
+
+
+		private record Sensor(Point P, int Size);
+
+		private (Sensor[] Sensors, HashSet<Point> Beacons) ReadSensors(string[] input)
+		{
+			var beacons = new HashSet<Point>();
 			var sensors = input
 				.Select(s =>
 				{
+					// Sensor at x=2557568, y=3759110: closest beacon is at x=2594124, y=3746832
 					var (sx, sy, bx, by) = s.RxMatch("Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d").Get<int, int, int, int>();
 					var beacon = Point.From(bx, by);
 					var sensor = Point.From(sx, sy);
 					beacons.Add(beacon);
-					return (sensor, sensor.ManhattanDistanceTo(beacon));
+					return new Sensor(sensor, sensor.ManhattanDistanceTo(beacon));
 				})
 				.ToArray();
-
-			// var map2 = new CharMap('.');
-			// foreach (var (s, dist) in sensors)
-			// {
-			// 	map2[s] = 'S';
-			// }
-			// foreach (var b in beacons)
-			// {
-			// 	map2[b] = 'B';
-			// }
-			// map2.ConsoleWrite();
-
-
-			var maxw = sensors.Length < 15 ? 20 : 4000000;
-
-			for (var y0 = 0; y0 <= maxw; y0++)
-			{
-				//var map = new HashSet<int>();
-				var ranges = new List<Range>();
-
-				foreach (var (s, dist) in sensors)
-				{
-					var dy0 = Math.Abs(s.Y - y0);
-					var w = dist - dy0;
-					if (w < 0)
-						continue;
-					var range = new Range(Math.Max(s.X - w, 0), Math.Min(s.X + w + 1, maxw+1));
-					ranges.Add(range);
-				}
-
-				// ranges.Sort((a, b) => a.Start.Value < b.Start.Value ? -1 : a.Start.Value > b.Start.Value ? 1 : 0);
-				// while (ranges.Count > 1 && ranges[0].Overlaps(ranges[1]))
-				// {
-				// 	ranges[0] = ranges[0].Combine(ranges[1]);
-				// 	ranges.RemoveAt(1);
-				// }
-
-				//ranges.Sort((a, b) => a.Start.Value < b.Start.Value ? -1 : a.Start.Value > b.Start.Value ? 1 : 0);
-
-				
-				while (ranges.Count > 1)
-				{
-					var r0 = ranges[0];
-					var empties = new List<int>();
-					for (var i = 1; i < ranges.Count; i++)
-					{
-						if (r0.Overlaps(ranges[i]))
-						{
-							ranges[0] = r0 = r0.Combine(ranges[i]);
-							empties.Add(i);
-						}
-					}
-					empties.Reverse();
-					foreach (var i in empties)
-						ranges.RemoveAt(i);
-					if (empties.Count == 0)
-						break;
-				}
-
-
-
-				// while (Reduce())
-				// 	{}
-
-				if (ranges.Count > 1)
-				{
-					var x = ranges
-						.OrderBy(x => x.Start.Value)
-						.First()
-						.End.Value;
-					var freq = 4000000L * x + y0;
-					//Console.WriteLine($"at {y0}: {freq}");
-					return freq;
-				}
-
-				// bool Reduce()
-				// {
-				// 	for (var i = 0; i < ranges.Count; i++)
-				// 	{
-				// 		for (var j = i+1; j < ranges.Count; j++)
-				// 		{
-				// 			var (a, b) = (ranges[i], ranges[j]);
-				// 			// var (a1, a2, b1, b2) = line.RxMatch("%d-%d,%d-%d").Get<int, int, int, int>();
-				// 			// return a1 <= b2 && b1 <= a2;							
-				// 			if (a.Overlaps(b))
-				// 			{
-				// 				// overlap; reduce
-				// 				ranges[i] = a.Combine(b);
-				// 				ranges.RemoveAt(j);
-				// 				return true;
-				// 			}
-				// 		}
-				// 	}
-				// 	return false;
-				// }
-
-				// 841265410 not right
-
-			}
-			throw new Exception();
-
-		}
-
-	}
-
-	public static class Extention
-	{
-		public static bool Overlaps(this Range a, Range b)
-		{
-			return a.Start.Value < b.End.Value && b.Start.Value < a.End.Value;
-		}
-
-		public static Range Combine(this Range a, Range b)
-		{
-			return new Range(Math.Min(a.Start.Value, b.Start.Value), Math.Max(a.End.Value, b.End.Value));
+			return (sensors, beacons);
 		}
 	}
 }
