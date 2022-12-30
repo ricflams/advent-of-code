@@ -20,6 +20,7 @@ namespace AdventOfCode.Y2022.Day16
 		public void Run()
 		{
 			Run("test1").Part1(1651).Part2(1707);
+	//		Run("test9").Part1(1850).Part2(1707);
 			//Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(1915).Part2(2772); // 1331 too low, 2582 wrong
 			// 649 not right
@@ -89,20 +90,6 @@ namespace AdventOfCode.Y2022.Day16
 						Debug.Assert(time >= time2);
 						if (released <= released2 + (time - time2) * flowrate)
 							continue;
-					// }
-					// else
-					// 	;
-		
-					// else if (time2 > time)
-					// {
-					// 	if (released + (time2 - time) * flowrate <= released2)
-					// 		continue;
-					// }
-					// else if (time == time2)
-					// {
-					// 	if (released <= released2)
-					// 		continue;
-					// }
 				}
 				seen[key] = (time, released);
 
@@ -181,19 +168,6 @@ namespace AdventOfCode.Y2022.Day16
 				v.Tunnels = v.TunnelNames.Select(x => valves.Single(v => v.Name == x)).ToArray();
 			}
 			var valvesWithFlow = valves.Count(x => x.Flow > 0);
-
-			// Console.WriteLine(valves.Count());
-			//Console.WriteLine(valves.Count(x => x.Flow > 0));
-			// Console.WriteLine("digraph {");
-			// foreach (var v in valves)
-			// {
-			// 	foreach (var e in v.Tunnels)
-			// 	{
-			// 		Console.WriteLine($"  \"{v.Name}\" -> \"{e.Name}\"");
-			// 	}
-			// }
-			// Console.WriteLine("}");
-
 			var minutes = 26;
 
 			var seen = new Dictionary<ulong, (int Time, long Released)>();
