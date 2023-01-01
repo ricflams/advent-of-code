@@ -241,21 +241,21 @@ namespace AdventOfCode.Y2022.Day19.Raw
 				// 		continue;
 				// }
 				// seenrobots[rstate] = materials[Geo];
-				bool IsAllLessThanOrEqual(int[] a, int[] b)
-				{
-					for (var i = 0; i < N; i++)
-						if (a[i] > b[i])
-							return false;
-					return true;
-				}
+				// bool IsAllLessThanOrEqual(int[] a, int[] b)
+				// {
+				// 	for (var i = 0; i < N; i++)
+				// 		if (a[i] > b[i])
+				// 			return false;
+				// 	return true;
+				// }
 	
-				bool IsGreaterThanOrEqual(int[] a, int[] b)
-				{
-					for (var i = 0; i < N; i++)
-						if (a[i] < b[i])
-							return false;
-					return true;
-				}
+				// bool IsGreaterThanOrEqual(int[] a, int[] b)
+				// {
+				// 	for (var i = 0; i < N; i++)
+				// 		if (a[i] < b[i])
+				// 			return false;
+				// 	return true;
+				// }
 
 
 

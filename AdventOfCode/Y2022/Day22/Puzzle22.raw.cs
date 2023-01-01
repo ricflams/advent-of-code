@@ -236,20 +236,20 @@ namespace AdventOfCode.Y2022.Day22.Raw
 				return true;
 			}
 
-			void DrawMappings()
-			{
-				map.ConsoleWrite((p, ch) =>
-				{
-					var ps = p.ToString();
-					var mapping = mappings.Keys.Where(k => k[..^1] == ps).ToArray();
-					return mapping.Length == 0
-						? ch
-						: mapping.Length == 1
-							? mapping[0][^1]
-							: (char)('0'+mapping.Length);
-				});
-				Console.WriteLine();
-			}
+			// void DrawMappings()
+			// {
+			// 	map.ConsoleWrite((p, ch) =>
+			// 	{
+			// 		var ps = p.ToString();
+			// 		var mapping = mappings.Keys.Where(k => k[..^1] == ps).ToArray();
+			// 		return mapping.Length == 0
+			// 			? ch
+			// 			: mapping.Length == 1
+			// 				? mapping[0][^1]
+			// 				: (char)('0'+mapping.Length);
+			// 	});
+			// 	Console.WriteLine();
+			// }
 
 
 	//		DrawMappings();
@@ -288,17 +288,17 @@ namespace AdventOfCode.Y2022.Day22.Raw
 			}
 
 
-			void Draw()
-			{
-				var lines = map.Render((p, ch) => p == pose.Point ? pose.Direction.AsChar() : ch).ToArray();
-				var from = Math.Max(0, pose.Point.Y - 2);
-				var to = Math.Min(h-1, pose.Point.Y + 2);
-				for(var y = from; y <= to; y++)
-				{
-					Console.WriteLine(lines[y]);
-				}
-				Console.WriteLine();
-			}
+			// void Draw()
+			// {
+			// 	var lines = map.Render((p, ch) => p == pose.Point ? pose.Direction.AsChar() : ch).ToArray();
+			// 	var from = Math.Max(0, pose.Point.Y - 2);
+			// 	var to = Math.Min(h-1, pose.Point.Y + 2);
+			// 	for(var y = from; y <= to; y++)
+			// 	{
+			// 		Console.WriteLine(lines[y]);
+			// 	}
+			// 	Console.WriteLine();
+			// }
 
 			// Facing is 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
 			var facing = pose.Direction switch

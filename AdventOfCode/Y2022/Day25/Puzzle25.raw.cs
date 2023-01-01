@@ -59,7 +59,7 @@ namespace AdventOfCode.Y2022.Day25.Raw
 			}
 
 			var result = "";
-			var exp = 1;
+	//		var exp = 1;
 			while (sum > 0)
 			{
 				var dig = (int)( ((sum+2) % 5) - 2 );

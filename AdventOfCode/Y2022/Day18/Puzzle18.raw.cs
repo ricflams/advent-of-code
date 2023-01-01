@@ -360,7 +360,7 @@ namespace AdventOfCode.Y2022.Day18.Raw
 			// 	}
 			// }
 
-			var internalsides = 0;
+	//		var internalsides = 0;
 			// foreach (var e1 in ends)
 			// {
 			// 	var empty = displacements.Select(d => e1.Add(d)).Where(c => !allcubes.Contains(c)).ToArray();
@@ -400,7 +400,7 @@ namespace AdventOfCode.Y2022.Day18.Raw
 			// 	}
 			// }
 
-			return 0;
+	//		return 0;
 			//return externals - internalsides / 2;
 		}
 

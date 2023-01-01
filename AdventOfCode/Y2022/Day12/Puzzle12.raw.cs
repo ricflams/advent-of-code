@@ -38,7 +38,7 @@ namespace AdventOfCode.Y2022.Day12.Raw
 		public int ShortestPath(char[,] map)
 		{
 			// Fast dictonary-key
-			int Key(Point p) => p.X * 10000 + p.Y;
+			//int Key(Point p) => p.X * 10000 + p.Y;
 
 			var (w, h) = map.Dim();
 

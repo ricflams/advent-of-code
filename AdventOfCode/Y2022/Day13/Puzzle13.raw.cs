@@ -146,7 +146,7 @@ namespace AdventOfCode.Y2022.Day13.Raw
 					continue;
 				return check;
 			}
-			return true;
+			//return true;
 		}
 
 		protected override long Part1(string[] input)

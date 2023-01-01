@@ -97,12 +97,12 @@ namespace AdventOfCode.Y2022.Day17.Raw
 					top = y;
 			}
 
-			void DrawMap()
-			{
-				Console.WriteLine();
-				Console.WriteLine("Map:");
-				map.ConsoleWrite();
-			}
+			// void DrawMap()
+			// {
+			// 	Console.WriteLine();
+			// 	Console.WriteLine("Map:");
+			// 	map.ConsoleWrite();
+			// }
 
 			bool CanMove(string[] rock, int x0, int y0)
 			{
@@ -289,12 +289,12 @@ namespace AdventOfCode.Y2022.Day17.Raw
 			// 	}
 			// }
 
-			void DrawMap()
-			{
-				Console.WriteLine();
-				Console.WriteLine("Map:");
-				map.ConsoleWrite();
-			}
+			// void DrawMap()
+			// {
+			// 	Console.WriteLine();
+			// 	Console.WriteLine("Map:");
+			// 	map.ConsoleWrite();
+			// }
 
 			bool CanMove(string[] rock, int x0, int y0)
 			{
