@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
@@ -55,7 +54,7 @@ namespace AdventOfCode.Y2022.Day14
 		{
 			var (map, abyss) = ReadMap(input);
 			var start = (500, 0);
-			var floor = abyss + 2;
+			var floor = abyss + 1;
 
 			for (var unit = 1; ; unit++)
 			{
@@ -68,7 +67,7 @@ namespace AdventOfCode.Y2022.Day14
 				var (x, y) = start;
 				while (true)
 				{
-					if (y == floor-1)
+					if (y == floor)
 					{
 						map.Set(x, y);
 						return false;
@@ -88,20 +87,9 @@ namespace AdventOfCode.Y2022.Day14
 			}
 		}
 
-		private class QuickMapSmall : HashSet<int>
+		private (BoolMap, int) ReadMap(string[] input)
 		{
-			private readonly int Size = (int)System.Math.Sqrt(int.MaxValue);
-			// public void Set(int x, int y) => Add(Size*x + y);
-			// public bool IsSet(int x, int y) => Contains(Size*x + y);
-			private bool[,] _map = new bool[10000,10000];
-			public void Set(int x, int y) { unchecked { _map[x+5000, y] = true; } }
-			public bool IsSet(int x, int y) { unchecked { return _map[x+5000, y]; } }
-		}
-
-		private (QuickMapSmall, int) ReadMap(string[] input)
-		{
-			//var map = new CharMap('.');
-			var map = new QuickMapSmall();
+			var map = new BoolMap();
 			var maxy = 0;
 			foreach (var line in input)
 			{
