@@ -61,6 +61,15 @@ namespace AdventOfCode.Y2022.Day20
 				// Go backward/forward through list, now wihout the removed number
 				value %= N-1;
 				var pos = k;
+
+				// If we going more than halfway forward then it's cheaper to go
+				// backwards; likewise for going more than halfway backwards. This
+				// makes part 2 an impressively 50% faster.
+				if (value > N/2)
+					value -= N-1;
+				else if (value < -N/2)
+					value += N-1;
+
 				if (value < 0)
 				{
 					for (var i = 0; i < -value+1; i++)

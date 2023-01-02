@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
@@ -20,9 +21,8 @@ namespace AdventOfCode.Y2022.Day14
 
 		protected override long Part1(string[] input)
 		{
-			var map = ReadMap(input);
-			var abyss = map.Max().Y;
-			var start = Point.From(500, 0);
+			var (map, abyss) = ReadMap(input);
+			var start = (500, 0);
 
 			for (var unit = 1; ; unit++)
 			{
@@ -32,18 +32,18 @@ namespace AdventOfCode.Y2022.Day14
 
 			bool PourIntoAbyss()
 			{
-				var p = start;
-				while (p.Y < abyss)
+				var (x, y) = start;
+				while (y < abyss)
 				{
-					if (map[p.Down] == '.')
-						p = p.Down;
-					else if (map[p.DiagonalDownLeft] == '.')
-						p = p.DiagonalDownLeft;
-					else if (map[p.DiagonalDownRight] == '.')
-						p = p.DiagonalDownRight;
+					if (!map.IsSet(x, y+1))
+						y++;
+					else if (!map.IsSet(x-1, y+1))
+						{x--; y++; }
+					else if (!map.IsSet(x+1, y+1))
+						{x++; y++; }
 					else
 					{
-						map[p] = 'o';
+						map.Set(x, y);
 						return false;
 					}
 				}
@@ -53,9 +53,9 @@ namespace AdventOfCode.Y2022.Day14
 
 		protected override long Part2(string[] input)
 		{
-			var map = ReadMap(input);
-			var start = Point.From(500, 0);
-			var floor = map.Max().Y + 2;
+			var (map, abyss) = ReadMap(input);
+			var start = (500, 0);
+			var floor = abyss + 2;
 
 			for (var unit = 1; ; unit++)
 			{
@@ -65,42 +65,58 @@ namespace AdventOfCode.Y2022.Day14
 
 			bool PourReachesStart()
 			{
-				var p = start;
+				var (x, y) = start;
 				while (true)
 				{
-					if (p.Y == floor-1)
+					if (y == floor-1)
 					{
-						map[p] = 'o';
+						map.Set(x, y);
 						return false;
 					}
-					if (map[p.Down] == '.')
-						p = p.Down;
-					else if (map[p.DiagonalDownLeft] == '.')
-						p = p.DiagonalDownLeft;
-					else if (map[p.DiagonalDownRight] == '.')
-						p = p.DiagonalDownRight;
+					if (!map.IsSet(x, y+1))
+						y++;
+					else if (!map.IsSet(x-1, y+1))
+						{x--; y++; }
+					else if (!map.IsSet(x+1, y+1))
+						{x++; y++; }
 					else
 					{
-						map[p] = 'o';
-						return p.Y == 0;
-					}
+						map.Set(x, y);
+						return y == 0;
+					}					
 				}
 			}
 		}
 
-		private CharMap ReadMap(string[] input)
+		private class QuickMapSmall : HashSet<int>
 		{
-			var map = new CharMap('.');
+			private readonly int Size = (int)System.Math.Sqrt(int.MaxValue);
+			// public void Set(int x, int y) => Add(Size*x + y);
+			// public bool IsSet(int x, int y) => Contains(Size*x + y);
+			private bool[,] _map = new bool[10000,10000];
+			public void Set(int x, int y) { unchecked { _map[x+5000, y] = true; } }
+			public bool IsSet(int x, int y) { unchecked { return _map[x+5000, y]; } }
+		}
+
+		private (QuickMapSmall, int) ReadMap(string[] input)
+		{
+			//var map = new CharMap('.');
+			var map = new QuickMapSmall();
+			var maxy = 0;
 			foreach (var line in input)
 			{
 				var points = line.Split("->").Select(Point.Parse);
 				foreach (var (a, b) in points.Windowed2())
 				{
-					foreach (var p in a.LineTo(b))
-						map[p] = '#';
+					foreach (var (x, y) in a.LineTo(b))
+					{
+						map.Set(x, y);
+						if (y > maxy)
+							maxy = y;
+					}
 				}
 			}
-			return map;
+			return (map, maxy);
 		}
 	}
 }

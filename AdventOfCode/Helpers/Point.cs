@@ -34,6 +34,8 @@ namespace AdventOfCode.Helpers
 		public override int GetHashCode() => X * 397 ^ Y;
 		public override string ToString() => $"({X},{Y})";
 
+        public void Deconstruct(out int x, out int y) => (x, y) = (X, Y);
+
 		public static Point operator -(Point p) => Point.From(-p.X, -p.Y);
 		public static Point operator +(Point p1, Point p2) => Point.From(p1.X + p2.X, p1.Y + p2.Y);
 		public static Point operator *(Point p, int n) => Point.From(p.X * n, p.Y * n);
