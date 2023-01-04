@@ -63,9 +63,70 @@ namespace AdventOfCode.Helpers
 
 		public static void AddEdge(Vertex v1, Vertex v2, int weight)
 		{
-			v1.Edges.Add(v2, weight);
-			v2.Edges.Add(v1, weight);
+			if (!v1.Edges.ContainsKey(v2))
+				v1.Edges.Add(v2, weight);
+			if (!v2.Edges.ContainsKey(v1))
+				v2.Edges.Add(v1, weight);
 		}
+
+		public void Reduce(Func<Vertex, bool> reduction)
+		{
+			var vertices = Vertices.ToArray();
+			foreach (var (key,v) in vertices)
+			{
+				if (!reduction(v))
+					continue;
+				// Remove this vertex; connect all its edges directly
+				Vertices.Remove(key);
+				foreach (var n1 in v.Edges)
+				{
+					foreach (var n2 in v.Edges.Where(n => !n.Equals(n1)))
+					{
+						if (n1.Key.Edges.ContainsKey(n2.Key))
+						{
+							var dist = Math.Min(n1.Key.Edges[n2.Key], n1.Value + n2.Value);
+							n1.Key.Edges[n2.Key] = dist;
+						}
+						else
+						{
+							n1.Key.Edges.Add(n2.Key, n1.Value + n2.Value);
+						}
+					}
+					n1.Key.Edges.Remove(v);
+				}
+			}
+		}
+
+		public Dictionary<Vertex, int> ShortestPathToAllDijkstra(Vertex from)
+		{
+			var vertices = Vertices.Values;
+
+			var visited = new HashSet<Vertex>();
+			var distances = vertices.ToDictionary(x => x, _ => int.MaxValue);
+			distances[from] = 0;
+
+			var node = from;
+			while (node != null)
+			{
+				foreach (var edge in node.Edges)
+				{
+					var neighbour = edge.Key;
+					var weight = edge.Value;
+					var dist = distances[node] + weight;
+					if (dist < distances[neighbour])
+					{
+						distances[neighbour] = dist;
+					}
+				}
+				visited.Add(node);
+				node = vertices
+					.Where(v => !visited.Contains(v))
+					.OrderBy(x => distances[x])
+					.FirstOrDefault();
+			}
+
+			return distances;
+		}		
 
 		public int TspShortestDistanceBruteForce()
 		{
