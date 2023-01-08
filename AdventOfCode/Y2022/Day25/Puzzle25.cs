@@ -2,7 +2,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2022.Day25
 {
-	internal class Puzzle : Puzzle<string, long>
+	internal class Puzzle : Puzzle<string, int>
 	{
 		public static Puzzle Instance = new();
 		public override string Name => "Full of Hot Air";
@@ -37,11 +37,11 @@ namespace AdventOfCode.Y2022.Day25
 			{
 				var val = (int)((sum+2) % 5) - 2;
 				result = digits[val+2] + result;
-				sum = (sum -val) / 5;
+				sum = (sum - val) / 5;
 			}
 			return result;
 		}
 
-		protected override long Part2(string[] _) => 0;
+		protected override int Part2(string[] _) => 0;
 	}
 }

@@ -10,7 +10,7 @@ using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2022.Day25.Raw
 {
-	internal class Puzzle : Puzzle<string, long>
+	internal class Puzzle : Puzzle<string, int>
 	{
 		public static Puzzle Instance = new();
 		public override string Name => "Day 25";
@@ -69,5 +69,7 @@ namespace AdventOfCode.Y2022.Day25.Raw
 			}
 			return result;
 		}
+
+		protected override int Part2(string[] _) => 0;
 	}
 }
