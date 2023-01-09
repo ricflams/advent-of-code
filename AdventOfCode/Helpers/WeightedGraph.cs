@@ -5,6 +5,105 @@ using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
+	public class GraphxNode
+	{
+		public record Edge(GraphxNode Node, int Weight) {}
+		public string Name { get; set; }
+		public int Index { get; set; }
+		public List<Edge> Edges = new();
+		public Dictionary<string, Edge> EdgeByName = new();
+		public void AddEdge(GraphxNode node, int weight)
+		{
+			var edge = new Edge(node, weight);
+			Edges.Add(edge);
+			EdgeByName[edge.Node.Name] = edge;
+		}
+		public void UpdateEdge(GraphxNode node, int weight)
+		{
+			var edge = new Edge(node, weight);
+			Edges[Edges.IndexOf(e => e.Node == node)] = edge;
+			EdgeByName[edge.Node.Name] = edge;
+		}
+		public void RemoveEdge(GraphxNode node)
+		{
+			Edges.RemoveAt(Edges.IndexOf(e => e.Node == node));
+			EdgeByName.Remove(node.Name);
+		}		
+	}
+	
+	public class Graphx<T> where T:GraphxNode, new()
+	{
+		public List<T> Nodes = new();
+		private Dictionary<string, int> _nodeIndex = new();
+
+		public T AddEdge(string name1, string name2, int weight)
+		{
+			var a = GetOrCreate(name1);
+			var b = GetOrCreate(name2);
+			a.AddEdge(b, weight);
+			return a;
+		}
+
+		public T this[string name] => Nodes[_nodeIndex[name]];
+
+
+		private T GetOrCreate(string name)
+		{
+			if (!_nodeIndex.TryGetValue(name, out var nodeIndex))
+			{
+				var node = new T();
+				node.Name = name;
+				node.Index = Nodes.Count;
+				Nodes.Add(node);
+				nodeIndex = _nodeIndex[name] = node.Index;
+			}
+			return Nodes[nodeIndex];
+		}
+
+		public void Reduce(Func<T, bool> reduction)
+		{
+			foreach (var node in Nodes.ToArray())
+			{
+				if (!reduction(node))
+					continue;
+				// Remove this vertex; connect all its edges directly
+				Nodes.Remove(node);
+				foreach (var n1 in node.Edges)
+				{
+					foreach (var n2 in node.Edges.Where(n => !n.Equals(n1)))
+					{
+						if (n1.Node.Edges.Any(e => e.Node == n2.Node))
+						{
+							var weight = Math.Min(n1.Node.EdgeByName[n2.Node.Name].Weight, n1.Weight + n2.Weight);
+							n1.Node.UpdateEdge(n2.Node, weight);
+						}
+						else
+						{
+							n1.Node.AddEdge(n2.Node, n1.Weight+ n2.Weight);
+						}
+					}
+					n1.Node.RemoveEdge(node);
+				}
+			}
+			_nodeIndex = Nodes.Select((n, idx) => (n, idx)).ToDictionary(x => x.n.Name, x => x.idx);
+		}
+
+		public void WriteAsGraphwiz()
+		{
+			Console.WriteLine("digraph {");
+			foreach (var n in Nodes)
+			{
+				foreach (var e in n.Edges)
+				{
+					Console.WriteLine($"  \"{n}\" -> \"{e.Node}\" [label=\"{e.Weight}\"]");
+				}
+			}
+			Console.WriteLine("}");
+		}
+	}
+
+
+
     public class WeightedGraph<T>
     {
 		public Dictionary<T, Vertex> Vertices { get; } = new Dictionary<T, Vertex>();
@@ -97,7 +196,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public Dictionary<Vertex, int> ShortestPathToAllDijkstra(Vertex from)
+		public Dictionary<Vertex, int> ShortestPathToAllDijkstra2(Vertex from)
 		{
 			var vertices = Vertices.Values;
 
@@ -108,14 +207,12 @@ namespace AdventOfCode.Helpers
 			var node = from;
 			while (node != null)
 			{
-				foreach (var edge in node.Edges)
+				foreach (var (next, weight) in node.Edges)
 				{
-					var neighbour = edge.Key;
-					var weight = edge.Value;
 					var dist = distances[node] + weight;
-					if (dist < distances[neighbour])
+					if (dist < distances[next])
 					{
-						distances[neighbour] = dist;
+						distances[next] = dist;
 					}
 				}
 				visited.Add(node);
@@ -126,6 +223,44 @@ namespace AdventOfCode.Helpers
 			}
 
 			return distances;
+		}		
+
+
+		public Dictionary<Vertex, (int Distance, Vertex Direction)> ShortestPathToAllDijkstra(Vertex start)
+		{
+			var frontier = new PriorityQueue<Vertex, int>();
+			frontier.Enqueue(start, 0);
+
+			var paths = new Dictionary<Vertex, Vertex>();
+			var costs = new Dictionary<Vertex, int>();
+			paths[start] = null;
+			costs[start] = 0;
+
+			while (frontier.TryDequeue(out var current, out var _))
+			{
+				foreach (var (next, weight) in current.Edges)
+				{
+					var cost = costs[current] + weight;
+					if (!costs.ContainsKey(next) || cost < costs[next])
+					{
+						costs[next] = cost;
+						paths[next] = current;
+						frontier.Enqueue(next, cost);
+					}
+				}
+			}
+
+			var results = Vertices.Values
+				.Where(v => v != start)
+				.Select(v =>
+				{
+					var dir = v;
+					while (paths[dir] != start)
+						dir = paths[dir];
+					return (Dest: v, Distance: costs[v], Direction: dir);
+				})
+				.ToDictionary(x => x.Dest, x => (x.Distance, x.Direction));
+			return results;
 		}		
 
 		public int TspShortestDistanceBruteForce()

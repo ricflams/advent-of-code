@@ -23,6 +23,7 @@ namespace AdventOfCode
 			}
 			else
 			{
+				Console.WriteLine($"Running {iterations} iterations...");
 				//PuzzleOptions.OnlyRunForInputs = true;
 				PuzzleOptions.Silent = true;
 				PuzzleOptions.Iterations = 1;
@@ -44,13 +45,13 @@ namespace AdventOfCode
 
 		private static void AllPuzzles()
 		{
-			// Y2015Puzzles();
-			// Y2016Puzzles();
-			// Y2017Puzzles();
+			Y2015Puzzles();
+			Y2016Puzzles();
+			Y2017Puzzles();
 			Y2018Puzzles();
-			// Y2019Puzzles();
-			// Y2020Puzzles();
-			// Y2021Puzzles();
+			Y2019Puzzles();
+			Y2020Puzzles();
+			Y2021Puzzles();
 			Y2022Puzzles();
 		}
 
@@ -161,7 +162,7 @@ namespace AdventOfCode
 			Y2018.Day19.Puzzle.Instance.Run();
 			Y2018.Day20.Puzzle.Instance.Run();
 			Y2018.Day21.Puzzle.Instance.Run();
-			//Y2018.Day22.Puzzle.Instance.Run();
+			Y2018.Day22.Puzzle.Instance.Run();
 			//Y2018.Day23.Puzzle.Instance.Run();
 			//Y2018.Day24.Puzzle.Instance.Run();
 			//Y2018.Day25.Puzzle.Instance.Run();
@@ -242,7 +243,7 @@ namespace AdventOfCode
 			Y2021.Day16.Puzzle.Instance.Run();
 			Y2021.Day17.Puzzle.Instance.Run();
 			Y2021.Day18.Puzzle.Instance.Run();
-	//		Y2021.Day19.Puzzle.Instance.Run();
+//			Y2021.Day19.Puzzle.Instance.Run();
 			Y2021.Day20.Puzzle.Instance.Run();
 			Y2021.Day21.Puzzle.Instance.Run();
 			Y2021.Day22.Puzzle.Instance.Run();

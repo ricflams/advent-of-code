@@ -32,16 +32,23 @@ namespace AdventOfCode.Y2021.Day19
 
 		internal class Scanner
 		{
-			public Scanner(Point3D[] beacons, int number) => (Beacons, AlignedBeacons, Number) = (beacons, beacons, number);
+			public Scanner(Point3D[] beacons, int number)
+			{
+				Beacons = beacons;
+				AlignedBeacons = beacons;
+				Number = number;
+				BeaconsRotations = BeaconsRot().ToArray();
+			}
 
 			public int Number { get; }
 			public Point3D[] Beacons { get; private set; }
 			public Point3D[] AlignedBeacons { get; private set; }
+			public Point3D[][] BeaconsRotations { get; private set; }
 			public Point3D Position { get; private set; } = new Point3D(0, 0, 0);
 
 			public bool Match12beacons(Scanner other)
 			{
-				foreach (var rot in BeaconsRot())
+				foreach (var rot in BeaconsRotations)
 				{
 					//Console.WriteLine();
 					//foreach (var p in rot)
