@@ -78,6 +78,26 @@ namespace AdventOfCode.Helpers
 			return prod;
 		}
 
+		public static uint Sum(this uint[] values)
+		{
+			var sum = 0u;
+			foreach (var v in values)
+			{
+				sum += v;
+			}
+			return sum;
+		}
+
+		public static ulong Sum(this ulong[] values)
+		{
+			var sum = 0ul;
+			foreach (var v in values)
+			{
+				sum += v;
+			}
+			return sum;
+		}
+
 		public static BigInteger ModInverse(this BigInteger a, BigInteger m)
 		{
 			if (m == 1) return 0;

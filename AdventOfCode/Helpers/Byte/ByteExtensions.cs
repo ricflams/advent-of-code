@@ -13,6 +13,7 @@ namespace AdventOfCode.Helpers.Byte
 			i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
 			return (int)((((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24);
 		}
+        public static int NumberOfSetBits(this int value) => NumberOfSetBits((uint)value);
 
 		private static readonly int[] NumberOfBitsInByteLookup = new []
 		{
