@@ -100,6 +100,35 @@ namespace AdventOfCode.Helpers
 			}
 			Console.WriteLine("}");
 		}
+
+		public Dictionary<T, int> ShortestPathToAllDijkstra(T from)
+		{
+			var vertices = Nodes;
+
+			var visited = new HashSet<T>();
+			var distances = vertices.ToDictionary(x => x, _ => int.MaxValue);
+			distances[from] = 0;
+
+			var node = from;
+			while (node != null)
+			{
+				foreach (var (next, weight) in node.Edges)
+				{
+					var dist = distances[node] + weight;
+					if (dist < distances[(T)next])
+					{
+						distances[(T)next] = dist;
+					}
+				}
+				visited.Add(node);
+				node = vertices
+					.Where(v => !visited.Contains(v))
+					.OrderBy(x => distances[x])
+					.FirstOrDefault();
+			}
+
+			return distances;
+		}		
 	}
 
 
