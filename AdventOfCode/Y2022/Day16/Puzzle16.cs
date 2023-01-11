@@ -188,13 +188,9 @@ namespace AdventOfCode.Y2022.Day16
 					.Select(v => (Vertex:v, Dists:network.Graph.ShortestPathToAllDijkstra(v)))
 					.ToDictionary(x => x.Vertex, x => x.Dists);
 				network.DistInfoFromA = network.DistInfo[network.Graph["AA"]];
+				network.DistInfoFromA.Remove(network.Graph["AA"]);
 				network.Graph.Reduce(v => v.Flow == 0);
 
-				var index = 0;
-				foreach (var n in network.Graph.Nodes)
-				{
-					n.Index = index++;
-				}
 				network.DistInfo2 = new int[network.Graph.Nodes.Count, network.Graph.Nodes.Count];
 				foreach (var n1 in network.Graph.Nodes)
 				{
@@ -203,12 +199,18 @@ namespace AdventOfCode.Y2022.Day16
 						network.DistInfo2[n1.Index, n2.Index] = network.DistInfo[n1][n2];
 					}
 				}
+				network.DistInfoFromA2 = new int[network.Graph.Nodes.Count];
+				foreach (var n in network.DistInfoFromA)
+				{
+					network.DistInfoFromA2[n.Key.Index] = n.Value;
+				}
 
 				return (network, starts2);
 			}
 
 			public Dictionary<Valve, Dictionary<Valve, int>> DistInfo;
 			public int[,] DistInfo2;
+			public int[] DistInfoFromA2;
 			public Dictionary<Valve, int> DistInfoFromA;
 
 			public void Draw()
@@ -316,7 +318,7 @@ namespace AdventOfCode.Y2022.Day16
 				{
 					n.MayOpen = (mask & n.Bit) != 0;
 				}
-				var mayOpen = nodes.Where(x => x.MayOpen).OrderByDescending(x => x.Flow * (minutes - DistInfoFromA[x])).ToArray();
+				var mayOpen = nodes.Where(x => x.MayOpen).OrderByDescending(x => x.Flow * (minutes - DistInfoFromA2[x.Index])).ToArray();
 
 				var allSet = mayOpen.Sum(n => n.Bit);
 				var maxflowrate = mayOpen.Sum(x => x.Flow);				
@@ -326,7 +328,7 @@ namespace AdventOfCode.Y2022.Day16
 
 				foreach (var n in mayOpen)
 				{
-					var dist = DistInfoFromA[n];
+					var dist = DistInfoFromA2[n.Index];
 					if (dist+1 >= minutes)
 						continue;
 					FindMax(n, 1 + dist+1, n.Flow, n.Flow, n.Bit);
