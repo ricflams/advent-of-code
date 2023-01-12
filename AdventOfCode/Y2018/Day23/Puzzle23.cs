@@ -30,6 +30,8 @@ namespace AdventOfCode.Y2018.Day23
 			public int X, Y, Z, R;
 			public override string ToString() => $"pos=<{X},{Y},{Z}>, r={R}";
 			public int ManhattanDistanceTo(Nanobot o) => Math.Abs(X - o.X) + Math.Abs(Y - o.Y) + Math.Abs(Z - o.Z);
+			public bool OverlapsWith(Nanobot o) => Overlap(o) > 0; //ManhattanDistanceTo(o) <= R + o.R;
+			public int Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o)-1);
 		}
 
 		protected override long Part1(string[] input)
@@ -61,19 +63,54 @@ namespace AdventOfCode.Y2018.Day23
 					return new Nanobot(x, y, z, r);
 				})
 				.ToArray();
+			var N = bots.Length;
 
-			var overlaps = bots
-				.Select(b =>
-					bots
-						.Where(x => x != b)
-						.Count(o => b.R + o.R >= b.ManhattanDistanceTo(o))
-				)
-				.OrderBy(x => x)
-				.ToArray();
-			foreach (var x in overlaps)
+			var overlaps = new HashSet<int>[N];
+
+			for (var i = 0; i < N; i++)
 			{
-				Console.WriteLine(x);
+				overlaps[i] = new();
+				for (var j = 0; j < N; j++)
+				{
+					if (bots[i].OverlapsWith(bots[j]))
+						overlaps[i].Add(j);
+				}
 			}
+
+			var overlappings = overlaps
+				.Select(o =>
+				{
+					var set = new HashSet<int>(o);
+					foreach (var j in o)
+					{
+						set = new HashSet<int>(set.Intersect(overlaps[j]));
+					}
+					return set;
+				})
+				.OrderByDescending(x => x.Count)
+				.ToArray();
+
+			var sum = overlappings
+				.Select((o, index) => (Index: index, Overlaps: o))
+				.OrderByDescending(x => x.Overlaps.Count())
+				.ToArray();
+			var top = sum.First().Overlaps.Count();
+			var tops = sum.TakeWhile(b => b.Overlaps.Count() == top).ToArray();
+			
+			// var matches = tops
+			// 	.Select(x => overlaps x.Index)
+
+			var first = tops.First();
+			foreach (var t in tops.Skip(1))
+			{
+				if (!first.Overlaps.SetEquals(t.Overlaps))
+					Console.Write("x");
+			}
+
+			var dists = overlappings[first.Index]
+				.Select(i => tops.Where(j => j.Index != first.Index).Select(j => j.Overlaps.OrderBy(x => bots[i].Overlap(bots[x]))))
+				.OrderBy(x => x.First())
+				.ToArray();
 
 			return 0;
 		}
