@@ -114,7 +114,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			}
 			if (!PuzzleOptions.Silent)
 			{
-				WriteName(sw.Elapsed, testname, part);
+				WriteName(sw.Elapsed / PuzzleOptions.Iterations, testname, part);
 				WriteResult(result, expectedResult);
 				Console.WriteLine();
 			}
@@ -124,7 +124,7 @@ namespace AdventOfCode.Helpers.Puzzles
 		{
 			var units = Math.Round(elapsed / TimingBarUnit, MidpointRounding.AwayFromZero);
 			var bars = (int)Math.Min(units, TimingBar.Length);
-			var t = 1000.0 * elapsed.Ticks / Stopwatch.Frequency / PuzzleOptions.Iterations;
+			var t = 1000.0 * elapsed.Ticks / Stopwatch.Frequency;
 			Console.Write($"[{TimingBar.Substring(0, bars),-10}] {t,7:F2} ms: ");
 			if (!PuzzleOptions.OnlyRunForInputs)
 			{
