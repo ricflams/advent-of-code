@@ -34,6 +34,12 @@ namespace AdventOfCode.Y2018.Day23
 			public int Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o)-1);
 		}
 
+		private class Node : GraphxNode
+		{
+			public Nanobot Bot;
+			public override string ToString() => Bot.ToString();
+		}
+
 		protected override long Part1(string[] input)
 		{
 			var bots = input
@@ -65,52 +71,73 @@ namespace AdventOfCode.Y2018.Day23
 				.ToArray();
 			var N = bots.Length;
 
-			var overlaps = new HashSet<int>[N];
+			var groups = new List<List<Nanobot>>();
 
-			for (var i = 0; i < N; i++)
+			var graph = new Graphx<Node>();
+			foreach (var b1 in bots)
 			{
-				overlaps[i] = new();
-				for (var j = 0; j < N; j++)
+				foreach (var b2 in bots)
 				{
-					if (bots[i].OverlapsWith(bots[j]))
-						overlaps[i].Add(j);
+					if (b1 == b2)
+						continue;
+					if (b1.OverlapsWith(b2))
+					{
+						var n = graph.AddEdge(b1.ToString(), b2.ToString(), b1.Overlap(b2));
+						n.Bot = b1;
+					}
 				}
 			}
 
-			var overlappings = overlaps
-				.Select(o =>
-				{
-					var set = new HashSet<int>(o);
-					foreach (var j in o)
-					{
-						set = new HashSet<int>(set.Intersect(overlaps[j]));
-					}
-					return set;
-				})
-				.OrderByDescending(x => x.Count)
-				.ToArray();
+			var chunks = graph.Chunks().OrderByDescending(c => c.Count).ToArray();
 
-			var sum = overlappings
-				.Select((o, index) => (Index: index, Overlaps: o))
-				.OrderByDescending(x => x.Overlaps.Count())
-				.ToArray();
-			var top = sum.First().Overlaps.Count();
-			var tops = sum.TakeWhile(b => b.Overlaps.Count() == top).ToArray();
+			;
+
+			// var overlaps = new HashSet<int>[N];
+
+			// for (var i = 0; i < N; i++)
+			// {
+			// 	overlaps[i] = new();
+			// 	for (var j = 0; j < N; j++)
+			// 	{
+			// 		if (bots[i].OverlapsWith(bots[j]))
+			// 			overlaps[i].Add(j);
+			// 	}
+			// }
+
+			// var overlappings = overlaps
+			// 	.Select(o =>
+			// 	{
+			// 		var set = new HashSet<int>(o);
+			// 		foreach (var j in o)
+			// 		{
+			// 			set = new HashSet<int>(set.Intersect(overlaps[j]));
+			// 		}
+			// 		return set;
+			// 	})
+			// 	.OrderByDescending(x => x.Count)
+			// 	.ToArray();
+
+			// var sum = overlappings
+			// 	.Select((o, index) => (Index: index, Overlaps: o))
+			// 	.OrderByDescending(x => x.Overlaps.Count())
+			// 	.ToArray();
+			// var top = sum.First().Overlaps.Count();
+			// var tops = sum.TakeWhile(b => b.Overlaps.Count() == top).ToArray();
 			
-			// var matches = tops
-			// 	.Select(x => overlaps x.Index)
+			// // var matches = tops
+			// // 	.Select(x => overlaps x.Index)
 
-			var first = tops.First();
-			foreach (var t in tops.Skip(1))
-			{
-				if (!first.Overlaps.SetEquals(t.Overlaps))
-					Console.Write("x");
-			}
+			// var first = tops.First();
+			// foreach (var t in tops.Skip(1))
+			// {
+			// 	if (!first.Overlaps.SetEquals(t.Overlaps))
+			// 		Console.Write("x");
+			// }
 
-			var dists = overlappings[first.Index]
-				.Select(i => tops.Where(j => j.Index != first.Index).Select(j => j.Overlaps.OrderBy(x => bots[i].Overlap(bots[x]))))
-				.OrderBy(x => x.First())
-				.ToArray();
+			// var dists = overlappings[first.Index]
+			// 	.Select(i => tops.Where(j => j.Index != first.Index).Select(j => j.Overlaps.OrderBy(x => bots[i].Overlap(bots[x]))))
+			// 	.OrderBy(x => x.First())
+			// 	.ToArray();
 
 			return 0;
 		}

@@ -184,5 +184,29 @@ namespace AdventOfCode.Helpers
 
 			return dist;
 		}
+
+		public IEnumerable<List<T>> Chunks()
+		{
+			var nodes = new HashSet<T>(Nodes);
+			while (nodes.Any())
+			{
+				yield return Chunk(nodes.First());
+			}
+
+			List<T> Chunk(T node)
+			{
+				var chunk = new List<T>();
+				var cq = new Queue<T>();
+				cq.Enqueue(node);
+				while (cq.TryDequeue(out var n))
+				{
+					nodes.Remove(n);
+					chunk.Add(n);
+					foreach (var e in n.Edges.Where(e => nodes.Contains(e.Node)))
+						cq.Enqueue((T)e.Node);
+				}
+				return chunk;
+			}
+		}
 	}
 }
