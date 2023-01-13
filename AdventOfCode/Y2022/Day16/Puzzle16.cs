@@ -158,10 +158,10 @@ namespace AdventOfCode.Y2022.Day16
 							continue;
 						// Only explore this valve if we can visit it before time runs out. It will
 						// be reached in the t+dist minute and then it takes 1 minute to open it; only
-						// if there's time left (ie that time is not yet minutes) will it yield any
-						// flow, so only explore it if t+dist+1 < minute.
+						// if there's time left (ie that time is at most minutes) will it yield any
+						// flow, so only explore it if t+dist+1 <= minute.
 						var dist = _distances[valve.Index, v.Index];
-						if (t+dist+1 < minutes)
+						if (t+dist+1 <= minutes)
 						{
 							// Go there and open it. The parameters passed here is what the flowrate
 							// and released amount will be at that next time; only in the last minute
