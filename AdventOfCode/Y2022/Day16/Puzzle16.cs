@@ -14,6 +14,13 @@ namespace AdventOfCode.Y2022.Day16
 		public void Run()
 		{
 			Run("test1").Part1(1651).Part2(1707);
+
+			// https://www.reddit.com/r/adventofcode/comments/znklnh/2022_day_16_some_extra_test_cases_for_day_16/
+			Run("test2").Part1(2640).Part2(2670);
+			Run("test3").Part1(13468).Part2(12887);
+			Run("test4").Part1(1288).Part2(1484);
+			Run("test5").Part1(2400).Part2(3680);
+
 		 	Run("test9").Part1(1850).Part2(2306);
 		 	Run("input").Part1(1915).Part2(2772);
 		}
@@ -151,10 +158,10 @@ namespace AdventOfCode.Y2022.Day16
 							continue;
 						// Only explore this valve if we can visit it before time runs out. It will
 						// be reached in the t+dist minute and then it takes 1 minute to open it; only
-						// if there's time left (ie that time is not yet minutes) will it yield any
-						// flow, so only explore it if t+dist+1 < minute.
+						// if there's time left (ie that time is at most minutes) will it yield any
+						// flow, so only explore it if t+dist+1 <= minute.
 						var dist = _distances[valve.Index, v.Index];
-						if (t+dist+1 < minutes)
+						if (t+dist+1 <= minutes)
 						{
 							// Go there and open it. The parameters passed here is what the flowrate
 							// and released amount will be at that next time; only in the last minute
