@@ -15,6 +15,7 @@ namespace AdventOfCode.Helpers
 	{
 		void Put(T item, int priority = 0);
 		bool TryGet(out T item);
+		int Count { get; }
 	}
     public abstract class Quack<T>
     {
@@ -39,6 +40,7 @@ namespace AdventOfCode.Helpers
 		{
 			return _stack.TryPop(out item);
 		}
+		public int Count => _stack.Count;
 	}
 
 	internal class QuackQueue<T> : IQuack<T>
@@ -52,6 +54,7 @@ namespace AdventOfCode.Helpers
 		{
 			return _queue.TryDequeue(out item);
 		}
+		public int Count => _queue.Count;
 	}
 
 	internal class QuackPriorityQueue<T> : IQuack<T>
@@ -67,5 +70,6 @@ namespace AdventOfCode.Helpers
 		{
 			return _queue.TryDequeue(out item, out var _);
 		}
+		public int Count => _queue.Count;
 	}
 }
