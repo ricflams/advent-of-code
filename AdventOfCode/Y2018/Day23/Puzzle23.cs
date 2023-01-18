@@ -20,7 +20,7 @@ namespace AdventOfCode.Y2018.Day23
 		public void Run()
 		{
 			// Run("test1").Part1(7);
-	//		Run("test2").Part2(36);
+			//Run("test2").Part2(36);
 			Run("input").Part1(613).Part2(0);
 			 // 102411278 to high
 			 // 102411078
@@ -79,9 +79,29 @@ namespace AdventOfCode.Y2018.Day23
 			public override string ToString() => $"pos={O}, r={R}";
 			public long ManhattanDistanceTo(Nanobot o) => O.ManhattanDistanceTo(o.O);
 			public bool OverlapsWith(Nanobot o) => Overlap(o) > 0; //ManhattanDistanceTo(o) <= R + o.R;
-			public long Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o)-3);
+			public long Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o)-1);
 			public bool Contains(Point3D p) => O.ManhattanDistanceTo(p) <= R;
 			public long ManhattanDistanceTo(Point3D p) => O.ManhattanDistanceTo(p);
+
+			public IEnumerable<Point3D> Corners()
+			{
+				yield return O with { X = O.X+R };
+				yield return O with { Y = O.Y+R };
+				yield return O with { Z = O.Z+R };
+				yield return O with { X = O.X-R };
+				yield return O with { Y = O.Y-R };
+				yield return O with { Z = O.Z-R };
+			}
+
+			// Pyramid(Polygon((0,-1,0),(1,0,0),(0,1,0),(-1,0,0)),1)
+			// Pyramid(Polygon((0,-1,0),(1,0,0),(0,1,0),(-1,0,0)),-1)
+			public void WriteAsPyramid()
+			{
+				Console.WriteLine($"Pyramid(Polygon(({O.X+R},{O.Y},{O.Z}),({O.X},{O.Y+R},{O.Z}),({O.X-R},{O.Y},{O.Z}),({O.X},{O.Y-R},{O.Z})),{R})");
+				Console.WriteLine($"Pyramid(Polygon(({O.X+R},{O.Y},{O.Z}),({O.X},{O.Y+R},{O.Z}),({O.X-R},{O.Y},{O.Z}),({O.X},{O.Y-R},{O.Z})),{-R})");
+			}
+
+
 		}
 
 		private class Node : GraphxNode
@@ -168,27 +188,46 @@ namespace AdventOfCode.Y2018.Day23
 			}
 
 
-			var includesOrigin = span.Count(s => s.Contains(new Point3D(0,0,0)));
-			var aboveOrigin = span.Select(s => (s, s.ManhattanDistanceTo(Point3D.Origin) - s.R)).OrderByDescending(x => x.Item2).ToArray();
-			var (bfar, bdist) = aboveOrigin.First();
-			var b1b2x = (double)(bdist - bfar.R) / bdist;
-			var p0x = new Point3D(
-				(long)(bfar.O.X*b1b2x),
-				(long)(bfar.O.Y*b1b2x),
-				(long)(bfar.O.Z*b1b2x)
-				// X: (b1.X + b
-				// Y: (b1.Y + b2.Y)/2,
-				// Z: (b1.Z + b2.Z)/2
-			);
-			var incount = span.Count(s => s.Contains(p0x));
+			// var includesOrigin = span.Count(s => s.Contains(new Point3D(0,0,0)));
+			// var aboveOrigin = span.Select(s => (s, s.ManhattanDistanceTo(Point3D.Origin) - s.R)).OrderByDescending(x => x.Item2).ToArray();
+			// var (bfar, bdist) = aboveOrigin.First();
+			// var b1b2x = (double)(bdist - bfar.R) / bdist;
+			// var p0 = new Point3D(
+			// 	(long)(bfar.O.X*b1b2x),
+			// 	(long)(bfar.O.Y*b1b2x),
+			// 	(long)(bfar.O.Z*b1b2x)
+			// 	// X: (b1.X + b
+			// 	// Y: (b1.Y + b2.Y)/2,
+			// 	// Z: (b1.Z + b2.Z)/2
+			// );
+			// var incount = span.Count(s => s.Contains(p0));
 
-			// Execute[{"A=Sphere((413982,33018475,42272511),81533371)","B=Sphere((62049508,14737551,109848523),89608487)"}]
-			var spheres = span.Select((a,idx) => $"\"Bot{idx}=Sphere(({a.O.X},{a.O.Y},{a.O.Z}),{a.R})\"");
-			var s = $"Execute[{{{string.Join(",", spheres)}}}]";
-			Console.WriteLine(s);
+			// // Execute[{"A=Sphere((413982,33018475,42272511),81533371)","B=Sphere((62049508,14737551,109848523),89608487)"}]
+			// var spheres = span.Select((a,idx) => $"\"Bot{idx}=Sphere(({a.O.X},{a.O.Y},{a.O.Z}),{a.R})\"");
+			// var s = $"Execute[{{{string.Join(",", spheres)}}}]";
+			// Console.WriteLine(s);
 
-			// foreach (var a in span)
-			// 	Console.WriteLine($"Sphere(({a.O.X},{a.O.Y},{a.O.Z}),{a.R})");
+			// // foreach (var a in span)
+			// // 	Console.WriteLine($"Sphere(({a.O.X},{a.O.Y},{a.O.Z}),{a.R})");
+
+			var cornerDist = span
+				.SelectMany(s => s.Corners())
+				.Select(s => (s, span.Count(b => b.Contains(s))))
+				.OrderByDescending(x => x.Item2)
+				.ToArray();
+			// foreach (var x in cornerDist)
+			// 	Console.WriteLine($"{x.s} : {x.Item2}");
+			// foreach (var s in span)
+			// 	s.WriteAsPyramid();
+
+
+
+			var corner219 = new Point3D(82886322,-4450974,37731510);
+			var botw219 = span.Single(s => s.Corners().Contains(corner219));
+			var misses = span.Where(s => !s.Contains(corner219)).ToArray();
+			botw219.WriteAsPyramid();
+			foreach (var miss in misses)
+				miss.WriteAsPyramid();
 
 			var N = span.Length;
 			var close0 = new List<(Nanobot A, Nanobot B, long Dist)>();
@@ -199,8 +238,6 @@ namespace AdventOfCode.Y2018.Day23
 				for (var j = 0; j < i; j++)
 				{
 					var botb = span[j];
-					if (bota.ManhattanDistanceTo(botb)+1 == bota.R+botb.R)
-						;
 					var overlap0 = bota.Overlap(botb);
 					if (overlap0 <= minOverlap)
 					{
@@ -214,26 +251,26 @@ namespace AdventOfCode.Y2018.Day23
 
 
 
-			var shortest = new List<(Nanobot A, Nanobot B, int cas, long shortest, long otherdist)>();
-			for (var i = 0; i < N; i++)
-			{
-				var bota = span[i];
-				for (var j = 0; j < i; j++)
-				{
-					var botb = span[j];
-					var radii = bota.R+botb.R;
-					shortest.Add((bota, botb, 1, Math.Abs(bota.O.Y-botb.O.Y)+Math.Abs(bota.O.Z-botb.O.Z), radii - Math.Abs(bota.O.X-botb.O.X)));
-					shortest.Add((bota, botb, 2, Math.Abs(bota.O.X-botb.O.X)+Math.Abs(bota.O.Z-botb.O.Z), radii - Math.Abs(bota.O.Y-botb.O.Y)));
-					shortest.Add((bota, botb, 3, Math.Abs(bota.O.X-botb.O.X)+Math.Abs(bota.O.Y-botb.O.Y), radii - Math.Abs(bota.O.Z-botb.O.Z)));
-				}
-			}
-			var shortest2 = shortest
-				.OrderBy(x => x.shortest)
-				.ThenBy(x => x.otherdist)
-				.ToArray();
-			var shortest3 = shortest
-				.OrderBy(x => x.shortest+x.otherdist)
-				.ToArray();
+			// // var shortest = new List<(Nanobot A, Nanobot B, int cas, long shortest, long otherdist)>();
+			// // for (var i = 0; i < N; i++)
+			// // {
+			// // 	var bota = span[i];
+			// // 	for (var j = 0; j < i; j++)
+			// // 	{
+			// // 		var botb = span[j];
+			// // 		var radii = bota.R+botb.R;
+			// // 		shortest.Add((bota, botb, 1, Math.Abs(bota.O.Y-botb.O.Y)+Math.Abs(bota.O.Z-botb.O.Z), radii - Math.Abs(bota.O.X-botb.O.X)));
+			// // 		shortest.Add((bota, botb, 2, Math.Abs(bota.O.X-botb.O.X)+Math.Abs(bota.O.Z-botb.O.Z), radii - Math.Abs(bota.O.Y-botb.O.Y)));
+			// // 		shortest.Add((bota, botb, 3, Math.Abs(bota.O.X-botb.O.X)+Math.Abs(bota.O.Y-botb.O.Y), radii - Math.Abs(bota.O.Z-botb.O.Z)));
+			// // 	}
+			// // }
+			// // var shortest2 = shortest
+			// // 	.OrderBy(x => x.shortest)
+			// // 	.ThenBy(x => x.otherdist)
+			// // 	.ToArray();
+			// // var shortest3 = shortest
+			// // 	.OrderBy(x => x.shortest+x.otherdist)
+			// // 	.ToArray();
 
 
 			// if (close.Count > 18)
@@ -250,7 +287,7 @@ namespace AdventOfCode.Y2018.Day23
 				.Select(s =>
 				{
 					var (b1, b2, dist) = s;
-					var b1b2 = (double)b1.R / (b1.R+b2.R);
+					var b1b2 = (double)b1.R / (b1.ManhattanDistanceTo(b2));
 					return new Point3D(
 						(long)(b1.O.X+(b2.O.X-b1.O.X)*b1b2),
 						(long)(b1.O.Y+(b2.O.Y-b1.O.Y)*b1b2),
@@ -272,15 +309,15 @@ namespace AdventOfCode.Y2018.Day23
 			// 	foreach (var m2 in middles)
 			// 		Console.WriteLine($"  mhdist={m1.ManhattanDistanceTo(m2)}");
 
-			var bot21 = span.Single(s=>s.Index==21);
-			var bot270 = span.Single(s=>s.Index==270);
-			Debug.Assert(span.All(s => s.OverlapsWith(bot21)));
-			Debug.Assert(span.All(s => s.OverlapsWith(bot270)));
+			// var bot21 = span.Single(s=>s.Index==21);
+			// var bot270 = span.Single(s=>s.Index==270);
+			// Debug.Assert(span.All(s => s.OverlapsWith(bot21)));
+			// Debug.Assert(span.All(s => s.OverlapsWith(bot270)));
 
 			var p0 = middles.First();
-			var dists0 = span.Select(s => (s.Index, s.R - s.ManhattanDistanceTo(p0))).OrderByDescending(x => x.Item2).ToArray();
-			var dist21 = bot21.ManhattanDistanceTo(p0);
-			var overlap21 = dist21 - bot21.R;
+			// var dists0 = span.Select(s => (s.Index, s.R - s.ManhattanDistanceTo(p0))).OrderByDescending(x => x.Item2).ToArray();
+			// var dist21 = bot21.ManhattanDistanceTo(p0);
+			// var overlap21 = dist21 - bot21.R;
 
 
 			// {
@@ -297,25 +334,34 @@ namespace AdventOfCode.Y2018.Day23
 			// 	Console.WriteLine($"d={xd}");
 			// }
 
-			span = span.Where(s=>s.Index!=21 && s.Index!=270).ToArray();
+			// span = span.Where(s=>s.Index!=21 && s.Index!=270).ToArray();
 
 			var inAll = new List<long>();
 			var inAllP = new List<Point3D>();
 
 			span = new [] { closest.First().A, closest.First().B };
 
+			span[0].WriteAsPyramid();
+			span[1].WriteAsPyramid();
+
 			var queue = Quack<(Point3D, int)>.Create(QuackType.Stack);
 			var containedIn0 = span.Count(b => b.Contains(p0));
 			queue.Put((p0, containedIn0));
-			var seen = new HashSet<Point3D>();
+			//var seen = new HashSet<Point3D>();
+			var seen = new HashSet<string>();
 			var round = 0;
 			while (queue.TryGet(out var item))
 			{
 				var (p, n) = item;
+				Console.WriteLine($"round={round} distp={p.ManhattanDistanceTo(p0)}");
 
-				if (seen.Contains(p))
+				// if (seen.Contains(p))
+				// 	continue;
+				// seen.Add(p);
+				if (seen.Contains(p.ToString()))
 					continue;
-				seen.Add(p);
+				seen.Add(p.ToString());
+				
 
 				if (++round % 10000 == 0)
 				{
@@ -339,7 +385,7 @@ namespace AdventOfCode.Y2018.Day23
 							var n2 = span.Count(b => b.Contains(next));
 							if (n2 < n)
 								continue;
-							if (seen.Contains(next))
+							if (seen.Contains(next.ToString()))
 								continue;								
 							queue.Put((next, n2));
 						}
