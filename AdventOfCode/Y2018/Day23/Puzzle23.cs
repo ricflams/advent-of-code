@@ -7,6 +7,7 @@ using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
+using static AdventOfCode.Helpers.GraphxNode;
 
 namespace AdventOfCode.Y2018.Day23
 {
@@ -360,7 +361,7 @@ namespace AdventOfCode.Y2018.Day23
 		protected override long Part2(string[] input)
 		{
 			var bots = input
-				.Select((s,idx) =>
+				.Select((s, idx) =>
 				{
 					var (x, y, z, r) = s.RxMatch("pos=<%d,%d,%d>, r=%d").Get<int, int, int, int>();
 					return new Nanobot(x, y, z, r, idx);
@@ -389,15 +390,15 @@ namespace AdventOfCode.Y2018.Day23
 				.Select((o, idx) => (idx, o.Count(x => x)))
 				.OrderByDescending(x => x.Item2)
 				.ToArray();
-			var chosen = new HashSet<int>(bots.Select(x=>x.Index));
+			var chosen = new HashSet<int>(bots.Select(x => x.Index));
 			var firstindex = sortedoverlaps.First().idx;
-			var bot432index = sortedoverlaps.Single(x => x.idx==432);
+			var bot432index = sortedoverlaps.Single(x => x.idx == 432);
 			foreach (var botidx in sortedoverlaps)
 			{
 				var (idx, n) = botidx;
 				if (!chosen.Contains(idx))
 					continue;
-				var chosen2 = new HashSet<int>(overlaps[idx].Select((b,idx) => (b,idx)).Where(x => x.b && chosen.Contains(x.idx)).Select(x => x.idx));
+				var chosen2 = new HashSet<int>(overlaps[idx].Select((b, idx) => (b, idx)).Where(x => x.b && chosen.Contains(x.idx)).Select(x => x.idx));
 				chosen = new HashSet<int>(chosen.Intersect(chosen2));
 			}
 
@@ -420,14 +421,14 @@ namespace AdventOfCode.Y2018.Day23
 
 
 			//var span = FindGreatestSet(bots);
-;
+			;
 
-            // var rv = new Point3D(0, -1, -1);
-            // var rp = new Point3D(0, 0, 10);
-            // var pn = new Point3D(0, 0, 1);
-            // var pp = new Point3D(0, 0, 5);
-            // var ip = Point3D.IntersectPoint(rv, rp, pn, pp);
-            // Console.WriteLine("The ray intersects the plane at {0}", ip);			
+			// var rv = new Point3D(0, -1, -1);
+			// var rp = new Point3D(0, 0, 10);
+			// var pn = new Point3D(0, 0, 1);
+			// var pp = new Point3D(0, 0, 5);
+			// var ip = Point3D.IntersectPoint(rv, rp, pn, pp);
+			// Console.WriteLine("The ray intersects the plane at {0}", ip);			
 
 
 			static Nanobot[] FindGreatestSet(Nanobot[] bots)
@@ -441,8 +442,8 @@ namespace AdventOfCode.Y2018.Day23
 
 					for (var i = 0; i < N; i++)
 					{
-						overlaps.Add(new bool[i+1]);
-						for (var j = 0; j < i+1; j++)
+						overlaps.Add(new bool[i + 1]);
+						for (var j = 0; j < i + 1; j++)
 						{
 							if (set[i].OverlapsWith(set[j]))
 							{
@@ -452,7 +453,7 @@ namespace AdventOfCode.Y2018.Day23
 					}
 
 					var span = 0;
-					while (span < N && overlaps[span].All(x=>x))
+					while (span < N && overlaps[span].All(x => x))
 						span++;
 
 					if (span == N)
@@ -468,9 +469,9 @@ namespace AdventOfCode.Y2018.Day23
 						break;
 					}
 
-					for (var i = N; i-- > span; )
+					for (var i = N; i-- > span;)
 					{
-						if (overlaps[i].TakeWhile(x=>x).Count() <= span)
+						if (overlaps[i].TakeWhile(x => x).Count() <= span)
 							set.RemoveAt(i);
 					}
 				}
@@ -504,7 +505,7 @@ namespace AdventOfCode.Y2018.Day23
 					}
 				}
 			}
-			var close = close0.Where(x=>x.Dist<=5).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
+			var close = close0.Where(x => x.Dist <= 5).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
 			foreach (var x in close)
 			{
 				Console.WriteLine();
@@ -514,132 +515,138 @@ namespace AdventOfCode.Y2018.Day23
 				geox.Add(x.B);
 				geox.Print();
 			}
-	
+
 			var geoz = new Visualize3D();
 			geoz.Add(bots[218]);
 			geoz.Add(bots[152]);
 			geoz.Add(bots[432]);
 			geoz.Add(bots[975]);
+
+			var botinner = new Nanobot(0, 0, 0, 101599534, 99999);
+			var botouter = new Nanobot(0, 0, 0, 102410482, 99999);
+			geoz.Add(botinner);
+			geoz.Add(botouter);
+
 			geoz.Print();
 
-			var b218 = bots[218];
-			for (var dx = 0; dx < b218.R; dx += 1000)
-			{
-				var p = new Point3D(b218.O.X + dx, b218.O.Y, b218.O.X - dx);
-				var incl = span.Count(s => s.Contains(p));
-				if (incl == span.Length)
-				{
-					Console.WriteLine($"bingo! at {p}");
-					var dist = p.ManhattanDistanceTo(Point3D.Origin);
-					return dist;
-				}				
-				Console.Write($"{incl} ");
-			}
+			// var b218 = bots[218];
+			// for (var dx = 0; dx < b218.R; dx += 1000)
+			// {
+			// 	var p = new Point3D(b218.O.X + dx, b218.O.Y, b218.O.X - dx);
+			// 	var incl = span.Count(s => s.Contains(p));
+			// 	if (incl == span.Length)
+			// 	{
+			// 		Console.WriteLine($"bingo! at {p}");
+			// 		var dist = p.ManhattanDistanceTo(Point3D.Origin);
+			// 		return dist;
+			// 	}				
+			// 	Console.Write($"{incl} ");
+			// }
 
 
-			foreach (var x in close.TakeWhile(x=>x.Dist<=5))
-			{
-				//if (x.Dist==1)
-				{
-					geoz.Add(x.A);
-					geoz.Add(x.B);
-					var i1 = x.A.Intersections(x.B).Concat(x.B.Intersections(x.A)).Distinct().ToArray();
-					if (i1.Length < 3)
-						continue;
-					var pol = new Polygon();
-					foreach (var p in i1)
-						pol._points.Add(p);
-					pol._points.Add(i1.First());
-					geoz.Add(pol);
-					Console.WriteLine(i1.Length);
-				}
-			}
-			geoz.Print();
+			// foreach (var x in close.TakeWhile(x=>x.Dist<=5))
+			// {
+			// 	//if (x.Dist==1)
+			// 	{
+			// 		geoz.Add(x.A);
+			// 		geoz.Add(x.B);
+			// 		var i1 = x.A.Intersections(x.B).Concat(x.B.Intersections(x.A)).Distinct().ToArray();
+			// 		if (i1.Length < 3)
+			// 			continue;
+			// 		var pol = new Polygon();
+			// 		foreach (var p in i1)
+			// 			pol._points.Add(p);
+			// 		pol._points.Add(i1.First());
+			// 		geoz.Add(pol);
+			// 		Console.WriteLine(i1.Length);
+			// 	}
+			// }
+			// geoz.Print();
 
-			var span2 = close.Where(x => x.Dist==1).ToArray();
-			var candidates = new List<Point3D>();
+			// var span2 = close.Where(x => x.Dist==1).ToArray();
+			// var candidates = new List<Point3D>();
 
-			var vis3 = new Visualize3D();
-			vis3.Add(bots[432]);
-			foreach (var x in span2)
-			{
-				if (x.A.Index != 432)
-					vis3.Add(x.A);
-				if (x.B.Index != 432)
-					vis3.Add(x.B);
-			}
-			vis3.Print();
+			// var vis3 = new Visualize3D();
+			// vis3.Add(bots[432]);
+			// foreach (var x in span2)
+			// {
+			// 	if (x.A.Index != 432)
+			// 		vis3.Add(x.A);
+			// 	if (x.B.Index != 432)
+			// 		vis3.Add(x.B);
+			// }
+			// vis3.Print();
 
-			var bot432 = bots[432];
-			var dt = 1;
-			for (var dz = 27635000; dz < bot432.R; dz += dt)
-			{
-				var maxincl = 0;
-				var xy = bot432.R-dz;
-				for (var dx = 0; dx < xy; dx += dt)
-				{
-					var dy = xy-dx;
-					Debug.Assert(dx+dy+dz == bot432.R);
-					var p = new Point3D(bot432.O.X - dx, bot432.O.Y - dy, bot432.O.Z + dz);
-					Debug.Assert(bot432.Contains(p));
-					var incl = span.Count(s => s.Contains(p));
-					if (incl == span.Length)
-					{
-						Console.WriteLine($"bingo! at {p}");
-						var dist = p.ManhattanDistanceTo(Point3D.Origin);
-						return dist;
-					}
-					if (incl > maxincl)
-						maxincl = incl;
-				}
-				Console.Write($"{maxincl} ");
-			}
-			var dist0 = bot432.O.ManhattanDistanceTo(Point3D.Origin) - bot432.R;
-			return dist0;
+			// var bot432 = bots[432];
+			// var dt = 1;
+			// for (var dz = 27635000; dz < bot432.R; dz += dt)
+			// {
+			// 	var maxincl = 0;
+			// 	var xy = bot432.R-dz;
+			// 	for (var dx = 0; dx < xy; dx += dt)
+			// 	{
+			// 		var dy = xy-dx;
+			// 		Debug.Assert(dx+dy+dz == bot432.R);
+			// 		var p = new Point3D(bot432.O.X - dx, bot432.O.Y - dy, bot432.O.Z + dz);
+			// 		Debug.Assert(bot432.Contains(p));
+			// 		var incl = span.Count(s => s.Contains(p));
+			// 		if (incl == span.Length)
+			// 		{
+			// 			Console.WriteLine($"bingo! at {p}");
+			// 			var dist = p.ManhattanDistanceTo(Point3D.Origin);
+			// 			return dist;
+			// 		}
+			// 		if (incl > maxincl)
+			// 			maxincl = incl;
+			// 	}
+			// 	Console.Write($"{maxincl} ");
+			// }
+			// var dist0 = bot432.O.ManhattanDistanceTo(Point3D.Origin) - bot432.R;
+			// return dist0;
 
-			foreach (var x in span2)
-			{
-				// if (b.Index!=683)
-				// 	continue;						
-				Console.WriteLine();
-				Console.WriteLine(x.A.Index);
-				var geo2 = new Visualize3D();
-				geo2.Add(x.A);
-				geo2.Add(x.B);
-				foreach (var p in x.A.Intersections(x.B))
-				{
-					geo2.Add(p);
-					if (span.All(s => s.Contains(p)))
-						candidates.Add(p);
-				}
-				foreach (var p in x.B.Intersections(x.A))
-				{
-					geo2.Add(p);
-					if (span.All(s => s.Contains(p)))
-						candidates.Add(p);
-				}
-				geo2.Print();
-			}
+			// foreach (var x in span2)
+			// {
+			// 	// if (b.Index!=683)
+			// 	// 	continue;						
+			// 	Console.WriteLine();
+			// 	Console.WriteLine(x.A.Index);
+			// 	var geo2 = new Visualize3D();
+			// 	geo2.Add(x.A);
+			// 	geo2.Add(x.B);
+			// 	foreach (var p in x.A.Intersections(x.B))
+			// 	{
+			// 		geo2.Add(p);
+			// 		if (span.All(s => s.Contains(p)))
+			// 			candidates.Add(p);
+			// 	}
+			// 	foreach (var p in x.B.Intersections(x.A))
+			// 	{
+			// 		geo2.Add(p);
+			// 		if (span.All(s => s.Contains(p)))
+			// 			candidates.Add(p);
+			// 	}
+			// 	geo2.Print();
+			// }
 
-			foreach (var s in span)
-			{
-				foreach (var c in s.Corners)
-					candidates.Add(c);
-			}
+			// foreach (var s in span)
+			// {
+			// 	foreach (var c in s.Corners)
+			// 		candidates.Add(c);
+			// }
 
-			var gotsome = Nanobot.GotMore.OrderBy(x=>x).ToArray();
+			// var gotsome = Nanobot.GotMore.OrderBy(x=>x).ToArray();
 
-			var dedup = candidates.Distinct().ToArray();
-			var most = dedup.Select(p => (p, span.Count(s => s.Contains(p)))).OrderByDescending(x=>x.Item2).ToArray();
-			var cand2 = dedup.Where(p => span.All(s => s.Contains(p))).ToArray();
-			Point3D p0 = null;
-			if (cand2.Any())
-			{
-				Console.WriteLine("bingo!");
-				var dists2 = cand2.Select(c => (c, c.ManhattanDistanceTo(Point3D.Origin))).OrderBy(x=>x.Item2);
-				Console.WriteLine(dists2.First());
-				p0 = dists2.First().c;
-			}
+			// var dedup = candidates.Distinct().ToArray();
+			// var most = dedup.Select(p => (p, span.Count(s => s.Contains(p)))).OrderByDescending(x=>x.Item2).ToArray();
+			// var cand2 = dedup.Where(p => span.All(s => s.Contains(p))).ToArray();
+			// Point3D p0 = null;
+			// if (cand2.Any())
+			// {
+			// 	Console.WriteLine("bingo!");
+			// 	var dists2 = cand2.Select(c => (c, c.ManhattanDistanceTo(Point3D.Origin))).OrderBy(x=>x.Item2);
+			// 	Console.WriteLine(dists2.First());
+			// 	p0 = dists2.First().c;
+			// }
 
 			// var p1 = most.First().p;
 			// var not1 = span.First(s => !s.Contains(p1));
@@ -650,7 +657,7 @@ namespace AdventOfCode.Y2018.Day23
 			// geo.Add(p1);
 			// geo.Print();
 
-;
+			;
 			// var includesOrigin = span.Count(s => s.Contains(new Point3D(0,0,0)));
 			// var aboveOrigin = span.Select(s => (s, s.ManhattanDistanceTo(Point3D.Origin) - s.R)).OrderByDescending(x => x.Item2).ToArray();
 			// var (bfar, bdist) = aboveOrigin.First();
@@ -749,7 +756,7 @@ namespace AdventOfCode.Y2018.Day23
 			// // 	Debug.Assert(closest[i].A.Contains(middles[i]));
 			// // 	Debug.Assert(closest[i].B.Contains(middles[i]));
 			// // }
-			
+
 			// // foreach (var m1 in middles)
 			// // 	foreach (var m2 in middles)
 			// // 		Console.WriteLine($"  mhdist={m1.ManhattanDistanceTo(m2)}");
@@ -789,41 +796,104 @@ namespace AdventOfCode.Y2018.Day23
 			// // span[0].WriteAsPyramid();
 			// span[1].WriteAsPyramid();
 
-			var queue = Quack<Point3D>.Create(QuackType.PriorityQueue);
-			queue.Put(p0, 0);
+			//var p0 = new Point3D(58524715, 19067477, 32800921);
+			//var p0 = new Point3D(55593734,16136266,29869567);
+			var p0 = new Point3D(58593733, 19067449, 32731933);
+			var bots4 = new[] { bots[218], bots[152], bots[432], bots[975] };
+			var minr = 101599534;
+			var maxr = 110393116; //102410482;
+
+			var p1 = MidPoint(bots[218], bots[152]);
+			var p2 = MidPoint(bots[432], bots[975]);
+
+			Point3D MidPoint(Nanobot a, Nanobot b)
+			{
+				var aedge = Edge(a, b);
+				var bedge = Edge(b, a);
+
+				if (aedge == bedge)
+					return aedge;
+				if (a.Contains(aedge) && b.Contains(aedge))
+					return aedge;
+				if (a.Contains(bedge) && b.Contains(bedge))
+					return bedge;
+
+				var p = new Point3D((aedge.X + bedge.X) / 2, (aedge.Y + bedge.Y) / 2, (aedge.Z + bedge.Z) / 2);
+				Debug.Assert(a.Contains(p));
+				Debug.Assert(b.Contains(p));
+				return p;
+
+				static Point3D Edge(Nanobot a, Nanobot b)
+				{
+					var f = (double)a.R / a.ManhattanDistanceTo(b);
+					var x = (long)Math.Round(a.O.X + (b.O.X - a.O.X) * f);
+					var y = (long)Math.Round(a.O.Y + (b.O.Y - a.O.Y) * f);
+					//var z = (a.O.Z < b.O.Z ? 1 : -1) * (a.R - (Math.Abs(x - a.O.X) + Math.Abs(y - a.O.Y) + a.O.Z));
+					var z = (long)Math.Round(a.O.Z + (b.O.Z - a.O.Z) * f);
+					var p = new Point3D(x, y, z);
+					if (!a.Contains(p))
+					{
+						var diff = a.R - a.ManhattanDistanceTo(p);
+						p = p with { Z = z - diff };
+					}
+					Debug.Assert(a.Contains(p));
+					return p;
+				}
+			}
+
+
+			var queue = Quack<(Point3D, int, int)>.Create(QuackType.Stack);
+			queue.Put((p0,0,0), 0);
 			//var seen = new HashSet<Point3D>();
 			var mindist = (long)int.MaxValue;
-			var seen = new HashSet<string>();
+			var seen = new HashSet<Point3D>();
 			var round = 0;
-			while (queue.TryGet(out var p))
+			var minbotsfound = 0;
+			var minspanfound = 0;
+			while (queue.TryGet(out var item))
 			{
-				//var (p, n) = item;
+				var (p, botsfoundatp, spanfoundatp) = item;
 	//			Console.WriteLine($"round={round} distp={p.ManhattanDistanceTo(p0)}");
+
+				if (botsfoundatp < minbotsfound)
+					continue;				
+				if (spanfoundatp < minspanfound)
+					continue;				
 
 				// if (seen.Contains(p))
 				// 	continue;
 				// seen.Add(p);
-				if (seen.Contains(p.ToString()))
+				if (seen.Contains(p))
 					continue;
-				seen.Add(p.ToString());
-				
+				seen.Add(p);
 
-				// if (++round % 10000 == 0)
+				// if (minbotsfound == 4)
 				// {
-				// 	// var dists = span.Select(s => (s.Index, s.ManhattanDistanceTo(p) - s.R)).OrderByDescending(x => x.Item2).Take(10).ToArray();
-				// 	Console.WriteLine($"round={round} q={queue.Count} p={p} mindist={mindist}");
+				// 	if (span.All(b => b.Contains(p)))
+				// 	{
+				// 		var d = p.ManhattanDistanceTo(Point3D.Origin);
+				// 		if (d < mindist)
+				// 			mindist = d;							
+				// 		Console.WriteLine($"round={round} q={queue.Count} p={p} mindist={mindist}");
+				// 	}
 				// }
 
-				//if (n == span.Length)
+				if (++round % 10000 == 0)
 				{
-					var d = p.ManhattanDistanceTo(Point3D.Origin);
-					if (d >= mindist)
-						continue;
-					mindist = d;	
-					Console.WriteLine($"round={round} q={queue.Count} p={p} mindist={mindist}");
-					// inAll.Add(d);
-					// inAllP.Add(p);
+					// var dists = span.Select(s => (s.Index, s.ManhattanDistanceTo(p) - s.R)).OrderByDescending(x => x.Item2).Take(10).ToArray();
+					Console.WriteLine($"round={round} q={queue.Count} p={p} botsfound={minbotsfound} distp0={p.ManhattanDistanceTo(p0)} dist={p.ManhattanDistanceTo(Point3D.Origin)} included={span.Count(b => b.Contains(p))}");
 				}
+
+				//if (n == span.Length)
+				// {
+				// 	var d = p.ManhattanDistanceTo(Point3D.Origin);
+				// 	if (d >= mindist)
+				// 		continue;
+				// 	mindist = d;	
+				// 	Console.WriteLine($"round={round} q={queue.Count} findall={findAll} p={p} mindist={mindist}");
+				// 	// inAll.Add(d);
+				// 	// inAllP.Add(p);
+				// }
 
 				for (var dx = -1; dx <= 1; dx++)
 				{
@@ -832,14 +902,28 @@ namespace AdventOfCode.Y2018.Day23
 						for (var dz = -1; dz <= 1; dz++)
 						{
 							var next = new Point3D(p.X + dx, p.Y + dy, p.Z + dz);
-							if (!span.All(b => b.Contains(next)))
+							var xdist = next.ManhattanDistanceTo(Point3D.Origin);
+							if (xdist <= minr)
 								continue;
-							var xdist = next.ManhattanDistanceTo(Point3D.Origin);																
-							if (xdist >= mindist)
+							if (xdist >= maxr)
 								continue;
-							if (seen.Contains(next.ToString()))
+							var found = bots4.Count(b => b.Contains(next));
+							if (found < minbotsfound)
 								continue;
-							queue.Put(next, (int)xdist);
+							if (found > minbotsfound)
+								minbotsfound = found;
+							if (seen.Contains(next))
+								continue;
+							var spanfound = span.Count(b => b.Contains(p));
+							if (spanfound < minspanfound)
+								continue;
+							minspanfound = spanfound;
+							if (spanfound == span.Length)
+							{
+								var d = p.ManhattanDistanceTo(Point3D.Origin);
+								Console.WriteLine($"BINGO: round={round} q={queue.Count} p={p} dist={d}");
+							}
+							queue.Put((next, found, spanfound), (int)xdist);
 						}
 					}
 				}
