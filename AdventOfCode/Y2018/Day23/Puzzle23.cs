@@ -22,7 +22,7 @@ namespace AdventOfCode.Y2018.Day23
 		{
 			 //Run("test1").Part1(7);
 			//Run("test2").Part2(36);
-			Run("input").Part1(613).Part2(0);
+			Run("input").Part1(613).Part2(101599540);
 			 // 102411278 to high
 			 // 102411078
 			 // 102410678
@@ -30,6 +30,7 @@ namespace AdventOfCode.Y2018.Day23
 			 // 102407482
 			 // 102405482 too high
 			 // 102410482
+			 // 101599540 correct!
 			 // 101599534 too low
 
 
@@ -213,7 +214,7 @@ namespace AdventOfCode.Y2018.Day23
 			public Point3D O;
 			public long R;
 			public int Index;
-			public override string ToString() => $"pos={O}, r={R}";
+			public override string ToString() => $"idx={Index} pos={O} r={R}";
 			public long ManhattanDistanceTo(Nanobot o) => O.ManhattanDistanceTo(o.O);
 			public bool OverlapsWith(Nanobot o) => Overlap(o) > 0; //ManhattanDistanceTo(o) <= R + o.R;
 			public long Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o)-1);
@@ -228,6 +229,19 @@ namespace AdventOfCode.Y2018.Day23
 
 			public readonly (Point3D A, Point3D B)[] Edges;
 			public readonly (Point3D Point, Point3D Normal)[] Planes;
+
+			public (Point3D Normal, long D) IntersectingPlane(Nanobot o)
+			{
+				if (!OverlapsWith(o))
+					throw new Exception();
+				var p0 = MidPoint(o);
+				var (px, py, pz) = (p0.X, p0.Y, p0.Z);
+				var (ox, oy, oz) = (O.X, O.Y, O.Z);
+				var signx = Math.Sign(px - ox);
+				var signy = Math.Sign(py - oy);
+				var signz = Math.Sign(pz - oz);
+				return (new Point3D(signx, signy, signz), R + signx*ox + signy*oy + signz*oz);
+			}
 
 			public IEnumerable<Point3D> Intersections(Nanobot o)
 			{
@@ -272,7 +286,45 @@ namespace AdventOfCode.Y2018.Day23
 				}
 			}
 
-//			private EdgePlusFactors
+			public Point3D MidPoint(Nanobot b)
+			{
+				return Edge(this, b);
+
+				var a = this;
+				var aedge = Edge(a, b);
+				var bedge = Edge(b, a);
+
+				if (aedge == bedge)
+					return aedge;
+				if (a.Contains(aedge) && b.Contains(aedge))
+					return aedge;
+				if (a.Contains(bedge) && b.Contains(bedge))
+					return bedge;
+
+				var p = new Point3D((aedge.X + bedge.X) / 2, (aedge.Y + bedge.Y) / 2, (aedge.Z + bedge.Z) / 2);
+		//		Debug.Assert(a.Contains(p));
+		//		Debug.Assert(b.Contains(p));
+				return p;
+
+				static Point3D Edge(Nanobot a, Nanobot b)
+				{
+					var f = (double)a.R / a.ManhattanDistanceTo(b);
+					var x = (long)Math.Round(a.O.X + (b.O.X - a.O.X) * f);
+					var y = (long)Math.Round(a.O.Y + (b.O.Y - a.O.Y) * f);
+					//var z = (a.O.Z < b.O.Z ? 1 : -1) * (a.R - (Math.Abs(x - a.O.X) + Math.Abs(y - a.O.Y) + a.O.Z));
+					var z = (long)Math.Round(a.O.Z + (b.O.Z - a.O.Z) * f);
+					var p = new Point3D(x, y, z);
+					//if (!a.Contains(p))
+					//{
+					//	var diff = a.R - a.ManhattanDistanceTo(p);
+					//	p = p with { Z = z - diff };
+					//}
+			//		Debug.Assert(a.Contains(p));
+					return p;
+				}
+			}
+
+			//			private EdgePlusFactors
 
 			// Pyramid(Polygon((0,-1,0),(1,0,0),(0,1,0),(-1,0,0)),1)
 			// Pyramid(Polygon((0,-1,0),(1,0,0),(0,1,0),(-1,0,0)),-1)
@@ -505,11 +557,13 @@ namespace AdventOfCode.Y2018.Day23
 					}
 				}
 			}
-			var close = close0.Where(x => x.Dist <= 5).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
+			var close = close0.Where(x => x.Dist <= 1000).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
 			foreach (var x in close)
 			{
+				var plane1 = x.A.IntersectingPlane(x.B);
+				var plane2 = x.B.IntersectingPlane(x.A);
 				Console.WriteLine();
-				Console.WriteLine($"{x.A.Index} vs {x.B.Index} dist={x.Dist}");
+				Console.WriteLine($"{x.A.Index} vs {x.B.Index} dist={x.Dist} plane1={plane1.Normal} D={plane1.D}");
 				var geox = new Visualize3D();
 				geox.Add(x.A);
 				geox.Add(x.B);
@@ -798,48 +852,16 @@ namespace AdventOfCode.Y2018.Day23
 
 			//var p0 = new Point3D(58524715, 19067477, 32800921);
 			//var p0 = new Point3D(55593734,16136266,29869567);
-			var p0 = new Point3D(58593733, 19067449, 32731933);
+			//var p0 = new Point3D(58593733, 19067449, 32731933);
+			var p0 = new Point3D(40703828, 17023757, 17023753);
 			var bots4 = new[] { bots[218], bots[152], bots[432], bots[975] };
-			var minr = 101599534;
+			var minr = 0;// 101599534;
 			var maxr = 110393116; //102410482;
 
-			var p1 = MidPoint(bots[218], bots[152]);
-			var p2 = MidPoint(bots[432], bots[975]);
+			var p1 = bots[218].MidPoint(bots[152]);
+			var p2 = bots[432].MidPoint(bots[975]);
 
-			Point3D MidPoint(Nanobot a, Nanobot b)
-			{
-				var aedge = Edge(a, b);
-				var bedge = Edge(b, a);
 
-				if (aedge == bedge)
-					return aedge;
-				if (a.Contains(aedge) && b.Contains(aedge))
-					return aedge;
-				if (a.Contains(bedge) && b.Contains(bedge))
-					return bedge;
-
-				var p = new Point3D((aedge.X + bedge.X) / 2, (aedge.Y + bedge.Y) / 2, (aedge.Z + bedge.Z) / 2);
-				Debug.Assert(a.Contains(p));
-				Debug.Assert(b.Contains(p));
-				return p;
-
-				static Point3D Edge(Nanobot a, Nanobot b)
-				{
-					var f = (double)a.R / a.ManhattanDistanceTo(b);
-					var x = (long)Math.Round(a.O.X + (b.O.X - a.O.X) * f);
-					var y = (long)Math.Round(a.O.Y + (b.O.Y - a.O.Y) * f);
-					//var z = (a.O.Z < b.O.Z ? 1 : -1) * (a.R - (Math.Abs(x - a.O.X) + Math.Abs(y - a.O.Y) + a.O.Z));
-					var z = (long)Math.Round(a.O.Z + (b.O.Z - a.O.Z) * f);
-					var p = new Point3D(x, y, z);
-					if (!a.Contains(p))
-					{
-						var diff = a.R - a.ManhattanDistanceTo(p);
-						p = p with { Z = z - diff };
-					}
-					Debug.Assert(a.Contains(p));
-					return p;
-				}
-			}
 
 
 			var queue = Quack<(Point3D, int, int)>.Create(QuackType.Stack);
@@ -921,6 +943,7 @@ namespace AdventOfCode.Y2018.Day23
 							if (spanfound == span.Length)
 							{
 								var d = p.ManhattanDistanceTo(Point3D.Origin);
+								// BINGO: round=13424105 q=26848216 p=<54127927,17023759,30447854> dist=101599540
 								Console.WriteLine($"BINGO: round={round} q={queue.Count} p={p} dist={d}");
 							}
 							queue.Put((next, found, spanfound), (int)xdist);
