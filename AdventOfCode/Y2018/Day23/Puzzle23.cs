@@ -102,17 +102,17 @@ namespace AdventOfCode.Y2018.Day23
 			var coeff = Matrix.Build.Dense(3, 3);
 			var normals = new HashSet<Point3D>();
 			var row = 0;
-			foreach (var x in closeNeighbors.OrderBy(x => x.Distance))
+			foreach (var (a, b, distance) in closeNeighbors.OrderBy(x => x.Distance))
 			{
-				var plane = x.A.IntersectingPlane(x.B);
-				if (normals.Contains(plane.Normal))
+				var (normal, val) = a.IntersectingPlane(b);
+				if (normals.Contains(normal))
 					continue;
-				normals.Add(plane.Normal);
-				normals.Add(plane.Normal * -1);
-				vals[row, 0] = plane.D;
-				coeff[row, 0] = plane.Normal.X;
-				coeff[row, 1] = plane.Normal.Y;
-				coeff[row, 2] = plane.Normal.Z;
+				normals.Add(normal);
+				normals.Add(normal * -1);
+				vals[row, 0] = val;
+				coeff[row, 0] = normal.X;
+				coeff[row, 1] = normal.Y;
+				coeff[row, 2] = normal.Z;
 				if (++row == 3)
 					break;
 			}
