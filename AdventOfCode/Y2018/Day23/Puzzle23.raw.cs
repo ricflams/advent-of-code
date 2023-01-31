@@ -1,17 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
-using static AdventOfCode.Helpers.GraphxNode;
-using System.Reflection;
-using MathNet.Numerics.LinearAlgebra.Double;
 
-namespace AdventOfCode.Y2018.Day23
+namespace AdventOfCode.Y2018.Day23.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -22,22 +16,21 @@ namespace AdventOfCode.Y2018.Day23
 
 		public void Run()
 		{
-			Run("test1").Part1(7);
+			 //Run("test1").Part1(7);
 			//Run("test2").Part2(36);
-			Run("test9").Part1(906).Part2(121493971);
 			Run("input").Part1(613).Part2(101599540);
-			// 102411278 to high
-			// 102411078
-			// 102410678
-			// 102409478
-			// 102407482
-			// 102405482 too high
-			// 102410482
-			// 101599540 correct!
-			// 101599534 too low
+			 // 102411278 to high
+			 // 102411078
+			 // 102410678
+			 // 102409478
+			 // 102407482
+			 // 102405482 too high
+			 // 102410482
+			 // 101599540 correct!
+			 // 101599534 too low
 
 
-			// https://www.geogebra.org/3d
+			 // https://www.geogebra.org/3d
 		}
 
 		// #
@@ -95,14 +88,6 @@ namespace AdventOfCode.Y2018.Day23
 
 			public long Dot(Point3D rhs) {
 				return checked (X * rhs.X + Y * rhs.Y + Z * rhs.Z);
-			}
-
-			public Point3D Cross(Point3D o)
-			{
-				//cx = aybz - azby
-				//cy = azbx - axbz
-				//cz = axby - aybx
-				return new Point3D(Y * o.Z - Z * o.Y, Z * o.X - X * o.Z, X * o.Y - Y * o.X);
 			}
 
 			public static Point3D IntersectPoint(Point3D rayVector, Point3D rayPoint, Point3D planeNormal, Point3D planePoint) {
@@ -265,7 +250,7 @@ namespace AdventOfCode.Y2018.Day23
 						if (p == null)
 							continue;
 						//var found = false;
-						//if (Contains(p) && o.Contains(p))// && !Corners.Contains(p) && !o.Corners.Contains(p))
+						if (Contains(p) && o.Contains(p))// && !Corners.Contains(p) && !o.Corners.Contains(p))
 						{
 							yield return p;
 							//found = true;
@@ -342,18 +327,8 @@ namespace AdventOfCode.Y2018.Day23
 			public IEnumerable<string> Command(Func<int> NextId)
 			{
 				// https://wiki.geogebra.org/en/Naming_Objects
-				if (Index == 432)
-				{
-					yield return $"p{NextId()}=Pyramid(Polygon(({O.X + R},{O.Y},{O.Z}),({O.X},{O.Y + R},{O.Z}),({O.X - R},{O.Y},{O.Z}),({O.X},{O.Y - R},{O.Z})),{R})";
-					yield return $"p{NextId()}=Pyramid(Polygon(({O.X + R},{O.Y},{O.Z}),({O.X},{O.Y + R},{O.Z}),({O.X - R},{O.Y},{O.Z}),({O.X},{O.Y - R},{O.Z})),{-R})";
-					yield break;
-				}
-
-				foreach (var e in Edges)
-				{
-					yield return $"g{NextId()}=Segment(({e.A.X},{e.A.Y},{e.A.Z}),({e.B.X},{e.B.Y},{e.B.Z}))";
-				}
-
+				yield return $"p{NextId()}=Pyramid(Polygon(({O.X+R},{O.Y},{O.Z}),({O.X},{O.Y+R},{O.Z}),({O.X-R},{O.Y},{O.Z}),({O.X},{O.Y-R},{O.Z})),{R})";
+				yield return $"p{NextId()}=Pyramid(Polygon(({O.X+R},{O.Y},{O.Z}),({O.X},{O.Y+R},{O.Z}),({O.X-R},{O.Y},{O.Z}),({O.X},{O.Y-R},{O.Z})),{-R})";
 				// foreach (var p in Planes)
 				// {
 				// 	var pt = p.Point;
@@ -457,11 +432,7 @@ namespace AdventOfCode.Y2018.Day23
 				}
 			}
 
-			{
-				var geo = new Visualize3D();
-			//	geo.Add(bots[432]);
-				//geo.Print();
-			}
+
 
 			var sortedoverlaps = overlaps
 				.Select((o, idx) => (idx, o.Count(x => x)))
@@ -469,7 +440,7 @@ namespace AdventOfCode.Y2018.Day23
 				.ToArray();
 			var chosen = new HashSet<int>(bots.Select(x => x.Index));
 			var firstindex = sortedoverlaps.First().idx;
-		//	var bot432index = sortedoverlaps.Single(x => x.idx == 432);
+			var bot432index = sortedoverlaps.Single(x => x.idx == 432);
 			foreach (var botidx in sortedoverlaps)
 			{
 				var (idx, n) = botidx;
@@ -575,82 +546,38 @@ namespace AdventOfCode.Y2018.Day23
 				{
 					var botb = span[j];
 					var overlap0 = bota.Overlap(botb);
-					if (overlap0 <= 100)
+					if (overlap0 <= minOverlap)
 					{
 						minOverlap = overlap0;
 						close0.Add((bota, botb, overlap0));
 					}
 				}
 			}
-			var close = close0.OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
-			var planes = new Dictionary<Point3D, long>();
+			var close = close0.Where(x => x.Dist <= 1000).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
 			foreach (var x in close)
 			{
 				var plane1 = x.A.IntersectingPlane(x.B);
 				var plane2 = x.B.IntersectingPlane(x.A);
-				Debug.Assert(plane1.Normal == plane2.Normal * -1);
-				//Console.WriteLine();
-				//Console.WriteLine($"{x.A.Index} vs {x.B.Index} dist={x.Dist} plane1={plane1.Normal} D={plane1.D}");
+				Console.WriteLine();
+				Console.WriteLine($"{x.A.Index} vs {x.B.Index} dist={x.Dist} plane1={plane1.Normal} D={plane1.D}");
 				var geox = new Visualize3D();
 				geox.Add(x.A);
 				geox.Add(x.B);
-				//geox.Print();
-
-				var rev = plane1.Normal * -1;
-				if (!planes.ContainsKey(plane1.Normal) && !planes.ContainsKey(rev))
-				{
-					planes[plane1.Normal] = plane1.D;
-					if (planes.Count == 3)
-						break;
-				}
+				geox.Print();
 			}
 
-			var p0 = Point3D.Origin;
-			{
-				var p1 = (M: planes.First().Key, D: planes.First().Value);
-				var p2 = (M: planes.Skip(1).First().Key, D: planes.Skip(1).First().Value);
-				var p3 = (M: planes.Skip(2).First().Key, D: planes.Skip(2).First().Value);
+			var geoz = new Visualize3D();
+			geoz.Add(bots[218]);
+			geoz.Add(bots[152]);
+			geoz.Add(bots[432]);
+			geoz.Add(bots[975]);
 
-				// https://en.wikipedia.org/wiki/Determinant
-				var (a, b, c, d, e, f, g, h, i) = (p1.M.X, p1.M.Y, p1.M.Z, p2.M.X, p2.M.Y, p2.M.Z, p3.M.X, p3.M.Y, p3.M.Z);
-				var det = a * e * i + b * f * g + c * d * h - c * e * g - b * d * i - a * f * h;
-				// https://www.mathsisfun.com/algebra/systems-linear-equations-matrices.html
+			var botinner = new Nanobot(0, 0, 0, 101599534, 99999);
+			var botouter = new Nanobot(0, 0, 0, 102410482, 99999);
+			geoz.Add(botinner);
+			geoz.Add(botouter);
 
-				var ds = Matrix.Build.Dense(3, 1);
-				ds[0, 0] = p1.D;
-				ds[1, 0] = p2.D;
-				ds[2, 0] = p3.D;
-
-				var t = Matrix.Build.Dense(3, 3);
-				t[0, 0] = a;
-				t[0, 1] = b;
-				t[0, 2] = c;
-				t[1, 0] = d;
-				t[1, 1] = e;
-				t[1, 2] = f;
-				t[2, 0] = g;
-				t[2, 1] = h;
-				t[2, 2] = i;
-				var t2 = t.Inverse();
-				var det2 = t.Determinant();
-				var res = t2 * ds;// / det2;
-				p0 = new Point3D((long)Math.Round(res[0, 0]), (long)Math.Round(res[1, 0]), (long)Math.Round(res[2, 0]));
-			}
-
-			//var cross = planes.First().Key.Cross(planes.Skip(1).First().Key);
-
-			//var geoz = new Visualize3D();
-			//geoz.Add(bots[218]);
-			//geoz.Add(bots[152]);
-			//geoz.Add(bots[432]);
-			//geoz.Add(bots[975]);
-
-			//var botinner = new Nanobot(0, 0, 0, 101599534, 99999);
-			//var botouter = new Nanobot(0, 0, 0, 102410482, 99999);
-			//geoz.Add(botinner);
-			//geoz.Add(botouter);
-
-	//		geoz.Print();
+			geoz.Print();
 
 			// var b218 = bots[218];
 			// for (var dx = 0; dx < b218.R; dx += 1000)
@@ -687,7 +614,7 @@ namespace AdventOfCode.Y2018.Day23
 			// geoz.Print();
 
 			// var span2 = close.Where(x => x.Dist==1).ToArray();
-	//		var candidates = new List<Point3D>();
+			// var candidates = new List<Point3D>();
 
 			// var vis3 = new Visualize3D();
 			// vis3.Add(bots[432]);
@@ -700,8 +627,7 @@ namespace AdventOfCode.Y2018.Day23
 			// }
 			// vis3.Print();
 
-			//var bot432 = bots[432];
-			var pAns = new Point3D(54127927, 17023759, 30447854);
+			// var bot432 = bots[432];
 			// var dt = 1;
 			// for (var dz = 27635000; dz < bot432.R; dz += dt)
 			// {
@@ -728,34 +654,35 @@ namespace AdventOfCode.Y2018.Day23
 			// var dist0 = bot432.O.ManhattanDistanceTo(Point3D.Origin) - bot432.R;
 			// return dist0;
 
-			//var mindist3 = (long)int.MaxValue;
-			//foreach (var x in span)
-			//{
-			//	if (x.Index == 432)
-			//		continue;
+			// foreach (var x in span2)
+			// {
+			// 	// if (b.Index!=683)
+			// 	// 	continue;						
+			// 	Console.WriteLine();
+			// 	Console.WriteLine(x.A.Index);
+			// 	var geo2 = new Visualize3D();
+			// 	geo2.Add(x.A);
+			// 	geo2.Add(x.B);
+			// 	foreach (var p in x.A.Intersections(x.B))
+			// 	{
+			// 		geo2.Add(p);
+			// 		if (span.All(s => s.Contains(p)))
+			// 			candidates.Add(p);
+			// 	}
+			// 	foreach (var p in x.B.Intersections(x.A))
+			// 	{
+			// 		geo2.Add(p);
+			// 		if (span.All(s => s.Contains(p)))
+			// 			candidates.Add(p);
+			// 	}
+			// 	geo2.Print();
+			// }
 
-			//	foreach (var p in bot432.Intersections(x))
-			//	{
-			//		if (span.All(s => s.Contains(p)))
-			//			candidates.Add(p);
-			//		var dist = p.ManhattanDistanceTo(pAns);
-			//		if (dist < mindist3)
-			//			mindist3 = dist;
-   //       		}
-			//	//foreach (var p in x.B.Intersections(x.A))
-			//	//{
-			//	//	geo2.Add(p);
-			//	//	if (span.All(s => s.Contains(p)))
-			//	//		candidates.Add(p);
-			//	//}
-			//	//geo2.Print();
-			//}
-
-			//foreach (var s in span)
-			//{
-			//	foreach (var c in s.Corners)
-			//		candidates.Add(c);
-			//}
+			// foreach (var s in span)
+			// {
+			// 	foreach (var c in s.Corners)
+			// 		candidates.Add(c);
+			// }
 
 			// var gotsome = Nanobot.GotMore.OrderBy(x=>x).ToArray();
 
@@ -922,75 +849,19 @@ namespace AdventOfCode.Y2018.Day23
 			//var p0 = new Point3D(58524715, 19067477, 32800921);
 			//var p0 = new Point3D(55593734,16136266,29869567);
 			//var p0 = new Point3D(58593733, 19067449, 32731933);
+			var p0 = new Point3D(40703828, 17023757, 17023753);
+			var bots4 = new[] { bots[218], bots[152], bots[432], bots[975] };
+			var minr = 0;// 101599534;
+			var maxr = 110393116; //102410482;
 
-//			var p0 = new Point3D(40703828, 17023757, 17023753);
-
-//			var bots4 = new[] { bots[218], bots[152], bots[432], bots[975] };
-			//var minr = 0;// 101599534;
-			//var maxr = 110393116; //102410482;
-
-			//var p1 = bots[218].MidPoint(bots[152]);
-			//var p2 = bots[432].MidPoint(bots[975]);
-
-			//{
-			//	var missingAt = new Dictionary<Nanobot, List<Point3D>>();
-			//	var allmissing = new HashSet<Nanobot>();
-			//	for (var dx = -1; dx <= 1; dx++)
-			//	{
-			//		for (var dy = -1; dy <= 1; dy++)
-			//		{
-			//			for (var dz = -1; dz <= 1; dz++)
-			//			{
-			//				var d = new Point3D(dx, dy, dz);
-			//				var p = pAns + d;
-			//				var missing = span.Where(s => !s.Contains(p)).ToList();
-			//				foreach (var m in missing)
-			//				{
-			//					if (!missingAt.TryGetValue(m, out var t))
-			//						missingAt[m] = new List<Point3D>();
-			//					missingAt[m].Add(d);
-			//					allmissing.Add(m);
-			//				}
-			//				Console.WriteLine($"{d}: {string.Join(" ", missing.Select(s=>s.Index))}");
-			//			}
-			//		}
-			//	}
-			//	Console.WriteLine($"All missing: {string.Join(" ", allmissing.Select(s => s.Index))}");
-			//	var geo = new Visualize3D();
-			//	geo.Add(pAns);
-			//	foreach (var b in allmissing)
-			//		geo.Add(b);
-			//	foreach (var x in allmissing)
-			//	{
-			//		if (x.Index == 432)
-			//			continue;
-			//		foreach (var p in bot432.Intersections(x))
-			//		{
-			//			if (p.ManhattanDistanceTo(pAns) < 100)
-			//				geo.Add(p);
-			//		}
-			//	}
-			//	//geo.Print();
-			//	var seenat = new HashSet<string>();
-			//	foreach (var m in missingAt.OrderBy(x=>x.Key.Index).Where(x => x.Value.Count == 10))
-			//	{
-			//		var key = string.Join(",", m.Value.Select(x => x.ToString()));
-			//		var dup = seenat.Contains(key);
-			//		seenat.Add(key);
-			//		Console.WriteLine($"Bot {m.Key.Index}: {(dup?"dup":"")}");
-			//		foreach (var p in m.Value.Distinct())
-			//			Console.WriteLine($"cube({p.X}|{p.Y}|{p.Z} 1)");
-			//		Console.WriteLine();
-			//	}
-			//}
+			var p1 = bots[218].MidPoint(bots[152]);
+			var p2 = bots[432].MidPoint(bots[975]);
 
 
 
 
-
-
-			var queue = Quack<(Point3D, int)>.Create(QuackType.Stack);
-			queue.Put((p0,0), 0);
+			var queue = Quack<(Point3D, int, int)>.Create(QuackType.Stack);
+			queue.Put((p0,0,0), 0);
 			//var seen = new HashSet<Point3D>();
 			var mindist = (long)int.MaxValue;
 			var seen = new HashSet<Point3D>();
@@ -999,9 +870,11 @@ namespace AdventOfCode.Y2018.Day23
 			var minspanfound = 0;
 			while (queue.TryGet(out var item))
 			{
-				var (p, spanfoundatp) = item;
+				var (p, botsfoundatp, spanfoundatp) = item;
 	//			Console.WriteLine($"round={round} distp={p.ManhattanDistanceTo(p0)}");
 
+				if (botsfoundatp < minbotsfound)
+					continue;				
 				if (spanfoundatp < minspanfound)
 					continue;				
 
@@ -1048,15 +921,15 @@ namespace AdventOfCode.Y2018.Day23
 						{
 							var next = new Point3D(p.X + dx, p.Y + dy, p.Z + dz);
 							var xdist = next.ManhattanDistanceTo(Point3D.Origin);
-							//if (xdist <= minr)
-							//	continue;
-							//if (xdist >= maxr)
-							//	continue;
-							//var found = bots4.Count(b => b.Contains(next));
-							//if (found < minbotsfound)
-							//	continue;
-							//if (found > minbotsfound)
-							//	minbotsfound = found;
+							if (xdist <= minr)
+								continue;
+							if (xdist >= maxr)
+								continue;
+							var found = bots4.Count(b => b.Contains(next));
+							if (found < minbotsfound)
+								continue;
+							if (found > minbotsfound)
+								minbotsfound = found;
 							if (seen.Contains(next))
 								continue;
 							var spanfound = span.Count(b => b.Contains(p));
@@ -1067,11 +940,9 @@ namespace AdventOfCode.Y2018.Day23
 							{
 								var d = p.ManhattanDistanceTo(Point3D.Origin);
 								// BINGO: round=13424105 q=26848216 p=<54127927,17023759,30447854> dist=101599540
-		//						Console.WriteLine($"BINGO: round={round} q={queue.Count} p={p} dist={d}");
-								if (d < mindist)
-									mindist = d;
+								Console.WriteLine($"BINGO: round={round} q={queue.Count} p={p} dist={d}");
 							}
-							queue.Put((next, spanfound), (int)xdist);
+							queue.Put((next, found, spanfound), (int)xdist);
 						}
 					}
 				}
