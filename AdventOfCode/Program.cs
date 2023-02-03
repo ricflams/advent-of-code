@@ -8,11 +8,11 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			PuzzleOptions.RunOnly(2018, 23);
+			PuzzleOptions.RunOnly(2018, 24);
 			//PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
-			//iterations = 5;
+			//iterations = 3;
 
 			if (iterations == 1)
 			{
@@ -164,8 +164,8 @@ namespace AdventOfCode
 			Y2018.Day21.Puzzle.Instance.Run();
 			Y2018.Day22.Puzzle.Instance.Run();
 			Y2018.Day23.Puzzle.Instance.Run();
-			//Y2018.Day24.Puzzle.Instance.Run();
-			//Y2018.Day25.Puzzle.Instance.Run();
+			Y2018.Day24.Puzzle.Instance.Run();
+			Y2018.Day25.Puzzle.Instance.Run();
 		}
 		private static void Y2019Puzzles()
 		{
