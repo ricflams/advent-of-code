@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//using System.Text.RegularExpressions;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 
@@ -24,23 +23,32 @@ namespace AdventOfCode.Y2018.Day25
 
 		protected override long Part1(string[] input)
 		{
-			var pts = input.Select(s => s.Split(',').Select(int.Parse).ToArray()).ToArray();
+			// Store points as tuples, which seems to be faster than a record or array
+			var pts = input
+				.Select(s => s.Split(',').Select(int.Parse).ToArray())
+				.Select(x => (A: x[0], B: x[1], C: x[2], D: x[3]))
+				.ToArray();
 
-			var constellations = new List<List<int[]>>();
+			var constellations = new List<List<(int A,int B,int C,int D)>>();
 
 			foreach (var p in pts)
 			{
-				var connected = constellations.Where(c => c.Any(x => x.Dist(p) <= 3)).ToArray();
-				if (connected.Any())
+				var join = constellations
+					.Where(c => c.Any(x => Math.Abs(x.A - p.A) + Math.Abs(x.B - p.B) + Math.Abs(x.C - p.C) + Math.Abs(x.D - p.D) <= 3))
+					.ToArray();
+				if (join.Any())
 				{
-					var combined = connected.SelectMany(x => x).Append(p).ToList();
-					foreach (var c in connected)
+					var dest = join[0];
+					foreach (var c in join[1..])
+					{
 						constellations.Remove(c);
-					constellations.Add(combined);
+						dest.AddRange(c);
+					}
+					dest.Add(p);
 				}
 				else
 				{
-					constellations.Add(new List<int[]> { p });
+					constellations.Add(new List<(int,int,int,int)> { p });
 				}
 			}
 
@@ -48,18 +56,5 @@ namespace AdventOfCode.Y2018.Day25
 		}
 
 		protected override long Part2(string[] input) => 0;
-	}
-
-	static class Extensions
-	{
-		public static int Dist(this int[] a, int[] b)
-		{
-			var dist = 0;
-			for (var i = 0; i < 4; i++)
-			{
-				dist += Math.Abs(a[i] - b[i]);
-			}
-			return dist;
-		}
 	}
 }
