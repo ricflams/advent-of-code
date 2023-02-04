@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-//using System.Text.RegularExpressions;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using static AdventOfCode.Y2019.Day14.Puzzle;
 
 namespace AdventOfCode.Y2018.Day24
 {
@@ -19,42 +16,30 @@ namespace AdventOfCode.Y2018.Day24
 		public void Run()
 		{
 			Run("test1").Part1(5216).Part2(51);
-			//Run("test2").Part1(7);
-			//Run("test9").Part1(906).Part2(121493971);
 			Run("input").Part1(10538).Part2(9174);
-			// 6302 too low
 		}
 
 		protected override long Part1(string[] input)
 		{
-			var (a1, a2) = Army.Parse(input, 0);
+			var (a1, a2) = Army.Parse(input);
 			return Army.Fight(a1, a2);
 		}
 
 		protected override long Part2(string[] input)
 		{
-			//var units = 0;
-			//Guess.FindLowest(1, guess =>
-			//{
-			//	var (a1, a2) = Army.Parse(input, guess);
-			//	Army.Fight(a1, a2);
-			//	var u = a1.TotalUnits;
-			//	if (u > 0)
-			//		units = u;
-			//	Console.WriteLine($"Boost={guess}: {units} units left");
-			//	return u > 0;
-			//});
-
-			for (var boost = 1; boost<50; boost++)
+			var minUnits = int.MaxValue;
+			Guess.FindLowest(1, guess =>
 			{
-				var (a1, a2) = Army.Parse(input, boost);
-				if (Army.Fight(a1, a2) < 0)
-					continue;
-				Console.WriteLine($"Boost={boost}: {a1.TotalUnits} units left");
-				//if (a1.TotalUnits > 0)
-				//	return a1.TotalUnits;
-			}
-			return 0;
+				var (immune, infection) = Army.Parse(input);
+				immune.Boost(guess);
+				if (Army.Fight(immune, infection) < 0)
+					return false;
+				var units = immune.TotalUnits;
+				if (units > 0 && units < minUnits)
+					minUnits = units;
+				return units > 0;
+			});
+			return minUnits;
 		}
 
 		private class Army
@@ -62,18 +47,14 @@ namespace AdventOfCode.Y2018.Day24
 			public enum AttackType { Bludgeoning, Cold, Fire, Radiation, Slashing };
 
 			public string Name { get; init; }
-			public List<Group> Groups { get; init; }
+			internal List<Group> Groups { get; init; }
 
-			public static (Army, Army) Parse(string[] input, int boost)
+			public static (Army, Army) Parse(string[] input)
 			{
 				var armies = input
 					.GroupByEmptyLine()
 					.Select(x => new Army(x))
 					.ToArray();
-				foreach (var g in armies.Single(a => a.Name == "Immune System").Groups)
-				{
-					g.AttackDamage += boost;
-				}
 				return (armies[0], armies[1]);
 			}
 
@@ -83,25 +64,17 @@ namespace AdventOfCode.Y2018.Day24
 				Groups = input.Skip(1).Select((s, idx) => Group.Parse(this, idx+1, s)).ToList();
 			}
 
-			public Dictionary<Group, Group> SelectTargets(Army enemy)
+			public int TotalUnits => Groups.Sum(g => g.Units);
+
+			public void Boost(int boost)
 			{
-				var targets = new Dictionary<Group, Group>();
-				foreach (var me in Groups.OrderByDescending(g => g.EffectivePower).ThenByDescending(g => g.Initiative))
+				foreach (var g in Groups)
 				{
-					var target = enemy.Groups.Select(you => (You: you, Damage: me.CanDamage(you)))
-						.OrderByDescending(x => x.Damage)
-						.ThenByDescending(x => x.You.EffectivePower)
-						.ThenByDescending(x => x.You.Initiative)
-						.First();
-					if (target.Damage > 0 && !targets.ContainsValue(target.You))
-					{
-						targets[me] = target.You;
-					}
+					g.AttackDamage += boost;
 				}
-				return targets;
 			}
 
-			public void RemoveEmptyGroups()
+			private void RemoveEmptyGroups()
 			{
 				foreach (var g in Groups.ToArray())
 				{
@@ -110,23 +83,10 @@ namespace AdventOfCode.Y2018.Day24
 				}
 			}
 
-			public void WriteStatus()
-			{
-				Console.WriteLine($"{Name}:");
-				foreach (var g in Groups)
-					Console.WriteLine($"Group {g.Number} contains {g.Units} units");
-			}
-
-			public int TotalUnits => Groups.Sum(g => g.Units);
-
 			public static int Fight(Army a1, Army a2)
 			{
 				while (a1.TotalUnits > 0 && a2.TotalUnits > 0)
 				{
-					//	Console.WriteLine();
-					//	a1.WriteStatus();
-					//	a2.WriteStatus();
-
 					// Phase 1: target selection
 					var attackFrom = new Dictionary<Army.Group, Army.Group>();
 					foreach (var me in a1.Groups.Concat(a2.Groups).OrderByDescending(g => g.EffectivePower).ThenByDescending(g => g.Initiative))
@@ -143,18 +103,7 @@ namespace AdventOfCode.Y2018.Day24
 						}
 					}
 
-					//var t1 = a1.SelectTargets(a2);
-					//var t2 = a2.SelectTargets(a1);
-					//var targets = t1.Concat(t2).ToDictionary(x => x.Key, x => x.Value);
-
-					//	Console.WriteLine();
-					foreach (var (me, you) in attackFrom)
-					{
-						//		Console.WriteLine($"{me.Army.Name} group {me.Number} would deal defending group {you.Number} {me.CanDamage(you)} damage");
-					}
-
 					// Phase 2: attack
-					//	Console.WriteLine();
 					var totalkills = 0;
 					foreach (var (me, you) in attackFrom.OrderByDescending(x => x.Key.Initiative))
 					{
@@ -164,22 +113,20 @@ namespace AdventOfCode.Y2018.Day24
 						var kills = Math.Min(you.Units, damage / you.HitPoints); // round down
 						you.Units -= kills;
 						totalkills += kills;
-						//		Console.WriteLine($"{me.Army.Name} group {me.Number} attacks defending group {you.Number}, killing {kills} units");
 					}
+					if (totalkills == 0) // No kills, it will be a tie from now on
+						return -1;
 
 					// Carry out the dead
 					a1.RemoveEmptyGroups();
 					a2.RemoveEmptyGroups();
-
-					if (totalkills == 0)
-						return -1;
 				}
 
 				var remains = a1.TotalUnits + a2.TotalUnits;
 				return remains;
 			}
 
-			public class Group
+			internal class Group
 			{
 				public int Units;
 				public int AttackDamage;
@@ -248,6 +195,5 @@ namespace AdventOfCode.Y2018.Day24
 				}
 			}
 		}
-
 	}
 }
