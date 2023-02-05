@@ -1,11 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.IO;
-using System.Text;
 
 namespace AdventOfCode.Y2015.Day22
 {
@@ -18,720 +13,156 @@ namespace AdventOfCode.Y2015.Day22
 
 		public void Run()
 		{
-			Run("input").Part1(0).Part2(0);
+			Run("input").Part1(1824).Part2(1937);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var rawinput = string.Join(Environment.NewLine, input);
-			//Hit Points: 71
-			//Damage: 10
-			//var state = new State
-			//{
-			//	PlayerHitpoints = 50,
-			//	PlayerMana = 500,
-			//	BossHitpoints = SimpleRegex.MatchInt(input, "Hit Points: %d"),
-			//	BossDamage = SimpleRegex.MatchInt(input, "Damage: %d")
-			//};
-			//state = new State
-			//{
-			//	PlayerHitpoints = 10,
-			//	PlayerMana = 250,
-			//	BossHitpoints = 14,
-			//	BossDamage = 8
-			//};
-
-			var player = new Player
-			{
-				Armor = 0,
-				Hitpoints = 50,
-				Mana = 500
-			};
-			var boss = new Boss
-			{
-				Hitpoints = rawinput.RxMatch("Hit Points: %d").Get<int>(),
-				Damage = rawinput.RxMatch("Damage: %d").Get<int>(),
-			};
-
-			var leastSpent = Fight(player, boss);
-
-			return 1;
-
-			//var player1 = new Player
-			//{
-			//	Armor = 0,
-			//	Hitpoints = 10,
-			//	Mana = 250
-			//};
-			//var boss1 = new Boss
-			//{
-			//	Hitpoints = 14,
-			//	Damage = 8
-			//};
-
-
-			//var fixedmatch = new FixedFight(
-			//	new RechargeSpell(),
-			//	new ShieldSpell(),
-			//	new DrainSpell(),
-			//	new PoisonSpell(),
-			//	new MagicMissileSpell()
-			//	);
-			////Fight(player1, boss1, fixedmatch);
-
-			//var randomFight = new RandomFight();
-			//var leastSpent = int.MaxValue;
-			//for (var i = 0; i < 100000; i++)
-			//{
-			//	var player = new Player
-			//	{
-			//		Armor = 0,
-			//		Hitpoints = 50,
-			//		Mana = 500
-			//	};
-			//	var boss = new Boss
-			//	{
-			//		Hitpoints = SimpleRegex.MatchInt(input, "Hit Points: %d"),
-			//		Damage = SimpleRegex.MatchInt(input, "Damage: %d")
-			//	};
-			//	Fight(player, boss, randomFight);
-			//	if (boss.Hitpoints <= 0)
-			//	{
-			//		Console.Write("+");
-			//		if (player.ManaSpent < leastSpent)
-			//		{
-			//			leastSpent = player.ManaSpent;
-			//			Console.Write("#");
-			//		}
-			//	}
-			//	else
-			//	{
-			//		Console.Write(".");
-			//	}
-			//	Console.ReadLine();
-			//}
+			return MinimumManaSpentOnFight(input, 0);
 		}
 
 		protected override int Part2(string[] input)
 		{
-			return 1;
+			return MinimumManaSpentOnFight(input, 1);
 		}
 
-
-
-		private static int Fight(Player player, Boss boss)
+		private static int MinimumManaSpentOnFight(string[] input, int extraDamage)
 		{
-			var firstSpell = new List<MagicSpell>();
-			var minManaSpent = int.MaxValue;
-			for (var depth = 0; depth < 20; depth++)
+			var bossHitpoints = input[0].RxMatch("Hit Points: %d").Get<int>();
+			var bossDamage = input[1].RxMatch("Damage: %d").Get<int>();
+
+			var game0 = new Game
 			{
-				var (spell, bossHits, spent) = AllSpells
-					.Select(spell =>
-					{
-						//if (firstSpell.Sum(x => x.Cost) + spell.Cost > player.Mana)
-						//{
-						//	return (null, 0, int.MaxValue);
-						//}
-						var minManaSpent = int.MaxValue;
-						var bossHits = 0;
-						var thisFirstSpells = firstSpell.Append(spell);
+				IsPlayersTurn = true,
+				TotalManaSpent = 0,
+				PlayerHitpoints = 50,
+				PlayerMana = 500,
+				BossHitpoints = bossHitpoints,
+				BossDamage = bossDamage,
+				EffectShield = 0,
+				EffectPoison = 0,
+				EffectRecharge = 0
+			};
 
-						foreach (var spellOrder in MathHelper.CountInBaseX(AllSpells.Length, 6))
-						{
-							var spells = firstSpell.Append(spell).Concat(spellOrder.Select(x => AllSpells[x]));
-							var spellChooser = new SelectiveFight(spells);
-							var p = new Player { Hitpoints = player.Hitpoints, Mana = player.Mana };
-							var b = new Boss { Hitpoints = boss.Hitpoints, Damage = boss.Damage };
-							Fight(p, b, spellChooser);
-							//Console.WriteLine();
+			var minManaSpent = int.MaxValue;
+			var queue = Quack<Game>.Create(QuackType.Stack);
+			queue.Put(game0);
 
-							//Console.ReadLine();
-							//bossHits += boss.Hitpoints - b.Hitpoints + (p.Hitpoints - player.Hitpoints);
-							bossHits += (p.Hitpoints - b.Hitpoints) - (player.Hitpoints - boss.Hitpoints);
+			while (queue.TryGet(out var game))
+			{
+				// Skip exploring games that can't end up spending less mana
+				if (game.TotalManaSpent >= minManaSpent)
+					continue;
 
-							if (b.Hitpoints <= 0 && p.ManaSpent < minManaSpent)
-							{
-								minManaSpent = p.ManaSpent;
-							}
-						}
-						return (spell, bossHits, minManaSpent);
-					})
-					//.OrderBy(x => x.minManaSpent)
-					.Where(x => x.spell != null)
-					.OrderByDescending(x => x.bossHits)
-					.First();
-				if (spent < minManaSpent)
+				// Make a copy of game to modify
+				game = game with { };
+
+				// In part 2 the player sustains additional damage
+				if (extraDamage > 0 && game.IsPlayersTurn)
 				{
-					minManaSpent = spent;
+					game.PlayerHitpoints -= extraDamage;
+					if (game.PlayerHitpoints <= 0)
+						continue;
 				}
-				firstSpell.Add(spell);
 
-				Console.WriteLine($"minSpent={minManaSpent} for {bossHits} hits on {spell.GetType().Name}");
+				// Effect of poison, if any
+				if (game.EffectPoison > 0)
+				{
+					game.EffectPoison--;
+					game.BossHitpoints -= 3;
+				}
 
+				// Effect of recharge, if any
+				if (game.EffectRecharge > 0)
+				{
+					game.EffectRecharge--;
+					game.PlayerMana += 101;
+				}
+
+				// Effect of shield on armor, if any
+				var armor = 0;
+				if (game.EffectShield > 0)
+				{
+					game.EffectShield--;
+					armor += 7;
+				}
+
+				// Check if boss is dead
+				if (game.BossHitpoints <= 0)
+				{
+					minManaSpent = game.TotalManaSpent;
+					continue;
+				}
+
+				// Play the round
+				if (game.IsPlayersTurn)
+				{
+					// Player lose if no spells can be cast
+					if (game.PlayerMana < Game.CostMinimum)
+						continue;
+					if (game.CanCastMagicMissile) queue.Put(game.CastMagicMissile());
+					if (game.CanCastDrain) queue.Put(game.CastDrain());
+					if (game.CanCastShield) queue.Put(game.CastShield());
+					if (game.CanCastPoison) queue.Put(game.CastPoison());
+					if (game.CanCastRecharge) queue.Put(game.CastRecharge());
+				}
+				else
+				{
+					var damage = Math.Max(1, game.BossDamage - armor);
+					game.PlayerHitpoints -= damage;
+					if (game.PlayerHitpoints > 0)
+					{
+						game.IsPlayersTurn = true;
+						queue.Put(game);
+					}
+				}
 			}
+
 			return minManaSpent;
 		}
 
-
-		//internal const int BigValue = 1000000;
-
-		private static void Fight(Player player, Boss boss, ISpellChooser spellChooser)
+		private record Game
 		{
-			Log("\n#############################\n");
-			for (var isPlayersTurn = true; ; isPlayersTurn = !isPlayersTurn)
+			public bool IsPlayersTurn;
+			public int TotalManaSpent;
+			public int PlayerHitpoints;
+			public int PlayerMana;
+			public int BossHitpoints;
+			public int BossDamage;
+			public int EffectShield;
+			public int EffectPoison;
+			public int EffectRecharge;
+
+			public override string ToString()
 			{
-				Log($"-- {(isPlayersTurn ? "Player" : "Boss")} turn --");
-				Log($"- Player has {player.Hitpoints} hit points, {player.Armor} armor, {player.Mana} mana");
-				Log($"- Boss has {boss.Hitpoints} hit points");
-
-				player.ApplyEffects();
-				if (boss.Hitpoints <= 0)
-				{
-					Log($"\nThis kills the boss, and the player wins.");
-					return;
-				}
-
-				if (isPlayersTurn)
-				{
-					var spell = spellChooser.NextSpell(player);
-					if (spell == null)
-					{
-						Log($"\nThe player has not enough mana to cast a spell, so the boss wins.");
-						return;
-					}
-
-					//Console.Write(spell.GetType().Name + " ");
-
-					player.Mana -= spell.Cost;
-					player.ManaSpent += spell.Cost;
-					spell.Cast(player, boss);
-					if (boss.Hitpoints <= 0)
-					{
-						Log($"\nThis kills the boss, and the player wins.");
-						return;
-					}
-				}
-				else
-				{
-					boss.Attack(player);
-					if (player.Hitpoints <= 0)
-					{
-						Log($"\nThe player lose.");
-						return;
-					}
-				}
-
-				Log("");
-			}
-		}
-
-		internal static void Log(string message)
-		{
-			//Console.WriteLine(message);
-		}
-
-		private static void Puzzle2()
-		{
-
-			//Console.WriteLine($"Day 22 Puzzle 2: {result}");
-			//Debug.Assert(result == );
-		}
-
-		private interface ISpellChooser
-		{
-			MagicSpell NextSpell(Player player);
-		}
-
-		private class FixedFight : ISpellChooser
-		{
-			private readonly Queue<MagicSpell> _spells;
-			public FixedFight(params MagicSpell[] spells)
-			{
-				_spells = new Queue<MagicSpell>(spells);
+				return $"{(IsPlayersTurn ? "You" : "Boss")} spent={TotalManaSpent} hp={PlayerHitpoints} mana={PlayerMana} bosshp={BossHitpoints} damage={BossDamage} shield={EffectShield} poison={EffectPoison} recharge={EffectRecharge}";
 			}
 
-			public MagicSpell NextSpell(Player _) => _spells.Dequeue();
-		}
+			private static int CostMagicMissile = 53;
+			private static int CostDrain = 73;
+			private static int CostShield = 113;
+			private static int CostPoison = 173;
+			private static int CostRecharge = 229;
+			public static int CostMinimum = CostMagicMissile;
 
-		private readonly static MagicSpell[] AllSpells = new MagicSpell[]
-		{
-			new MagicMissileSpell(),
-			new ShieldSpell(),
-			new DrainSpell(),
-			new PoisonSpell(),
-			new RechargeSpell()
-		};
+			public bool CanCastMagicMissile => PlayerMana >= CostMagicMissile;
+			public bool CanCastDrain => PlayerMana >= CostDrain;
+			public bool CanCastShield => PlayerMana >= CostShield && EffectShield == 0;
+			public bool CanCastPoison => PlayerMana >= CostPoison && EffectPoison == 0;
+			public bool CanCastRecharge => PlayerMana >= CostRecharge && EffectRecharge == 0;
 
-		private class RandomFight : ISpellChooser
-		{
-			private static readonly Random Random = new Random();
-
-			public MagicSpell NextSpell(Player player)
+			public Game CastMagicMissile() => Spend(CostMagicMissile) with { BossHitpoints = BossHitpoints - 4 };
+			public Game CastDrain() => Spend(CostDrain) with { BossHitpoints = BossHitpoints - 2, PlayerHitpoints = PlayerHitpoints + 2 };
+			public Game CastShield() => Spend(CostShield) with { EffectShield = 6 };
+			public Game CastPoison() => Spend(CostPoison) with { EffectPoison = 6 };
+			public Game CastRecharge() => Spend(CostRecharge) with { EffectRecharge = 5 };
+			private Game Spend(int mana) => this with
 			{
-				var spells = AllSpells
-					.Where(s => s.Cost <= player.Mana)
-					.Where(s => s.EffectType == null || !player.Effects.Any(e => e.GetType() == s.EffectType))
-					.ToArray();
-				if (!spells.Any())
-				{
-					return null;
-				}
-				var spell = spells[Random.Next(0, spells.Length-1)];
-				return spell;
-			}
+				IsPlayersTurn = !IsPlayersTurn,
+				PlayerMana = PlayerMana - mana,
+				TotalManaSpent = TotalManaSpent + mana
+			};
 		}
-
-
-		private class SelectiveFight : ISpellChooser
-		{
-			private static readonly Random Random = new Random();
-			private readonly Queue<MagicSpell> _firstSpells;
-
-			public SelectiveFight(IEnumerable<MagicSpell> firstSpells)
-			{
-				_firstSpells = new Queue<MagicSpell>(firstSpells);
-			}
-
-			public MagicSpell NextSpell(Player player)
-			{
-				while (_firstSpells.Count > 0 && _firstSpells.Peek().Cost > player.Mana)
-				{
-					_firstSpells.Dequeue();
-				}
-				if (_firstSpells.Count > 0)
-				{
-					return _firstSpells.Dequeue();
-				}
-				return null;
-
-				//////if (player.Hitpoints > 24 && player.Mana >= 229 && player.Mana < 229+173 && !player.Effects.Any(e => e.GetType() == typeof(RechargeEffect)))
-				//////	return new RechargeSpell();
-
-				////var spells = AllSpells
-				////	.Where(s => s.Cost <= player.Mana)
-				////	.Where(s => s.EffectType == null || !player.Effects.Any(e => e.GetType() == s.EffectType))
-				////	.ToArray();
-				////if (!spells.Any())
-				////{
-				////	return null;
-				////}
-				////var spell = spells[Random.Next(0, spells.Length - 1)];
-				////return spell;
-			}
-		}
-
-
-		private class Player
-		{
-			public int Hitpoints { get; set; }
-			public int Armor { get; set; }
-			public int Mana { get; set; }
-			public int ManaSpent { get; set; }
-			public List<MagicEffect> Effects { get; } = new List<MagicEffect>();
-
-			public void ApplyEffects()
-			{
-				foreach (var effect in Effects)
-				{
-					effect.Apply();
-				}
-				Effects.RemoveAll(x => x.Timer == 0);
-			}
-		}
-
-		private class Boss
-		{
-			public int Hitpoints { get; set; }
-			public int Damage { get; set; }
-
-			public void Attack(Player player)
-			{
-				if (player.Armor == 0)
-				{
-					Log($"Boss attacks for {Damage} damage!");
-					player.Hitpoints -= Damage;
-				}
-				else
-				{
-					var damage = Math.Max(1, Damage - player.Armor);
-					Log($"Boss attacks for {Damage} - {player.Armor} = {damage} damage!");
-					player.Hitpoints -= damage;
-				}
-			}
-		}
-
-		private abstract class MagicEffect
-		{
-			protected readonly Player _player;
-			protected readonly Boss _boss;
-
-			public int Timer { get; protected set; }
-
-			protected MagicEffect(Player player, Boss boss, int timer)
-			{
-				_player = player;
-				_boss = boss;
-				Timer = timer;
-			}
-
-			public abstract void Apply();
-		}
-
-		private class ShieldEffect : MagicEffect
-		{
-			public ShieldEffect(Player player, Boss boss)
-				: base(player, boss, 6) { }
-
-			public override void Apply()
-			{
-				Log($"Shield's timer is now {--Timer}.");
-				if (Timer == 0)
-				{
-					Log($"Shield wears off, decreasing armor by 7.");
-					_player.Armor -= 7;
-				}
-			}
-		}
-
-		private class PoisonEffect : MagicEffect
-		{
-			public PoisonEffect(Player player, Boss boss)
-				: base(player, boss, 6) { }
-
-			public override void Apply()
-			{
-				Log($"Poison deals 3 damage; its timer is now {--Timer}.");
-				if (Timer == 0)
-				{
-					Log($"Poison wears off.");
-				}
-				_boss.Hitpoints -= 3;
-			}
-		}
-
-		private class RechargeEffect : MagicEffect
-		{
-			public RechargeEffect(Player player, Boss boss)
-				: base(player, boss, 5) { }
-
-			public override void Apply()
-			{
-				Log($"Recharge provides 101 mana; its timer is now {--Timer}.");
-				if (Timer == 0)
-				{
-					Log($"Recharge wears off.");
-				}
-				_player.Mana += 101;
-			}
-		}
-
-		private abstract class MagicSpell
-		{
-			public abstract int Cost { get; }
-			public virtual Type EffectType => null;
-			public abstract void Cast(Player player, Boss boss);
-		}
-
-		private class MagicMissileSpell : MagicSpell
-		{
-			public override int Cost => 53;
-			public override void Cast(Player player, Boss boss)
-			{
-				Log($"Player casts Magic Missile, dealing 4 damage.");
-				boss.Hitpoints -= 4;
-			}
-		}
-
-		private class DrainSpell : MagicSpell
-		{
-			public override int Cost => 73;
-			public override void Cast(Player player, Boss boss)
-			{
-				Log($"Player casts Drain, dealing 2 damage, and healing 2 hit points.");
-				player.Hitpoints += 2;
-				boss.Hitpoints -= 2;
-			}
-		}
-
-		private class ShieldSpell : MagicSpell
-		{
-			public override int Cost => 113;
-			public override Type EffectType => typeof(ShieldEffect);
-			public override void Cast(Player player, Boss boss)
-			{
-				Log($"Player casts Shield, increasing armor by 7.");
-				player.Armor += 7;
-				player.Effects.Add(new ShieldEffect(player, boss));
-			}
-		}
-
-		private class PoisonSpell : MagicSpell
-		{
-			public override int Cost => 173;
-			public override Type EffectType => typeof(PoisonEffect);
-			public override void Cast(Player player, Boss boss)
-			{
-				Log($"Player casts Poison.");
-				player.Effects.Add(new PoisonEffect(player, boss));
-			}
-		}
-
-		private class RechargeSpell : MagicSpell
-		{
-			public override int Cost => 229;
-			public override Type EffectType => typeof(RechargeEffect);
-			public override void Cast(Player player, Boss boss)
-			{
-				Log($"Player casts Recharge.");
-				player.Effects.Add(new RechargeEffect(player, boss));
-			}
-		}
-
 	}
 }
-//public int Cast(Player player, Boss boss)
-//	{
-//		Log($"Player cast Magic Missile, dealing 4 damage.\n");
-//		player.Mana -= Cost;
-
-//		var newstate = state;
-//		newstate.PlayerMana -= 53;
-//		newstate.BossHitpoints -= 4;
-//		if (state.BossHitpoints <= 0)
-//		{
-//			Log($"This kills the boss, and the player wins.");
-//			Console.Write("B");
-//			playerMana = state.PlayerMana;
-//			var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//			if (playerMana > biggestManaSeen)
-//			{
-//				BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//				Console.Write("O");
-//			}
-//			return true;
-//		}
-
-//	}
-
-
-
-//private static SafeDictionary<int, int> BiggestManaForDiff = new SafeDictionary<int, int>(-10000);
-
-
-//private static int Fight(pl)
-//{
-
-//}
-
-
-//internal static bool Fight(State state, bool isPlayersTurn, out int playerMana)
-//{
-//	Log($"-- {(isPlayersTurn ? "Player" : "Boss")} turn --");
-//	Log($"- Player has {state.PlayerHitpoints} hit points, {state.PlayerArmor} armor, {state.PlayerMana} mana");
-//	Log($"- Boss has {state.BossHitpoints} hit points");
-
-
-//	if (state.ShieldEffect == 0 && state.PoisonEffect == 0 && state.RechargeEffect == 0)
-//	{
-//		var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//		if (biggestManaSeen > state.PlayerMana)
-//		{
-//			playerMana = 0;
-//			Console.Write("#");
-//			return false;
-//		}
-//		Console.Write(".");
-//	}
-//	else
-//		Console.Write(":");
-
-//	if (state.ShieldEffect > 0)
-//	{
-//		state.ShieldEffect--;
-//		Log($"Shield's timer is now {state.ShieldEffect}.");
-//		if (state.ShieldEffect == 0)
-//		{
-//			Log($"Shield wears off, decreasing armor by 7.");
-//			state.PlayerArmor -= 7;
-//		}
-//	}
-//	if (state.PoisonEffect > 0)
-//	{
-//		state.PoisonEffect--;
-//		state.BossHitpoints -= 3;
-//		Log($"Poison deals 3 damage; it's timer is now {state.PoisonEffect}.");
-//		if (state.BossHitpoints <= 0)
-//		{
-//			Log($"This kills the boss, and the player wins.");
-//			Console.Write("B");
-//			playerMana = state.PlayerMana;
-//			return true;
-//		}
-//	}
-//	if (state.RechargeEffect > 0)
-//	{
-//		state.RechargeEffect--;
-//		state.PlayerMana += 101;
-//		Log($"Recharge provides 101 mana; it's timer is now {state.RechargeEffect}.");
-//		if (state.RechargeEffect == 0)
-//		{
-//			Log($"Recharge wears off.");
-//		}
-//	}
-
-//	if (isPlayersTurn)
-//	{
-//		playerMana = 0;
-//		if (state.PlayerMana >= 53)
-//		{
-//			Log($"Player cast Magic Missile, dealing 4 damage.\n");
-//			var newstate = state;
-//			newstate.PlayerMana -= 53;
-//			newstate.BossHitpoints -= 4;
-//			if (state.BossHitpoints <= 0)
-//			{
-//				Log($"This kills the boss, and the player wins.");
-//				Console.Write("B");
-//				playerMana = state.PlayerMana;
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//				return true;
-//			}
-//			if (Fight(newstate, !isPlayersTurn, out var mana))
-//			{
-//				playerMana = Math.Max(playerMana, mana);
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//			}
-//		}
-
-//		if (state.PlayerMana >= 73)
-//		{
-//			Log($"Player cast Drain, dealing 2 damage, and healing 2 hit points.\n");
-//			var newstate = state;
-//			newstate.PlayerMana -= 73;
-//			newstate.PlayerHitpoints += 2;
-//			newstate.BossHitpoints -= 2;
-//			if (state.BossHitpoints <= 0)
-//			{
-//				Log($"This kills the boss, and the player wins.");
-//				Console.Write("B");
-//				playerMana = state.PlayerMana;
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//				return true;
-//			}
-//			if (Fight(newstate, !isPlayersTurn, out var mana))
-//			{
-//				playerMana = Math.Max(playerMana, mana);
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//			}
-//		}
-
-//		if (state.ShieldEffect == 0 && state.PlayerMana >= 113)
-//		{
-//			Log($"Player casts Shield.\n");
-//			var newstate = state;
-//			newstate.PlayerMana -= 113;
-//			newstate.ShieldEffect = 6;
-//			newstate.PlayerArmor += 7;
-//			if (Fight(newstate, !isPlayersTurn, out var mana))
-//			{
-//				playerMana = Math.Max(playerMana, mana);
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//			}
-//		}
-
-//		if (state.PoisonEffect == 0 && state.PlayerMana >= 173)
-//		{
-//			Log($"Player casts Poison.\n");
-//			var newstate = state;
-//			newstate.PlayerMana -= 173;
-//			newstate.PoisonEffect = 6;
-//			if (Fight(newstate, !isPlayersTurn, out var mana))
-//			{
-//				playerMana = Math.Max(playerMana, mana);
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//			}
-//		}
-
-//		if (state.RechargeEffect == 0 && state.PlayerMana >= 229)
-//		{
-//			Log($"Player casts Recharge.\n");
-//			var newstate = state;
-//			newstate.PlayerMana -= 229;
-//			newstate.RechargeEffect = 5;
-//			if (Fight(newstate, !isPlayersTurn, out var mana))
-//			{
-//				playerMana = Math.Max(playerMana, mana);
-//				var biggestManaSeen = BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints];
-//				if (playerMana > biggestManaSeen)
-//				{
-//					BiggestManaForDiff[state.PlayerHitpoints - state.BossHitpoints] = biggestManaSeen;
-//					Console.Write("O");
-//				}
-//			}
-//		}
-
-//		return playerMana > 0;
-//	}
-//	else
-//	{
-//		playerMana = 0;
-//		var damage = Math.Max(1, state.BossDamage - state.PlayerArmor);
-//		Log($"Boss attacks for {damage} damage!\n");
-//		var newstate = state;
-//		newstate.PlayerHitpoints -= damage;
-//		if (newstate.PlayerHitpoints <= 0)
-//		{
-//			Log($"You die.\n");
-//			Console.Write("Y");
-//			return false;
-//		}
-
-//		return Fight(newstate, !isPlayersTurn, out playerMana);
-//	}
-
-//}
-
-//internal struct State
-//{
-//	public int PlayerHitpoints { get; set; }
-//	public int PlayerArmor { get; set; }
-//	public int PlayerMana { get; set; }
-//	public int BossHitpoints { get; set; }
-//	public int BossDamage { get; set; }
-//	public int ShieldEffect { get; set; }
-//	public int PoisonEffect { get; set; }
-//	public int RechargeEffect { get; set; }
-//}
-
-
 
