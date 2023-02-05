@@ -14,7 +14,6 @@ namespace AdventOfCode.Y2021.Day01
 		public void Run()
 		{
 			Run("test1").Part1(7).Part2(5);
-			Run("test9").Part1(7).Part2(5);
 			Run("input").Part1(1482).Part2(1518);
 		}
 
