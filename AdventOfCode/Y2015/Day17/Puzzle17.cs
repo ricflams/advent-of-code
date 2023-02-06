@@ -15,13 +15,13 @@ namespace AdventOfCode.Y2015.Day17
 
 		public void Run()
 		{
-			// TODO, doesn't work: Run("test1").Part1(4).Part2(3);
+			Run("test1").Part1(4).Part2(3);
 			Run("input").Part1(4372).Part2(4);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var goal = 150;
+			var goal = input.Length == 5 ? 25 : 150;
 			var containers = input.Select(int.Parse).ToArray();
 			var all = NumberOfCombinations(containers, goal);
 			return all;
@@ -29,7 +29,7 @@ namespace AdventOfCode.Y2015.Day17
 
 		protected override int Part2(string[] input)
 		{
-			var goal = 150;
+			var goal = input.Length == 5 ? 25 : 150;
 			var containers = input.Select(int.Parse).ToArray();
 			var shortest = NumberOfShortestCombinations(containers, goal);
 			return shortest;
