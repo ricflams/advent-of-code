@@ -243,7 +243,7 @@ namespace AdventOfCode.Helpers
 					var v = graph.Vertices[pos];
 					if (v != null)
 					{
-						AddEdge(origin, v, weight);
+						SetEdge(origin, v, weight);
 						return;
 					}
 

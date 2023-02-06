@@ -14,7 +14,7 @@ namespace AdventOfCode.Y2019.Day20
 
 		public void Run()
 		{
-			// TODO, fail: Run("test1").Part1(23);
+			Run("test1").Part1(23);
 			Run("test2").Part1(58);
 			Run("test3").Part2(396);
 			Run("input").Part1(608).Part2(6706);
@@ -55,11 +55,10 @@ namespace AdventOfCode.Y2019.Day20
 			var entry = graph.Vertices[maze.Entry];
 			var exit = graph.Vertices[maze.Exit];
 
-			var root = graph.Root;
-			toplevel.Visited[root.Pos] = true;
+			toplevel.Visited[entry.Pos] = true;
 
 			var queue = new Queue<(MazeLevel, PortalGraph.Vertex, int)>();
-			queue.Enqueue((toplevel, root, 0));
+			queue.Enqueue((toplevel, entry, 0));
 			while (queue.Any())
 			{
 				var (level, node, distance) = queue.Dequeue();
