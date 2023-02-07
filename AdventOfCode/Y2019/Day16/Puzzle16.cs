@@ -43,24 +43,6 @@ namespace AdventOfCode.Y2019.Day16
 			return result;
 		}
 
-		//private static void Puzzle2()
-		//{
-		//	var rawinput = File.ReadAllText("Y2019/Day16/input.txt");
-		//	var numinput = rawinput.ToArray().Select(x => x - '0').ToArray();
-		//	var N = rawinput.Length;
-
-		//	var offset = int.Parse(rawinput.Substring(0, 7));
-		//	var length = N * 10000 - offset;
-		//	var input = new int[length];
-		//	for (var i = 0; i < length; i++)
-		//	{
-		//		input[i] = numinput[(offset + i) % N];
-		//	}
-		//	var result = FFt2(100, input).AsNumberFromDigits(8);
-		//	Console.WriteLine($"Day 16 Puzzle 2: {result}");
-		//	Debug.Assert(result == 91689380);
-		//}
-
 		private static int[] Fft(int phases, int[] input)
 		{
 			var N = input.Length;
@@ -81,7 +63,7 @@ namespace AdventOfCode.Y2019.Day16
 			}
 			return input;
 
-			IEnumerable<int> FactorGenerator(int phase)
+			static IEnumerable<int> FactorGenerator(int phase)
 			{
 				var pattern = new int[] { 0, 1, 0, -1 };
 				while (true)

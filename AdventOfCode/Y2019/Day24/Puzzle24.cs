@@ -116,7 +116,7 @@ namespace AdventOfCode.Y2019.Day24
 					var inner = i < levels.Count() - 1 ? levels[i + 1] : null;
 					var innerBugs = inner?.AllPoints(c => c == '#').ToArray();
 					var nextmap = new CharMap();
-					foreach (var pos in level.AllPoints().Where(p => p != center)) // ToArray should not be needed?
+					foreach (var pos in level.AllPoints().Where(p => p != center))
 					{
 						var n = DirectionExtensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
 						var isOnBug = level[pos] == '#';
@@ -127,19 +127,6 @@ namespace AdventOfCode.Y2019.Day24
 					nextlevels.Add(nextmap);
 				}
 				levels = nextlevels;
-
-				//Console.WriteLine();
-				//Console.WriteLine($"After {t} minutes");
-				//var leveldepth = lowest;
-				//foreach (var l in levels)
-				//{
-				//	Console.WriteLine($"Depth {leveldepth++}:");
-				//	l.ConsoleWrite(false);
-				//	Console.WriteLine();
-				//}
-				//Console.WriteLine($"{levels.Count} levels, lowest={lowest}");
-				//Console.ReadLine();
-
 			}
 
 
@@ -177,24 +164,6 @@ namespace AdventOfCode.Y2019.Day24
 				}
 				return level[pos] == '#' ? 1 : 0;
 			}
-
-
-
-
-			//IEnumerable<CharMap> PaddedLevels(IEnumerable<CharMap> maps)
-			//{
-			//	yield return new CharMap('.');
-			//	foreach (var m in maps)
-			//	{
-			//		yield return m;
-			//	}
-			//	yield return new CharMap('.');
-			//}
-
-
-			//Console.WriteLine($"Day 24 Puzzle 2: {}");
-			//Debug.Assert(beampoints == 141);
-
 		}
 
 		private static uint BioDiversity(CharMap map)

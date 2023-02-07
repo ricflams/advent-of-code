@@ -27,7 +27,7 @@ namespace AdventOfCode.Y2021.Day19
 			//Run("input").Part1(403).Part2(0);
 			Run("input").Part2(10569);
 
-			// todo: clean
+			// todo: optimize + clean
 		}
 
 		internal class Scanner

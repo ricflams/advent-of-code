@@ -45,6 +45,7 @@ namespace AdventOfCode.Y2019.Day20
 				}
 				//};
 
+				// todo: clean
 				//// Next find the portal exits and match with their entry
 				//foreach (var p in portalinfo)
 				//{
