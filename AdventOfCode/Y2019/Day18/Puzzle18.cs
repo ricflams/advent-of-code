@@ -16,14 +16,20 @@ namespace AdventOfCode.Y2019.Day18
 
 		public void Run()
 		{
-			Run("test1").Part1(8);
-			Run("test2").Part1(86);
-			Run("test3").Part1(132);
-			Run("test4").Part1(136);
-			Run("test5").Part1(81);
+			//Run("test11").Part1(8);
+			//Run("test12").Part1(86);
+			//Run("test13").Part1(132);
+			//Run("test14").Part1(136);
+			//Run("test15").Part1(81);
+			Run("test21").Part2(8);
+			Run("test22").Part2(24);
+			Run("test23").Part2(32);
+			Run("test24").Part2(72);
 
-			Run("input").Part1(3216);
-			// TODO, doesn't work anymore: Run("input").Part1(3216).Part2(1538);
+			//Run("input").Part1(3216);
+			Run("input").Part1(3216).Part2(1538);
+
+			// todo: fix + clean
 		}
 
 		protected override int Part1(string[] input)
