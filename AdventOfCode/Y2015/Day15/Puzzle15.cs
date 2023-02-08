@@ -15,7 +15,8 @@ namespace AdventOfCode.Y2015.Day15
 
 		public void Run()
 		{
-			// TODO, fails: Run("test1").Part1(62842880).Part2(57600000);
+			// TODO, fails:
+			Run("test1").Part1(62842880).Part2(57600000);
 			Run("input").Part1(13882464).Part2(11171160);
 		}
 
@@ -72,7 +73,7 @@ namespace AdventOfCode.Y2015.Day15
 						maxscore = fullscore;
 						//Console.WriteLine($"[{string.Join(" ", walk)}: {fullscore}]");
 					}
-					if (fullscore > maxscore * .95)
+					if (fullscore >= maxscore)
 					{
 						queue.Enqueue(spoons);
 					}
@@ -84,7 +85,6 @@ namespace AdventOfCode.Y2015.Day15
 
 		private class Ingredient
 		{
-			private const int ScoresCount = 4;
 			public string Name { get; set; }
 			public int[] Scores { get; set; }
 			public int Calories { get; set; }
@@ -99,7 +99,7 @@ namespace AdventOfCode.Y2015.Day15
 				return new Ingredient
 				{
 					Name = name,
-					Scores = new int[ScoresCount] { capacity, durability, flavor, texture },
+					Scores = new int[] { capacity, durability, flavor, texture },
 					Calories = calories
 				};
 			}

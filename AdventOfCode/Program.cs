@@ -78,7 +78,7 @@ namespace AdventOfCode
 			Y2015.Day19.Puzzle.Instance.Run();
 			Y2015.Day20.Puzzle.Instance.Run();
 			Y2015.Day21.Puzzle.Instance.Run();
-			//Y2015.Day22.Puzzle.Instance.Run();
+			Y2015.Day22.Puzzle.Instance.Run();
 			Y2015.Day23.Puzzle.Instance.Run();
 			Y2015.Day24.Puzzle.Instance.Run();
 			Y2015.Day25.Puzzle.Instance.Run();
