@@ -35,7 +35,7 @@
     <None Update="Y2015\Day13\test1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Y2015\Day15\test1.txt">
+    <None Update="Y2015\Day15\test9.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Y2015\Day17\test1.txt">

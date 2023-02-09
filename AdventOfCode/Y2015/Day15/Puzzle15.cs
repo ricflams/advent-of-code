@@ -1,8 +1,6 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace AdventOfCode.Y2015.Day15
 {
@@ -15,67 +13,38 @@ namespace AdventOfCode.Y2015.Day15
 
 		public void Run()
 		{
-			// TODO, fails:
-			Run("test1").Part1(62842880).Part2(57600000);
+			Run("test9").Part1(222870).Part2(117936);
 			Run("input").Part1(13882464).Part2(11171160);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var ingredients = input.Select(Ingredient.ParseFrom).ToArray();
-			var score1 = FindMaximumScore(ingredients, _ => true);
-			return score1;
-		}
+			var (_, scores) = Parse(input);
 
-		protected override int Part2(string[] input)
-		{
-			var ingredients = input.Select(Ingredient.ParseFrom).ToArray();
-			var score2 = FindMaximumScore(ingredients, calories => calories == 500);
-			return score2;
-		}
-
-		private static int FindMaximumScore(Ingredient[] ingredients, Func<int,bool> calorieCondition)
-		{
-			var vicinity = new VicinityExplorer();
 			var maxscore = 0;
-
-			var seed = MathHelper.DivideEvenly(100, ingredients.Length);
-			var queue = new Queue<int[]>();
-			queue.Enqueue(seed);
-
-			while (queue.Any())
+			for (var a = 0; a < 100; a++)
 			{
-				var currentSpoons = queue.Dequeue();
-				foreach (var spoons in vicinity.Explore(currentSpoons))
+				var maxb = 100 - a;
+				for (var b = 0; b < maxb; b++)
 				{
-					var scores = new int[currentSpoons.Length];
-					for (var spoon = 0; spoon < currentSpoons.Length; spoon++)
+					var maxc = 100 - (a + b);
+					for (var c = 0; c < maxc; c++)
 					{
-						for (var i = 0; i < ingredients.Length; i++)
+						var d = 100 - (a + b + c);
+						if (ScoreFor(0, out var s0) && ScoreFor(1, out var s1) && ScoreFor(2, out var s2) && ScoreFor(3, out var s3))
 						{
-							scores[spoon] += spoons[i] * ingredients[i].Scores[spoon];
+							var fullscore = s0 * s1 * s2 * s3;
+							if (fullscore > maxscore)
+							{
+								maxscore = fullscore;
+							}
 						}
-					}
-					if (scores.Any(x => x <= 0))
-					{
-						continue;
-					}
 
-					var calories = 0;
-					for (var i = 0; i < ingredients.Length; i++)
-					{
-						calories += spoons[i] * ingredients[i].Calories;
-					}
-
-					var fullscore = scores.Aggregate(1, (sum, v) => sum * v);
-					if (fullscore > maxscore && calorieCondition(calories))
-					{
-						maxscore = fullscore;
-						//Console.WriteLine($"[{string.Join(" ", walk)}: {fullscore}]");
-					}
-					if (fullscore >= maxscore)
-					{
-						queue.Enqueue(spoons);
+						bool ScoreFor(int i, out int v)
+						{
+							v = a * scores[0, i] + b * scores[1, i] + c * scores[2, i] + d * scores[3, i];
+							return v > 0;
+						}
 					}
 				}
 			}
@@ -83,26 +52,66 @@ namespace AdventOfCode.Y2015.Day15
 			return maxscore;
 		}
 
-		private class Ingredient
+		protected override int Part2(string[] input)
 		{
-			public string Name { get; set; }
-			public int[] Scores { get; set; }
-			public int Calories { get; set; }
+			var (cal, scores) = Parse(input);
 
-			public static Ingredient ParseFrom(string line)
+			var maxscore = 0;
+			for (var a = 0; a < 100; a++)
+			{
+				var maxb = 100 - a;
+				for (var b = 0; b < maxb; b++)
+				{
+					var maxc = 100 - (a + b);
+					for (var c = 0; c < maxc; c++)
+					{
+						var d = 100 - (a + b + c);
+						var calories = a * cal[0] + b * cal[1] + c * cal[2] + d * cal[3];
+						if (calories != 500)
+							continue;
+						if (ScoreFor(0, out var s0) && ScoreFor(1, out var s1) && ScoreFor(2, out var s2) && ScoreFor(3, out var s3))
+						{
+							var fullscore = s0 * s1 * s2 * s3;
+							if (fullscore > maxscore)
+							{
+								maxscore = fullscore;
+							}
+						}
+
+						bool ScoreFor(int i, out int v)
+						{
+							v = a * scores[0, i] + b * scores[1, i] + c * scores[2, i] + d * scores[3, i];
+							return v > 0;
+						}
+					}
+				}
+			}
+
+			return maxscore;
+		}
+
+
+		private static (int[] Calories, int[,] Scores) Parse(string[] input)
+		{
+			var N = input.Length;
+			Debug.Assert(N == 4);
+			var calories = new int[N];
+			var scores = new int[N, 4];
+			for (var i = 0; i < N; i++)
 			{
 				// Example:
 				// Frosting: capacity 0, durability -1, flavor 4, texture 0, calories 6
-				var (name, capacity, durability, flavor, texture, calories) = line
+				var (name, capacity, durability, flavor, texture, cals) = input[i]
 					.RxMatch("%s: capacity %d, durability %d, flavor %d, texture %d, calories %d")
 					.Get<string, int, int, int, int, int>();
-				return new Ingredient
-				{
-					Name = name,
-					Scores = new int[] { capacity, durability, flavor, texture },
-					Calories = calories
-				};
+				calories[i] = cals;
+				scores[i,0] = capacity;
+				scores[i,1] = durability;
+				scores[i,2] = flavor;
+				scores[i,3] = texture;
 			}
+
+			return (calories, scores);
 		}
 	}
 }
