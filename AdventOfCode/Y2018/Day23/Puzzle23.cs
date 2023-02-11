@@ -8,7 +8,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace AdventOfCode.Y2018.Day23
 {
-	internal class Puzzle : Puzzle<long, long>
+	internal class Puzzle : Puzzle<int, int>
 	{
 		public static Puzzle Instance = new();
 		public override string Name => "Experimental Emergency Teleportation";
@@ -23,7 +23,7 @@ namespace AdventOfCode.Y2018.Day23
 			Run("input").Part1(613).Part2(101599540);
 		}
 
-		protected override long Part1(string[] input)
+		protected override int Part1(string[] input)
 		{
 			var bots = Nanobot.Parse(input);
 
@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2018.Day23
 			return nearby;
 		}
 
-		protected override long Part2(string[] input)
+		protected override int Part2(string[] input)
 		{
 			var bots = Nanobot.Parse(input);
 
@@ -77,7 +77,7 @@ namespace AdventOfCode.Y2018.Day23
 
 			// Find all close neighbor-bots, ie those bots that just barely overlap.
 			// The real puzzle has plenty of those but the smaller tests doesn't. Oh well.
-			var closeNeighbors = new List<(Nanobot A, Nanobot B, long Distance)>();
+			var closeNeighbors = new List<(Nanobot A, Nanobot B, int Distance)>();
 			for (var i = 0; i < swarm.Length; i++)
 			{
 				var a = swarm[i];
@@ -119,12 +119,12 @@ namespace AdventOfCode.Y2018.Day23
 
 			// Find the intersection point, ip
 			var xyz = coeff.Inverse() * vals;
-			var ip = new Point3D((long)Math.Round(xyz[0, 0]), (long)Math.Round(xyz[1, 0]), (long)Math.Round(xyz[2, 0]));
+			var ip = new Point3D((int)Math.Round(xyz[0, 0]), (int)Math.Round(xyz[1, 0]), (int)Math.Round(xyz[2, 0]));
 
 			// The intersection point is likely not the precise closest-to-0 point, so
 			// swirl around a bit looking for points that belong to all bots until we've
 			// found that shortest-distance point. This takes only 10-20 rounds.
-			var shortestDistance = (long)int.MaxValue;
+			var shortestDistance = int.MaxValue;
 			var foundMax = 0;
 			var seen = new HashSet<Point3D>();
 			var queue = new Queue<Point3D>();
@@ -180,16 +180,16 @@ namespace AdventOfCode.Y2018.Day23
 			internal Nanobot(int x, int y, int z, int r) => (O, R) = (new Point3D(x, y, z), r);
 
 			public Point3D O;
-			public long R;
+			public int R;
 
-			public long ManhattanDistanceTo(Nanobot o) => O.ManhattanDistanceTo(o.O);
-			public long Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o) - 1);
+			public int ManhattanDistanceTo(Nanobot o) => O.ManhattanDistanceTo(o.O);
+			public int Overlap(Nanobot o) => R + o.R - (ManhattanDistanceTo(o) - 1);
 			public bool OverlapsWith(Nanobot o) => Overlap(o) > 0;
 			public bool Contains(Point3D p) => O.ManhattanDistanceTo(p) <= R;
 
 			public override string ToString() => $"pos={O} r={R}";
 
-			public (Point3D Normal, long D) IntersectingPlane(Nanobot bot)
+			public (Point3D Normal, int D) IntersectingPlane(Nanobot bot)
 			{
 				Debug.Assert(OverlapsWith(bot));
 
@@ -197,9 +197,9 @@ namespace AdventOfCode.Y2018.Day23
 				// okay for finding the relative position to this nanobot's origin
 				var (x0, y0, z0) = (O.X, O.Y, O.Z);
 				var f = (double)R / ManhattanDistanceTo(bot);
-				var x = (long)Math.Round(x0 + (bot.O.X - x0) * f);
-				var y = (long)Math.Round(y0 + (bot.O.Y - y0) * f);
-				var z = (long)Math.Round(z0 + (bot.O.Z - z0) * f);
+				var x = (int)Math.Round(x0 + (bot.O.X - x0) * f);
+				var y = (int)Math.Round(y0 + (bot.O.Y - y0) * f);
+				var z = (int)Math.Round(z0 + (bot.O.Z - z0) * f);
 
 				// Find the normal vector and 
 				//      |x-x0| + |y-y0| + |z-z0| = R
