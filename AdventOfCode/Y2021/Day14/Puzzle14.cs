@@ -1,60 +1,44 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
 using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day14
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
-		public override string Name => "Day 14";
+		public override string Name => "Extended Polymerization";
 		public override int Year => 2021;
 		public override int Day => 14;
 
 		public void Run()
 		{
 			Run("test1").Part1(1588).Part2(2188189693529);
-
-			//Run("test2").Part1(0).Part2(0);
-
-			// 2158894777815 not right
+			Run("test9").Part1(3048).Part2(3288891573057);
 			Run("input").Part1(2068).Part2(2158894777814);
-
-			// todo: clean
 		}
 
 		protected override long Part1(string[] input)
 		{
-			var template = input.First();
+			var (template, rules) = ReadInput(input);
 
-			var rules = new Dictionary<string, string>();
-			foreach (var s in input.Skip(2))
+			var polymer = template;
+			for (var step = 0; step < 10; step++)
 			{
-				var (a, b) = s.RxMatch("%s -> %s").Get<string, string>();
-				rules.Add(a, b);
-			}
-
-			// Just do it
-			for (var i = 0; i < 10; i++)
-			{
-				var result = new StringBuilder();
-				result.Append(template[0]);
-				for (var p = 0; p < template.Length - 1; p++)
+				var sb = new StringBuilder();
+				sb.Append(polymer[0]);
+				for (var i = 0; i < polymer.Length - 1; i++)
 				{
-					var pair = template.Substring(p, 2);
-					result.Append(rules[pair]);
-					result.Append(pair[1]);
+					var pair = polymer[i..(i+2)];
+					sb.Append(rules[pair]);
+					sb.Append(pair[1]);
 				}
-				template = result.ToString();
+				polymer = sb.ToString();
 			}
 
-			var elements = template
+			var elements = polymer
 				.GroupBy(x => x)
 				.OrderByDescending(x => x.Count())
 				.ToArray();
@@ -67,6 +51,60 @@ namespace AdventOfCode.Y2021.Day14
 
 		protected override long Part2(string[] input)
 		{
+			var (template, rules) = ReadInput(input);
+
+			var pairs = new SafeDictionary<string, long>();
+			for (var i = 0; i < template.Length - 1; i++)
+			{
+				var pp = template[i..(i + 2)];
+				pairs[pp]++;
+			}
+
+			for (var i = 0; i < 40; i++)
+			{
+				var next = new SafeDictionary<string, long>();
+				foreach (var p in pairs)
+				{
+					next[p.Key] = p.Value;
+				}	
+				foreach (var p in pairs)
+				{
+					var reduc = rules[p.Key];
+					next[p.Key] -= pairs[p.Key];
+					next[$"{p.Key[0]}{reduc[0]}"] += p.Value;
+					next[$"{reduc[0]}{p.Key[1]}"] += p.Value;
+				}
+				pairs = next;
+			}
+
+			var occurences = new SafeDictionary<char, long>();
+			foreach (var p in pairs)
+			{
+				occurences[p.Key[0]] += p.Value;
+				occurences[p.Key[1]] += p.Value;
+			}
+
+			var first = template.First();
+			var last = template.Last();
+			var ordered = occurences
+				.Select(x => 
+				{
+					var n = x.Value;
+					if (x.Key == first || x.Key == last) n++;
+					return n / 2;
+				})
+				.OrderByDescending(x => x)
+				.ToArray();
+
+			var mostCommon = ordered.First();
+			var leastCommon = ordered.Last();
+			var result = mostCommon - leastCommon;
+
+			return result;
+		}
+
+		private static (string, Dictionary<string, string>) ReadInput(string[] input)
+		{
 			var template = input.First();
 
 			var rules = new Dictionary<string, string>();
@@ -76,64 +114,7 @@ namespace AdventOfCode.Y2021.Day14
 				rules.Add(a, b);
 			}
 
-			var pairs = new SafeDictionary<string, long>();
-			for (var p = 0; p < template.Length - 1; p++)
-			{
-				var pp = template.Substring(p, 2);
-				pairs[pp]++;
-			}
-
-
-			for (var i = 0; i < 40; i++)
-			{
-				var pairs2 = new SafeDictionary<string, long>();
-				foreach (var k in pairs)
-				{
-					pairs2[k.Key] = k.Value;
-				}	
-				foreach (var pp in pairs)
-				{
-					if (pp.Value == 0)
-						continue;
-					pairs2[pp.Key] -= pairs[pp.Key];
-					var reduc = rules[pp.Key];
-					var sb = new StringBuilder();
-					sb.Append(pp.Key[0]);
-					sb.Append(reduc[0]);
-					var name1 = sb.ToString();
-					pairs2[name1] += pp.Value;
-					sb.Clear();
-					sb.Append(reduc[0]);
-					sb.Append(pp.Key[1]);
-					//var name2 = sb.ToString();
-					var name2 = $"{reduc[0]}{pp.Key[1]}";
-					pairs2[name2] += pp.Value;
-				}
-				pairs = pairs2;
-			}
-
-			var occur = new SafeDictionary<char, long>();
-			foreach (var kk in pairs)
-			{
-				occur[kk.Key[0]] += kk.Value;
-				occur[kk.Key[1]] += kk.Value;
-			}
-			var ord = occur
-				.Select(x => 
-				{
-					var n = x.Value;
-					if (x.Key == template.First()) n++;
-					if (x.Key == template.Last()) n++;
-					return n / 2;
-				})
-				.OrderBy(x => x).ToArray();
-
-			var aa = ord.First();
-			var bb = ord.Last();
-			var uniq = bb - aa;
-
-			return uniq;
+			return (template, rules);
 		}
-
 	}
 }
