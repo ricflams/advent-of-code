@@ -243,7 +243,7 @@ namespace AdventOfCode
 			Y2021.Day16.Puzzle.Instance.Run();
 			Y2021.Day17.Puzzle.Instance.Run();
 			Y2021.Day18.Puzzle.Instance.Run();
-//			Y2021.Day19.Puzzle.Instance.Run();
+			Y2021.Day19.Puzzle.Instance.Run();
 			Y2021.Day20.Puzzle.Instance.Run();
 			Y2021.Day21.Puzzle.Instance.Run();
 			Y2021.Day22.Puzzle.Instance.Run();
