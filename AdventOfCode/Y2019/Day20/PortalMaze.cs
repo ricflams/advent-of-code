@@ -28,7 +28,6 @@ namespace AdventOfCode.Y2019.Day20
 			// Map all entry-portals
 			foreach (var p in portalinfo)
 			{
-
 				if (Map[p.Down] == '.')
 				{
 					//       X
@@ -43,12 +42,6 @@ namespace AdventOfCode.Y2019.Day20
 					//       Y
 					AddPortal(p, p.Down, p, p.Up);
 				}
-				//};
-
-				// todo: clean
-				//// Next find the portal exits and match with their entry
-				//foreach (var p in portalinfo)
-				//{
 				else if (Map[p.Right] == '.')
 				{
 					// exit vv arrival 
