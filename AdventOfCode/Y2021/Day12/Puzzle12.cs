@@ -1,12 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2021.Day12
 {
@@ -20,116 +15,96 @@ namespace AdventOfCode.Y2021.Day12
 		public void Run()
 		{
 			Run("test1").Part1(10).Part2(36);
-
 			Run("test2").Part1(19).Part2(103);
 			Run("test3").Part1(226).Part2(3509);
-
 			Run("test9").Part1(4304).Part2(118242);
-
 			Run("input").Part1(3713).Part2(91292);
-
-			// todo: clean
 		}
 
 		protected override long Part1(string[] input)
 		{
-			var graph = new Graph(input);
-
-			var start = graph.Vertices.Single(x => x.Key == "start").Value;
-			var end = graph.Vertices.Single(x => x.Key == "end").Value;
-
-			var seenpaths = new HashSet<string>();
-			var seensmallcaves = new HashSet<string>();
-
-			VisitFrom(start, seensmallcaves, start.Value);
-
-			void VisitFrom(Graph.Vertex v, HashSet<string> seensmallcaves, string path)
-			{
-				if (v == end)
-					return;
-				foreach (var e in v.Edges)
-				{
-					if (e == start)
-						continue;
-					var name = e.Value;
-					var seensmallcaves2 = new HashSet<string>(seensmallcaves);
-					if (name.All(char.IsLower))
-					{
-						if (seensmallcaves2.Contains(name))
-							continue;
-						seensmallcaves2.Add(name);
-					}
-					var path2 = $"{path},{name}";
-					if (seenpaths.Contains(path2))
-						continue;
-					seenpaths.Add(path2);
-					//Console.WriteLine(path2);
-					VisitFrom(e, seensmallcaves2, path2);
-				}
-			}
-
-
-			return seenpaths.Count(x => x.EndsWith("end"));
+			return CountPaths(input, false);
 		}
 
 		protected override long Part2(string[] input)
 		{
-			var graph = new Graph(input);
+			return CountPaths(input, true);
+		}
 
-			var start = graph.Vertices.Single(x => x.Key == "start").Value;
-			var end = graph.Vertices.Single(x => x.Key == "end").Value;
+		private static int CountPaths(string[] input, bool allowOneSmallCaveRevisit)
+		{
+			var terrain = new Terrain(input);
+			var start = terrain["start"];
+			var end = terrain["end"];
 
-			var seenpaths = new HashSet<string>();
-			var seensmallcaves = new Dictionary<string, int>();
+			// Keep track of the paths seen by performing a continuous hashing
+			// of all the visited nodes; the hash at each individual path taken
+			// will be unique for sure
+			var seen = new HashSet<ulong>();
+			var count = 0;
+			Visit(start, 0, allowOneSmallCaveRevisit, 3074457345618258791UL);
+			return count;
 
-			VisitFrom(start, seensmallcaves, start.Value);
-			var paths = seenpaths.Where(x => x.EndsWith(",end")).ToArray();
-
-			return paths.Length;
-
-			void VisitFrom(Graph.Vertex v, Dictionary<string, int> seensmallcaves, string path)
+			void Visit(Terrain.Cave v, uint visited, bool allowRevisit, ulong path)
 			{
-				if (v == end)
+				if (seen.Contains(path))
 					return;
-				foreach (var e in v.Edges)
+				seen.Add(path);
+
+				// Count the number of full paths found
+				if (v == end)
+				{
+					count++;
+					return;
+				}
+
+				foreach (var e in v.Neighbors)
 				{
 					if (e == start)
 						continue;
-					var name = e.Value;
-					var seensmallcaves2 = new Dictionary<string, int>(seensmallcaves);
-					if (name.All(char.IsLower))
-					{
-						var seentwice = seensmallcaves2.Values.Any(x => x > 1);
-						if (!seensmallcaves2.TryGetValue(name, out var cv))
-						{
-							cv = seensmallcaves2[name] = 0;
-						}
-						else if (seentwice)
-						{
-							continue;
-						}
 
-						seensmallcaves2[name] = seensmallcaves2[name]+1;
+					var path2 = path * 3074457345618258799UL + (ulong)e.Index;
+					if (e.IsSmall)
+					{
+						// Maybe allow one small cave to be revisited
+						var revisit = (visited & e.Bit) != 0;
+						if (revisit && !allowRevisit)
+							continue;
+						Visit(e, visited | e.Bit, allowRevisit && !revisit, path2);
 					}
-					var path2 = $"{path},{name}";
-					if (seenpaths.Contains(path2))
-						continue;
-					seenpaths.Add(path2);
-					//Console.WriteLine(path2);
-					VisitFrom(e, seensmallcaves2, path2);
+					else
+					{
+						Visit(e, visited, allowRevisit, path2);
+					}
 				}
 			}
 		}
 
 
-		internal class Graph : BaseUnitGraph<string>
+		private class Terrain : Graphx<Terrain.Cave>
 		{
-			public Graph(string[] input)
+			internal class Cave : GraphxNode
+			{
+				public bool IsSmall;
+				public uint Bit;
+				public IEnumerable<Cave> Neighbors => Edges.Select(e => e.Node).Cast<Cave>();
+			}
+
+			public Terrain(string[] input)
 			{
 				foreach (var line in input)
 				{
 					var (from, to) = line.RxMatch("%s-%s").Get<string, string>();
-					AddEdge(from, to);
+					AddEdges(from, to, 1);
+				}
+
+				// Assign a bit to each node for more efficient sets 
+				var bit = 1u;
+				foreach (var n in Nodes)
+				{
+					n.IsSmall = char.IsLower(n.Name[0]);
+					n.Bit = bit;
+					bit <<= 1;
 				}
 			}
 		}
