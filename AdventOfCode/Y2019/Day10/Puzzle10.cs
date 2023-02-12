@@ -160,11 +160,6 @@ namespace AdventOfCode.Y2019.Day10
 					if (ag.Count() > dist)
 					{
 						var asteroid = ag.ElementAt(dist);
-						//Console.WriteLine($"{asteroid.X},{asteroid.Y} at angle {asteroid.Angle}");
-						//if (astoroids.Count() > dist + 1)
-						//{
-						//	Console.WriteLine($"--- skipping {string.Join(" ", astoroids.Skip(dist + 1).Select(x => $"{x.X},{x.Y}"))}");
-						//}
 						yield return asteroid.X * 100 + asteroid.Y;
 					}
 				}
