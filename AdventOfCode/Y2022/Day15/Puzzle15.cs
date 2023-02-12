@@ -110,46 +110,10 @@ namespace AdventOfCode.Y2022.Day15
 			throw new Exception("No vacant spot found");
 		}
 
-		// var freq0 = 0L;
-		// foreach (var si in MathHelper.Combinations(sensors, 2))
-		// {
-		// 	var (s1, s2) = (si[0],si[1]);
-		// 	if (s1.sensor.ManhattanDistanceTo(s2.sensor) == s1.Item2 + s2.Item2 + 2)
-		// 	{
-		// 		var smallest = s1.Item2 < s2.Item2 ? s1 : s2;
-		// 		var nearbySensors = sensors
-		// 			.OrderBy(s => s.sensor.ManhattanDistanceTo(smallest.sensor)-s.Item2)
-		// 			.ToArray();
-
-		// 		var (xs, ys) = (smallest.sensor.X, smallest.sensor.Y);
-		// 		var dist = smallest.Item2 + 1;
-		// 		for (var d = 0; d < dist; d++)
-		// 		{
-		// 			Check(xs+d, ys-dist+d);
-		// 			Check(xs+d, ys+dist-d);
-		// 			Check(xs-d, ys-dist+d);
-		// 			Check(xs-d, ys+dist-d);
-		// 		}
-		// 		 if (freq0 > 0)
-		// 		 	return freq0;
-
-		// 		void Check(int xx, int yy)
-		// 		{
-		// 			if (xx < 0 || yy < 0 || xx > maxw || yy > maxw)
-		// 				return;
-		// 			if (nearbySensors.All(ss => ss.sensor.ManhattanDistanceTo(Point.From(xx, yy)) > ss.Item2))
-		// 			{
-		// 				Console.WriteLine($"bingo! at {xx},{yy}");
-		// 				freq0 = 4000000L * xx + yy;
-		// 			}
-		// 		}
-		// 	}
-		// }				
-
 
 		private record Sensor(Point P, int Size);
 
-		private (Sensor[] Sensors, HashSet<Point> Beacons) ReadSensors(string[] input)
+		private static (Sensor[] Sensors, HashSet<Point> Beacons) ReadSensors(string[] input)
 		{
 			var beacons = new HashSet<Point>();
 			var sensors = input
