@@ -8,7 +8,7 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			PuzzleOptions.RunOnly(2018, 24);
+			PuzzleOptions.RunOnly(2021, 12);
 			//PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
