@@ -98,7 +98,7 @@ namespace AdventOfCode.Y2022.Day16
 					foreach (var tn in v.TunnelNames)
 					{
 						var t = valves[tn];
-						var node = _graph.AddEdge(v.Name, t.Name, 1);
+						var node = _graph.AddEdges(v.Name, t.Name, 1);
 						node.Flow = v.Flow;
 					}
 				}

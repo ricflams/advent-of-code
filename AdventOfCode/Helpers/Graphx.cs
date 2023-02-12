@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode.Helpers
@@ -13,6 +14,11 @@ namespace AdventOfCode.Helpers
 		public Dictionary<string, Edge> EdgeByName = new();
 		public void AddEdge(GraphxNode node, int weight)
 		{
+			if (EdgeByName.TryGetValue(node.Name, out var e))
+			{
+				Debug.Assert(e.Weight == weight);
+				return;
+			}
 			var edge = new Edge(node, weight);
 			Edges.Add(edge);
 			EdgeByName[edge.Node.Name] = edge;
@@ -27,7 +33,8 @@ namespace AdventOfCode.Helpers
 		{
 			Edges.RemoveAt(Edges.IndexOf(e => e.Node == node));
 			EdgeByName.Remove(node.Name);
-		}		
+		}
+		public override string ToString() => Name;
 	}
 	
 	public class Graphx<T> where T:GraphxNode, new()
@@ -35,11 +42,12 @@ namespace AdventOfCode.Helpers
 		public List<T> Nodes = new();
 		private Dictionary<string, int> _nodeIndex = new();
 
-		public T AddEdge(string name1, string name2, int weight)
+		public T AddEdges(string name1, string name2, int weight)
 		{
 			var a = GetOrCreate(name1);
 			var b = GetOrCreate(name2);
 			a.AddEdge(b, weight);
+			b.AddEdge(a, weight);
 			return a;
 		}
 
