@@ -111,13 +111,6 @@ namespace AdventOfCode.Y2021.Day22
 				var z2 = Math.Min(_top.Z, other._top.Z);
 				return new Cube(!other.On, x1, x2, y1, y2, z1, z2);
 			}
-
-			private class Point3D
-			{
-				public Point3D(int x, int y, int z) => (X, Y, Z) = (x, y, z);
-				public int X, Y, Z;
-				public override string ToString() => $"({X},{Y},{Z})";
-			}
 		}
 	}
 }
