@@ -45,36 +45,36 @@ namespace AdventOfCode.Y2021.Day12
 			Visit(start, 0, allowOneSmallCaveRevisit, 3074457345618258791UL);
 			return count;
 
-			void Visit(Terrain.Cave v, uint visited, bool allowRevisit, ulong path)
+			void Visit(Terrain.Cave cave, uint visited, bool allowRevisit, ulong path)
 			{
 				if (seen.Contains(path))
 					return;
 				seen.Add(path);
 
 				// Count the number of full paths found
-				if (v == end)
+				if (cave == end)
 				{
 					count++;
 					return;
 				}
 
-				foreach (var e in v.Neighbors)
+				foreach (var c in cave.Neighbors)
 				{
-					if (e == start)
+					if (c == start)
 						continue;
 
-					var path2 = path * 3074457345618258799UL + (ulong)e.Index;
-					if (e.IsSmall)
+					var path2 = path * 3074457345618258799UL + (ulong)c.Index;
+					if (c.IsSmall)
 					{
 						// Maybe allow one small cave to be revisited
-						var revisit = (visited & e.Bit) != 0;
+						var revisit = (visited & c.Bit) != 0;
 						if (revisit && !allowRevisit)
 							continue;
-						Visit(e, visited | e.Bit, allowRevisit && !revisit, path2);
+						Visit(c, visited | c.Bit, allowRevisit && !revisit, path2);
 					}
 					else
 					{
-						Visit(e, visited, allowRevisit, path2);
+						Visit(c, visited, allowRevisit, path2);
 					}
 				}
 			}
