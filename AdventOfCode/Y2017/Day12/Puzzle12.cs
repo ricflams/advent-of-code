@@ -67,5 +67,27 @@ namespace AdventOfCode.Y2017.Day12
 				}
 			}			
 		}
+
+
+		//internal class Village : Graphx<Village.Pipe>
+		//{
+		//	internal class Pipe : GraphxNode
+		//	{
+		//		public int Id;
+		//		public IEnumerable<Pipe> Neighbors => Edges.Select(e => e.Node).Cast<Pipe>();
+		//	}
+
+		//	public Village(string[] input)
+		//	{
+		//		foreach (var line in input)
+		//		{
+		//			var (id, relations) = line.RxMatch("%d <-> %*").Get<int, string>();
+		//			foreach (var relation in relations.ToIntArray())
+		//			{
+		//				AddEdges(id, relation, 1);
+		//			}
+		//		}
+		//	}
+		//}
 	}
 }

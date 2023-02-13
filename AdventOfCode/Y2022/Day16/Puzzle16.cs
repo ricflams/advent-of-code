@@ -65,9 +65,8 @@ namespace AdventOfCode.Y2022.Day16
 		}
 
 
-		private class Volcano
+		private class Volcano : Graphx<Volcano.Valve>
 		{
-			private readonly Graphx<Valve> _graph = new();
 			private readonly int[,] _distances;
 			private readonly int[] _distancesFromStart;
 
@@ -98,7 +97,7 @@ namespace AdventOfCode.Y2022.Day16
 					foreach (var tn in v.TunnelNames)
 					{
 						var t = valves[tn];
-						var node = _graph.AddEdges(v.Name, t.Name, 1);
+						var node = AddEdges(v.Name, t.Name, 1);
 						node.Flow = v.Flow;
 					}
 				}
@@ -106,21 +105,21 @@ namespace AdventOfCode.Y2022.Day16
 				// Reduce away all the valve-less nodes except AA. Then calculate the
 				// distance from AA to any other node (for the initial step) and reduce
 				// AA itself away, leaving only nodes that has a valve to open.
-				_graph.Reduce(v => v.Name != "AA" && v.Flow == 0);
-				var start = _graph["AA"];
-				var distancesFromStart = _graph.ShortestPathToAllDijkstra(start);
-				_graph.Reduce(v => v.Flow == 0);
+				Reduce(v => v.Name != "AA" && v.Flow == 0);
+				var start = this["AA"];
+				var distancesFromStart = ShortestPathToAllDijkstra(start);
+				Reduce(v => v.Flow == 0);
 
 				// Assign a bit to each node for more efficient nodesets 
 				var bit = 1u;
-				foreach (var n in _graph.Nodes)
+				foreach (var n in Nodes)
 				{
 					n.Bit = bit;
 					bit <<= 1;
 				}
 
 				// Find all the shortest paths and also create a newly indexed start-distances
-				_distances = _graph.FloydWarshallShortestPaths();
+				_distances = FloydWarshallShortestPaths();
 				_distancesFromStart = distancesFromStart
 					.Where(x => x.Key != start)
 					.OrderBy(x => x.Key.Index)
@@ -130,7 +129,7 @@ namespace AdventOfCode.Y2022.Day16
 
 			public int[] AllMaximums(int minutes)
 			{
-				var valves = _graph.Nodes;
+				var valves = Nodes;
 
 				// Store all maximums in an array big enough to hold all nodeset-combinations.
 				// The Explore-function will always assume it's looking at a newly opened valve,

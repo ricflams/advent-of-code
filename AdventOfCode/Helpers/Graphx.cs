@@ -42,6 +42,15 @@ namespace AdventOfCode.Helpers
 		public List<T> Nodes = new();
 		private Dictionary<string, int> _nodeIndex = new();
 
+		public T AddEdges<Tobj>(Tobj o1, Tobj o2, int weight)
+		{
+			var a = GetOrCreate(o1.ToString());
+			var b = GetOrCreate(o2.ToString());
+			a.AddEdge(b, weight);
+			b.AddEdge(a, weight);
+			return a;
+		}
+
 		public T AddEdges(string name1, string name2, int weight)
 		{
 			var a = GetOrCreate(name1);
@@ -53,6 +62,7 @@ namespace AdventOfCode.Helpers
 
 		public T this[string name] => Nodes[_nodeIndex[name]];
 
+		public IEnumerable<T> Neighbors(T node) => node.Edges.Select(e => e.Node).Cast<T>();
 
 		private T GetOrCreate(string name)
 		{
