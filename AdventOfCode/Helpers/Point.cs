@@ -29,12 +29,11 @@ namespace AdventOfCode.Helpers
 
 		public static bool operator ==(Point p1, Point p2) => p1 is null ? p2 is null : p1.Equals(p2);
 		public static bool operator !=(Point p1, Point p2) => !(p1 == p2);
-		public override bool Equals(object p) => Equals(p as Point);
-		public bool Equals(Point p) => X == p?.X && Y == p?.Y;
-		public override int GetHashCode() => X * 397 ^ Y;
 		public override string ToString() => $"({X},{Y})";
+		public override int GetHashCode() => X * 397 ^ Y;
+		public override bool Equals(object o) => o is Point p && X == p.X && Y == p.Y;
 
-        public void Deconstruct(out int x, out int y) => (x, y) = (X, Y);
+		public void Deconstruct(out int x, out int y) => (x, y) = (X, Y);
 
 		public static Point operator -(Point p) => Point.From(-p.X, -p.Y);
 		public static Point operator +(Point p1, Point p2) => Point.From(p1.X + p2.X, p1.Y + p2.Y);
