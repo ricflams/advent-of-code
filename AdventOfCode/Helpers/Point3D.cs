@@ -55,5 +55,8 @@ namespace AdventOfCode.Helpers
 			yield return new Point3D(-X, -Y, Z);
 			yield return new Point3D(Y, -X, Z);
 		}
+
+		public IEnumerable<Point3D> Neighbors => Displacements.Select(d => this + d);
+		private static readonly Point3D[] Displacements = new[] { new Point3D(-1, 0, 0), new Point3D(1, 0, 0), new Point3D(0, -1, 0), new Point3D(0, 1, 0), new Point3D(0, 0, -1), new Point3D(0, 0, 1) };
 	}
 }

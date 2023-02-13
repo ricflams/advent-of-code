@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
@@ -44,14 +45,6 @@ namespace AdventOfCode.Y2022.Day18
 			return surfaces;
 		}
 
-		private record Point3D(int X, int Y, int Z)
-		{
-			public Point3D Add(Point3D p) => new Point3D(X + p.X, Y + p.Y, Z + p.Z);
-			public IEnumerable<Point3D> Neighbors => Displacements.Select(d => Add(d));
-			public override int GetHashCode() => X * 1000000 + Y * 1000 + Z;
-			public override string ToString() => $"{X},{Y},{Z}";
-			private static Point3D[] Displacements = new[] { new Point3D(-1,0,0), new Point3D(1,0,0), new Point3D(0,-1,0), new Point3D(0,1,0), new Point3D(0,0,-1), new Point3D(0,0,1) };
-		}
 
 		private static int CountSurfaces(HashSet<Point3D> world)
 		{
