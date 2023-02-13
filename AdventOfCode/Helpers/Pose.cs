@@ -23,10 +23,11 @@ namespace AdventOfCode.Helpers
 		public Point Point { get; private set; }
 		public Direction Direction { get; private set; }
 
-		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
 		public override string ToString() => $"{Point}{Direction.AsChar()}";
+		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
+		public override bool Equals(object o) => o is Pose p && Point == p.Point && Direction == p.Direction;
 
-		public Pose Copy() => Pose.From(Point, Direction);
+		public Pose Copy() => From(Point, Direction);
 
 		public void Move() => Point = Point.Move(Direction, 1);
 		public void Move(int n) => Point = Point.Move(Direction, n);
