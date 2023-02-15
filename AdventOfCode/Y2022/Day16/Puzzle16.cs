@@ -70,11 +70,13 @@ namespace AdventOfCode.Y2022.Day16
 			private readonly int[,] _distances;
 			private readonly int[] _distancesFromStart;
 
-			internal class Valve : GraphxNode
+			internal record Valve
 			{
+				public Valve(string name) => Name = name;
+				public string Name;
 				public int Flow;
 				public uint Bit;
-				public override string ToString() => $"{Name} Index={Index} Bit={Bit} Flow={Flow}";
+				public override string ToString() => $"{Name}: Bit={Bit} Flow={Flow}";
 			}
 
 			public Volcano(string[] input)
@@ -92,29 +94,31 @@ namespace AdventOfCode.Y2022.Day16
 						};
 					})
 					.ToDictionary(x => x.Name, x => x);
-				foreach (var v in valves.Values)
+				foreach (var valve in valves.Values)
 				{
-					foreach (var tn in v.TunnelNames)
+					foreach (var name in valve.TunnelNames)
 					{
-						var t = valves[tn];
-						var node = AddEdges(v.Name, t.Name, 1);
-						node.Flow = v.Flow;
+						Add(new Valve(valve.Name), new Valve(name), 1);
 					}
+				}
+				foreach (var n in Nodes)
+				{
+					n.Data.Flow = valves[n.Data.Name].Flow;
 				}
 
 				// Reduce away all the valve-less nodes except AA. Then calculate the
 				// distance from AA to any other node (for the initial step) and reduce
 				// AA itself away, leaving only nodes that has a valve to open.
-				Reduce(v => v.Name != "AA" && v.Flow == 0);
-				var start = this["AA"];
+				Reduce(n => n.Data.Name != "AA" && n.Data.Flow == 0);
+				var start = Nodes.First(n => n.Data.Name == "AA");
 				var distancesFromStart = ShortestPathToAllDijkstra(start);
-				Reduce(v => v.Flow == 0);
+				Reduce(n => n.Data.Flow == 0);
 
 				// Assign a bit to each node for more efficient nodesets 
 				var bit = 1u;
 				foreach (var n in Nodes)
 				{
-					n.Bit = bit;
+					n.Data.Bit = bit;
 					bit <<= 1;
 				}
 
@@ -139,11 +143,11 @@ namespace AdventOfCode.Y2022.Day16
 				foreach (var v in valves)
 				{
 					var dist = _distancesFromStart[v.Index];
-					Explore(v, 1 + dist+1, v.Flow, v.Flow, v.Bit);
+					Explore(v, 1 + dist+1, v.Data.Flow, v.Data.Flow, v.Data.Bit);
 				}
 				return maximums;
 
-				void Explore(Volcano.Valve valve, int t, int flowrate, int released, uint opened)
+				void Explore(Node valve, int t, int flowrate, int released, uint opened)
 				{
 					// Remember the highest total release for this particular set of nodes
 					var total = released + flowrate * (minutes - t);
@@ -153,7 +157,7 @@ namespace AdventOfCode.Y2022.Day16
 					// Visit each un-opened valve
 					foreach (var v in valves)
 					{
-						if ((opened & v.Bit) != 0)
+						if ((opened & v.Data.Bit) != 0)
 							continue;
 						// Only explore this valve if we can visit it before time runs out. It will
 						// be reached in the t+dist minute and then it takes 1 minute to open it; only
@@ -165,8 +169,8 @@ namespace AdventOfCode.Y2022.Day16
 							// Go there and open it. The parameters passed here is what the flowrate
 							// and released amount will be at that next time; only in the last minute
 							// of the dist+1 duration does the new flowrate kick in.
-							var opened2 = opened | v.Bit;
-							var flowrate2 = flowrate + v.Flow;
+							var opened2 = opened | v.Data.Bit;
+							var flowrate2 = flowrate + v.Data.Flow;
 							Explore(v, t+dist+1, flowrate2, released + flowrate*dist + flowrate2, opened2);
 						}
 					}

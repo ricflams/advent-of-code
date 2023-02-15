@@ -8,7 +8,7 @@ namespace AdventOfCode.Y2017.Day12
 {
 	internal class Puzzle : Puzzle<int, int>
 	{
-		public static Puzzle Instance = new Puzzle();
+		public static Puzzle Instance = new();
 		public override string Name => "Digital Plumber";
 		public override int Year => 2017;
 		public override int Day => 12;
@@ -21,18 +21,18 @@ namespace AdventOfCode.Y2017.Day12
 
 		protected override int Part1(string[] input)
 		{
-			var graph = new Graph(input);
+			var graph = new Village(input);
 
 			// Count the number of vertices reachable from id 0
-			var program0 = graph.Vertices[0];
-			var groupsize = graph.VerticesReachableFrom(program0).Length;
+			var program0 = graph[0];
+			var groupsize = graph.NodesReachableFrom(program0).Length;
 
 			return groupsize;
 		}
 
 		protected override int Part2(string[] input)
 		{
-			var graph = new Graph(input);
+			var graph = new Village(input);
 
 			// Pick out vertice-clusters, group by group, adding all the group's vertices
 			// to one big common seen-set until eventually there are none left unseen,
@@ -41,53 +41,32 @@ namespace AdventOfCode.Y2017.Day12
 			var seen = new HashSet<int>();
 			while (true)
 			{
-				var unseen = graph.Vertices.Values.FirstOrDefault(v => !seen.Contains(v.Value));
+				var unseen = graph.Nodes.FirstOrDefault(v => !seen.Contains(v.Data));
 				if (unseen == null)
 					break;
-				foreach (var v in graph.VerticesReachableFrom(unseen))
+				foreach (var v in graph.NodesReachableFrom(unseen))
 				{
-					seen.Add(v.Value);
+					seen.Add(v.Data);
 				}
 				n++;
 			}
 			return n;
 		}
 
-		internal class Graph : BaseUnitGraph<int>
+
+		internal class Village : Graphx<int>
 		{
-			public Graph(string[] input)
+			public Village(string[] input)
 			{
 				foreach (var line in input)
 				{
 					var (id, relations) = line.RxMatch("%d <-> %*").Get<int, string>();
 					foreach (var relation in relations.ToIntArray())
 					{
-						AddEdge(id, relation);
+						Add(id, relation, 1);
 					}
 				}
-			}			
+			}
 		}
-
-
-		//internal class Village : Graphx<Village.Pipe>
-		//{
-		//	internal class Pipe : GraphxNode
-		//	{
-		//		public int Id;
-		//		public IEnumerable<Pipe> Neighbors => Edges.Select(e => e.Node).Cast<Pipe>();
-		//	}
-
-		//	public Village(string[] input)
-		//	{
-		//		foreach (var line in input)
-		//		{
-		//			var (id, relations) = line.RxMatch("%d <-> %*").Get<int, string>();
-		//			foreach (var relation in relations.ToIntArray())
-		//			{
-		//				AddEdges(id, relation, 1);
-		//			}
-		//		}
-		//	}
-		//}
 	}
 }

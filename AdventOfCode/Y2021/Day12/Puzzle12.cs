@@ -34,8 +34,8 @@ namespace AdventOfCode.Y2021.Day12
 		private static int CountPaths(string[] input, bool allowOneSmallCaveRevisit)
 		{
 			var terrain = new Terrain(input);
-			var start = terrain["start"];
-			var end = terrain["end"];
+			var start = terrain.Nodes.First(n => n.Data.Name == "start");
+			var end = terrain.Nodes.First(n => n.Data.Name == "end");
 
 			// Keep track of the paths seen by performing a continuous hashing
 			// of all the visited nodes; the hash at each individual path taken
@@ -45,7 +45,7 @@ namespace AdventOfCode.Y2021.Day12
 			Visit(start, 0, allowOneSmallCaveRevisit, 3074457345618258791UL);
 			return count;
 
-			void Visit(Terrain.Cave cave, uint visited, bool allowRevisit, ulong path)
+			void Visit(Terrain.Node cave, uint visited, bool allowRevisit, ulong path)
 			{
 				if (seen.Contains(path))
 					return;
@@ -58,19 +58,19 @@ namespace AdventOfCode.Y2021.Day12
 					return;
 				}
 
-				foreach (var c in cave.Neighbors)
+				foreach (var (c, _) in cave.Neighbors)
 				{
 					if (c == start)
 						continue;
 
 					var path2 = path * 3074457345618258799UL + (ulong)c.Index;
-					if (c.IsSmall)
+					if (c.Data.IsSmall)
 					{
 						// Maybe allow one small cave to be revisited
-						var revisit = (visited & c.Bit) != 0;
+						var revisit = (visited & c.Data.Bit) != 0;
 						if (revisit && !allowRevisit)
 							continue;
-						Visit(c, visited | c.Bit, allowRevisit && !revisit, path2);
+						Visit(c, visited | c.Data.Bit, allowRevisit && !revisit, path2);
 					}
 					else
 					{
@@ -83,11 +83,13 @@ namespace AdventOfCode.Y2021.Day12
 
 		private class Terrain : Graphx<Terrain.Cave>
 		{
-			internal class Cave : GraphxNode
+			internal record Cave
 			{
+				public Cave(string name) => (Name, IsSmall) = (name, char.IsLower(name.First()));
+				public string Name;
 				public bool IsSmall;
 				public uint Bit;
-				public IEnumerable<Cave> Neighbors => Edges.Select(e => e.Node).Cast<Cave>();
+				public override string ToString() => $"{Name}: IsSmall={IsSmall} Bit={Bit}";
 			}
 
 			public Terrain(string[] input)
@@ -95,15 +97,14 @@ namespace AdventOfCode.Y2021.Day12
 				foreach (var line in input)
 				{
 					var (from, to) = line.RxMatch("%s-%s").Get<string, string>();
-					AddEdges(from, to, 1);
+					Add(new Cave(from), new Cave(to), 1);
 				}
 
 				// Assign a bit to each node for more efficient sets 
 				var bit = 1u;
 				foreach (var n in Nodes)
 				{
-					n.IsSmall = char.IsLower(n.Name[0]);
-					n.Bit = bit;
+					n.Data.Bit = bit;
 					bit <<= 1;
 				}
 			}

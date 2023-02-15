@@ -9,6 +9,7 @@ namespace AdventOfCode
 		static void Main(string[] _)
 		{
 			//PuzzleOptions.RunOnly(2019, 18);
+			PuzzleOptions.RunOnly(2016, 13);
 			PuzzleOptions.RunOnly(2021, 12);
 			PuzzleOptions.RunOnly(2022, 16);
 			PuzzleOptions.RunOnly(2017, 12);
