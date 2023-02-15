@@ -5,79 +5,97 @@ using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
- 	public class GraphxNode
+	public class Graphx<T>
 	{
-		public record Edge(GraphxNode Node, int Weight) {}
-		public string Name { get; set; }
-		public int Index { get; set; }
-		public List<Edge> Edges = new();
-		public Dictionary<string, Edge> EdgeByName = new();
-		public void AddEdge(GraphxNode node, int weight)
+		public class Node
 		{
-			if (EdgeByName.TryGetValue(node.Name, out var e))
+			internal static int NodeIndex = 0;
+
+			public T Data { get; init; }
+			public int Index { get; internal set; }
+			public List<(Node Node, int Weight)> Neighbors { get; internal set; }
+			public int Weight(Node node) => Neighbors.First(x => x.Node == node).Weight;
+
+			public Node(T data)
 			{
-				Debug.Assert(e.Weight == weight);
-				return;
+				Data = data;
+				Index = NodeIndex++;
+				Neighbors = new();
 			}
-			var edge = new Edge(node, weight);
-			Edges.Add(edge);
-			EdgeByName[edge.Node.Name] = edge;
-		}
-		public void UpdateEdge(GraphxNode node, int weight)
-		{
-			var edge = new Edge(node, weight);
-			Edges[Edges.IndexOf(e => e.Node == node)] = edge;
-			EdgeByName[edge.Node.Name] = edge;
-		}
-		public void RemoveEdge(GraphxNode node)
-		{
-			Edges.RemoveAt(Edges.IndexOf(e => e.Node == node));
-			EdgeByName.Remove(node.Name);
-		}
-		public override string ToString() => Name;
-	}
-	
-	public class Graphx<T> where T:GraphxNode, new()
-	{
-		public List<T> Nodes = new();
-		private Dictionary<string, int> _nodeIndex = new();
 
-		public T AddEdges<Tobj>(Tobj o1, Tobj o2, int weight)
-		{
-			var a = GetOrCreate(o1.ToString());
-			var b = GetOrCreate(o2.ToString());
-			a.AddEdge(b, weight);
-			b.AddEdge(a, weight);
-			return a;
-		}
+			public override string ToString() => Data.ToString();
+			public override int GetHashCode() => Data.GetHashCode();
+			public override bool Equals(object obj) => obj is Node n && n.Index == Index;
 
-		public T AddEdges(string name1, string name2, int weight)
-		{
-			var a = GetOrCreate(name1);
-			var b = GetOrCreate(name2);
-			a.AddEdge(b, weight);
-			b.AddEdge(a, weight);
-			return a;
-		}
-
-		public T this[string name] => Nodes[_nodeIndex[name]];
-
-		public IEnumerable<T> Neighbors(T node) => node.Edges.Select(e => e.Node).Cast<T>();
-
-		private T GetOrCreate(string name)
-		{
-			if (!_nodeIndex.TryGetValue(name, out var nodeIndex))
+			public void AddEdge(Node node, int weight)
 			{
-				var node = new T();
-				node.Name = name;
-				node.Index = Nodes.Count;
+				var existing = Neighbors.FirstOrDefault(x => x.Node == node);
+				if (existing != default)
+				{
+					Debug.Assert(existing.Weight == weight);
+					return;
+				}
+				Neighbors.Add((node, weight));
+			}
+
+			public void UpdateEdge(Node node, int weight)
+			{
+				var existing = Neighbors.FirstOrDefault(x => x.Node == node);
+				if (existing != default)
+				{
+					existing.Weight = weight;
+				}
+			}
+
+			public void AddOrUpdateEdge(Node node, int weight)
+			{
+				var existing = Neighbors.FirstOrDefault(x => x.Node == node);
+				if (existing == default)
+				{
+					AddEdge(node, weight);
+				}
+				else if (weight < existing.Weight)
+				{
+					existing.Weight = weight;
+				}
+			}
+
+			public void RemoveEdge(Node node)
+			{
+				Neighbors.RemoveAll(x => x.Node == node);
+			}
+		}
+
+		public List<Node> Nodes = new();
+		private Dictionary<T,Node> _nodeMap = new();
+
+		public Node AddNode(T v)
+		{
+			if (!_nodeMap.TryGetValue(v, out var node))
+			{
+				node = _nodeMap[v] = new Node(v);
 				Nodes.Add(node);
-				nodeIndex = _nodeIndex[name] = node.Index;
 			}
-			return Nodes[nodeIndex];
+			return node;
 		}
 
-		public void Reduce(Func<T, bool> reduction)
+		public (Node A, Node B) Add(T v1, T v2, int weight)
+		{
+			var (a, b) = (AddNode(v1), AddNode(v2));
+			a.AddEdge(b, weight);
+			b.AddEdge(a, weight);
+			return (a, b);
+		}
+
+		public void SetEdge(Node n1, Node n2, int weight)
+		{
+			n1.AddOrUpdateEdge(n2, weight);
+			n2.AddOrUpdateEdge(n1, weight);
+		}
+
+		public Node this[T obj] => _nodeMap[obj];
+
+		public void Reduce(Func<Node, bool> reduction)
 		{
 			foreach (var node in Nodes.ToArray())
 			{
@@ -85,13 +103,13 @@ namespace AdventOfCode.Helpers
 					continue;
 				// Remove this vertex; connect all its edges directly
 				Nodes.Remove(node);
-				foreach (var n1 in node.Edges)
+				foreach (var n1 in node.Neighbors)
 				{
-					foreach (var n2 in node.Edges.Where(n => !n.Equals(n1)))
+					foreach (var n2 in node.Neighbors.Where(n => !n.Equals(n1)))
 					{
-						if (n1.Node.Edges.Any(e => e.Node == n2.Node))
+						if (n1.Node.Neighbors.Any(e => e.Node == n2.Node))
 						{
-							var weight = Math.Min(n1.Node.EdgeByName[n2.Node.Name].Weight, n1.Weight + n2.Weight);
+							var weight = Math.Min(n1.Node.Weight(n2.Node), n1.Weight + n2.Weight);
 							n1.Node.UpdateEdge(n2.Node, weight);
 						}
 						else
@@ -102,9 +120,13 @@ namespace AdventOfCode.Helpers
 					n1.Node.RemoveEdge(node);
 				}
 			}
-			for (var i = 0; i < Nodes.Count; i++)
-				Nodes[i].Index = i;
-			_nodeIndex = Nodes.Select((n, idx) => (n, idx)).ToDictionary(x => x.n.Name, x => x.idx);
+			Node.NodeIndex = 0;
+			_nodeMap = new();
+			foreach (var n in Nodes)
+			{
+				n.Index = Node.NodeIndex++;
+				_nodeMap[n.Data] = n;
+			}
 		}
 
 		public void WriteAsGraphwiz()
@@ -112,7 +134,7 @@ namespace AdventOfCode.Helpers
 			Console.WriteLine("digraph {");
 			foreach (var n in Nodes)
 			{
-				foreach (var e in n.Edges)
+				foreach (var e in n.Neighbors)
 				{
 					Console.WriteLine($"  \"{n}\" -> \"{e.Node}\" [label=\"{e.Weight}\"]");
 				}
@@ -120,23 +142,23 @@ namespace AdventOfCode.Helpers
 			Console.WriteLine("}");
 		}
 
-		public Dictionary<T, int> ShortestPathToAllDijkstra(T from)
+		public Dictionary<Node, int> ShortestPathToAllDijkstra(Node from)
 		{
 			var vertices = Nodes;
 
-			var visited = new HashSet<T>();
+			var visited = new HashSet<Node>();
 			var distances = vertices.ToDictionary(x => x, _ => int.MaxValue);
 			distances[from] = 0;
 
 			var node = from;
 			while (node != null)
 			{
-				foreach (var (next, weight) in node.Edges)
+				foreach (var (next, weight) in node.Neighbors)
 				{
 					var dist = distances[node] + weight;
-					if (dist < distances[(T)next])
+					if (dist < distances[next])
 					{
-						distances[(T)next] = dist;
+						distances[next] = dist;
 					}
 				}
 				visited.Add(node);
@@ -176,7 +198,7 @@ namespace AdventOfCode.Helpers
 
 			foreach (var n in Nodes)
 			{
-				foreach (var e in n.Edges)
+				foreach (var e in n.Neighbors)
 				{
 					dist[n.Index, e.Node.Index] = e.Weight;
 					next[n.Index, e.Node.Index] = e.Node.Index;
@@ -203,27 +225,96 @@ namespace AdventOfCode.Helpers
 			return dist;
 		}
 
-		public IEnumerable<List<T>> Chunks()
+		public Node[] NodesReachableFrom(Node start)
 		{
-			var nodes = new HashSet<T>(Nodes);
-			while (nodes.Any())
+			var visited = new Dictionary<T, Node>();
+			var queue = new Queue<Node>();
+			queue.Enqueue(start);
+			while (queue.Any())
 			{
-				yield return Chunk(nodes.First());
+				var v = queue.Dequeue();
+				visited[v.Data] = v;
+				foreach (var e in v.Neighbors.Where(e => !visited.ContainsKey(e.Node.Data)))
+				{
+					queue.Enqueue(e.Node);
+				}
+			}
+			return visited.Values.ToArray();
+		}
+
+		//public int ShortestPathDijkstra(Node start, Node dest)
+		//{
+		//	const int Infinite = 10000000;
+		//	var nodes = Nodes;
+
+		//	var distances
+		//	foreach (var v in Nodes)
+		//	{
+		//		v.Distance = int.MaxValue;
+		//	}
+		//	start.Distance = 0;
+
+		//	var node = start;
+		//	while (node != null)
+		//	{
+		//		if (node == destination)
+		//		{
+		//			return destination.Distance;
+		//		}
+		//		foreach (var edge in node.Edges)
+		//		{
+		//			var neighbour = edge.Key;
+		//			var weight = edge.Value;
+		//			var dist = node.Distance + weight;
+		//			if (dist < neighbour.Distance)
+		//			{
+		//				neighbour.Distance = dist;
+		//			}
+		//		}
+		//		node.Visited = true;
+		//		node = vertices
+		//			.Where(v => !v.Visited)
+		//			.OrderBy(x => x.Distance)
+		//			.FirstOrDefault();
+		//	}
+
+		//	return Infinite;
+		//}
+
+
+		public static Graphx<Point> FromMaze(Maze maze)
+		{
+			var graph = new Graphx<Point>();
+
+			var root = graph.AddNode(maze.Entry);
+			foreach (var p in maze.ExternalMapPoints)
+			{
+				graph.AddNode(p);
 			}
 
-			List<T> Chunk(T node)
+			BuildGraph(root);
+			return graph;
+
+			void BuildGraph(Graphx<Point>.Node origin)
 			{
-				var chunk = new List<T>();
-				var cq = new Queue<T>();
-				cq.Enqueue(node);
-				while (cq.TryDequeue(out var n))
+				var routes = origin.Data.LookAround()
+						.Select(maze.Transform)
+						.Where(maze.IsWalkable)
+						.ToArray();
+
+				foreach (var p in routes)
 				{
-					nodes.Remove(n);
-					chunk.Add(n);
-					foreach (var e in n.Edges.Where(e => nodes.Contains(e.Node)))
-						cq.Enqueue((T)e.Node);
+					var v = graph[p];
+					if (v != null)
+					{
+						graph.SetEdge(origin, v, 1);
+					}
+					else
+					{
+						var next = graph.AddNode(p);
+						BuildGraph(next);
+					}
 				}
-				return chunk;
 			}
 		}
 	}
