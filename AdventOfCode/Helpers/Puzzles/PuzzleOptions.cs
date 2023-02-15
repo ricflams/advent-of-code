@@ -5,22 +5,18 @@ namespace AdventOfCode.Helpers.Puzzles
 {
 	public static class PuzzleOptions
 	{
-		private static int? _year;
-		private static HashSet<int> _days = new HashSet<int>();
+		private static List<(int Year, int Day)> PuzzleDays = new();
 		static public bool OnlyRunForInputs { get; set; } = false;
 		static public bool Silent { get; set; } = false;
 		static public int Iterations { get; set; } = 1;
-		static public void RunOnly(int year, params int[] days)
+		static public void RunOnly(int year, int day)
 		{
-			_year = year;
-			_days = new HashSet<int>(days);
+			PuzzleDays.Add((year, day));
 		}
 
 		static public bool ShouldRun(IPuzzle puzzle, string filename)
 		{
-			if (_year.HasValue && puzzle.Year != _year)
-				return false;
-			if (_days.Any() && !_days.Contains(puzzle.Day))
+			if (PuzzleDays.Any() && !PuzzleDays.Contains((puzzle.Year, puzzle.Day)))
 				return false;
 			if (OnlyRunForInputs)
 				return filename == "input";
