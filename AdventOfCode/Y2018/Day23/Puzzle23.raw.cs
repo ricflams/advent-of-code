@@ -67,7 +67,7 @@ namespace AdventOfCode.Y2018.Day23.Raw
 		{
 			public override string ToString() => $"<{X},{Y},{Z}>";
 			public long ManhattanDistanceTo(Point3D o) => Math.Abs(X - o.X) + Math.Abs(Y - o.Y) + Math.Abs(Z - o.Z);
-			public static readonly Point3D Origin = new Point3D(0, 0, 0);
+			public static readonly Point3D Origin = new(0, 0, 0);
 
 			public IEnumerable<string> Command(Func<int> NextId)
 			{
@@ -241,12 +241,12 @@ namespace AdventOfCode.Y2018.Day23.Raw
 
 			public IEnumerable<Point3D> Intersections(Nanobot o)
 			{
-				foreach (var edge in o.Edges)
+				foreach (var (A, B) in o.Edges)
 				{
 					foreach (var plane in Planes)
 					{
-						var edgeVector = edge.B - edge.A;
-						var p = Point3D.IntersectPoint(edgeVector, edge.A, plane.Normal, plane.Point);
+						var edgeVector = B - A;
+						var p = Point3D.IntersectPoint(edgeVector, A, plane.Normal, plane.Point);
 						if (p == null)
 							continue;
 						//var found = false;
@@ -381,12 +381,6 @@ namespace AdventOfCode.Y2018.Day23.Raw
 			{
 				Console.WriteLine(AsExecuteCommands());
 			}
-		}
-
-		private class Node : GraphxNode
-		{
-			//public Nanobot Bot;
-			//public override string ToString() => Bot.ToString();
 		}
 
 		protected override long Part1(string[] input)
@@ -554,15 +548,15 @@ namespace AdventOfCode.Y2018.Day23.Raw
 				}
 			}
 			var close = close0.Where(x => x.Dist <= 1000).OrderBy(x => x.Dist).ThenBy(x => Math.Min(x.A.R, x.B.R)).ToList();
-			foreach (var x in close)
+			foreach (var (A, B, Dist) in close)
 			{
-				var plane1 = x.A.IntersectingPlane(x.B);
-				var plane2 = x.B.IntersectingPlane(x.A);
+				var plane1 = A.IntersectingPlane(B);
+				var plane2 = B.IntersectingPlane(A);
 				Console.WriteLine();
-				Console.WriteLine($"{x.A.Index} vs {x.B.Index} dist={x.Dist} plane1={plane1.Normal} D={plane1.D}");
+				Console.WriteLine($"{A.Index} vs {B.Index} dist={Dist} plane1={plane1.Normal} D={plane1.D}");
 				var geox = new Visualize3D();
-				geox.Add(x.A);
-				geox.Add(x.B);
+				geox.Add(A);
+				geox.Add(B);
 				geox.Print();
 			}
 
