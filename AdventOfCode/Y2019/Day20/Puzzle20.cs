@@ -111,7 +111,7 @@ namespace AdventOfCode.Y2019.Day20
 			return Infinite;
 		}
 
-		internal class PortalGraph : Graph<PortalMaze.Portal> { }
+		internal class PortalGraph : Graphx<PortalMaze.Portal> { }
 
 		internal class MazeLevel
 		{
@@ -123,24 +123,31 @@ namespace AdventOfCode.Y2019.Day20
 
 		private static PortalGraph BuildSimpleGraph(PortalMaze maze)
 		{
-			var walked = new SparseMap<PortalGraph.Vertex>();
+			var walked = new SparseMap<PortalGraph.Node>();
 			var graph = new PortalGraph();
 
-			graph.AddVertex(maze.Entry);
-			BuildSimpleGraph(graph.Root);
+			var start = new PortalMaze.Portal
+			{
+				Name = "?",
+				Pos = maze.Entry,
+				IsDownward = true
+			};
+			graph.AddNode(start);
+			BuildSimpleGraph(start);
 
 			return graph;
 
-			void BuildSimpleGraph(PortalGraph.Vertex node)
+			void BuildSimpleGraph(PortalGraph.Node node)
 			{
-				while (walked[node.Pos] == null)
+				var portal = node.Data;
+				while (walked[portal.Pos] == null)
 				{
-					walked[node.Pos] = node;
-					var positions = node.Pos
+					walked[portal.Pos] = node;
+					var positions = portal.Pos
 						.LookAround()
 						.Select(p => new { Pos = p, Dest = maze.Transform(p) })
 						.Where(x => maze.Map[x.Dest] == '.')
-						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Edges.ContainsKey(node))
+						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Neighbors.Any(c => x.Pos == portal.Pos))
 						.ToList();
 
 					foreach (var p in positions.Where(x => walked[x.Dest] != null).ToList())

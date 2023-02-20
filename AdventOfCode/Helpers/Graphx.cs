@@ -7,11 +7,13 @@ namespace AdventOfCode.Helpers
 {
 	public class Graphx<T>
 	{
+		public int Infinite = 1_000_000_000;
+
 		public class Node
 		{
 			internal static int NodeIndex = 0;
 
-			public T Data { get; init; }
+			public T Data { get; set; }
 			public int Index { get; internal set; }
 			public List<(Node Node, int Weight)> Neighbors { get; internal set; }
 			public int Weight(Node node) => Neighbors.First(x => x.Node == node).Weight;
@@ -67,13 +69,13 @@ namespace AdventOfCode.Helpers
 		}
 
 		public List<Node> Nodes = new();
-		private Dictionary<T,Node> _nodeMap = new();
+		public Dictionary<T,Node> NodeMap = new();
 
 		public Node AddNode(T v)
 		{
-			if (!_nodeMap.TryGetValue(v, out var node))
+			if (!NodeMap.TryGetValue(v, out var node))
 			{
-				node = _nodeMap[v] = new Node(v);
+				node = NodeMap[v] = new Node(v);
 				Nodes.Add(node);
 			}
 			return node;
@@ -93,7 +95,7 @@ namespace AdventOfCode.Helpers
 			n2.AddOrUpdateEdge(n1, weight);
 		}
 
-		public Node this[T obj] => _nodeMap[obj];
+		public Node this[T obj] => NodeMap[obj];
 
 		public void Reduce(Func<Node, bool> reduction)
 		{
@@ -121,11 +123,11 @@ namespace AdventOfCode.Helpers
 				}
 			}
 			Node.NodeIndex = 0;
-			_nodeMap = new();
+			NodeMap = new();
 			foreach (var n in Nodes)
 			{
 				n.Index = Node.NodeIndex++;
-				_nodeMap[n.Data] = n;
+				NodeMap[n.Data] = n;
 			}
 		}
 
@@ -242,46 +244,46 @@ namespace AdventOfCode.Helpers
 			return visited.Values.ToArray();
 		}
 
-		//public int ShortestPathDijkstra(Node start, Node dest)
-		//{
-		//	const int Infinite = 10000000;
-		//	var nodes = Nodes;
 
-		//	var distances
-		//	foreach (var v in Nodes)
-		//	{
-		//		v.Distance = int.MaxValue;
-		//	}
-		//	start.Distance = 0;
+		public int ShortestPathDijkstra(T start, T goal)
+		{
+			return ShortestPathDijkstra(NodeMap[start], NodeMap[goal]);
+		}
 
-		//	var node = start;
-		//	while (node != null)
-		//	{
-		//		if (node == destination)
-		//		{
-		//			return destination.Distance;
-		//		}
-		//		foreach (var edge in node.Edges)
-		//		{
-		//			var neighbour = edge.Key;
-		//			var weight = edge.Value;
-		//			var dist = node.Distance + weight;
-		//			if (dist < neighbour.Distance)
-		//			{
-		//				neighbour.Distance = dist;
-		//			}
-		//		}
-		//		node.Visited = true;
-		//		node = vertices
-		//			.Where(v => !v.Visited)
-		//			.OrderBy(x => x.Distance)
-		//			.FirstOrDefault();
-		//	}
+		public int ShortestPathDijkstra(Node start, Node goal)
+		{
+			var frontier = new PriorityQueue<Node, int>();
+			frontier.Enqueue(start, 0);
 
-		//	return Infinite;
-		//}
+			var costs = new Dictionary<Node, int>();
+			costs[start] = 0;
+			//var paths = new Dictionary<Node, Node>();
+			//paths[start] = null;
 
+			while (frontier.TryDequeue(out var current, out var _))
+			{
+				if (current == goal)
+					return costs[current];
 
+				foreach (var (next, weight) in current.Neighbors)
+				{
+					var cost = costs[current] + weight;
+					if (!costs.ContainsKey(next) || cost < costs[next])
+					{
+						costs[next] = cost;
+						//paths[next] = current;
+						frontier.Enqueue(next, cost);
+					}
+				}
+			}
+
+			return Infinite;
+		}
+
+	}
+
+	static class GraphHelper
+	{
 		public static Graphx<Point> FromMaze(Maze maze)
 		{
 			var graph = new Graphx<Point>();
@@ -304,10 +306,9 @@ namespace AdventOfCode.Helpers
 
 				foreach (var p in routes)
 				{
-					var v = graph[p];
-					if (v != null)
+					if (graph.NodeMap.TryGetValue(p, out var n))
 					{
-						graph.SetEdge(origin, v, 1);
+						graph.SetEdge(origin, n, 1);
 					}
 					else
 					{

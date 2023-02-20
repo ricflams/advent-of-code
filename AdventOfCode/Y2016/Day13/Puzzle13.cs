@@ -24,9 +24,11 @@ namespace AdventOfCode.Y2016.Day13
 
 			// Search in a map extending twice past the destination point
 			var map = BuildMap(input, dest.X * 2, dest.Y * 2);
-			var maze = new Maze(map);
-			maze.Entry = Point.From(1, 1);
-			var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
+			var maze = new Maze(map)
+			{
+				Entry = Point.From(1, 1)
+			};
+			var graph = GraphHelper.FromMaze(maze);
 			var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
 
 			return steps;

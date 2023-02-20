@@ -10,13 +10,14 @@ namespace AdventOfCode
 		{
 			//PuzzleOptions.RunOnly(2019, 18);
 			PuzzleOptions.RunOnly(2016, 13);
-			PuzzleOptions.RunOnly(2021, 12);
-			PuzzleOptions.RunOnly(2022, 16);
-			PuzzleOptions.RunOnly(2017, 12);
+			PuzzleOptions.RunOnly(2019, 20);
+			//PuzzleOptions.RunOnly(2021, 12);
+			//PuzzleOptions.RunOnly(2022, 16);
+			//PuzzleOptions.RunOnly(2017, 12);
 			PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
-			//iterations = 10;
+			iterations = 10;
 
 			if (iterations == 1)
 			{
