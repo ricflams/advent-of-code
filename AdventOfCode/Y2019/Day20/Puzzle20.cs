@@ -126,28 +126,28 @@ namespace AdventOfCode.Y2019.Day20
 			var walked = new SparseMap<PortalGraph.Node>();
 			var graph = new PortalGraph();
 
-			var start = new PortalMaze.Portal
+			var initial = new PortalMaze.Portal
 			{
 				Name = "?",
 				Pos = maze.Entry,
 				IsDownward = true
 			};
-			graph.AddNode(start);
+			var start = graph.AddNode(initial);
 			BuildSimpleGraph(start);
 
 			return graph;
 
 			void BuildSimpleGraph(PortalGraph.Node node)
 			{
-				var portal = node.Data;
-				while (walked[portal.Pos] == null)
+				var entry = node.Data;
+				while (walked[entry.Pos] == null)
 				{
-					walked[portal.Pos] = node;
-					var positions = portal.Pos
+					walked[entry.Pos] = node;
+					var positions = entry.Pos
 						.LookAround()
 						.Select(p => new { Pos = p, Dest = maze.Transform(p) })
 						.Where(x => maze.Map[x.Dest] == '.')
-						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Neighbors.Any(c => x.Pos == portal.Pos))
+						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Neighbors.Any(c => x.Pos == entry.Pos))
 						.ToList();
 
 					foreach (var p in positions.Where(x => walked[x.Dest] != null).ToList())
@@ -156,10 +156,10 @@ namespace AdventOfCode.Y2019.Day20
 						var portal = maze.Portals[p.Pos];
 						var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
 						var portalName = portal == null ? null : portal.Name;
-						node.Value = portal;
-						existing.Value = portal;
-						node.Edges[existing] = portalValue;
-						existing.Edges[node] = -portalValue;
+						node.Data = portal;
+						existing.Data = portal;
+						node.UpdateEdge(existing, portalValue);
+						existing.UpdateEdge(node, -portalValue);
 						positions.Remove(p);
 					}
 
@@ -169,7 +169,7 @@ namespace AdventOfCode.Y2019.Day20
 							return;
 						case 1:
 							var p = positions.First();
-							var next = graph.AddVertex(p.Dest);
+							var next = graph.AddNode(p.Dest);
 							//graph.Vertices.Add(next);
 							var portal = maze.Portals[p.Pos];
 							var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
