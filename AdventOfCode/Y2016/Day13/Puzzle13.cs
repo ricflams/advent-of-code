@@ -1,11 +1,12 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Byte;
 using AdventOfCode.Helpers.Puzzles;
+using System;
 using System.Linq;
 
 namespace AdventOfCode.Y2016.Day13
 {
-	internal class Puzzle : Puzzle<int, int>
+	internal class Puzzle : PuzzleWithParam<(int, int),int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "A Maze of Twisty Little Cubicles";
@@ -14,16 +15,17 @@ namespace AdventOfCode.Y2016.Day13
 
 		public void Run()
 		{
-			Run("test1").Part1(11);
-			Run("input").Part1(86).Part2(127);
+			Run("test1").WithParam((7, 4)).Part1(11);
+			Run("input").WithParam((31, 39)).Part1(86).Part2(127);
 		}
 
 		protected override int Part1(string[] input)
 		{
-			var dest = Point.From(int.Parse(input[1]), int.Parse(input[2]));
+			var favorite = int.Parse(input[0]);
+			var dest = Point.From(Param.Item1, Param.Item2);
 
 			// Search in a map extending twice past the destination point
-			var map = BuildMap(input, dest.X * 2, dest.Y * 2);
+			var map = BuildMap(favorite, dest.X * 2, dest.Y * 2);
 			var maze = new Maze(map);
 			maze.Entry = Point.From(1, 1);
 			var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
@@ -34,8 +36,11 @@ namespace AdventOfCode.Y2016.Day13
 
 		protected override int Part2(string[] input)
 		{
+			var favorite = int.Parse(input[0]);
+			var dest = Point.From(Param.Item1, Param.Item2);
+
 			// We can at most move 50 steps away from (1,1)
-			var map = BuildMap(input, 50+1, 50+1);
+			var map = BuildMap(favorite, 50+1, 50+1);
 
 			var unvisitedBefore = map.Count('.');
 			var visit = new Point[] {Point.From(1, 1)};
@@ -53,11 +58,8 @@ namespace AdventOfCode.Y2016.Day13
 			return visited;
 		}
 
-		private static CharMap BuildMap(string[] input, int width, int height)
+		private static CharMap BuildMap(int favorite, int width, int height)
 		{
-			var favorite = int.Parse(input[0]);
-			var dest = Point.From(int.Parse(input[1]), int.Parse(input[2]));
-
 			var map = new CharMap('#');
 			for (var x = 0; x < width; x++)
 			{
