@@ -4,19 +4,13 @@ using System.IO;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
-
-	internal abstract class PuzzleWithParam<TP, T1,T2> : Puzzle<T1, T2>
+	internal abstract class PuzzleWithParam<TP, T1, T2> : Puzzle<T1, T2>
 	{
 		protected TP Param { get; set; }
 
 		public new PuzzleRunnerWithParam Run(string testname)
 		{
 			return new PuzzleRunnerWithParam(this, testname, testname);
-		}
-
-		public PuzzleRunner RunParamOnly(string testname)
-		{
-			return new PuzzleRunner(this, testname, null);
 		}
 
 		internal class PuzzleRunnerWithParam
@@ -34,12 +28,6 @@ namespace AdventOfCode.Helpers.Puzzles
 				return this;
 			}
 
-			public PuzzleRunnerWithParam WithNoInput()
-			{
-				_filename = null;
-				return this;
-			}
-
 			public PuzzleRunnerWithParam Part1(T1 expectedResult)
 			{
 				_puzzle.RunPart(_testname, _filename, 1, _puzzle.Part1, expectedResult);
@@ -51,23 +39,18 @@ namespace AdventOfCode.Helpers.Puzzles
 				return this;
 			}			
 		}
-
-
 	}
 
 	internal abstract class Puzzle<T1,T2> : IPuzzle
 	{
-		private static readonly string TimingBar = new string('#', 10);
+		private static readonly string TimingBar = new('#', 10);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
+
 		public abstract string Name { get; }
 		public abstract int Year { get; }
 		public abstract int Day { get; }
-
-		
-
 		protected abstract T1 Part1(string[] input);
 		protected abstract T2 Part2(string[] input);
-
 
 		internal class PuzzleRunner
 		{
