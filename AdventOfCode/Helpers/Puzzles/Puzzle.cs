@@ -76,20 +76,13 @@ namespace AdventOfCode.Helpers.Puzzles
 			return new PuzzleRunner(this, testname, testname);
 		}
 
-		private string[] ReadInput(string filename)
-		{
-			return filename == null
-				? null
-				: File.ReadAllLines($"Y{Year}/Day{Day:D2}/{filename}.txt");
-		}
-
 		internal void RunPart<T>(string testname, string filename, int part, Func<string[],T> solution, T expectedResult)
 		{
 			if (!PuzzleOptions.ShouldRun(this, testname))
 				return;
 
 			T result = default;
-			var input = ReadInput(filename);
+			var input = FileSystem.Instance.ReadFile(Year, Day, filename);
 			var sw = Stopwatch.StartNew();
 			for (var i = 0; i < PuzzleOptions.Iterations; i++)
 			{
