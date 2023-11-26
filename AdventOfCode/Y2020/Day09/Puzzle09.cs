@@ -4,7 +4,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day09
 {
-	internal class Puzzle : PuzzleWithParam<int, long, long>
+	internal class Puzzle : PuzzleWithParameter<int, long, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Encoding Error";
@@ -13,14 +13,14 @@ namespace AdventOfCode.Y2020.Day09
 
 		public void Run()
 		{
-			Run("test1").WithParam( 5).Part1(127).Part2(62);
-			Run("input").WithParam(25).Part1(217430975).Part2(28509180);
+			Run("test1").WithParameter( 5).Part1(127).Part2(62);
+			Run("input").WithParameter(25).Part1(217430975).Part2(28509180);
 		}
 
 		protected override long Part1(string[] input)
 		{
 			var data = input.Select(long.Parse).ToArray();
-			var len = Param;
+			var len = PuzzleParameter;
 
 			// Use a sliding window of hashed preambles for really fast sum-lookup
 			var result = 0L;

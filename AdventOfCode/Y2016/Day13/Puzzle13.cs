@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2016.Day13
 {
-	internal class Puzzle : PuzzleWithParam<(int, int),int, int>
+	internal class Puzzle : PuzzleWithParameter<(int, int),int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "A Maze of Twisty Little Cubicles";
@@ -15,14 +15,14 @@ namespace AdventOfCode.Y2016.Day13
 
 		public void Run()
 		{
-			Run("test1").WithParam((7, 4)).Part1(11);
-			Run("input").WithParam((31, 39)).Part1(86).Part2(127);
+			Run("test1").WithParameter((7, 4)).Part1(11);
+			Run("input").WithParameter((31, 39)).Part1(86).Part2(127);
 		}
 
 		protected override int Part1(string[] input)
 		{
 			var favorite = int.Parse(input[0]);
-			var dest = Point.From(Param.Item1, Param.Item2);
+			var dest = Point.From(PuzzleParameter.Item1, PuzzleParameter.Item2);
 
 			// Search in a map extending twice past the destination point
 			var map = BuildMap(favorite, dest.X * 2, dest.Y * 2);
@@ -37,7 +37,7 @@ namespace AdventOfCode.Y2016.Day13
 		protected override int Part2(string[] input)
 		{
 			var favorite = int.Parse(input[0]);
-			var dest = Point.From(Param.Item1, Param.Item2);
+			var dest = Point.From(PuzzleParameter.Item1, PuzzleParameter.Item2);
 
 			// We can at most move 50 steps away from (1,1)
 			var map = BuildMap(favorite, 50+1, 50+1);
