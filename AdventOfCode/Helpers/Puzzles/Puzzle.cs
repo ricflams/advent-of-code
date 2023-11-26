@@ -1,43 +1,30 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
-	internal abstract class PuzzleWithParam<TP, T1, T2> : Puzzle<T1, T2>
+	internal abstract class PuzzleWithParameter<TP, T1, T2> : Puzzle<T1, T2>
 	{
-		protected TP Param { get; set; }
+		protected TP PuzzleParameter { get; set; }
 
-		public new PuzzleRunnerWithParam Run(string testname)
+		public new PuzzleWithParameterRunner Run(string testname)
 		{
-			return new PuzzleRunnerWithParam(this, testname, testname);
+			return new PuzzleWithParameterRunner(this, testname, testname);
 		}
 
-		internal class PuzzleRunnerWithParam
+		internal class PuzzleWithParameterRunner : PuzzleRunner
 		{
+			private readonly PuzzleWithParameter<TP, T1, T2> _puzzleWithParameter;
 
-			private readonly PuzzleWithParam<TP, T1, T2> _puzzle;
-			private readonly string _testname;
-			private string _filename;			
-			public PuzzleRunnerWithParam(PuzzleWithParam<TP, T1, T2> puzzle, string testname, string filename) =>
-				(_puzzle, _testname, _filename) = (puzzle, testname, filename);
+			public PuzzleWithParameterRunner(PuzzleWithParameter<TP, T1, T2> puzzle, string testname, string filename)
+			 : base(puzzle, testname, filename)
+				 => _puzzleWithParameter = puzzle;
 
-			public PuzzleRunnerWithParam WithParam(TP param)
+			public PuzzleRunner WithParameter(TP param)
 			{
-				_puzzle.Param = param;
+				_puzzleWithParameter.PuzzleParameter = param;
 				return this;
 			}
-
-			public PuzzleRunnerWithParam Part1(T1 expectedResult)
-			{
-				_puzzle.RunPart(_testname, _filename, 1, _puzzle.Part1, expectedResult);
-				return this;
-			}
-			public PuzzleRunnerWithParam Part2(T2 expectedResult)
-			{
-				_puzzle.RunPart(_testname, _filename, 2, _puzzle.Part2, expectedResult);
-				return this;
-			}			
 		}
 	}
 
@@ -52,28 +39,31 @@ namespace AdventOfCode.Helpers.Puzzles
 		protected abstract T1 Part1(string[] input);
 		protected abstract T2 Part2(string[] input);
 
+		public PuzzleRunner Run(string testname)
+		{
+			return new PuzzleRunner(this, testname, testname);
+		}
+
 		internal class PuzzleRunner
 		{
 			private readonly Puzzle<T1,T2> _puzzle;
 			private readonly string _testname;
 			private readonly string _filename;
+
 			public PuzzleRunner(Puzzle<T1,T2> puzzle, string testname, string filename) =>
 				(_puzzle, _testname, _filename) = (puzzle, testname, filename);
+
 			public PuzzleRunner Part1(T1 expectedResult)
 			{
 				_puzzle.RunPart(_testname, _filename, 1, _puzzle.Part1, expectedResult);
 				return this;
 			}
+
 			public PuzzleRunner Part2(T2 expectedResult)
 			{
 				_puzzle.RunPart(_testname, _filename, 2, _puzzle.Part2, expectedResult);
 				return this;
 			}
-		}
-
-		public PuzzleRunner Run(string testname)
-		{
-			return new PuzzleRunner(this, testname, testname);
 		}
 
 		internal void RunPart<T>(string testname, string filename, int part, Func<string[],T> solution, T expectedResult)
