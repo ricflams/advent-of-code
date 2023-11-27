@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using AdventOfCode.Helpers;
+﻿using System.IO;
 
 namespace AdventOfCode.Helpers.PuzzleDay
 {
