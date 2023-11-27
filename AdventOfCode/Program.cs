@@ -8,6 +8,8 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
+			//AdventOfCode.Helpers.PuzzleDay.GeneratePuzzles.Generate(2023); return;
+
 			PuzzleOptions.RunOnly((year, day) =>
 				false
 				|| (year, day) == (2019, 18)
