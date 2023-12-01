@@ -2,7 +2,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2016.Day18
 {
-	internal class Puzzle : Puzzle<int, int>
+	internal class Puzzle : PuzzleWithParameter<int, int, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Like a Rogue";
@@ -11,14 +11,14 @@ namespace AdventOfCode.Y2016.Day18
 
 		public void Run()
 		{
-			Run("test1").Part1(38);
-			Run("input").Part1(1926).Part2(19986699);
+			Run("test1").WithParameter(10).Part1(38);
+			Run("input").WithParameter(40).Part1(1926).Part2(19986699);
 		}
 
 		protected override int Part1(string[] input)
 		{
 			var tiles = input[0];
-			var rows = int.Parse(input[1]);
+			var rows = PuzzleParameter;
 			return CountSafeTiles(tiles, rows);
 		}
 

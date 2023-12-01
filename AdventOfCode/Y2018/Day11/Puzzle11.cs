@@ -2,7 +2,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2018.Day11
 {
-	internal class Puzzle : PuzzleWithParam<int, string, string>
+	internal class Puzzle : Puzzle<string, string>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Chronal Charge";
@@ -11,16 +11,17 @@ namespace AdventOfCode.Y2018.Day11
 
 		public void Run()
 		{
-			Run("test1").WithParam(  18).WithNoInput().Part1("33,45").Part2("90,269,16");
-			Run("test2").WithParam(  42).WithNoInput().Part1("21,61").Part2("232,251,12");
-			Run("input").WithParam(3999).WithNoInput().Part1("21,77").Part2("224,222,27");
+			Run("test1").Part1("33,45").Part2("90,269,16");
+			Run("test2").Part1("21,61").Part2("232,251,12");
+			Run("input").Part1("21,77").Part2("224,222,27");			
 		}
 
 		private const int N = 300;
 
 		protected override string Part1(string[] input)
 		{
-			var grid = ReadGrid(Param);
+			var serial = int.Parse(input[0]);
+			var grid = ReadGrid(serial);
 
 			// Just do the sums manually by exploring and summing up every 3x3 square
 			var maxsum = 0;
@@ -50,7 +51,8 @@ namespace AdventOfCode.Y2018.Day11
 
 		protected override string Part2(string[] input)
 		{
-			var grid = ReadGrid(Param);
+			var serial = int.Parse(input[0]);
+			var grid = ReadGrid(serial);
 
 			// This two-step can be simplified, see xysum below
 			// // var xsum = new int[N+1,N+1];

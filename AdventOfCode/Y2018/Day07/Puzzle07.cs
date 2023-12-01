@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2018.Day07
 {
-	internal class Puzzle : PuzzleWithParam<(int,int), string, int>
+	internal class Puzzle : PuzzleWithParameter<(int,int), string, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "The Sum of Its Parts";
@@ -17,8 +17,8 @@ namespace AdventOfCode.Y2018.Day07
 		{
 			// For test: 1 helper and +0 sec
 			// For real input: 5 helpers and +60 sec
-			Run("test1").WithParam((1,  0)).Part1("CABDFE").Part2(15);
-			Run("input").WithParam((5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			Run("test1").WithParameter((1,  0)).Part1("CABDFE").Part2(15);
+			Run("input").WithParameter((5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
 		}
 
 		protected override string Part1(string[] input)
@@ -45,7 +45,7 @@ namespace AdventOfCode.Y2018.Day07
 		protected override int Part2(string[] input)
 		{
 			var work = ReadWorks(input);
-			var (helpers, extraSeconds) = Param;
+			var (helpers, extraSeconds) = PuzzleParameter;
 			
 			// Keep track of the ongoing work,time here
 			var ongoing = new Dictionary<char, int>();

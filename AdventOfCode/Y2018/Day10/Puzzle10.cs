@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2018.Day10
 {
-	internal class Puzzle : PuzzleWithParam<int, string, int>
+	internal class Puzzle : PuzzleWithParameter<int, string, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "The Stars Align";

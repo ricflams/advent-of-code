@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AdventOfCode.Y2018.Day14
 {
-	internal class Puzzle : PuzzleWithParam<(int, string), long, int>
+	internal class Puzzle : Puzzle<long, int>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Chocolate Charts";
@@ -13,17 +13,21 @@ namespace AdventOfCode.Y2018.Day14
 
 		public void Run()
 		{
-			Run("test1").WithParam((     5,  "01245")).WithNoInput().Part1(0124515891).Part2(5);
-			Run("test2").WithParam((     9,  "51589")).WithNoInput().Part1(5158916779).Part2(9);
-			Run("test3").WithParam((    18,  "92510")).WithNoInput().Part1(9251071085).Part2(18);
-			Run("test4").WithParam((  2018,  "59414")).WithNoInput().Part1(5941429882).Part2(2018);
-			Run("input").WithParam((540561, "540561")).WithNoInput().Part1(1413131339).Part2(20254833);
+			Run("test11").Part1(0124515891);
+			Run("test12").Part2(5);
+			Run("test21").Part1(5158916779);
+			Run("test22").Part2(9);
+			Run("test31").Part1(9251071085);
+			Run("test32").Part2(18);
+			Run("test41").Part1(5941429882);
+			Run("test42").Part2(2018);
+			Run("input").Part1(1413131339).Part2(20254833);
 		}
 
-		protected override long Part1(string[] _)
+		protected override long Part1(string[] input)
 		{
 			const int Recipies = 10;
-			var (N, _) = Param;
+			var N = int.Parse(input[0]);
 
 			// Make room for N recipies followed by the NRecipies and 1 more
 			// because the last recipe when we're just 1 short may produce 2,
@@ -61,7 +65,7 @@ namespace AdventOfCode.Y2018.Day14
 
 		protected override int Part2(string[] input)
 		{
-			var (_, scorePattern) = Param;
+			var scorePattern = input[0];
 
 			// Use a string as input to cater for leading 0
 			var scores = scorePattern.Select(c => c - '0').ToArray();
@@ -96,8 +100,8 @@ namespace AdventOfCode.Y2018.Day14
 				// by only engaging it when needed, replacing this:
 				// e1 = (e1 + 1 + r[e1]) % i;
 				// e2 = (e2 + 1 + r[e2]) % i;
-				e1 = (e1 + 1 + r[e1]);
-				e2 = (e2 + 1 + r[e2]);
+				e1 += 1 + r[e1];
+				e2 += 1 + r[e2];
 				if (e1 >= i) e1 %= i;
 				if (e2 >= i) e2 %= i;
 			}
