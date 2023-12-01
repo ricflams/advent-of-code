@@ -8,12 +8,19 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			//PuzzleOptions.RunOnly(2019, 18);
-			PuzzleOptions.RunOnly(2016, 13);
-			PuzzleOptions.RunOnly(2021, 12);
-			PuzzleOptions.RunOnly(2022, 16);
-			PuzzleOptions.RunOnly(2017, 12);
-			PuzzleOptions.OnlyRunForInputs = true;
+			//AdventOfCode.Helpers.PuzzleDay.GeneratePuzzles.Generate(2023); return;
+
+			PuzzleOptions.RunOnly((year, day) =>
+				false
+				// || (year, day) == (2019, 18)
+				// || (year, day) == (2016, 13)
+				// || (year, day) == (2021, 12)
+				// || (year, day) == (2022, 16)
+				// || (year, day) == (2017, 12)
+				|| (year, day) == (2023, 1)				
+			);
+
+			// PuzzleOptions.OnlyRunForInputs = true;
 
 			var iterations = 1;
 			//iterations = 10;
