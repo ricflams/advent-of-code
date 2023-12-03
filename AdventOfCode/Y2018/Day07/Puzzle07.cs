@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2018.Day07
 		public override int Year => 2018;
 		public override int Day => 7;
 
-		public void Run()
+		public override void Run()
 		{
 			// For test: 1 helper and +0 sec
 			// For real input: 5 helpers and +60 sec

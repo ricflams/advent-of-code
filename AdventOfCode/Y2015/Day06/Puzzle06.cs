@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2015.Day06
 		public override int Year => 2015;
 		public override int Day => 6;
 
-		public void Run()
+		public override void Run()
 		{
 			Run("input").Part1(543903).Part2(14687245);
 		}

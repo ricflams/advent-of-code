@@ -5,5 +5,6 @@
 		string Name { get; }
 		int Year { get; }
 		int Day { get; }
+		void Run();
 	}
 }

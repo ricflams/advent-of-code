@@ -156,7 +156,7 @@ namespace AdventOfCode.Y2021.Day23.Raw
 		}).ToMaze();
 
 
-		public void Run()
+		public override void Run()
 		{
 			Run("test1").Part1(12521).Part2(44169);
 

@@ -17,7 +17,7 @@ namespace AdventOfCode.Y2022.Day15.Raw
 		public override int Year => 2022;
 		public override int Day => 15;
 
-		public void Run()
+		public override void Run()
 		{
 			Run("test1").Part1(26).Part2(56000011);
 			//Run("test2").Part1(0).Part2(0);

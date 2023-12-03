@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2022.Day22
 		public override int Year => 2022;
 		public override int Day => 22;
 
-		public void Run()
+		public override void Run()
 		{
 			Run("test1").Part1(6032).Part2(5031);
 			Run("test9").Part1(181128).Part2(52311);

@@ -14,7 +14,7 @@ namespace AdventOfCode.Y2021.Day08
 		public override int Year => 2021;
 		public override int Day => 8;
 
-		public void Run()
+		public override void Run()
 		{
 			Run("test1").Part1(0).Part2(5353);
 			Run("test2").Part1(26).Part2(61229);

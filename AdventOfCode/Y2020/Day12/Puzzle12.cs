@@ -11,7 +11,7 @@ namespace AdventOfCode.Y2020.Day12
 		public override int Year => 2020;
 		public override int Day => 12;
 
-		public void Run()
+		public override void Run()
 		{
 			//Action N means to move north by the given value.
 			//Action S means to move south by the given value.

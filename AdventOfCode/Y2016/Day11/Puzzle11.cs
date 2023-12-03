@@ -13,7 +13,7 @@ namespace AdventOfCode.Y2016.Day11
 		public override int Year => 2016;
 		public override int Day => 11;
 
-		public void Run()
+		public override void Run()
 		{
 			Run("test1").Part1(11);
 			Run("test2").Part1(25).Part2(49); // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db4omkn
