@@ -19,7 +19,8 @@ namespace AdventOfCode
 				// || (year, day) == (2021, 12)
 				// || (year, day) == (2022, 16)
 				// || (year, day) == (2017, 12)
-				|| (year, day) == (2023, 3)				
+				//|| year == 2023 && day <= 4
+				|| (year, day) == (2023, 5)
 			);
 
 			var iterations = 1;
