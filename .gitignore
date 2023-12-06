@@ -351,4 +351,4 @@ MigrationBackup/
 
 
 /AdventOfCode/cache/*
-/AdventOfCode/aoc-sessioncookie
+/AdventOfCode/*.sessioncookie

@@ -12,21 +12,23 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		public string[] ReadFile(int year, int day, string name)
 		{
-			var text = name == "input"
-				? ReadInputFile(year, day)
-				: File.ReadAllLines(Path.Combine(_root, $"Y{year}/Day{day:D2}/{name}.txt"));
-			return text;
+			return name switch
+			{
+				"input" => ReadInputFile("github", year, day),
+				"test9" => ReadInputFile("google", year, day),
+				_ => File.ReadAllLines(Path.Combine(_root, $"Y{year}/Day{day:D2}/{name}.txt"))
+			};
 		}
 
 
-		private string[] ReadInputFile(int year, int day)
+		private string[] ReadInputFile(string profile, int year, int day)
 		{
-			var cache = Path.Combine(_root, "cache");
+			var cache = Path.Combine(_root, "cache", profile);
 			var filename = Path.Combine(cache, $"{year}_{day:D2}_input.txt");
 
 			if (!File.Exists(filename))
 			{
-				var cookieFilename = Path.Combine(_root, "aoc-sessioncookie");
+				var cookieFilename = Path.Combine(_root, $"{profile}.sessioncookie");
 				if (!File.Exists(cookieFilename))
 				{
 					throw new Exception($"Missing cookie file '{cookieFilename}'");
