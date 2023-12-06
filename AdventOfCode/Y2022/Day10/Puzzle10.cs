@@ -13,8 +13,8 @@ namespace AdventOfCode.Y2022.Day10
 		public override void Run()
 		{
 			Run("test1").Part1(13140);
-			Run("test9").Part1(14320).Part2("PCPBKAPJ");
 			Run("input").Part1(13220).Part2("RUAKHBEK");
+			Run("extra").Part1(14320).Part2("PCPBKAPJ");
 		}
 
 		protected override long Part1(string[] input)

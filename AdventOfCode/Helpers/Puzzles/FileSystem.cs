@@ -15,7 +15,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			return name switch
 			{
 				"input" => ReadInputFile("github", year, day),
-				"test9" => ReadInputFile("google", year, day),
+				"extra" => ReadInputFile("google", year, day),
 				_ => File.ReadAllLines(Path.Combine(_root, $"Y{year}/Day{day:D2}/{name}.txt"))
 			};
 		}

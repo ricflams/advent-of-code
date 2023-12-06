@@ -21,8 +21,8 @@ namespace AdventOfCode.Y2022.Day16
 			Run("test4").Part1(1288).Part2(1484);
 			Run("test5").Part1(2400).Part2(3680);
 
-		 	Run("test9").Part1(1850).Part2(2306);
 		 	Run("input").Part1(1915).Part2(2772);
+		 	Run("extra").Part1(1850).Part2(2306);
 		}
 
 		protected override long Part1(string[] input)

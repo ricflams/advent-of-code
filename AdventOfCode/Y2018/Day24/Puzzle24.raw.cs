@@ -17,8 +17,8 @@ namespace AdventOfCode.Y2018.Day24.Raw
 		{
 			Run("test1").Part1(5216).Part2(51);
 			//Run("test2").Part1(7);
-			//Run("test9").Part1(906).Part2(121493971);
 			Run("input").Part1(10538).Part2(9174);
+			//Run("extra").Part1(906).Part2(121493971);
 			// 6302 too low
 		}
 

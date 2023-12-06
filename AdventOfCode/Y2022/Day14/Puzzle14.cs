@@ -14,8 +14,8 @@ namespace AdventOfCode.Y2022.Day14
 		public override void Run()
 		{
 			Run("test1").Part1(24).Part2(93);
-			Run("test9").Part1(888).Part2(26461);
 			Run("input").Part1(618).Part2(26358);
+			Run("extra").Part1(888).Part2(26461);
 		}
 
 		protected override long Part1(string[] input)

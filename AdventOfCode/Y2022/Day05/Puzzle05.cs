@@ -16,8 +16,8 @@ namespace AdventOfCode.Y2022.Day05
 		public override void Run()
 		{
 			Run("test1").Part1("CMZ").Part2("MCD");
-			Run("test9").Part1("TLNGFGMFN").Part2("FGLQJCMBD");
 			Run("input").Part1("QGTHFZBHV").Part2("MGDMPSZTM");
+			Run("extra").Part1("TLNGFGMFN").Part2("FGLQJCMBD");
 		}
 
 		protected override string Part1(string[] input)
