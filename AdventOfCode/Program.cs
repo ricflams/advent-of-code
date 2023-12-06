@@ -20,7 +20,7 @@ namespace AdventOfCode
 				// || (year, day) == (2022, 16)
 				// || (year, day) == (2017, 12)
 				//|| year == 2023 && day <= 4
-				|| (year, day) == (2023, 5)
+				|| (year, day) == (2023, 6)
 			);
 
 			var iterations = 1;
