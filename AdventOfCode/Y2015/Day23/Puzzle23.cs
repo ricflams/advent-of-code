@@ -16,6 +16,7 @@ namespace AdventOfCode.Y2015.Day23
 		public override void Run()
 		{
 			Run("input").Part1(184).Part2(231);
+			Run("extra").Part1(307).Part2(160);
 		}
 
 		private class Ins
