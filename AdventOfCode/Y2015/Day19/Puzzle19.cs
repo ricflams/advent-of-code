@@ -22,6 +22,7 @@ namespace AdventOfCode.Y2015.Day19
 			Run("test3").Part1(7);
 			Run("test4").Part2(6);
 			Run("input").Part1(535).Part2(212);
+			Run("extra").Part1(518).Part2(200);
 		}
 
 		protected override int Part1(string[] input)
@@ -95,36 +96,7 @@ namespace AdventOfCode.Y2015.Day19
 				}
 			}
 
-			// If all reductions are non-ambiguous then the puzzle can be solved quite easily
-			// by simply keep on reducing the molecule until we get to "e". The real puzzle
-			// is like that, but the examples are not. So solve them using the original code
-			// written before I noticed this simplification.
-			var reductionsByName = parts[0].Select(line => line.Split()[2]).ToArray();
-			var isUnambiguous = reductionsByName
-				.All(r => !reductionsByName.Any(x => x != r && x.Contains(r)));
-
-			// Unambiguous reductions can be solved the easy way
-			if (isUnambiguous)
-			{
-				var steps = 0;
-				while (molecule.Length > 1)
-				{
-					for (var i = 0; i < molecule.Length; i++)
-					{
-						foreach (var (to, from) in inverseReductions)
-						{
-							if (LookingAt(molecule, i, to))
-							{
-								molecule = molecule[..i].Append(from).Concat(molecule[(i + to.Length)..]).ToArray();
-								steps++;
-							}
-						}
-					}
-				}
-				return steps;
-			}
-
-			// Mmbiguous reductions must be solved the hard way
+			// Solve the reductions
 			molecule = molecule.Append(-1).ToArray(); // add sentinel
 			var minSteps = 0;
 			var seen = new HashSet<uint>();
