@@ -60,7 +60,7 @@ namespace AdventOfCode.Y2023.Day08.Raw
 				})
 				.ToDictionary(x => x.name, x => (x.left, x.right));
 			
-			var step = 0;
+			//var step = 0;
 			var nodes = network.Keys.Where(x => x.EndsWith('A')).ToArray();
 			var stepinfo = nodes.Select(n =>
 			{
