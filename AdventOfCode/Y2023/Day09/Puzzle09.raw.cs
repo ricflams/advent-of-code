@@ -8,7 +8,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
-namespace AdventOfCode.Y2023.Day09
+namespace AdventOfCode.Y2023.Day09.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -21,8 +21,8 @@ namespace AdventOfCode.Y2023.Day09
 		{
 			Run("test1").Part1(114).Part2(2);
 			//Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(1731106378).Part2(0);
-			//Run("extra").Part1(0).Part2(1087);
+			Run("input").Part1(0).Part2(0);
+			//Run("extra").Part1(0).Part2(0);
 		}
 
 		protected override long Part1(string[] input)
@@ -32,6 +32,20 @@ namespace AdventOfCode.Y2023.Day09
 				.ToArray();
 
 			var sum = oasis.Sum(LastNumber);
+			// foreach (var h in oasis)
+			// {
+			// 	var diffs = new List<int[]>();
+			// 	var hist = h;
+			// 	while (true)
+			// 	{
+			// 		var diff = Enumerable.Range(0, hist.Length - 1).Select(i => hist[i+1] - hist[i]).ToArray();
+			// 		diffs.Add(diff);
+			// 		if (diff.All(x => x == 0))
+			// 			break;
+			// 	}
+			// 	var last = diffs.Reverse()
+			// 	foreach (var)
+			// }
 
 			int LastNumber(int[] hist)
 			{
@@ -53,6 +67,20 @@ namespace AdventOfCode.Y2023.Day09
 				.ToArray();
 
 			var sum = oasis.Sum(LastNumber);
+			// foreach (var h in oasis)
+			// {
+			// 	var diffs = new List<int[]>();
+			// 	var hist = h;
+			// 	while (true)
+			// 	{
+			// 		var diff = Enumerable.Range(0, hist.Length - 1).Select(i => hist[i+1] - hist[i]).ToArray();
+			// 		diffs.Add(diff);
+			// 		if (diff.All(x => x == 0))
+			// 			break;
+			// 	}
+			// 	var last = diffs.Reverse()
+			// 	foreach (var)
+			// }
 
 			int LastNumber(int[] hist)
 			{
