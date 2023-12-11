@@ -138,5 +138,17 @@ namespace AdventOfCode.Helpers
 			}
 			return sum;
 		}
+
+		public CharMap ResetToOrigin()
+		{
+			var (min, _) = MinMax();
+			var map = new CharMap(_defaultValue);
+			foreach (var p in AllPoints())
+			{
+				map[p - min] = this[p];
+			}
+			return map;
+		}
+
 	}
 }
