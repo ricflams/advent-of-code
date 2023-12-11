@@ -7,23 +7,27 @@ namespace AdventOfCode.Helpers
 {
 	public class CharMap : SparseMap<char>
 	{
-		public CharMap(char defaultValue = default(char))
+		public CharMap(char defaultValue = default)
 			: base(defaultValue)
 		{
 		}
 
-		public static CharMap FromArray(string[] lines, char defaultValue = default(char))
+		public CharMap(string[] lines, char defaultValue = default)
+			: base(defaultValue)
 		{
-			var map = new CharMap(defaultValue);
 			for (var y = 0; y < lines.Length; y++)
 			{
 				var line = lines[y];
 				for (var x = 0; x < line.Length; x++)
 				{
-					map[x][y] = line[x];
+					this[x][y] = line[x];
 				}
-			}
-			return map;
+			}			
+		}
+
+		public static CharMap FromArray(string[] lines, char defaultValue = default)
+		{
+			return new CharMap(lines, defaultValue);
 		}
 
 		public void ConsoleWrite(bool clear = false, params string[] headers)
