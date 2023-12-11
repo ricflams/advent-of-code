@@ -44,7 +44,6 @@ namespace AdventOfCode.Helpers.Puzzles
 				var response = client.GetAsync(apiUrl).Result;
 				if (!response.IsSuccessStatusCode)
 				{
-					Console.Error.WriteLine($"No input yet for day {day}, {year}");
 					return [];
 				}
 

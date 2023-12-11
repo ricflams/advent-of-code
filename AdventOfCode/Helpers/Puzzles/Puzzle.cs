@@ -43,8 +43,14 @@ namespace AdventOfCode.Helpers.Puzzles
 			if (!Options.ShouldRun(this, testname))
 				return;
 
-			T result = default;
 			var input = FileSystem.Instance.ReadFile(Year, Day, filename);
+			if (input.Length == 0)
+			{
+				Console.Error.WriteLine($"No {testname} for day {Day}, {Year}");				
+				return;
+			}
+
+			T result = default;
 			var sw = Stopwatch.StartNew();
 			for (var i = 0; i < Options.Iterations; i++)
 			{
