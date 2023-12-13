@@ -20,6 +20,10 @@ namespace AdventOfCode.Y2016.Day16
 				.WithParameter((272, 35651584))
 				.Part1("00100111000101111")
 				.Part2("11101110011100110");
+			Run("extra")
+				.WithParameter((272, 35651584))
+				.Part1("10111110010110110")
+				.Part2("01101100001100100");
 		}
 
 		protected override string Part1(string[] input)

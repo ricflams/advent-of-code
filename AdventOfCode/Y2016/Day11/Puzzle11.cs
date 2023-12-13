@@ -18,8 +18,8 @@ namespace AdventOfCode.Y2016.Day11
 			Run("test1").Part1(11);
 			Run("test2").Part1(25).Part2(49); // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db4omkn
 			Run("test3").Part1(33).Part2(57); // https://www.reddit.com/r/adventofcode/comments/5hoia9/2016_day_11_solutions/db5ctc6
-			Run("test4").Part1(47).Part2(71); // https://www.reddit.com/r/adventofcode/comments/5hqxzq/2016_day_11_can_we_get_a_list_of_inputssolutions/db2eesk
 			Run("input").Part1(37).Part2(61);
+			Run("extra").Part1(47).Part2(71);
 		}
 
 		protected override int Part1(string[] input)

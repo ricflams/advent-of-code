@@ -15,6 +15,7 @@ namespace AdventOfCode.Y2016.Day06
 		{
 			Run("test1").Part1("easter").Part2("advent");
 			Run("input").Part1("mshjnduc").Part2("apfeeebz");
+			Run("extra").Part1("qrqlznrl").Part2("kgzdfaon");
 		}
 
 		protected override string Part1(string[] input)
