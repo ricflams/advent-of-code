@@ -33,7 +33,7 @@ namespace AdventOfCode.Y2023.Day12
 				{
 					var part = line.Split(' ').ToArray();
 					var (springs, groups) = (part[0], part[1].ToIntArray());
-					var n = CountCombos(springs, groups);
+					var n = FindMatches(springs, groups);
 					return n;
 				});
 
@@ -49,65 +49,73 @@ namespace AdventOfCode.Y2023.Day12
 					var (s, g) = (part[0], part[1].ToIntArray());
 					var springs = $"{s}?{s}?{s}?{s}?{s}";
 					var groups = g.Concat(g).Concat(g).Concat(g).Concat(g).ToArray();
-					var n = CountCombos(springs, groups);
+					var n = FindMatches(springs, groups);
 					return n;
 				});
 
 			return sum;
-		}		
+		}
 
-		private readonly Dictionary<string, long> _memo = [];
-
-		private long CountCombos(string spring, int[] groups)
+		static long FindMatches(string spring, int[] damageGroups)
 		{
-			// Clear the memo for each new search for efficiency.
-			// Also pad spring with as much extra dots as as the longest
+			var memo = new Dictionary<int, long>();
+
+			// The memo-key need this much space for the group-part
+			var memoKeyFactor = damageGroups.Length + 1;
+
+			// Pad spring with as much extra dots as as the longest
 			// group could possibly cause us to look-ahead to avoid having
 			// to do checks for reading past the end of the spring.
-			_memo.Clear();
-			var paddedSpring = spring + new string('.', groups.Max()+1);
-			return ComboMemo(paddedSpring, groups);
+			var paddedSpring = spring + new string('.', damageGroups.Max()+1);
+
+			return CountMatches(paddedSpring, damageGroups);
+
+			long CountMatches(ReadOnlySpan<char> s, int[] groups)
+			{
+				// Memoize the findings.
+				// Interestingly the key can be very simple: since neither the spring
+				// not the groups changes as such - only the positions that we're
+				// investigating inside them does - then it suffices to remember where
+				// in the spring and where in the group we're at now. And that can be
+				// cheaply stored as an integer by combining the two.
+				var key = s.Length * memoKeyFactor + groups.Length;
+				if (!memo.TryGetValue(key, out var n))
+					n = memo[key] = ComboCalculate(s, groups);
+				return n;
+			}
+
+			long ComboCalculate(ReadOnlySpan<char> s, int[] groups)
+			{
+				// Always skip leading dots
+				while (s.Length > 0 && s[0] == '.')
+					s = s[1..];
+
+				// If groups are exhausted there it's a match if only ?. are left; else not a match
+				if (groups.Length == 0)
+					return s.IndexOf('#') < 0 ? 1 : 0;
+
+				// If there are groups left but s is exhausted then it's not a match
+				if (s.Length == 0)
+					return 0;
+
+				// We know now that we're looking at # or ?
+				// If group can't match here (because s contains a . or has a trailing #)
+				// then skip wildcard and continue matching; if looking at # then it's not a match
+				var siz = groups[0];
+				if (s[..siz].Contains('.') || s[siz] == '#')
+					return s[0] == '?' ? CountMatches(s[1..], groups) : 0;
+
+				// It's a match so far, huzzah.
+				// Keep on matching the sequence following this group, ie move ahead the
+				// length of the group and move to the next group.
+				// If looking at a wildcard then also count any matches that we would find
+				// by skipping that wildcard.
+				var n = CountMatches(s[(siz+1)..], groups[1..]);
+				if (s[0] == '?') // may skip
+					n += CountMatches(s[1..], groups);
+				return n;
+			}
 		}
 
-		private long ComboMemo(ReadOnlySpan<char> s, int[] groups)
-		{
-			// Memoize the findings
-			var key = $"{s}/{string.Join('-', groups)}";
-			if (!_memo.TryGetValue(key, out var n))
-				n = _memo[key] = ComboCalculate(s, groups);
-			return n;
-		}
-
-		private long ComboCalculate(ReadOnlySpan<char> s, int[] groups)
-		{
-			// Always skip leading dots
-			while (s.Length > 0 && s[0] == '.')
-				s = s[1..];
-
-			// If groups are exhausted there it's a match if only ?. are left; else not a match
-			if (groups.Length == 0)
-				return s.IndexOf('#') < 0 ? 1 : 0;
-
-			// If there are groups left but s is exhausted then it's not a match
-			if (s.Length == 0)
-				return 0;
-
-			// We know now that we're looking at # or ?
-			// If group can't match here (because s contains a . or has a trailing #)
-			// then skip wildcard and continue matching; if looking at # then it's not a match
-			var siz = groups[0];
-			if (s[..siz].Contains('.') || s[siz] == '#')
-				return s[0] == '?' ? ComboMemo(s[1..], groups) : 0;
-
-			// It's a match so far, huzzah.
-			// Keep on matching the sequence following this group, ie move ahead the
-			// length of the group and move to the next group.
-			// If looking at a wildcard then also count any matches that we would find
-			// by skipping that wildcard.
-			var n = ComboMemo(s[(siz+1)..], groups[1..]);
-			if (s[0] == '?') // may skip
-				n += ComboMemo(s[1..], groups);
-			return n;
-		}
 	}
 }
