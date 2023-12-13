@@ -103,8 +103,6 @@ namespace AdventOfCode.Y2023.Day11.Raw
 
 
 			return sum;
-
-			return 0;
 		}
 	}
 }

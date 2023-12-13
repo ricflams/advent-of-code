@@ -13,6 +13,9 @@ using System.ComponentModel;
 
 namespace AdventOfCode.Y2023.Day12.Raw
 {
+	#pragma warning disable CS8321
+	#pragma warning disable CS0642
+
 	internal class Puzzle : Puzzle<long, long>
 	{
 		public static Puzzle Instance = new();
