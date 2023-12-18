@@ -287,5 +287,19 @@ namespace AdventOfCode.Helpers
 			}
 			return true;
 		}
+
+		public static long AreaByShoelace(IEnumerable<Point> points)
+		{
+			var p = points.ToArray();
+			var N = p.Length;
+
+			Point P(int i) => p[(i + N) % N];
+
+			var area = Enumerable.Range(0, N)
+				.Sum(i => (long)P(i).X * (P(i + 1).Y - P(i - 1).Y) + P(i).ManhattanDistanceTo(P(i + 1)))
+				/ 2 + 1;
+
+			return area;
+		}
 	}
 }
