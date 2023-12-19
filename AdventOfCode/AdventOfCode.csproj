@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>AdventOfCode</RootNamespace>
     <AssemblyName>AdventOfCode</AssemblyName>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="aoc-sessioncookie">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Helpers\PuzzleDay\template.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Y*\**\*.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
