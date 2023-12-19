@@ -19,12 +19,13 @@ namespace AdventOfCode
 				// || (year, day) == (2021, 12)
 				// || (year, day) == (2022, 16)
 				// || (year, day) == (2017, 12)
-				//|| year == 2023 && day <= 4
-				|| (year, day) == (2023, 6)
+				//|| year == 2023 & day < 16
+				|| (year, day) == (2023, 19)
 			);
 
+//runner.Options.OnlyRunForInputs = true;
 			var iterations = 1;
-			//iterations = 10;
+			//iterations = 3;
 
 			if (iterations == 1)
 			{

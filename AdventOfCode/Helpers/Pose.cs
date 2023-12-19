@@ -21,7 +21,7 @@ namespace AdventOfCode.Helpers
 		static public Pose From(Point p, Direction direction) => new Pose(p, direction);
 
 		public Point Point { get; private set; }
-		public Direction Direction { get; private set; }
+		public Direction Direction { get; set; }
 
 		public override string ToString() => $"{Point}{Direction.AsChar()}";
 		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
