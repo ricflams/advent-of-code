@@ -15,6 +15,7 @@ namespace AdventOfCode.Helpers.Puzzles
 		{
 			if (!_filter(puzzle.Year, puzzle.Day))
 				return false;
+			//return filename == "extra";
 			if (OnlyRunForInputs)
 				return filename == "input";
 			return true;

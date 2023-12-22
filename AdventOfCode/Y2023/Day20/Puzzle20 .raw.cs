@@ -10,7 +10,7 @@ using AdventOfCode.Helpers.String;
 using System.Collections;
 using static AdventOfCode.Y2023.Day20.Puzzle;
 
-namespace AdventOfCode.Y2023.Day20
+namespace AdventOfCode.Y2023.Day20.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{

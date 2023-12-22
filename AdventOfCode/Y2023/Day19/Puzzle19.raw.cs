@@ -13,7 +13,7 @@ using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Runtime.CompilerServices;
 using static AdventOfCode.Y2018.Day15.Puzzle;
 
-namespace AdventOfCode.Y2023.Day19
+namespace AdventOfCode.Y2023.Day19.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
