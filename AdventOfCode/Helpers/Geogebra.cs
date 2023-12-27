@@ -21,6 +21,17 @@ namespace AdventOfCode.Helpers
 		}
 	}
 
+	public class Line : IGeogebraObject
+	{
+		public List<Point3D> _points = new();
+		public IEnumerable<string> Command(Func<int> NextId)
+		{
+			// https://wiki.geogebra.org/en/Naming_Objects
+
+			var pts = string.Join(",", _points.Select(p => $"({p.X},{p.Y},{p.Z})"));
+			yield return $"p{NextId()}=Plane(Polygon({pts}))";
+		}
+	}
 	public class Geogebra
 	{
 		private int _index;

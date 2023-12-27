@@ -7,7 +7,7 @@ using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 
-namespace AdventOfCode.Y2023.Day23
+namespace AdventOfCode.Y2023.Day23.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
