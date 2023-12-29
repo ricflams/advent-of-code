@@ -223,25 +223,36 @@ namespace AdventOfCode.Y2023.Day24
 				.ToArray();
 
 
+			var matches = new List<int>();
 			var N = hails0.Length;
 
 			var pos = hails0.Select(h => h.P.X).ToArray();
 			var vel = hails0.Select(h => h.V.X).ToArray();
-			for (var dx = 3; dx < 10000; dx++)
+			for (var dx = 1; dx < 10000; dx++)
 			{
 				if (Solve(dx) || Solve(-dx))
 					break;
 			}
 
+			foreach (var m in matches.OrderDescending().Take(100))
+			{
+				Console.Write($"{m} ");
+			}
+			Console.WriteLine();
+
 			bool Solve(int v)
 			{
 				var factors = new List<BigInteger>();
 				var remainders = new List<BigInteger>();
+				if (vel.Any(vv => vv == v))
+					return false;
 				for (var i = 0; i < N; i++)
 				{
 					var dv = vel[i] - v;
-					if (IsPrime(dv) && dv > 0 && (pos[i] % dv)!=0 && !factors.Any(f => Math.Abs((int)f) == Math.Abs(dv)))
+					if (IsPrime(dv) && dv > 0)
 					{
+						if (factors.Any(f => Math.Abs((int)f) == Math.Abs(dv)))
+							return false;
 						factors.Add(new BigInteger(dv));
 						remainders.Add(new BigInteger(pos[i] % dv));
 					}
@@ -250,24 +261,37 @@ namespace AdventOfCode.Y2023.Day24
 				}
 				if (factors.Count == 0)
 					return false;
-				var p = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
-				//var remainprod = BigInteger.One;
-				//foreach (var r in factors)
-				//{
-				//	remainprod *= r;
-				//}
+				var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
+				decimal p;
+				try
+				{
+					p = (decimal)remainder;
+				}
+				catch (OverflowException)
+				{
+					Console.Write(".");
+					return false;
+				}
+
+
+				var factorprod = (decimal)1;
+				foreach (var r in factors)
+				{
+					factorprod *= (decimal)r;
+				}
+
 				//p /= remainprod;
 				//var prod = remainders.ToArray().Prod();
 				//p += prod;
 
-				try
+				for (var j = 0; j < 100000; j++)
 				{
 					var match = 0;
 					for (var i = 0; i < N; i++)
 					{
-						if (vel[i] == v)
-							continue;
-						var dist = (decimal)p - pos[i];
+						// if (vel[i] == v)
+						// 	continue;
+						var dist = p - pos[i];
 						var dv = vel[i] - v;
 						var rem = dist % dv;
 						if (rem != 0)
@@ -276,13 +300,14 @@ namespace AdventOfCode.Y2023.Day24
 						}
 						match++;
 					}
-					Console.Write($"{match}/{factors.Count} ");
-					return match == N;
+					if (match == N)
+						return true;
+					// Console.Write($"{match}/{factors.Count} ");
+					matches.Add(match);
+					// return match == N;
+					p += factorprod;
 				}
-				catch (OverflowException)
-				{
-					return false;
-				}
+				return false;
 			}
 
 			return 0;
