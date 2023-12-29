@@ -10,6 +10,8 @@ using AdventOfCode.Helpers.String;
 using System.Runtime.Intrinsics.X86;
 using System.Numerics;
 using MathNet.Numerics;
+using AdventOfCode.Helpers.Arrays;
+using MathNet.Numerics.LinearAlgebra.Solvers;
 
 namespace AdventOfCode.Y2023.Day24
 {
@@ -23,7 +25,7 @@ namespace AdventOfCode.Y2023.Day24
 		public override void Run()
 		{
 			//Run("test1").WithParameter((7, 27)).Part1(2).Part2(47);
-			Run("test1").Part2(47);
+//			Run("test1").Part2(47);
 	//		Run("test2").Part1(0).Part2(0);
 	//Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593);
 			Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593).Part2(0);
@@ -54,19 +56,10 @@ namespace AdventOfCode.Y2023.Day24
 
             public override string ToString() => $"{P} @ {V}";
 
-            public static void Move(IEnumerable<Hail> hails)
-			{
-				foreach (var h in hails)
-				{
-					var (p, v) = (h.P, h.V);
-					h.P = new Point3D(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
-				}
-			}
+			public static Hail[] Move(Hail[] hails, int t) => hails.Select(h => h.Move(t)).ToArray();
+			public static Point3D[] HailsAt(Hail[] hails, int t) => hails.Select(h => h.Move(t).P).ToArray();
 
-			public static Hail[] Copy(Hail[] hails)
-			{
-				return hails.Select(h => new Hail { P=new(h.P.X, h.P.Y, h.P.Z), V=h.V}).ToArray();
-			} 
+			public static Hail[] Copy(Hail[] hails) => Move(hails, 0);
 
 			public Point3D HitXy(Hail o)
 			{
@@ -198,10 +191,24 @@ namespace AdventOfCode.Y2023.Day24
 			return sum;
 		}
 
+		private bool IsPrime(decimal p)
+		{
+			p = Math.Abs(p);
+			if (p == 0 || p == 1)
+				return false;
+			var sqrt = Math.Sqrt((double)p);
+			for (var i = 2; i <= sqrt; i++)
+			{
+				if ((p % i) == 0)
+					return false;
+			}
+			return true;
+		}
+
 		protected override long Part2(string[] input)
 		{
-			var (min, max) = PuzzleParameter;
-			var (minP, maxP) = ((decimal)min, (decimal)max);
+			var (minp, maxp) = PuzzleParameter;
+			var (minP, maxP) = ((decimal)minp, (decimal)maxp);
 
 			var hails0 = input
 				.Select(s =>
@@ -215,10 +222,148 @@ namespace AdventOfCode.Y2023.Day24
 				})
 				.ToArray();
 
+
+			var N = hails0.Length;
+
+			var pos = hails0.Select(h => h.P.X).ToArray();
+			var vel = hails0.Select(h => h.V.X).ToArray();
+			for (var dx = 3; dx < 10000; dx++)
+			{
+				if (Solve(dx) || Solve(-dx))
+					break;
+			}
+
+			bool Solve(int v)
+			{
+				var factors = new List<BigInteger>();
+				var remainders = new List<BigInteger>();
+				for (var i = 0; i < N; i++)
+				{
+					var dv = vel[i] - v;
+					if (IsPrime(dv) && dv > 0 && (pos[i] % dv)!=0 && !factors.Any(f => Math.Abs((int)f) == Math.Abs(dv)))
+					{
+						factors.Add(new BigInteger(dv));
+						remainders.Add(new BigInteger(pos[i] % dv));
+					}
+					//if (factors.Count == 5)
+					//	break;
+				}
+				if (factors.Count == 0)
+					return false;
+				var p = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
+				//var remainprod = BigInteger.One;
+				//foreach (var r in factors)
+				//{
+				//	remainprod *= r;
+				//}
+				//p /= remainprod;
+				//var prod = remainders.ToArray().Prod();
+				//p += prod;
+
+				try
+				{
+					var match = 0;
+					for (var i = 0; i < N; i++)
+					{
+						if (vel[i] == v)
+							continue;
+						var dist = (decimal)p - pos[i];
+						var dv = vel[i] - v;
+						var rem = dist % dv;
+						if (rem != 0)
+						{
+							continue;
+						}
+						match++;
+					}
+					Console.Write($"{match}/{factors.Count} ");
+					return match == N;
+				}
+				catch (OverflowException)
+				{
+					return false;
+				}
+			}
+
+			return 0;
+
+			var hailprimex = hails0.Where(h => IsPrime(h.V.X)).ToArray();
+
+			var maxx = hails0.Max(h => Math.Abs(h.P.X));
+			var maxv = hails0.Max(h => Math.Abs(h.V.X));
+			var f = maxx / maxv;
+
+			var geo = new Geogebra();
+			foreach (var h in hails0.Append(new Hail { P = new Point3D(24, 13, 10), V = new Point3D(-3, 1, 2) }))
+			{
+				//for (var i = 0; i < 7; i++)
+				//{
+				//	geo.Add(new Helpers.Vector(h.P.X + i * h.V.X, i, h.V.X, 1));
+				//}
+				geo.Add(new Helpers.Vector(h.P.X/f, 0, h.V.X*f, f));
+			}
+			Console.WriteLine(geo.AsExecuteCommands());
+
+
+			var hailCache = new Dictionary<int, Point3D[]>();
+			Point3D[] HailsAt(int t)
+			{
+				if (!hailCache.TryGetValue(t, out Point3D[] hails))
+					hails = hailCache[t] = Hail.HailsAt(hails0, t);
+				return hails;
+			}
+
+			var minDx = hails0.Min(h => h.V.Y); // except the max's one
+			var hails = hails0.Select(h => h.P.Y).ToArray();
+			var vx = hails0.Select(h => h.V.Y).ToArray();
+
+			for (var t0 = 1; ; t0++)
+			{
+				if (t0 % 1000 == 0)
+					Console.Write('.');
+
+				var xMax = decimal.MinValue;
+				for (var i = 0; i < N; i++)
+				{
+					var max = hails[i] + t0*vx[i];
+					if (max > xMax)
+						xMax = max;
+				}
+				//var xMax = hails.Max();
+
+				//var tEnd = t0 + N - 1;
+				//var hailsAtEnd = HailsAt(tEnd);
+		//		var xMin = hailsAtEnd.Min(p => p.X);
+
+				for (var dx = minDx-1; dx > minDx*10; dx--)
+				{
+					//if (xMax + dx*N < xMin) // slope (dx) can't ever touch all hails
+					//	break;
+					var rockX0 = xMax - dx * t0;
+					var i = 0;
+					for (; i < N; i++)
+					{
+						var dv = Math.Abs(dx - vx[i]); // hack
+						if (dv == 0)
+							break;
+						if ((rockX0 - hails[i]) % dv != 0)
+							break;
+					}
+					if (i == N)
+					{
+						Console.WriteLine($"##### bingo at {t0} {dx} {rockX0}!");
+						return 0;
+					}
+				}
+
+			}
+
+
+
 			for (var t0 = 1;; t0++)
 			{
-				Console.Write('+');
-				Hail.Move(hails0);
+				//Console.Write('+');
+				hails0 = Hail.Move(hails0, 1);
 				//var p0s = hails0.Select(h => h.P).ToArray();
 				for (var i = 0; i < hails0.Length; i++)
 				{
@@ -249,14 +394,14 @@ namespace AdventOfCode.Y2023.Day24
 							var hitall = hails0.All(h => h.HitXy(rock2) != null);
 							if (hitall)
 							{
-								var rock0 = rock2.Move(-(t0+dt));
+								var rock0 = rock2.Move(-t0);
 								var result = (long)(rock0.P.X + rock0.P.Y + rock0.P.Z);
 								//Console.WriteLine($"{t0+dt} {rock0} {result}");
 								Console.Write($".");
 								var ok = FullCheck(rock0, rock2, hails0);
 								if (ok)
 								{
-									Console.WriteLine($"##### found {t0+dt} {rock0}");
+									Console.WriteLine($"##### found {rock0}");
 									return result;
 								}
 								break;

@@ -1,6 +1,7 @@
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using System.Linq;
+using System.Numerics;
 
 namespace AdventOfCode.Y2016.Day15
 {
@@ -61,8 +62,8 @@ namespace AdventOfCode.Y2016.Day15
 				.Concat(extraDisc != null ? new[] {extraDisc} : Enumerable.Empty<Disc>())
 				.ToArray();
 
-			var n = factors.Select(x => x.N).ToArray();
-			var rem = factors.Select(x => x.A).ToArray();
+			var n = factors.Select(x => new BigInteger(x.N)).ToArray();
+			var rem = factors.Select(x => new BigInteger(x.A)).ToArray();
 			var result = MathHelper.SolveChineseRemainderTheorem(n, rem);
 
 			// for (var t = Math.Max(0, result - 10); t < result + 10; t++)
@@ -79,7 +80,7 @@ namespace AdventOfCode.Y2016.Day15
 			// 	Console.WriteLine();
 			// }
 
-			return result;
+			return (int)result;
 		}
 	}
 }

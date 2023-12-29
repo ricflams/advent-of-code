@@ -21,15 +21,15 @@ namespace AdventOfCode.Helpers
 		}
 	}
 
-	public class Line : IGeogebraObject
+	public class Vector : IGeogebraObject
 	{
-		public List<Point3D> _points = new();
+		public Vector(decimal x, decimal y, decimal vx, decimal vy) => vector = $"Vector(({x},{y}),({x+vx},{y+vy}))";// (x, y, vx, vy);
+		public readonly string vector;
 		public IEnumerable<string> Command(Func<int> NextId)
 		{
 			// https://wiki.geogebra.org/en/Naming_Objects
 
-			var pts = string.Join(",", _points.Select(p => $"({p.X},{p.Y},{p.Z})"));
-			yield return $"p{NextId()}=Plane(Polygon({pts}))";
+			yield return $"p{NextId()}={vector}";
 		}
 	}
 	public class Geogebra

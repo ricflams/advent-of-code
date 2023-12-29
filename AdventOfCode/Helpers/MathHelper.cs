@@ -38,6 +38,16 @@ namespace AdventOfCode.Helpers
 			return prod;
 		}
 
+		public static BigInteger Prod(this BigInteger[] values)
+		{
+			var prod = BigInteger.One;
+			foreach (var v in values)
+			{
+				prod *= v;
+			}
+			return prod;
+		}
+
 		public static long Prod(this int[] values)
 		{
 			var prod = 1L;
@@ -140,6 +150,20 @@ namespace AdventOfCode.Helpers
             }
             return sum % prod;
 		}
+
+		public static BigInteger SolveChineseRemainderTheorem(BigInteger[] n, BigInteger[] a)
+		{
+			var prod = n.Prod();
+			var sum = BigInteger.Zero;
+			for (int i = 0; i < n.Length; i++)
+			{
+				var p = prod / n[i];
+				sum += a[i] * p.ModInverse(n[i]) * p;
+				//sum += a[i] * ModularMultiplicativeInverse(p, n[i]) * p;
+			}
+			return sum % prod;
+		}
+
 
 		public static IEnumerable<long> Factorize(long n)
 		{

@@ -165,7 +165,7 @@ namespace AdventOfCode.Y2023.Day23.Raw
 			var stack = new Stack<Point>();
 			var visited = new HashSet<Point>();
 
-		    void TopologicalSortUtil(Point p)
+		    void TopologicalSort(Point p)
 			{
 				// Mark the current node as visited
 				visited.Add(p);
@@ -175,7 +175,7 @@ namespace AdventOfCode.Y2023.Day23.Raw
 				for (int i = 0; i < nodes[p].Edges.Count; i++) {
 					var node = nodes[p].Edges[i];
 					if (!visited.Contains(node.Item1.Pos))
-						TopologicalSortUtil(node.Item1.Pos);
+						TopologicalSort(node.Item1.Pos);
 				}
 				// Push current vertex to stack which stores
 				// topological sort
@@ -188,7 +188,7 @@ namespace AdventOfCode.Y2023.Day23.Raw
 			foreach (var p in nodes.Keys)
 			{
 				if (!visited.Contains(p))
-					TopologicalSortUtil(p);
+					TopologicalSort(p);
 			}
 
 
