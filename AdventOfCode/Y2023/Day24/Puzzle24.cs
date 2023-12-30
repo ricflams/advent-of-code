@@ -223,6 +223,17 @@ namespace AdventOfCode.Y2023.Day24
 				.ToArray();
 
 
+			//var fact = 2000000000000;
+			//var geo = new Geogebra();
+			//foreach (var h in hails0)
+			//{
+			//	geo.Add(new Helpers.Vector(h.P.X / fact, 0, h.V.X, 200));
+			//}
+			//Console.WriteLine(geo.AsExecuteCommands());
+
+
+
+
 			var matches = new List<int>();
 			var N = hails0.Length;
 
@@ -248,44 +259,83 @@ namespace AdventOfCode.Y2023.Day24
 					return false;
 				for (var i = 0; i < N; i++)
 				{
-					var dv = vel[i] - v;
-					if (IsPrime(dv) && dv > 0)
+					var pi = pos[i];
+					var vi = vel[i];
+					if (Math.Sign(vi) == Math.Sign(v))
 					{
-						if (factors.Any(f => Math.Abs((int)f) == Math.Abs(dv)))
-							return false;
-						factors.Add(new BigInteger(dv));
-						remainders.Add(new BigInteger(pos[i] % dv));
+						if (v > 0)
+						{
+							if (vi > v)
+							{
+								var dv = v - vi;
+								if (pi % dv != 0) continue;
+								factors.Add(new BigInteger(dv));
+							}
+							else
+							{
+								var dv = vi - v;
+								if (pi % dv != 0) continue;
+								factors.Add(new BigInteger(dv));
+							}
+						}
+						else
+						{
+							if (vi > v)
+							{
+								var dv = v - vi;
+								if (!IsPrime(dv)) continue;
+							}
+							else
+							{
+								var dv = vi - v;
+								if (!IsPrime(dv)) continue;
+							}
+						}
 					}
+					else
+					{
+
+					}
+
+					vel[i] - v;
+					if (!IsPrime(dv)) continue;
+					//if (dv < 0) continue;
+					if ((pos[i] % dv) != 0) continue;
+					factors.Add(new BigInteger(dv));
+					//remainders.Add(new BigInteger(pos[i] % dv));
 					//if (factors.Count == 5)
 					//	break;
 				}
 				if (factors.Count == 0)
 					return false;
-				var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
-				decimal p;
-				try
-				{
-					p = (decimal)remainder;
-				}
-				catch (OverflowException)
-				{
-					Console.Write(".");
-					return false;
-				}
+				//			var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
+				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
+				//var p = (decimal)0;
+				//try
+				//{
+				//	var pp = BigInteger.One;
+				//	foreach (var ff in factors)
+				//		pp *= ff;
+				//	p = (decimal)pp;
+				//}
+				//catch (OverflowException)
+				//{
+				//	Console.Write(".");
+				//	return false;
+				//}
 
-
-				var factorprod = (decimal)1;
-				foreach (var r in factors)
-				{
-					factorprod *= (decimal)r;
-				}
+				//var factorprod = (decimal)1;
+				//foreach (var r in factors)
+				//{
+				//	factorprod *= (decimal)r;
+				//}
 
 				//p /= remainprod;
 				//var prod = remainders.ToArray().Prod();
 				//p += prod;
 
-				for (var j = 0; j < 100000; j++)
-				{
+				//for (var j = 0; j < 10000000; j++)
+				//{
 					var match = 0;
 					for (var i = 0; i < N; i++)
 					{
@@ -305,8 +355,8 @@ namespace AdventOfCode.Y2023.Day24
 					// Console.Write($"{match}/{factors.Count} ");
 					matches.Add(match);
 					// return match == N;
-					p += factorprod;
-				}
+					//p += factorprod;
+				//}
 				return false;
 			}
 
@@ -318,16 +368,16 @@ namespace AdventOfCode.Y2023.Day24
 			var maxv = hails0.Max(h => Math.Abs(h.V.X));
 			var f = maxx / maxv;
 
-			var geo = new Geogebra();
-			foreach (var h in hails0.Append(new Hail { P = new Point3D(24, 13, 10), V = new Point3D(-3, 1, 2) }))
-			{
-				//for (var i = 0; i < 7; i++)
-				//{
-				//	geo.Add(new Helpers.Vector(h.P.X + i * h.V.X, i, h.V.X, 1));
-				//}
-				geo.Add(new Helpers.Vector(h.P.X/f, 0, h.V.X*f, f));
-			}
-			Console.WriteLine(geo.AsExecuteCommands());
+			//var geo = new Geogebra();
+			//foreach (var h in hails0.Append(new Hail { P = new Point3D(24, 13, 10), V = new Point3D(-3, 1, 2) }))
+			//{
+			//	//for (var i = 0; i < 7; i++)
+			//	//{
+			//	//	geo.Add(new Helpers.Vector(h.P.X + i * h.V.X, i, h.V.X, 1));
+			//	//}
+			//	geo.Add(new Helpers.Vector(h.P.X/f, 0, h.V.X*f, f));
+			//}
+			//Console.WriteLine(geo.AsExecuteCommands());
 
 
 			var hailCache = new Dictionary<int, Point3D[]>();
