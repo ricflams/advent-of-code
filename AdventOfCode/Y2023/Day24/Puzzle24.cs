@@ -235,17 +235,23 @@ namespace AdventOfCode.Y2023.Day24
 
 
 			var matches = new List<int>();
+			var matches2 = new List<int>();
 			var N = hails0.Length;
 
-			var pos = hails0.Select(h => h.P.X).ToArray();
-			var vel = hails0.Select(h => h.V.X).ToArray();
-			for (var dx = 1; dx < 10000; dx++)
+			var pos = hails0.Select(h => h.P.Z).ToArray();
+			var vel = hails0.Select(h => h.V.Z).ToArray();
+			for (var dx = 1; dx < 1000; dx++)
 			{
 				if (Solve(dx) || Solve(-dx))
 					break;
 			}
 
-			foreach (var m in matches.OrderDescending().Take(100))
+			foreach (var m in matches.OrderDescending().Take(30))
+			{
+				Console.Write($"{m} ");
+			}
+			Console.WriteLine();
+			foreach (var m in matches2.OrderDescending().Take(30))
 			{
 				Console.Write($"{m} ");
 			}
@@ -253,63 +259,29 @@ namespace AdventOfCode.Y2023.Day24
 
 			bool Solve(int v)
 			{
-				var factors = new List<BigInteger>();
-				var remainders = new List<BigInteger>();
+				var factors = new List<int>();
+				var remainders = new List<int>();
 				if (vel.Any(vv => vv == v))
 					return false;
 				for (var i = 0; i < N; i++)
 				{
 					var pi = pos[i];
 					var vi = vel[i];
-					if (Math.Sign(vi) == Math.Sign(v))
-					{
-						if (v > 0)
-						{
-							if (vi > v)
-							{
-								var dv = v - vi;
-								if (pi % dv != 0) continue;
-								factors.Add(new BigInteger(dv));
-							}
-							else
-							{
-								var dv = vi - v;
-								if (pi % dv != 0) continue;
-								factors.Add(new BigInteger(dv));
-							}
-						}
-						else
-						{
-							if (vi > v)
-							{
-								var dv = v - vi;
-								if (!IsPrime(dv)) continue;
-							}
-							else
-							{
-								var dv = vi - v;
-								if (!IsPrime(dv)) continue;
-							}
-						}
-					}
-					else
-					{
 
-					}
-
-					vel[i] - v;
+					var dv = vel[i] - v;
 					if (!IsPrime(dv)) continue;
-					//if (dv < 0) continue;
-					if ((pos[i] % dv) != 0) continue;
-					factors.Add(new BigInteger(dv));
-					//remainders.Add(new BigInteger(pos[i] % dv));
-					//if (factors.Count == 5)
-					//	break;
+					if (dv < 0) continue;
+					//if ((pos[i] % dv) != 0) continue;
+					if (factors.Contains((int)dv))
+						continue;
+					factors.Add((int)dv);
+					remainders.Add((int)(pos[i] % dv));
+					if (factors.Count == 15)
+						break;
 				}
 				if (factors.Count == 0)
 					return false;
-				//			var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
-				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
+//				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
 				//var p = (decimal)0;
 				//try
 				//{
@@ -324,11 +296,6 @@ namespace AdventOfCode.Y2023.Day24
 				//	return false;
 				//}
 
-				//var factorprod = (decimal)1;
-				//foreach (var r in factors)
-				//{
-				//	factorprod *= (decimal)r;
-				//}
 
 				//p /= remainprod;
 				//var prod = remainders.ToArray().Prod();
@@ -336,27 +303,63 @@ namespace AdventOfCode.Y2023.Day24
 
 				//for (var j = 0; j < 10000000; j++)
 				//{
+				try
+				{
+					var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
+					decimal p = remainder;
+					var factorprod = (decimal)1;
+					foreach (var r in factors)
+					{
+						factorprod *= (decimal)r;
+					}			
 					var match = 0;
 					for (var i = 0; i < N; i++)
 					{
 						// if (vel[i] == v)
 						// 	continue;
-						var dist = p - pos[i];
 						var dv = vel[i] - v;
-						var rem = dist % dv;
-						if (rem != 0)
+						for (var j = 0L; j < Math.Abs(dv); j++)
 						{
-							continue;
+							var dist = p - pos[i];
+							var rem = dist % dv;
+							if (rem == 0)
+							{
+								match++;
+								break;
+							}
+							p += factorprod;
 						}
-						match++;
 					}
 					if (match == N)
-						return true;
+					{
+						match = 0;
+						for (var i = 0; i < N; i++)
+						{
+							var dv = vel[i] - v;
+							var dist = p - pos[i];
+							var rem = dist % dv;
+							if (rem == 0)
+							{
+								match++;
+							}
+						}
+						matches2.Add(match);
+						if (match >= 296)
+							;
+						if (match == N)
+							return true;
+					}
+					if (match >= 296)
+						;
 					// Console.Write($"{match}/{factors.Count} ");
 					matches.Add(match);
 					// return match == N;
 					//p += factorprod;
-				//}
+				}
+				catch
+				{
+					return false;
+				}
 				return false;
 			}
 
