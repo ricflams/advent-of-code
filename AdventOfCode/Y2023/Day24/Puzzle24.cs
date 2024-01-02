@@ -191,12 +191,14 @@ namespace AdventOfCode.Y2023.Day24
 			return sum;
 		}
 
-		private bool IsPrime(decimal p)
+		private bool IsPrime(BigInteger p)
 		{
-			p = Math.Abs(p);
+			p = BigInteger.Abs(p);
 			if (p == 0 || p == 1)
 				return false;
 			var sqrt = Math.Sqrt((double)p);
+			if (new BigInteger(sqrt+1)*new BigInteger(sqrt+1) < p)
+				throw new Exception();
 			for (var i = 2; i <= sqrt; i++)
 			{
 				if ((p % i) == 0)
@@ -238,11 +240,13 @@ namespace AdventOfCode.Y2023.Day24
 			var matches2 = new List<int>();
 			var N = hails0.Length;
 
-			var pos = hails0.Select(h => h.P.Z).ToArray();
-			var vel = hails0.Select(h => h.V.Z).ToArray();
-			for (var dx = 1; dx < 1000; dx++)
+			var pos = hails0.Select(h => new BigInteger(h.P.Z)).ToArray();
+			var vel = hails0.Select(h => new BigInteger(h.V.Z)).ToArray();
+			var posinv = hails0.Select(h => -new BigInteger(h.P.Z)).ToArray();
+			var velinv = hails0.Select(h => -new BigInteger(h.V.Z)).ToArray();
+			for (var dx = 1; dx < 2000; dx++)
 			{
-				if (Solve(dx) || Solve(-dx))
+				if (Solve(dx, pos, vel) || Solve(dx, posinv, velinv))
 					break;
 			}
 
@@ -257,10 +261,9 @@ namespace AdventOfCode.Y2023.Day24
 			}
 			Console.WriteLine();
 
-			bool Solve(int v)
+			bool Solve(int v, BigInteger[] pos, BigInteger[] vel)
 			{
-				var factors = new List<int>();
-				var remainders = new List<int>();
+				var parts = new List<(BigInteger Fac, BigInteger Rem)>();
 				if (vel.Any(vv => vv == v))
 					return false;
 				for (var i = 0; i < N; i++)
@@ -269,85 +272,75 @@ namespace AdventOfCode.Y2023.Day24
 					var vi = vel[i];
 
 					var dv = vel[i] - v;
-					if (!IsPrime(dv)) continue;
-					if (dv < 0) continue;
-					//if ((pos[i] % dv) != 0) continue;
-					if (factors.Contains((int)dv))
-						continue;
-					factors.Add((int)dv);
-					remainders.Add((int)(pos[i] % dv));
-					if (factors.Count == 15)
-						break;
+					//if (!IsPrime(dv)) continue;
+					// if (parts.Any(f => f.Fac == dv))
+					// 	continue;
+					var remainder = pi % dv;
+					parts.Add((dv, remainder));
 				}
-				if (factors.Count == 0)
+				if (parts.Count < 3)
 					return false;
+				
+				parts = parts.Distinct().ToList();
+				var moduli = parts.Select(x => x.Fac).ToArray();
+				var remainders = parts.Select(x => x.Rem).ToArray();
+				// if (factors.Any(f => parts.Count(x => x.Fac == f) > 1))
+				// 	return false;
+
 //				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
-				//var p = (decimal)0;
-				//try
-				//{
-				//	var pp = BigInteger.One;
-				//	foreach (var ff in factors)
-				//		pp *= ff;
-				//	p = (decimal)pp;
-				//}
-				//catch (OverflowException)
-				//{
-				//	Console.Write(".");
-				//	return false;
-				//}
 
-
-				//p /= remainprod;
-				//var prod = remainders.ToArray().Prod();
-				//p += prod;
-
-				//for (var j = 0; j < 10000000; j++)
-				//{
 				try
 				{
-					var remainder = MathHelper.SolveChineseRemainderTheorem(factors.ToArray(), remainders.ToArray());
-					decimal p = remainder;
-					var factorprod = (decimal)1;
-					foreach (var r in factors)
-					{
-						factorprod *= (decimal)r;
-					}			
+					//var remainder = MathHelper.SolveChineseRemainderTheorem(factors, remainders);
+					var remainder = SolveCRT(moduli, remainders);
+					var p = remainder;
+					// var factorprod = BigInteger.One;
+					// foreach (var r in factors)
+					// {
+					// 	factorprod *= r;
+					// }			
 					var match = 0;
-					for (var i = 0; i < N; i++)
-					{
-						// if (vel[i] == v)
-						// 	continue;
-						var dv = vel[i] - v;
-						for (var j = 0L; j < Math.Abs(dv); j++)
-						{
-							var dist = p - pos[i];
-							var rem = dist % dv;
-							if (rem == 0)
-							{
-								match++;
-								break;
-							}
-							p += factorprod;
-						}
-					}
-					if (match == N)
+					// for (var i = 0; i < N; i++)
+					// {
+					// 	// if (vel[i] == v)
+					// 	// 	continue;
+					// 	var pi = new BigInteger(pos[i]);
+					// 	var dv = new BigInteger(vel[i] - v);
+					// 	for (var j = 0L; j < Math.Abs((int)dv); j++)
+					// 	{
+					// 		var dist = p - pi;
+					// 		var rem = dist % dv;
+					// 		if (rem == 0)
+					// 		{
+					// 			match++;
+					// 			break;
+					// 		}
+					// 		p += factorprod;
+					// 	}
+					// }
+					// if (match >= N-10)
 					{
 						match = 0;
 						for (var i = 0; i < N; i++)
 						{
+							var pi = pos[i];
 							var dv = vel[i] - v;
-							var dist = p - pos[i];
+							var dist = p - pi;
 							var rem = dist % dv;
 							if (rem == 0)
 							{
 								match++;
+								//break;
 							}
 						}
 						matches2.Add(match);
 						if (match >= 296)
 							;
 						if (match == N)
+						{
+							Console.WriteLine($"################### {p} v={v}");
 							return true;
+						}
 					}
 					if (match >= 296)
 						;
@@ -365,130 +358,130 @@ namespace AdventOfCode.Y2023.Day24
 
 			return 0;
 
-			var hailprimex = hails0.Where(h => IsPrime(h.V.X)).ToArray();
+		// 	var hailprimex = hails0.Where(h => IsPrime(h.V.X)).ToArray();
 
-			var maxx = hails0.Max(h => Math.Abs(h.P.X));
-			var maxv = hails0.Max(h => Math.Abs(h.V.X));
-			var f = maxx / maxv;
+		// 	var maxx = hails0.Max(h => Math.Abs(h.P.X));
+		// 	var maxv = hails0.Max(h => Math.Abs(h.V.X));
+		// 	var f = maxx / maxv;
 
-			//var geo = new Geogebra();
-			//foreach (var h in hails0.Append(new Hail { P = new Point3D(24, 13, 10), V = new Point3D(-3, 1, 2) }))
-			//{
-			//	//for (var i = 0; i < 7; i++)
-			//	//{
-			//	//	geo.Add(new Helpers.Vector(h.P.X + i * h.V.X, i, h.V.X, 1));
-			//	//}
-			//	geo.Add(new Helpers.Vector(h.P.X/f, 0, h.V.X*f, f));
-			//}
-			//Console.WriteLine(geo.AsExecuteCommands());
-
-
-			var hailCache = new Dictionary<int, Point3D[]>();
-			Point3D[] HailsAt(int t)
-			{
-				if (!hailCache.TryGetValue(t, out Point3D[] hails))
-					hails = hailCache[t] = Hail.HailsAt(hails0, t);
-				return hails;
-			}
-
-			var minDx = hails0.Min(h => h.V.Y); // except the max's one
-			var hails = hails0.Select(h => h.P.Y).ToArray();
-			var vx = hails0.Select(h => h.V.Y).ToArray();
-
-			for (var t0 = 1; ; t0++)
-			{
-				if (t0 % 1000 == 0)
-					Console.Write('.');
-
-				var xMax = decimal.MinValue;
-				for (var i = 0; i < N; i++)
-				{
-					var max = hails[i] + t0*vx[i];
-					if (max > xMax)
-						xMax = max;
-				}
-				//var xMax = hails.Max();
-
-				//var tEnd = t0 + N - 1;
-				//var hailsAtEnd = HailsAt(tEnd);
-		//		var xMin = hailsAtEnd.Min(p => p.X);
-
-				for (var dx = minDx-1; dx > minDx*10; dx--)
-				{
-					//if (xMax + dx*N < xMin) // slope (dx) can't ever touch all hails
-					//	break;
-					var rockX0 = xMax - dx * t0;
-					var i = 0;
-					for (; i < N; i++)
-					{
-						var dv = Math.Abs(dx - vx[i]); // hack
-						if (dv == 0)
-							break;
-						if ((rockX0 - hails[i]) % dv != 0)
-							break;
-					}
-					if (i == N)
-					{
-						Console.WriteLine($"##### bingo at {t0} {dx} {rockX0}!");
-						return 0;
-					}
-				}
-
-			}
+		// 	//var geo = new Geogebra();
+		// 	//foreach (var h in hails0.Append(new Hail { P = new Point3D(24, 13, 10), V = new Point3D(-3, 1, 2) }))
+		// 	//{
+		// 	//	//for (var i = 0; i < 7; i++)
+		// 	//	//{
+		// 	//	//	geo.Add(new Helpers.Vector(h.P.X + i * h.V.X, i, h.V.X, 1));
+		// 	//	//}
+		// 	//	geo.Add(new Helpers.Vector(h.P.X/f, 0, h.V.X*f, f));
+		// 	//}
+		// 	//Console.WriteLine(geo.AsExecuteCommands());
 
 
+		// 	var hailCache = new Dictionary<int, Point3D[]>();
+		// 	Point3D[] HailsAt(int t)
+		// 	{
+		// 		if (!hailCache.TryGetValue(t, out Point3D[] hails))
+		// 			hails = hailCache[t] = Hail.HailsAt(hails0, t);
+		// 		return hails;
+		// 	}
 
-			for (var t0 = 1;; t0++)
-			{
-				//Console.Write('+');
-				hails0 = Hail.Move(hails0, 1);
-				//var p0s = hails0.Select(h => h.P).ToArray();
-				for (var i = 0; i < hails0.Length; i++)
-				{
-					var hi = hails0[i];
-					for (var j = 0; j < hails0.Length; j++)
-					{
-						if (j == i)
-							continue;
-						for (var dt = 1; dt < 1000; dt++)
-						{
-							var hj = hails0[j].Move(dt);
-							var dx = Math.Abs(hj.P.X - hi.P.X);
-							var dy = Math.Abs(hj.P.Y - hi.P.Y);
-							var dz = Math.Abs(hj.P.Z - hi.P.Z);
-							if (dx % dt != 0 || dy % dt != 0 || dz % dt != 0)
-								continue;
-							var v = new Point3D((hj.P.X - hi.P.X)/dt, (hj.P.Y - hi.P.Y)/dt, (hj.P.Z - hi.P.Z)/dt);
-							var rock2 = new Hail
-							{
-								P = hi.P,
-								V = v
-							};
-							// Now we have start-point p0 and a pnext
-							// Try the remaining hails on for fit
-							// var remain = Hail.Copy(hails);
-							// remain[i].P = null;
-							// remain[j].P = null;
-							var hitall = hails0.All(h => h.HitXy(rock2) != null);
-							if (hitall)
-							{
-								var rock0 = rock2.Move(-t0);
-								var result = (long)(rock0.P.X + rock0.P.Y + rock0.P.Z);
-								//Console.WriteLine($"{t0+dt} {rock0} {result}");
-								Console.Write($".");
-								var ok = FullCheck(rock0, rock2, hails0);
-								if (ok)
-								{
-									Console.WriteLine($"##### found {rock0}");
-									return result;
-								}
-								break;
-							}
-						}
-					}
+		// 	var minDx = hails0.Min(h => h.V.Y); // except the max's one
+		// 	var hails = hails0.Select(h => h.P.Y).ToArray();
+		// 	var vx = hails0.Select(h => h.V.Y).ToArray();
 
-				}
-			}
+		// 	for (var t0 = 1; ; t0++)
+		// 	{
+		// 		if (t0 % 1000 == 0)
+		// 			Console.Write('.');
+
+		// 		var xMax = decimal.MinValue;
+		// 		for (var i = 0; i < N; i++)
+		// 		{
+		// 			var max = hails[i] + t0*vx[i];
+		// 			if (max > xMax)
+		// 				xMax = max;
+		// 		}
+		// 		//var xMax = hails.Max();
+
+		// 		//var tEnd = t0 + N - 1;
+		// 		//var hailsAtEnd = HailsAt(tEnd);
+		// //		var xMin = hailsAtEnd.Min(p => p.X);
+
+		// 		for (var dx = minDx-1; dx > minDx*10; dx--)
+		// 		{
+		// 			//if (xMax + dx*N < xMin) // slope (dx) can't ever touch all hails
+		// 			//	break;
+		// 			var rockX0 = xMax - dx * t0;
+		// 			var i = 0;
+		// 			for (; i < N; i++)
+		// 			{
+		// 				var dv = Math.Abs(dx - vx[i]); // hack
+		// 				if (dv == 0)
+		// 					break;
+		// 				if ((rockX0 - hails[i]) % dv != 0)
+		// 					break;
+		// 			}
+		// 			if (i == N)
+		// 			{
+		// 				Console.WriteLine($"##### bingo at {t0} {dx} {rockX0}!");
+		// 				return 0;
+		// 			}
+		// 		}
+
+		// 	}
+
+
+
+		// 	for (var t0 = 1;; t0++)
+		// 	{
+		// 		//Console.Write('+');
+		// 		hails0 = Hail.Move(hails0, 1);
+		// 		//var p0s = hails0.Select(h => h.P).ToArray();
+		// 		for (var i = 0; i < hails0.Length; i++)
+		// 		{
+		// 			var hi = hails0[i];
+		// 			for (var j = 0; j < hails0.Length; j++)
+		// 			{
+		// 				if (j == i)
+		// 					continue;
+		// 				for (var dt = 1; dt < 1000; dt++)
+		// 				{
+		// 					var hj = hails0[j].Move(dt);
+		// 					var dx = Math.Abs(hj.P.X - hi.P.X);
+		// 					var dy = Math.Abs(hj.P.Y - hi.P.Y);
+		// 					var dz = Math.Abs(hj.P.Z - hi.P.Z);
+		// 					if (dx % dt != 0 || dy % dt != 0 || dz % dt != 0)
+		// 						continue;
+		// 					var v = new Point3D((hj.P.X - hi.P.X)/dt, (hj.P.Y - hi.P.Y)/dt, (hj.P.Z - hi.P.Z)/dt);
+		// 					var rock2 = new Hail
+		// 					{
+		// 						P = hi.P,
+		// 						V = v
+		// 					};
+		// 					// Now we have start-point p0 and a pnext
+		// 					// Try the remaining hails on for fit
+		// 					// var remain = Hail.Copy(hails);
+		// 					// remain[i].P = null;
+		// 					// remain[j].P = null;
+		// 					var hitall = hails0.All(h => h.HitXy(rock2) != null);
+		// 					if (hitall)
+		// 					{
+		// 						var rock0 = rock2.Move(-t0);
+		// 						var result = (long)(rock0.P.X + rock0.P.Y + rock0.P.Z);
+		// 						//Console.WriteLine($"{t0+dt} {rock0} {result}");
+		// 						Console.Write($".");
+		// 						var ok = FullCheck(rock0, rock2, hails0);
+		// 						if (ok)
+		// 						{
+		// 							Console.WriteLine($"##### found {rock0}");
+		// 							return result;
+		// 						}
+		// 						break;
+		// 					}
+		// 				}
+		// 			}
+
+		// 		}
+		// 	}
 
 
 
@@ -659,5 +652,68 @@ namespace AdventOfCode.Y2023.Day24
 			// 	}
 			// }
 		}
+
+		static BigInteger SolveCRT(BigInteger[] moduli, BigInteger[] remainders)
+		{
+			int n = moduli.Length;
+
+			// Calculate the product of all moduli
+			BigInteger product = 1;
+			for (int i = 0; i < n; i++)
+			{
+				if (moduli[i] == 0)
+					throw new ArgumentException("Modulus cannot be zero.");
+
+				product *= BigInteger.Abs(moduli[i]);
+			}
+
+			// Calculate partial products
+			BigInteger[] partialProducts = new BigInteger[n];
+			for (int i = 0; i < n; i++)
+			{
+				partialProducts[i] = product / BigInteger.Abs(moduli[i]);
+			}
+
+			// Calculate modular inverses
+			BigInteger[] inverses = new BigInteger[n];
+			for (int i = 0; i < n; i++)
+			{
+				inverses[i] = ModInverse(partialProducts[i], moduli[i]);
+			}
+
+			// Calculate the solution
+			BigInteger result = 0;
+			for (int i = 0; i < n; i++)
+			{
+				result += remainders[i] * partialProducts[i] * inverses[i];
+			}
+
+			// Take the result modulo the product of all moduli
+			result = result % product;
+
+			return result;
+		}
+
+		static BigInteger ModInverse(BigInteger a, BigInteger m)
+		{
+			BigInteger m0 = m;
+			BigInteger y = 0, x = 1;
+
+			while (a > 1)
+			{
+				BigInteger q = a / m;
+				BigInteger t = m;
+
+				m = a % m;
+				a = t;
+				t = y;
+
+				y = x - q * y;
+				x = t;
+			}
+
+			return x;
+		}
+
 	}
 }
