@@ -20,7 +20,7 @@ namespace AdventOfCode
 				// || (year, day) == (2022, 16)
 				// || (year, day) == (2017, 12)
 				//|| year == 2016 && day == 15
-				|| (year, day) == (2023, 24)
+				|| (year, day) == (2023, 25)
 			);
 
 //runner.Options.OnlyRunForInputs = true;
