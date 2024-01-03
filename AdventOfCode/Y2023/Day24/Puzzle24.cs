@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2023.Day24
 		public override void Run()
 		{
 			//Run("test1").WithParameter((7, 27)).Part1(2).Part2(47);
-//			Run("test1").Part2(47);
+			Run("test1").Part2(47);
 	//		Run("test2").Part1(0).Part2(0);
 	//Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593);
 			Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593).Part2(0);
@@ -215,11 +215,11 @@ namespace AdventOfCode.Y2023.Day24
 			var hails0 = input
 				.Select(s =>
 				{
-					var p = s.Replace(" ", "").Replace("@", ",").Split(',').Select(decimal.Parse).ToArray();
-					return new Hail
+					var p = s.Replace(" ", "").Replace("@", ",").Split(',').Select(BigInteger.Parse).ToArray();
+					return new
 					{
-						P = new Point3D(p[0], p[1], p[2]),
-						V = new Point3D(p[3], p[4], p[5])
+						P = (X: p[0], Y: p[1], Z: p[2]),
+						V = (X: p[3], Y: p[4], Z: p[5])
 					};
 				})
 				.ToArray();
@@ -233,21 +233,30 @@ namespace AdventOfCode.Y2023.Day24
 			//}
 			//Console.WriteLine(geo.AsExecuteCommands());
 
+			var x = SolveIt(hails0.Select(h => h.P.X).ToArray(), hails0.Select(h => h.V.X).ToArray());
+			var y = SolveIt(hails0.Select(h => h.P.Y).ToArray(), hails0.Select(h => h.V.Y).ToArray());
+			var z = SolveIt(hails0.Select(h => h.P.Z).ToArray(), hails0.Select(h => h.V.Z).ToArray());
+			Console.WriteLine($"x={x} y={y} z={z}");
 
+			return (long)x + (long)y + (long)z;
 
+		}
 
+		private static BigInteger SolveIt(BigInteger[] pos, BigInteger[] vel)
+		{
 			var matches = new List<int>();
 			var matches2 = new List<int>();
-			var N = hails0.Length;
 
-			var pos = hails0.Select(h => new BigInteger(h.P.Z)).ToArray();
-			var vel = hails0.Select(h => new BigInteger(h.V.Z)).ToArray();
-			var posinv = hails0.Select(h => -new BigInteger(h.P.Z)).ToArray();
-			var velinv = hails0.Select(h => -new BigInteger(h.V.Z)).ToArray();
-			for (var dx = 1; dx < 2000; dx++)
+			var result = BigInteger.MinusOne;
+
+			var N = pos.Length;
+
+			var posinv = pos.Select(p => new BigInteger(1000000000000000) - p).ToArray();
+			var velinv = vel.Select(v => -v).ToArray();
+			for (var dx = 1; dx < 50000; dx++)
 			{
-				if (Solve(dx, pos, vel) || Solve(dx, posinv, velinv))
-					break;
+				if (Solve(dx, pos, vel, out result)) break;
+				if (Solve(dx, posinv, velinv, out result)) break;
 			}
 
 			foreach (var m in matches.OrderDescending().Take(30))
@@ -261,39 +270,58 @@ namespace AdventOfCode.Y2023.Day24
 			}
 			Console.WriteLine();
 
-			bool Solve(int v, BigInteger[] pos, BigInteger[] vel)
+			return result;
+
+			bool Solve(int v, BigInteger[] pos, BigInteger[] vel, out BigInteger result)
 			{
-				var parts = new List<(BigInteger Fac, BigInteger Rem)>();
-				if (vel.Any(vv => vv == v))
-					return false;
+				result = -1;
+				var parts = new List<(BigInteger Moduli, BigInteger Rem)>();
+				//if (vel.Any(vv => vv == v))
+				//	return false;
 				for (var i = 0; i < N; i++)
 				{
 					var pi = pos[i];
 					var vi = vel[i];
 
-					var dv = vel[i] - v;
-					//if (!IsPrime(dv)) continue;
-					// if (parts.Any(f => f.Fac == dv))
-					// 	continue;
-					var remainder = pi % dv;
-					parts.Add((dv, remainder));
+					var mod = BigInteger.Abs(vel[i] - v);
+					var remainder = pi;
+					parts.Add((mod, pi));
 				}
-				if (parts.Count < 3)
-					return false;
 				
-				parts = parts.Distinct().ToList();
-				var moduli = parts.Select(x => x.Fac).ToArray();
-				var remainders = parts.Select(x => x.Rem).ToArray();
+//				parts = parts.Distinct().ToList();
+				var moduli = parts.Select(x => x.Moduli).ToArray();
+				var residues = parts.Select(x => x.Rem).ToArray();
+
+				//bool areCoprime = AreCoprime(moduli);
+
+				//if (!areCoprime)
+				//{
+				//	Console.Write("-");
+				//	return false;
+				//}
+				//Console.Write("+");
+
+
 				// if (factors.Any(f => parts.Count(x => x.Fac == f) > 1))
 				// 	return false;
 
-//				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
+				//				var p = MathHelper.LeastCommonMultiple(factors.Select(f => (long)f).Distinct().ToArray());
 
 				try
 				{
 					//var remainder = MathHelper.SolveChineseRemainderTheorem(factors, remainders);
-					var remainder = SolveCRT(moduli, remainders);
-					var p = remainder;
+					//var remainder = SolveCRT(moduli, remainders);
+
+					/** Works for non-coprime moduli.
+					 Returns {-1,-1} if solution does not exist or input is invalid.
+					 Otherwise, returns {x,L}, where x is the solution unique to mod L
+*/
+					var solutions = ChineseRemainderTheorem(residues, moduli);
+					if (solutions.Item1 == -1)
+						return false;
+
+
+					var p = solutions.Item1;
 					// var factorprod = BigInteger.One;
 					// foreach (var r in factors)
 					// {
@@ -324,7 +352,7 @@ namespace AdventOfCode.Y2023.Day24
 						for (var i = 0; i < N; i++)
 						{
 							var pi = pos[i];
-							var dv = vel[i] - v;
+							var dv = BigInteger.Abs(vel[i] - v);
 							var dist = p - pi;
 							var rem = dist % dv;
 							if (rem == 0)
@@ -338,7 +366,8 @@ namespace AdventOfCode.Y2023.Day24
 							;
 						if (match == N)
 						{
-							Console.WriteLine($"################### {p} v={v}");
+							Console.WriteLine($"################### v={v}: {p} at C={solutions.Item2}");
+							result = p;
 							return true;
 						}
 					}
@@ -355,8 +384,6 @@ namespace AdventOfCode.Y2023.Day24
 				}
 				return false;
 			}
-
-			return 0;
 
 		// 	var hailprimex = hails0.Where(h => IsPrime(h.V.X)).ToArray();
 
@@ -653,67 +680,78 @@ namespace AdventOfCode.Y2023.Day24
 			// }
 		}
 
-		static BigInteger SolveCRT(BigInteger[] moduli, BigInteger[] remainders)
+		static Tuple<BigInteger, BigInteger> ChineseRemainderTheorem(BigInteger[] A, BigInteger[] M)
 		{
-			int n = moduli.Length;
+			if (A.Length != M.Length)
+				return Tuple.Create(BigInteger.MinusOne, BigInteger.MinusOne); // Invalid input
 
-			// Calculate the product of all moduli
-			BigInteger product = 1;
-			for (int i = 0; i < n; i++)
+			int n = A.Length;
+
+			BigInteger a1 = A[0];
+			BigInteger m1 = M[0];
+			// Initially x = a_0 (mod m_0)
+
+			// Merge the solution with remaining equations
+			for (int i = 1; i < n; i++)
 			{
-				if (moduli[i] == 0)
-					throw new ArgumentException("Modulus cannot be zero.");
+				BigInteger a2 = A[i];
+				BigInteger m2 = M[i];
 
-				product *= BigInteger.Abs(moduli[i]);
+				BigInteger g = GCD(m1, m2);
+				if (a1 % g != a2 % g)
+					return Tuple.Create(BigInteger.MinusOne, BigInteger.MinusOne); // No solution exists
+
+				// Merge the two equations
+				BigInteger p, q;
+				ExtGCD(m1 / g, m2 / g, out p, out q);
+
+				BigInteger mod = m1 / g * m2; // LCM of m1 and m2
+
+				// We need to be careful about overflow, but I did not bother about overflow here to keep the code simple.
+				BigInteger x = (a1 * (m2 / g) * q + a2 * (m1 / g) * p) % mod;
+
+				// Merged equation
+				a1 = x;
+				if (a1 < 0) a1 += mod; // Result is not supposed to be negative
+				m1 = mod;
 			}
 
-			// Calculate partial products
-			BigInteger[] partialProducts = new BigInteger[n];
-			for (int i = 0; i < n; i++)
-			{
-				partialProducts[i] = product / BigInteger.Abs(moduli[i]);
-			}
-
-			// Calculate modular inverses
-			BigInteger[] inverses = new BigInteger[n];
-			for (int i = 0; i < n; i++)
-			{
-				inverses[i] = ModInverse(partialProducts[i], moduli[i]);
-			}
-
-			// Calculate the solution
-			BigInteger result = 0;
-			for (int i = 0; i < n; i++)
-			{
-				result += remainders[i] * partialProducts[i] * inverses[i];
-			}
-
-			// Take the result modulo the product of all moduli
-			result = result % product;
-
-			return result;
+			return Tuple.Create(a1, m1);
 		}
 
-		static BigInteger ModInverse(BigInteger a, BigInteger m)
+		static BigInteger GCD(BigInteger a, BigInteger b)
 		{
-			BigInteger m0 = m;
-			BigInteger y = 0, x = 1;
-
-			while (a > 1)
+			while (b != 0)
 			{
-				BigInteger q = a / m;
-				BigInteger t = m;
-
-				m = a % m;
-				a = t;
-				t = y;
-
-				y = x - q * y;
-				x = t;
+				BigInteger temp = b;
+				b = a % b;
+				a = temp;
 			}
-
-			return x;
+			return a;
 		}
 
+		static void ExtGCD(BigInteger a, BigInteger b, out BigInteger x, out BigInteger y)
+		{
+			BigInteger x0 = 1, x1 = 0, y0 = 0, y1 = 1;
+
+			while (b != 0)
+			{
+				BigInteger q = a / b;
+				BigInteger temp = b;
+				b = a % b;
+				a = temp;
+
+				temp = x0;
+				x0 = x1;
+				x1 = temp - q * x1;
+
+				temp = y0;
+				y0 = y1;
+				y1 = temp - q * y1;
+			}
+
+			x = x0;
+			y = y0;
+		}
 	}
 }
