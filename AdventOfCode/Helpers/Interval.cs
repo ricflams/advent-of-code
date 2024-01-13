@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
+	[DebuggerDisplay("{ToString()}")]
 	public record Interval(int Start, int End)
 	{
+		public static readonly Interval Empty = new(0, 0);
 		public bool Overlaps(Interval o) => Start < o.End && o.Start < End;
 		public bool Contains(int v) => Start <= v && v < End;
 		public int Length => End - Start;
@@ -14,6 +17,15 @@ namespace AdventOfCode.Helpers
 		{
 			return new Interval(Math.Min(Start, o.Start), Math.Max(End, o.End));
 		}
+
+		public Interval Intersect(Interval o)
+		{
+			if (o.Start > End || Start > o.End)
+				return Empty;
+			return new Interval(Math.Max(Start, o.Start), Math.Min(End, o.End));
+		}
+
+		public override string ToString() => $"[{Start}-{End}[";
 	}
 
 	public static class IntervalExtensions
@@ -36,6 +48,11 @@ namespace AdventOfCode.Helpers
 			}
 
 			return result.ToArray();
-		}		
+		}
+
+		public static int TotalLength(this IEnumerable<Interval> ranges)
+		{
+			return ranges.Sum(r => r.Length);
+		}
 	}
 }
