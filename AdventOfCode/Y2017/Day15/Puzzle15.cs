@@ -14,6 +14,7 @@ namespace AdventOfCode.Y2017.Day15
 		{
 			Run("test1").Part1(588).Part2(309);
 			Run("input").Part1(619).Part2(290);
+			Run("extra").Part1(600).Part2(313);
 		}
 
 		private const ulong N = 0x7fffffff;

@@ -21,6 +21,7 @@ namespace AdventOfCode.Y2019.Day14
 			Run("test4").Part1(180697).Part2(5586022);
 			Run("test5").Part1(2210736).Part2(460664);
 			Run("input").Part1(397771).Part2(3126714);
+			Run("extra").Part1(783895).Part2(1896688);
 		}
 
 		protected override long Part1(string[] input)

@@ -14,6 +14,7 @@ namespace AdventOfCode.Y2019.Day08
 		public override void Run()
 		{
 			Run("input").Part1(2356).Part2("PZEKB");
+			Run("extra").Part1(2806).Part2("ZBJAB");
 		}
 
 		const int Width = 25;

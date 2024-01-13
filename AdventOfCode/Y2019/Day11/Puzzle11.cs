@@ -15,6 +15,7 @@ namespace AdventOfCode.Y2019.Day11
 		public override void Run()
 		{
 			Run("input").Part1(2343).Part2("JFBERBUH");
+			Run("extra").Part1(2129).Part2("PECKRGZL");
 		}
 
 		const int ColorBlack = 0;

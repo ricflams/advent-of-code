@@ -18,6 +18,7 @@ namespace AdventOfCode.Y2019.Day20
 			Run("test2").Part1(58);
 			Run("test3").Part2(396);
 			Run("input").Part1(608).Part2(6706);
+			Run("extra").Part1(684).Part2(7758);
 		}
 
 		const int Infinite = 10000000;

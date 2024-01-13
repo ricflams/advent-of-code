@@ -17,6 +17,7 @@ namespace AdventOfCode.Y2019.Day15
 		public override void Run()
 		{
 			Run("input").Part1(300).Part2(312);
+			Run("extra").Part1(330).Part2(352);
 		}
 
 		private const int MoveNone = 0;
