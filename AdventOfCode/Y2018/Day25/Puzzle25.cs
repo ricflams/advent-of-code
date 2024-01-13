@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2018.Day25
@@ -19,6 +18,7 @@ namespace AdventOfCode.Y2018.Day25
 			Run("test2").Part1(3);
 			Run("test3").Part1(8);
 			Run("input").Part1(420);
+			Run("extra").Part1(422);
 		}
 
 		protected override long Part1(string[] input)

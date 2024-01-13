@@ -17,6 +17,7 @@ namespace AdventOfCode.Y2018.Day13
 		{
 			Run("test1").Part1("7,3");
 			Run("input").Part1("139,65").Part2("40,77");
+			Run("extra").Part1("45,34").Part2("91,25");
 		}
 
 		protected override string Part1(string[] input)

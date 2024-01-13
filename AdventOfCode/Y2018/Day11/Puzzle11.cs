@@ -13,7 +13,8 @@ namespace AdventOfCode.Y2018.Day11
 		{
 			Run("test1").Part1("33,45").Part2("90,269,16");
 			Run("test2").Part1("21,61").Part2("232,251,12");
-			Run("input").Part1("21,77").Part2("224,222,27");			
+			Run("input").Part1("21,77").Part2("224,222,27");
+			Run("extra").Part1("34,72").Part2("233,187,13");
 		}
 
 		private const int N = 300;

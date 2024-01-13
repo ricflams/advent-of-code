@@ -19,6 +19,7 @@ namespace AdventOfCode.Y2018.Day07
 			// For real input: 5 helpers and +60 sec
 			Run("test1").WithParameter((1,  0)).Part1("CABDFE").Part2(15);
 			Run("input").WithParameter((5, 60)).Part1("GKPTSLUXBIJMNCADFOVHEWYQRZ").Part2(920);
+			Run("extra").WithParameter((5, 60)).Part1("JDEKPFABTUHOQSXVYMLZCNIGRW").Part2(1048);
 		}
 
 		protected override string Part1(string[] input)
