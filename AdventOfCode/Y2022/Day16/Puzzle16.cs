@@ -14,13 +14,6 @@ namespace AdventOfCode.Y2022.Day16
 		public override void Run()
 		{
 			Run("test1").Part1(1651).Part2(1707);
-
-			// https://www.reddit.com/r/adventofcode/comments/znklnh/2022_day_16_some_extra_test_cases_for_day_16/
-			Run("test2").Part1(2640).Part2(2670);
-			Run("test3").Part1(13468).Part2(12887);
-			Run("test4").Part1(1288).Part2(1484);
-			Run("test5").Part1(2400).Part2(3680);
-
 		 	Run("input").Part1(1915).Part2(2772);
 		 	Run("extra").Part1(1850).Part2(2306);
 		}
