@@ -18,6 +18,7 @@ namespace AdventOfCode.Y2019.Day03
 			Run("test1").Part1(159).Part2(610);
 			Run("test2").Part1(135).Part2(410);
 			Run("input").Part1(860).Part2(9238);
+			Run("extra").Part1(352).Part2(43848);
 		}
 
 		protected override int Part1(string[] input)
@@ -43,23 +44,18 @@ namespace AdventOfCode.Y2019.Day03
 
 		private static WireCrossing[] GetWireCrossings(string[] wiredefs)
 		{
-			var map = new Dictionary<int, int[]>();
+			var map = new Dictionary<(int, int), int[]>();
 			for (var i = 0; i < wiredefs.Length; i++)
 			{
 				MapWire(i, wiredefs.Length, wiredefs[i]);
 			}
 
-			const int xyFactor = 100000;
-			static int MakeXy(int x, int y) => x * xyFactor + y;
-			static int MakeX(int xy) => xy / xyFactor;
-			static int MakeY(int xy) => xy % xyFactor;
-
 			var crossings = map
 				.Where(x => x.Value.All(s => s != 0))
 				.Select(x => new WireCrossing
 				{
-					X = MakeX(x.Key),
-					Y = MakeY(x.Key),
+					X = x.Key.Item1,
+					Y = x.Key.Item2,
 					Steps = x.Value.Sum()
 				})
 				.ToArray();
@@ -84,7 +80,7 @@ namespace AdventOfCode.Y2019.Day03
 						step++;
 						x += dx;
 						y += dy;
-						var xy = MakeXy(x, y);
+						var xy = (x, y);
 						if (!map.ContainsKey(xy))
 						{
 							map[xy] = new int[wireCount];
