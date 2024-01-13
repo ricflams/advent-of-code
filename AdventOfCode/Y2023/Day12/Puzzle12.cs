@@ -87,8 +87,7 @@ namespace AdventOfCode.Y2023.Day12
 			long ComboCalculate(ReadOnlySpan<char> s, int[] groups)
 			{
 				// Always skip leading dots
-				while (s.Length > 0 && s[0] == '.')
-					s = s[1..];
+				s = s.TrimStart('.');
 
 				// If groups are exhausted there it's a match if only ?. are left; else not a match
 				if (groups.Length == 0)
@@ -105,9 +104,9 @@ namespace AdventOfCode.Y2023.Day12
 				if (s[..siz].Contains('.') || s[siz] == '#')
 					return s[0] == '?' ? CountMatches(s[1..], groups) : 0;
 
-				// It's a match so far, huzzah.
-				// Keep on matching the sequence following this group, ie move ahead the
-				// length of the group and move to the next group.
+				// This group matched, huzzah.
+				// Keep on matching the sequence following this group, ie move s past this
+				// group and remove the group.
 				// If looking at a wildcard then also count any matches that we would find
 				// by skipping that wildcard.
 				var n = CountMatches(s[(siz+1)..], groups[1..]);
