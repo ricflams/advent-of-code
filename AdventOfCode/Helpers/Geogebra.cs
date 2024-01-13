@@ -21,6 +21,17 @@ namespace AdventOfCode.Helpers
 		}
 	}
 
+	public class Vector : IGeogebraObject
+	{
+		public Vector(decimal x, decimal y, decimal vx, decimal vy) => vector = $"Vector(({x},{y}),({x+vx},{y+vy}))";// (x, y, vx, vy);
+		public readonly string vector;
+		public IEnumerable<string> Command(Func<int> NextId)
+		{
+			// https://wiki.geogebra.org/en/Naming_Objects
+
+			yield return $"p{NextId()}={vector}";
+		}
+	}
 	public class Geogebra
 	{
 		private int _index;
