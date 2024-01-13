@@ -52,21 +52,21 @@ namespace AdventOfCode.Y2019.Day20
 			{
 				Level = 0
 			};
-			var entry = graph.Vertices[maze.Entry];
-			var exit = graph.Vertices[maze.Exit];
+			var entry = graph[maze.Entry];
+			var exit = graph[maze.Exit];
 
-			toplevel.Visited[entry.Pos] = true;
+			toplevel.Visited[entry.Id] = true;
 
-			var queue = new Queue<(MazeLevel, PortalGraph.Vertex, int)>();
+			var queue = new Queue<(MazeLevel, PortalGraph.Node, int)>();
 			queue.Enqueue((toplevel, entry, 0));
 			while (queue.Any())
 			{
 				var (level, node, distance) = queue.Dequeue();
-				if (node.Pos == exit.Pos && level.Level == 0)
+				if (node.Id == exit.Id && level.Level == 0)
 				{
 					return distance;
 				}
-				foreach (var e in node.Edges)
+				foreach (var e in node.Neighbors)
 				{
 					var nextnode = e.Key;
 					var nextlevel = level;
@@ -96,14 +96,14 @@ namespace AdventOfCode.Y2019.Day20
 								continue;
 							}
 						}
-						nextnode = graph.Vertices[nextnode.Pos];
+						nextnode = graph[nextnode.Id];
 					}
 
-					if (nextlevel.Visited[nextnode.Pos])
+					if (nextlevel.Visited[nextnode.Id])
 					{
 						continue;
 					}
-					nextlevel.Visited[nextnode.Pos] = true;
+					nextlevel.Visited[nextnode.Id] = true;
 
 					queue.Enqueue((nextlevel, nextnode, distance + 1));
 				}
@@ -111,7 +111,7 @@ namespace AdventOfCode.Y2019.Day20
 			return Infinite;
 		}
 
-		internal class PortalGraph : Graph<PortalMaze.Portal> { }
+		internal class PortalGraph : Graph<Point, PortalMaze.Portal> { }
 
 		internal class MazeLevel
 		{
@@ -123,24 +123,24 @@ namespace AdventOfCode.Y2019.Day20
 
 		private static PortalGraph BuildSimpleGraph(PortalMaze maze)
 		{
-			var walked = new SparseMap<PortalGraph.Vertex>();
+			var walked = new SparseMap<PortalGraph.Node>();
 			var graph = new PortalGraph();
 
-			graph.AddVertex(maze.Entry);
-			BuildSimpleGraph(graph.Root);
+			var root = graph.AddNode(maze.Entry, new());
+			BuildSimpleGraph(root);
 
 			return graph;
 
-			void BuildSimpleGraph(PortalGraph.Vertex node)
+			void BuildSimpleGraph(PortalGraph.Node node)
 			{
-				while (walked[node.Pos] == null)
+				while (walked[node.Id] == null)
 				{
-					walked[node.Pos] = node;
-					var positions = node.Pos
+					walked[node.Id] = node;
+					var positions = node.Id
 						.LookAround()
-						.Select(p => new { Pos = p, Dest = maze.Transform(p) })
+						.Select(p => new { Pos = p, Dest = maze.Teleport(p) })
 						.Where(x => maze.Map[x.Dest] == '.')
-						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Edges.ContainsKey(node))
+						.Where(x => walked[x.Dest] == null || !walked[x.Dest].Neighbors.ContainsKey(node))
 						.ToList();
 
 					foreach (var p in positions.Where(x => walked[x.Dest] != null).ToList())
@@ -149,10 +149,10 @@ namespace AdventOfCode.Y2019.Day20
 						var portal = maze.Portals[p.Pos];
 						var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
 						var portalName = portal == null ? null : portal.Name;
-						node.Value = portal;
-						existing.Value = portal;
-						node.Edges[existing] = portalValue;
-						existing.Edges[node] = -portalValue;
+						node.Data = portal;
+						existing.Data = portal;
+						node.Neighbors[existing] = portalValue;
+						existing.Neighbors[node] = -portalValue;
 						positions.Remove(p);
 					}
 
@@ -162,18 +162,18 @@ namespace AdventOfCode.Y2019.Day20
 							return;
 						case 1:
 							var p = positions.First();
-							var next = graph.AddVertex(p.Dest);
+							var next = graph.AddNode(p.Dest, new());
 							//graph.Vertices.Add(next);
 							var portal = maze.Portals[p.Pos];
 							var portalValue = portal == null ? 0 : portal.IsDownward ? -1 : 1;
-							node.Value = portal;
-							next.Value = portal;
-							node.Edges[next] = portalValue;
-							next.Edges[node] = -portalValue;
+							node.Data = portal;
+							next.Data = portal;
+							node.Neighbors[next] = portalValue;
+							next.Neighbors[node] = -portalValue;
 							node = next;
 							break;
 						default:
-							var forks = positions.Select(x => graph.AddVertex(x.Dest)).ToList();
+							var forks = positions.Select(x => graph.AddNode(x.Dest, new())).ToList();
 							foreach (var fork in forks)
 							{
 								BuildSimpleGraph(fork);

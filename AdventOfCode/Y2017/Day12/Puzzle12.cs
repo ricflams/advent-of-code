@@ -41,12 +41,12 @@ namespace AdventOfCode.Y2017.Day12
 			var seen = new HashSet<int>();
 			while (true)
 			{
-				var unseen = graph.Nodes.FirstOrDefault(v => !seen.Contains(v.Data));
+				var unseen = graph.Nodes.FirstOrDefault(v => !seen.Contains(v.Id));
 				if (unseen == null)
 					break;
 				foreach (var v in graph.NodesReachableFrom(unseen))
 				{
-					seen.Add(v.Data);
+					seen.Add(v.Id);
 				}
 				n++;
 			}
@@ -54,7 +54,7 @@ namespace AdventOfCode.Y2017.Day12
 		}
 
 
-		internal class Village : Graphx<int>
+		internal class Village : Graph<int>
 		{
 			public Village(string[] input)
 			{
@@ -63,7 +63,7 @@ namespace AdventOfCode.Y2017.Day12
 					var (id, relations) = line.RxMatch("%d <-> %*").Get<int, string>();
 					foreach (var relation in relations.ToIntArray())
 					{
-						Add(id, relation, 1);
+						AddNodes(id, relation, 1);
 					}
 				}
 			}

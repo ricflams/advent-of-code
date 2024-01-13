@@ -73,11 +73,6 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public Point FirstOrDefault(Func<T, bool> predicate)
-		{
-			return AllPoints(predicate).FirstOrDefault();
-		}
-
 		public T this[Point pos]
 		{
 			get => _column.TryGetValue(pos.X, out var col) ? col[pos.Y] : _defaultValue;

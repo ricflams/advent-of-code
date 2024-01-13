@@ -63,7 +63,6 @@ namespace AdventOfCode.Y2019.Day20
 			Exit = portalsByName["ZZ"].First().Item2;
 			Map[portalsByName["AA"].First().Item1] = '#';
 			Map[portalsByName["ZZ"].First().Item1] = '#';
-			ExternalMapPoints = new Point[] { Exit };
 
 			Portals = new SparseMap<Portal>();
 			var area = Map.MinMax();
@@ -98,10 +97,9 @@ namespace AdventOfCode.Y2019.Day20
 			}
 		}
 
-		public Point Exit { get; private set; }
 		public SparseMap<Portal> Portals { get; set; }
 
-		public override Point Transform(Point p)
+		public override Point Teleport(Point p)
 		{
 			return Portals[p]?.Pos ?? p;
 		}

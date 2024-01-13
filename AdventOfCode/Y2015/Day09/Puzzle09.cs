@@ -31,17 +31,18 @@ namespace AdventOfCode.Y2015.Day09
 			return longestDistance;
 		}
 
-		private static WeightedGraph<string> GetMap(string[] input)
+		private static Graph<string> GetMap(string[] input)
 		{
-			var graph = new WeightedGraph<string>();
+			var map = new Graph<string>();
 			foreach (var line in input)
 			{
 				// Example: Faerun to Tambi = 129
 				var (city1, city2, distance) = line.RxMatch("%s to %s = %d").Get<string, string, int>();
-				graph.AddVertices(city1, city2, distance);
+				map.AddNodes(city1, city2, distance);
 			}
-			// graph.WriteAsGraphwiz();			
-			return graph;
+			// map.WriteAsGraphwiz();
+			return map;
 		}
+
 	}
 }

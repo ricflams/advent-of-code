@@ -65,7 +65,7 @@ namespace AdventOfCode.Y2022.Day16
 		}
 
 
-		private class Volcano : Graphx<Volcano.Valve>
+		private class Volcano : Graph<string, Volcano.Valve>
 		{
 			private readonly int[,] _distances;
 			private readonly int[] _distancesFromStart;
@@ -98,7 +98,7 @@ namespace AdventOfCode.Y2022.Day16
 				{
 					foreach (var name in valve.TunnelNames)
 					{
-						Add(new Valve(valve.Name), new Valve(name), 1);
+						AddNodes(valve.Name, new Valve(valve.Name), name, new Valve(name), 1);
 					}
 				}
 				foreach (var n in Nodes)

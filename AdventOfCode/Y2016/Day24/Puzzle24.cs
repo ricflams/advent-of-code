@@ -20,7 +20,7 @@ namespace AdventOfCode.Y2016.Day24
 			Run("extra").Part1(462).Part2(676);
 		}
 
-		class DuctGraph : Graph<HashSet<uint>> {}
+		class DuctGraph : Graph<Point, HashSet<uint>> {}
 
 		protected override int Part1(string[] input)
 		{
@@ -36,28 +36,28 @@ namespace AdventOfCode.Y2016.Day24
 		{
 			var map = CharMap.FromArray(input);
 			var maze = new Maze(map)
-				.WithEntry(map.FirstOrDefault(c => c == '0'));
+				.WithEntry(map.AllPoints(c => c == '0').Single());
 			var allNumbers = map
-				.AllPoints(c => char.IsDigit(c)).ToArray()
+				.AllPoints(char.IsDigit).ToArray()
 				.Aggregate(0U, (mask, p) => mask |= (uint)(1U<<(map[p] - '0')));
 
 			var graph = DuctGraph.BuildUnitGraphFromMaze(maze);
-			foreach (var v in graph.Vertices.Values)
+			foreach (var v in graph.Nodes)
 			{
-				v.Value = new HashSet<uint>();
+				v.Data = new HashSet<uint>();
 			}
 
-			var queue = new Queue<(DuctGraph.Vertex, uint, int)>();
-			queue.Enqueue((graph.Root, 0U, 0));
+			var queue = new Queue<(DuctGraph.Node, uint, int)>();
+			queue.Enqueue((graph[maze.Entry], 0U, 0));
 			while (queue.Any())
 			{
 				var (node, found, steps) = queue.Dequeue();
 
-				if (node.Value.Contains(found))
+				if (node.Data.Contains(found))
 					continue;
-				node.Value.Add(found);
+				node.Data.Add(found);
 
-				var ch = map[node.Pos];
+				var ch = map[node.Id];
 				if (char.IsDigit(ch))
 				{
 					found |= 1U<<(ch - '0');
@@ -67,7 +67,7 @@ namespace AdventOfCode.Y2016.Day24
 					}
 				}
 
-				foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
+				foreach (var n in node.Neighbors.Keys.Where(n => !n.Data.Contains(found)))
 				{
 					queue.Enqueue((n, found, steps + 1));
 				}

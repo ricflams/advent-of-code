@@ -81,7 +81,7 @@ namespace AdventOfCode.Y2021.Day12
 		}
 
 
-		private class Terrain : Graphx<Terrain.Cave>
+		private class Terrain : Graph<string, Terrain.Cave>
 		{
 			internal record Cave
 			{
@@ -97,7 +97,7 @@ namespace AdventOfCode.Y2021.Day12
 				foreach (var line in input)
 				{
 					var (from, to) = line.RxMatch("%s-%s").Get<string, string>();
-					Add(new Cave(from), new Cave(to), 1);
+					AddNodes(from, new Cave(from), to, new Cave(to), 1);
 				}
 
 				// Assign a bit to each node for more efficient sets 

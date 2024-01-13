@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
-	public class Maze
-    {
-		public CharMap Map { get; set; }
+	public class Maze(CharMap map)
+	{
+		public CharMap Map { get; init; } = map;
 		public Point Entry { get; set; }
-		
-		public Maze(CharMap map)
-		{
-			Map = map;
-		}
+		public Point Exit { get; set; }
 
 		public Maze WithEntry(Point p)
 		{
@@ -20,11 +14,15 @@ namespace AdventOfCode.Helpers
 			return this;
 		}
 
-		public IEnumerable<Point> ExternalMapPoints = Enumerable.Empty<Point>();
+		public Maze WithExit(Point p)
+		{
+			Exit = p;
+			return this;
+		}
 
-		public virtual Point Transform(Point p) => p;
-		public virtual bool IsWalkable(Point p) => Map[p] != '#';
-		public virtual bool IsFork(Point p) => false;
+		public virtual Point Teleport(Point p) => p;
+		public bool IsWalkable(Point p) => Map[p] != '#';
+		public bool IsFork(Point p) => false;
 	
 		public void ConsoleWrite()
 		{

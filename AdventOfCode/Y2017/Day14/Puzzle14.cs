@@ -64,8 +64,8 @@ namespace AdventOfCode.Y2017.Day14
 			var n = 0;
 			while (true)
 			{
-				var set = map.FirstOrDefault(b => b);
-				if (set == null)
+				var set = map.AllPoints().FirstOrDefault();
+				if (set == Point.Origin)
 					break;
 				ClearRegion(set);
 				n++;
