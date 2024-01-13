@@ -15,6 +15,7 @@ namespace AdventOfCode.Y2021.Day13
 		{
 			Run("test1").Part1(17);
 			Run("input").Part1(716).Part2("RPCKFBLR");
+			Run("extra").Part1(847).Part2("BCZRCEAB");
 		}
 
 		protected override int Part1(string[] input)
@@ -77,26 +78,28 @@ namespace AdventOfCode.Y2021.Day13
 			var points = parts[0]
 				.Select(Point.Parse)
 				.ToArray();
-			var minx = points.Select(x => x.X).Min();
-			var miny = points.Select(x => x.Y).Min();
-			var coords = points.Select(p => Point.From(p.X - minx, p.Y - miny)).ToArray();
+
+			// The folding is ALWAYS exactly in the middle in the puzzle (to make it easy)
+			// so no need to remember the folding position at all, just the axis.
+			// We do need to create a big enough paper though so find the 
+			var folds = parts[1]
+				.Select(s => ((char Axis, char Fold))s.RxMatch("fold along %c=%d").Get<char,int>())
+				.ToArray();
+			var axis = folds.Select(x => x.Axis).ToArray();
+			var maxx = folds.First(x => x.Axis == 'x').Fold;
+			var maxy = folds.First(x => x.Axis == 'y').Fold;
+			var w = maxx * 2 + 1;
+			var h = maxy * 2 + 1;
 
 			// Now fill the paper with dots
-			var w = coords.Select(x => x.X).Max() + 1;
-			var h = coords.Select(x => x.Y).Max() + 1;
 			var paper = new bool[w, h];
-			foreach (var p in coords)
+			foreach (var p in points)
 			{
 				paper[p.X, p.Y] = true;
 			}
 
-			// The folding is ALWAYS exactly in the middle in the puzzle (to make it easy)
-			// so no need to remember the folding position at all, just the axis.
-			var folds = parts[1]
-				.Select(s => s.RxMatch("fold along %c").Get<char>())
-				.ToArray();
 
-			return (paper, w, h, folds);
+			return (paper, w, h, axis);
 		}
 
 		private static void FoldPaper(bool[,] paper, ref int width, ref int height, char fold)
