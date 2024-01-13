@@ -85,7 +85,7 @@ namespace AdventOfCode.Helpers
 				}
 				index++;
 			}
-			throw new Exception("No match");
+			return -1;
 		}
 	}
 }
