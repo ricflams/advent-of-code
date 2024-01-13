@@ -51,8 +51,6 @@ namespace AdventOfCode.Y2023.Day13.Raw
 
 		private static int ReflectionSmudge(string[] map)
 		{
-			if (map[0] == "###.#....##..")
-				;
 			var orgReflection = ReflectionValue2(map).First();
 			for (var i = 0; i < map.Length; i++)
 			{

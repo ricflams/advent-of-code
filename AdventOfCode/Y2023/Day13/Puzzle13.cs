@@ -21,59 +21,70 @@ namespace AdventOfCode.Y2023.Day13
 
 		protected override long Part1(string[] input)
 		{
+			// Result is the sum of all the reflection-patterns
 			return input.GroupByEmptyLine().Sum(ReflectionValue);
 
-			static int ReflectionValue(string[] map)
+			static int ReflectionValue(string[] pattern)
 			{
-				var yreflex = FindReflections(map).FirstOrDefault();
-				if (yreflex > 0)
-					return 100*yreflex;
+				var map = CharMatrix.FromArray(pattern);
 
-				map = CharMatrix.FromArray(map).RotateClockwise(90).ToStringArray();
-				return FindReflections(map).First();
+				// First try to find a horizontal reflection
+				var reflectionRow = FindReflectionRow(map).FirstOrDefault();
+				if (reflectionRow > 0)
+					return 100 * reflectionRow;
+
+				// Rotate the map and find the reflection which must exist by now
+				map = map.RotateClockwise(90);
+				return FindReflectionRow(map).Single();
 			}
-
 		}
 
 		protected override long Part2(string[] input)
 		{
+			// Result is the sum of all the smudged reflection-patterns
 			return input.GroupByEmptyLine().Sum(ReflectionSmudge);
 
-			static int ReflectionSmudge(string[] map)
+			static int ReflectionSmudge(string[] pattern)
 			{
-				var reflection = FindReflectionSmudge(map).FirstOrDefault();
-				if (reflection > 0)
-					return 100*reflection;
+				var map = CharMatrix.FromArray(pattern);
 
-				map = CharMatrix.FromArray(map).RotateClockwise(90).ToStringArray();
-				return FindReflectionSmudge(map).First();
+				// First try to find a horizontal reflection
+				var reflectionRow = FindReflectionSmudge(map);
+				if (reflectionRow > 0)
+					return 100 * reflectionRow;
 
-				static IEnumerable<int> FindReflectionSmudge(string[] map)
+				// Rotate the map and find the reflection which must exist by now
+				map = map.RotateClockwise(90);
+				return FindReflectionSmudge(map);
+
+				static int FindReflectionSmudge(char[,] map)
 				{
-					var reflection = FindReflections(map).FirstOrDefault();
+					// Find the reflection that exists without any smudge; we want to
+					// skip that one when finding the smudged reflection
+					var reflection = FindReflectionRow(map).FirstOrDefault();
 
-					for (var i = 0; i < map.Length; i++)
+					// Loop through the entire map, flip each pattern, and see if it
+					// produces a reflection that isn't the original unsmudged reflection.
+					// If not then just return 0, which isn't a valid reflection-line.
+					var (w, h) = map.Dim();
+					for (var x = 0; x < w; x++)
 					{
-						var line = map[i].ToCharArray();
-						for (var j = 0; j < line.Length; j++)
+						for (var y  = 0; y < h; y++)
 						{
-							map[i] = Flip(line, j);
-							foreach (var r in FindReflections(map).Where(r => r != reflection))
-								yield return r;
-							map[i] = Flip(line, j);
+							var ch = map[x, y];
+							map[x,y] = ch == '.' ? '#' : '.';
+							var r = FindReflectionRow(map).Where(r => r != reflection).FirstOrDefault();
+							if (r != 0)
+								return r;
+							map[x, y] = ch;
 						}
 					}
-
-					static string Flip(char[] line, int pos)
-					{
-						line[pos] = line[pos] == '.' ? '#' : '.';
-						return new string(line);
-					}
-				}			
+					return 0;
+				}
 			}
 		}
 
-		private static IEnumerable<int> FindReflections(string[] map)
+		private static IEnumerable<int> FindReflectionRow(char[,] map)
 		{
 			// Test all horizontal lines for possible reflection, starting
 			// at 1 since line 0 can't reflect "upwards". For each horizontal
@@ -81,10 +92,10 @@ namespace AdventOfCode.Y2023.Day13
 			// then we've found a reflection-line at hor.
 			// Just use two pointers, up and down, instead of being clever and
 			// using just one plus some math; this is easier to grasp.
-			var N = map.Length;
+			var (w, N) = map.Dim();
 			for (var hor = 1; hor < N; hor++)
 			{
-				var up = hor-1;
+				var up = hor - 1;
 				var down = hor;
 				while (true)
 				{
@@ -93,11 +104,19 @@ namespace AdventOfCode.Y2023.Day13
 						yield return hor;
 						break;
 					}
-					if (map[up] != map[down])
+					if (!LineMatch(up, down))
 						break;
 					up--;
 					down++;
 				}
+			}
+
+			bool LineMatch(int a, int b)
+			{
+				for (var x = 0; x < w; x++)
+					if (map[x, a] != map[x, b])
+						return false;
+				return true;
 			}
 		}
 	}
