@@ -16,6 +16,7 @@ namespace AdventOfCode.Y2018.Day19
 		{
 			Run("test1").Part1(6);
 			Run("input").Part1(1056).Part2(10915260);
+			Run("extra").Part1(2352).Part2(24619952);
 		}
 
 		protected override int Part1(string[] input)
@@ -80,15 +81,21 @@ namespace AdventOfCode.Y2018.Day19
 			//           a += f
 			//
 			// So we will simply run the init-code and then do the above as
-			// real code. Modify instriction 1 to set ip to something invalid
+			// real code. Modify instruction 1 to set ip to something invalid
 			// so it will bail after the init-code.
 
 			computer.Regs[0] = 1;
 			computer.Instructions[1] = new Computer.Ins { Opcode = Computer.Opcode.seti, A = 999, B = 0, C = computer.IpRegister };
 			computer.Run();
 
+			// Turns out the "e" in the reduced code varies with the puzzle input.
+			// So instead we have to decude if from the 4th instruction:
+			//     4 eqrr 1 4 1     b = b==e?1:0
+			// It's the second argument, the B-argument. That value is the register
+			// to take the place of e in the reduced expression.
+			var eRegister = computer.Instructions[4].B;
 			var a = computer.Regs[0];
-			var e = computer.Regs[4];
+			var e = computer.Regs[eRegister];
 
 			for (var f = 1; f <= e; f++)
 			{
