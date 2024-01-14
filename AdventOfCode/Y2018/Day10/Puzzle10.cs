@@ -17,6 +17,7 @@ namespace AdventOfCode.Y2018.Day10
 		{
 			Run("test1").Part1("HI");
 			Run("input").Part1("PHLGRNFK").Part2(10407);
+			Run("extra").Part1("HJBJXRAZ").Part2(10641);
 		}
 
 		protected override string Part1(string[] input)
@@ -76,7 +77,7 @@ namespace AdventOfCode.Y2018.Day10
 				{
 					return (message, sec);
 				}				
-			}			
+			}
 			throw new Exception("Message not found");
 		}
 
@@ -123,6 +124,22 @@ namespace AdventOfCode.Y2018.Day10
 						"#       #    #  #       #    #  #   #   #   ##  #       #  #  ",
 						"#       #    #  #       #   ##  #    #  #   ##  #       #   # ",
 						"#       #    #  ######   ### #  #    #  #    #  #       #    #"
+					}.ToCharMatrix()
+				},
+				{
+					"HJBJXRAZ",
+					new string[]
+					{
+						"#    #     ###  #####      ###  #    #  #####     ##    ######",
+						"#    #      #   #    #      #   #    #  #    #   #  #        #",
+						"#    #      #   #    #      #    #  #   #    #  #    #       #",
+						"#    #      #   #    #      #    #  #   #    #  #    #      # ",
+						"######      #   #####       #     ##    #####   #    #     #  ",
+						"#    #      #   #    #      #     ##    #  #    ######    #   ",
+						"#    #      #   #    #      #    #  #   #   #   #    #   #    ",
+						"#    #  #   #   #    #  #   #    #  #   #   #   #    #  #     ",
+						"#    #  #   #   #    #  #   #   #    #  #    #  #    #  #     ",
+						"#    #   ###    #####    ###    #    #  #    #  #    #  ######"
 					}.ToCharMatrix()
 				}
 			};
