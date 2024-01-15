@@ -12,20 +12,39 @@ namespace AdventOfCode
 
 			var runner = new PuzzleRunner();
 
-			runner.Options.RunOnly((year, day) =>
+			runner.Options.RunOnly((test, year, day) =>
 				false
-				// || (year, day) == (2019, 18)
-				// || (year, day) == (2016, 13)
-				// || (year, day) == (2021, 12)
-				// || (year, day) == (2022, 16)
-				// || (year, day) == (2017, 12)
-				//|| year == 2023 & day < 16
-				|| (year, day) == (2023, 19)
+			// || (year, day) == (2019, 18)
+			// || (year, day) == (2016, 13)
+			// || (year, day) == (2021, 12)
+			// || (year, day) == (2022, 16)
+			// || (year, day) == (2017, 12)
+			//|| year == 2021 && day == 12
+			//|| year == 2017 && day == 12
+			//|| year == 2022 && day == 16
+
+
+			//|| year == 2018
+			//|| (year, day) == (2023, 16)
+			|| test == "extra" && year == 2020
+
+			//				|| !(year == 2019 && day == 18)// || year == 2023 && day == 22)
+
+			//|| (year, day) == (2015, 9)
+			//|| (year, day) == (2016, 13)
+			//|| (year, day) == (2016, 24)
+			//|| (year, day) == (2017, 12)
+			//|| (year, day) == (2019, 18)
+			//|| (year, day) == (2019, 20)
+			//|| (year, day) == (2021, 12)
+			//|| (year, day) == (2022, 16)
+
+
 			);
 
 //runner.Options.OnlyRunForInputs = true;
 			var iterations = 1;
-			//iterations = 3;
+			//iterations = 1000;
 
 			if (iterations == 1)
 			{

@@ -4,8 +4,8 @@ namespace AdventOfCode.Helpers.Puzzles
 {
 	public class PuzzleOptions
 	{
-		private Func<int, int, bool> _filter = (_,_) => true;
-		public void RunOnly(Func<int, int, bool> filter) { _filter = filter; }
+		private Func<string, int, int, bool> _filter = (_,_,_) => true;
+		public void RunOnly(Func<string, int, int, bool> filter) { _filter = filter; }
 
 		public bool OnlyRunForInputs { get; set; } = false;
 		public bool Silent { get; set; } = false;
@@ -13,7 +13,7 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		public bool ShouldRun(IPuzzle puzzle, string filename)
 		{
-			if (!_filter(puzzle.Year, puzzle.Day))
+			if (!_filter(filename, puzzle.Year, puzzle.Day))
 				return false;
 			if (OnlyRunForInputs)
 				return filename == "input";
