@@ -66,7 +66,7 @@ namespace AdventOfCode.Y2017.Day14
 			while (true)
 			{
 				var set = map.AllPoints().FirstOrDefault();
-				if (set == Point.Origin)
+				if (set == null)
 					break;
 				ClearRegion(set);
 				n++;
@@ -75,7 +75,7 @@ namespace AdventOfCode.Y2017.Day14
 
 			void ClearRegion(Point pos)
 			{
-				map[pos] = false;
+				map.Remove(pos);
 				foreach (var p in pos.LookAround().Where(p => map[p]))
 				{
 					ClearRegion(p);

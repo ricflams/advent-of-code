@@ -90,6 +90,18 @@ namespace AdventOfCode.Helpers
 			return _column.TryGetValue(pos.X, out var col) && col.Exists(pos.Y);
 		}
 
+		public void Remove(Point pos)
+		{
+			if (_column.TryGetValue(pos.X, out var col))
+			{
+				col.Remove(pos.Y);
+				if (col.Count == 0)
+				{
+					_column.Remove(pos.X);
+				}
+			}
+		}
+
 		public SparseMapColumn this[int x]
 		{
 			get
@@ -217,6 +229,13 @@ namespace AdventOfCode.Helpers
 			{
 				return Row.ContainsKey(y);
 			}
+
+			public void Remove(int y)
+			{
+				Row.Remove(y);
+			}
+
+			public int Count => Row.Count;
 		}
 	}
 }
