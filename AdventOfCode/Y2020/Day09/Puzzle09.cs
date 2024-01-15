@@ -15,6 +15,7 @@ namespace AdventOfCode.Y2020.Day09
 		{
 			Run("test1").WithParameter( 5).Part1(127).Part2(62);
 			Run("input").WithParameter(25).Part1(217430975).Part2(28509180);
+			Run("extra").WithParameter(25).Part1(14360655).Part2(1962331);
 		}
 
 		protected override long Part1(string[] input)

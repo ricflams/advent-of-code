@@ -17,6 +17,7 @@ namespace AdventOfCode.Y2020.Day16
 		{
 			Run("test1").Part1(71);
 			Run("input").Part1(20048).Part2(4810284647569);
+			Run("extra").Part1(20060).Part2(2843534243843);
 		}
 
 		internal class TicketField

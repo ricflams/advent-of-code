@@ -20,6 +20,7 @@ namespace AdventOfCode.Y2020.Day18
 			Run("test5").Part1(12240).Part2(669060);
 			Run("test6").Part1(13632).Part2(23340);
 			Run("input").Part1(69490582260).Part2(362464596624526);
+			Run("extra").Part1(75592527415659).Part2(360029542265462);
 		}
 
 		protected override ulong Part1(string[] input)

@@ -3,7 +3,7 @@ using AdventOfCode.Helpers.Puzzles;
 
 namespace AdventOfCode.Y2020.Day03
 {
-	internal class Puzzle : Puzzle<int, int>
+	internal class Puzzle : Puzzle<int, long>
 	{
 		public static Puzzle Instance = new Puzzle();
 		public override string Name => "Toboggan Trajectory";
@@ -14,6 +14,7 @@ namespace AdventOfCode.Y2020.Day03
 		{
 			Run("test1").Part1(7).Part2(336);
 			Run("input").Part1(237).Part2(2106818610);
+			Run("extra").Part1(268).Part2(3093068400);
 		}
 
 		protected override int Part1(string[] input)
@@ -25,7 +26,7 @@ namespace AdventOfCode.Y2020.Day03
 			return result;
 		}
 
-		protected override int Part2(string[] input)
+		protected override long Part2(string[] input)
 		{
 			var result =
 				CountTrees(input, 1, 1) *
@@ -37,7 +38,7 @@ namespace AdventOfCode.Y2020.Day03
 			return result;
 		}
 
-		private static int CountTrees(string[] input, int right, int down)
+		private static long CountTrees(string[] input, int right, int down)
 		{
 			var trees = 0;
 			for (var (xpos, ypos) = (0, 0); ypos < input.Length; ypos += down, xpos += right)

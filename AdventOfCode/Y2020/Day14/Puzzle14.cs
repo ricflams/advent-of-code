@@ -18,6 +18,7 @@ namespace AdventOfCode.Y2020.Day14
 			Run("test1").Part1(165);
 			Run("test2").Part2(208);
 			Run("input").Part1(14553106347726).Part2(2737766154126);
+			Run("extra").Part1(8566770985168).Part2(4832039794082);
 		}
 
 		protected override ulong Part1(string[] input)

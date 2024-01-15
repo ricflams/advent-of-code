@@ -17,6 +17,7 @@ namespace AdventOfCode.Y2020.Day21
 		{
 			Run("test1").Part1(5).Part2("mxmxvkd,sqjhc,fvjkl");
 			Run("input").Part1(2423).Part2("jzzjz,bxkrd,pllzxb,gjddl,xfqnss,dzkb,vspv,dxvsp");
+			Run("extra").Part1(2020).Part2("bcdgf,xhrdsl,vndrb,dhbxtb,lbnmsr,scxxn,bvcrrfbr,xcgtv");
 		}
 
 		internal class Food

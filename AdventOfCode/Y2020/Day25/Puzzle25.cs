@@ -14,6 +14,7 @@ namespace AdventOfCode.Y2020.Day25
 		{
 			Run("test1").Part1(14897079U);
 			Run("input").Part1(11288669U);
+			Run("extra").Part1(6011069U);
 		}
 
 		protected override uint Part1(string[] input)
