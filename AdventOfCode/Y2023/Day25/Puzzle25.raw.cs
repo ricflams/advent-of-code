@@ -8,7 +8,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
-namespace AdventOfCode.Y2023.Day25
+namespace AdventOfCode.Y2023.Day25.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -22,7 +22,7 @@ namespace AdventOfCode.Y2023.Day25
 			Run("test1").Part1(54).Part2(0);
 	//		Run("test2").Part1(0).Part2(0);
 			Run("input").Part1(0).Part2(0);
-			Run("extra").Part1(0).Part2(0);
+	//		Run("extra").Part1(0).Part2(0);
 		}
 
 		protected override long Part1(string[] input)
@@ -111,6 +111,8 @@ namespace AdventOfCode.Y2023.Day25
 				}
 				return seen.Count();
 			}
+
+			//return 0;
 		}
 
 		protected override long Part2(string[] input)

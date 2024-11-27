@@ -7,7 +7,7 @@ using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 
-namespace AdventOfCode.Y2023.Day23
+namespace AdventOfCode.Y2023.Day23.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -25,7 +25,7 @@ namespace AdventOfCode.Y2023.Day23
 			// 1346 too low
 			// 2022 too low
 
-			Run("extra").Part1(2430).Part2(6534);
+			//	Run("extra").Part1(0).Part2(0);
 		}
 
 		private class DagNode

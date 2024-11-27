@@ -13,7 +13,7 @@ using MathNet.Numerics;
 using AdventOfCode.Helpers.Arrays;
 using MathNet.Numerics.LinearAlgebra.Solvers;
 
-namespace AdventOfCode.Y2023.Day24
+namespace AdventOfCode.Y2023.Day24.Raw
 {
 	internal class Puzzle : PuzzleWithParameter<(BigInteger, BigInteger), long, long>
 	{
@@ -29,7 +29,7 @@ namespace AdventOfCode.Y2023.Day24
 	//		Run("test2").Part1(0).Part2(0);
 	//Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593);
 			Run("input").WithParameter((new BigInteger(200000000000000), new BigInteger(400000000000000))).Part1(15593).Part2(757031940316991);
-			Run("extra").Part1(15889).Part2(0801386475216902);
+	//		Run("extra").Part1(0).Part2(0);
 		}
 
 		class Point3D
@@ -658,6 +658,8 @@ namespace AdventOfCode.Y2023.Day24
 			// 		}
 			// 	}
 			// }
+
+	//		return 0;
 
 			// bool LineFitxxx(decimal x, decimal dx, int t, List<(decimal P, decimal V)> remain)
 			// {

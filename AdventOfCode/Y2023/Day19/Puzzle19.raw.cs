@@ -13,7 +13,7 @@ using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Runtime.CompilerServices;
 using static AdventOfCode.Y2018.Day15.Puzzle;
 
-namespace AdventOfCode.Y2023.Day19
+namespace AdventOfCode.Y2023.Day19.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -26,8 +26,8 @@ namespace AdventOfCode.Y2023.Day19
 		{
 			Run("test1").Part1(19114).Part2(167409079868000);
 			Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(406934).Part2(131192538505367);
-			Run("extra").Part1(492702).Part2(138616621185978);
+			Run("input").Part1(406934).Part2(0);
+			//Run("extra").Part1(0).Part2(0);
 		}
 
 		protected override long Part1(string[] input)

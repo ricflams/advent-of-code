@@ -10,7 +10,7 @@ using AdventOfCode.Helpers.String;
 using System.Collections;
 using static AdventOfCode.Y2023.Day20.Puzzle;
 
-namespace AdventOfCode.Y2023.Day20
+namespace AdventOfCode.Y2023.Day20.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -23,10 +23,10 @@ namespace AdventOfCode.Y2023.Day20
 		{
 			Run("test1").Part1(32000000);
 			Run("test2").Part1(11687500);
-			Run("input").Part1(731517480).Part2(244178746156661);
+			Run("input").Part1(731517480).Part2(0);
 			// 244178746156662 too high
 			// 244178746156666 too high
-			Run("extra").Part1(825167435).Part2(225514321828633);
+			//	Run("extra").Part1(0).Part2(0);
 		}
 
 		internal enum Pulse { Low, High};
@@ -132,8 +132,6 @@ namespace AdventOfCode.Y2023.Day20
 			.ToDictionary(x => x.Name, x => x);
 
 			var broadcaster = config["broadcaster"];
-			var destrx = config.Where(x => x.Value.Dest.Any(x => x == "rx")).Select(x => x.Key).Single();
-			var destrxs = config.Where(x => x.Value.Dest.Any(x => x == destrx)).Select(x => x.Key).ToArray();
 			var flipFlops = config.Where(x => x.Value.Typ == '%').ToDictionary(x => x.Key, _ => false);
 			var conjunction = config.Where(x => x.Value.Typ == '&')
 				.ToDictionary(x => x.Key, x => config.Where(c => c.Value.Dest.Any(nam => nam == x.Key)).ToDictionary(x => x.Key, _ => Pulse.Low));
@@ -144,8 +142,6 @@ namespace AdventOfCode.Y2023.Day20
 			var pushes = 0;
 			var seen = new Dictionary<string, long>();
 
-			long result = 0;
-			
 			void PushButton()
 			{
 				var queue = new Queue<(string, string, Pulse)>();
@@ -189,9 +185,9 @@ namespace AdventOfCode.Y2023.Day20
 						{
 							conjunction[to][from] = pulse;
 							var pulse2 = conjunction[to].Values.All(x => x == Pulse.High) ? Pulse.Low : Pulse.High;
-							if (pulse == Pulse.High && destrxs.Contains(from))
+							if (pulse == Pulse.High && (from=="pv" || from == "qh" || from == "xm" || from == "hz"))
 							{
-								//Console.WriteLine($"{to} {pushes}");
+								Console.WriteLine($"{to} {pushes}");
 								if (seen.ContainsKey(from))
 								{
 									var prev = seen[from];
@@ -203,12 +199,8 @@ namespace AdventOfCode.Y2023.Day20
 								if (seen.Count == 4)
 								{
 									var p = MathHelper.LeastCommonMultiple(seen.Values.ToArray());
-									result = p;
-									rxLowSent = true;
-									return;
-
 									//var pp = p + 5;
-									//Console.WriteLine(p);
+									Console.WriteLine(p);
 									;
 								}
 							}
@@ -231,7 +223,7 @@ namespace AdventOfCode.Y2023.Day20
 				PushButton();
 			} while (!rxLowSent);
 
-			return result;
+			return pushes;
 		}
 	}
 }

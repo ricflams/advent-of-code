@@ -55,33 +55,33 @@ namespace AdventOfCode.Helpers.PuzzleDay
 			{
 				var map = CharMap.FromArray(input);
 				var maze = new Maze(map)
-					.WithEntry(map.FirstOrDefault(c => c == '0')); // or Point.From(1, 1);
+					.WithEntry(map.AllPoints(c => c == '0').Single()); // or Point.From(1, 1);
 				var dest = Point.From(2, 3);
-				var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
-				var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
+				//var graph = Graph<char>.BuildUnitGraphFromMaze(maze);
+				//var steps = graph.ShortestPathDijkstra(maze.Entry, dest);
 			}
 			{
 				var map = new CharMap('#');
 				var maze = new Maze(map).WithEntry(Point.From(1, 1));
 				var graph = SomeGraph.BuildUnitGraphFromMaze(maze);
-				var queue = new Queue<(SomeGraph.Vertex, uint, int)>();
-				queue.Enqueue((graph.Root, 0U, 0));
-				while (queue.Any())
-				{
-					var (node, found, steps) = queue.Dequeue();
-					if (node.Value.Contains(found))
-						continue;
-					node.Value.Add(found);
-					var ch = map[node.Pos];
-					if (char.IsDigit(ch))
-					{
+				var queue = new Queue<(SomeGraph.Node, uint, int)>();
+				//queue.Enqueue((graph.Root, 0U, 0));
+				//while (queue.Any())
+				//{
+				//	var (node, found, steps) = queue.Dequeue();
+				//	if (node.Value.Contains(found))
+				//		continue;
+				//	node.Value.Add(found);
+				//	var ch = map[node.Pos];
+				//	if (char.IsDigit(ch))
+				//	{
 
-					}
-					foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
-					{
-						queue.Enqueue((n, found, steps + 1));
-					}
-				}
+				//	}
+				//	foreach (var n in node.Edges.Keys.Where(n => !n.Value.Contains(found)))
+				//	{
+				//		queue.Enqueue((n, found, steps + 1));
+				//	}
+				//}
 			}
 			{
 				var ship = new Pose(Point.Origin, Direction.Right);

@@ -8,7 +8,7 @@ using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 
-namespace AdventOfCode.Y2023.Day21
+namespace AdventOfCode.Y2023.Day21.Raw
 {
 	internal class Puzzle : PuzzleWithParameter<(int, int), long, long>
 	{
@@ -19,9 +19,9 @@ namespace AdventOfCode.Y2023.Day21
 
 		public override void Run()
 		{
-			//		Run("test1").WithParameter((6, 5000)).Part1(16).Part2(16733044);
-			//		Run("test2").Part1(0).Part2(0);
-			Run("input").WithParameter((64, 26501365)).Part1(3814).Part2(632257949158206);
+	//		Run("test1").WithParameter((6, 5000)).Part1(16).Part2(16733044);
+	//		Run("test2").Part1(0).Part2(0);
+//			Run("input").WithParameter((64, 26501365)).Part1(3814).Part2(0);
 
 			// 702322399865078 not right 3
 			// 702322452867855 not right
@@ -31,7 +31,7 @@ namespace AdventOfCode.Y2023.Day21
 			// 8427833834362745577 not right
 			// 8427931027024412911
 
-			Run("extra").WithParameter((64, 26501365)).Part1(3764).Part2(622926941971282);
+						Run("extra").WithParameter((64, 26501365)).Part1(3764).Part2(0);
 			// 470149643712804 too low
 			// 13376107091282620562 too high
 			// 622908990684824 not right
@@ -114,7 +114,7 @@ namespace AdventOfCode.Y2023.Day21
 				gp = newtiles;
 
 				//if (i >= steps - 10)
-				//Console.WriteLine($"{step}:{gp.Count}:{diff1} {diffdiff} ");
+				Console.WriteLine($"{step}:{gp.Count}:{diff1} {diffdiff} ");
 
 				diff2seen.Add(diffdiff);
 				for (var j = 2; j < 300; j++)

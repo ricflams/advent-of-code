@@ -9,7 +9,7 @@ using AdventOfCode.Helpers.Puzzles;
 using AdventOfCode.Helpers.String;
 using System.Net;
 
-namespace AdventOfCode.Y2023.Day22
+namespace AdventOfCode.Y2023.Day22.Raw
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -22,11 +22,9 @@ namespace AdventOfCode.Y2023.Day22
 		{
 			Run("test1").Part1(5).Part2(7);
 			//	Run("test2").Part1(0).Part2(0);
-			//Run("input").Part1(477);//.Part2(61555);
+			//		Run("input").Part1(477).Part2(61555);
 			Run("input").Part2(61555);
-
-			Run("extra").Part1(451).Part2(66530);
-			// 214 too low
+			//	Run("extra").Part1(0).Part2(0);
 		}
 
 		[DebuggerDisplay("{ToString()}")]
@@ -62,103 +60,8 @@ namespace AdventOfCode.Y2023.Day22
 			public override string ToString() => $"{Id} {P1}~{P2}";
 		}
 
-		internal class SandStack
-		{
-			private readonly Block[] _blocks;
-			private readonly List<Block>[] _layers;
-			protected static uint HashKey(int x, int y) => ((uint)x << 16) + (uint)y;
-
-			private class Block
-			{
-				public Block(string def)
-				{
-					var parts = def.Split('~').ToArray();
-					var (p1, p2) = (Point3D.Parse(parts[0]), Point3D.Parse(parts[1]));
-					Debug.Assert(p2.X >= p1.X);
-					Debug.Assert(p2.Y >= p1.Y);
-					Debug.Assert(p2.Z >= p1.Z);
-
-					Area = new HashSet<uint>();
-					for (var x = p1.X; x <= p2.X; x++)
-					{
-						for (var y = p1.Y; y <= p2.Y; y++)
-						{
-							Area.Add(HashKey(x, y));
-						}
-					}
-					Level = p1.Z - 1; // Easier if levels are 0-aligned
-					Height = p2.Z - p1.Z + 1;
-				}
-				public int Level;
-				public int Height;
-				public HashSet<uint> Area;
-
-				//public bool AtLevel(int z) => z >= Level && z < Level+Height;
-
-				public bool IsAboveGround => Level > 0;
-			}
-
-			public SandStack(string[] input)
-			{
-				//var bricks = input
-				//	.Select((s, idx) =>
-				//	{
-				//		var bricks = s.Split('~').ToArray();
-				//		return new Brick(idx + 1, Point3D.Parse(bricks[0]), Point3D.Parse(bricks[1]));
-				//	})
-				//	.ToArray();
-
-				_blocks = input.Select(s => new Block(s)).ToArray();
-
-				var zMax = _blocks.Max(b => b.Level + b.Height);
-				_layers = Enumerable.Range(0, zMax).Select(_ => new List<Block>()).ToArray();
-
-				foreach (var b in _blocks)
-				{
-					_layers[b.Level].Add(b);
-				}
-			}
-
-			public void DropAll()
-			{
-				foreach (var b in _blocks)
-				{
-					while (b.IsAboveGround)
-					{
-						if (_layers[b.Level - 1].Any(lb => lb.Area.Intersect(b.Area).Any()))
-							break;
-						_layers[b.Level+b.Height-1].Remove(b);
-						_layers[b.Level-1].Add(b);
-						b.Level--;
-					}
-				}
-			}
-
-			public int CountUnsupportingBlocks()
-			{
-				return _blocks
-					.Count(b => 
-					{
-						//if (b.Level + b.Height == _layers.Length)
-						//	return false; // nothing above
-						var needSupport = _layers[b.Level + b.Height];
-						if (!needSupport.Any()) // nothing above
-							return false;
-
-						var removedSupport = _layers[b.Level + b.Height - 1].Where(x => x != b).Select(b => b.Area).UnionAll();
-						return !needSupport.Any(nb => !nb.Area.Intersect(removedSupport).Any());
-					});
-			}
-		}
-
 		protected override long Part1(string[] input)
 		{
-			var stack = new SandStack(input);
-
-			stack.DropAll();
-
-			//return stack.CountUnsupportingBlocks();
-
 			var bricks = input
 				.Select((s, idx) =>
 				{
@@ -167,12 +70,11 @@ namespace AdventOfCode.Y2023.Day22
 				})
 				.ToArray();
 
-			bricks = bricks.OrderBy(b => b.P2.Z).ToArray();
-			Console.WriteLine($"Sizes: " + string.Join(' ', bricks.Select(b => b.X.Length * b.Y.Length * b.Z.Length).OrderDescending()));
+			;
 			while (true)
 			{
-				Console.Write('.');
 				var anyFalling = false;
+				//bricks = bricks.OrderBy(b => b.P2.Z).ToArray();
 				for (var i = 0; i < bricks.Length; i++)
 				{
 					var brick = bricks[i];
@@ -288,19 +190,6 @@ namespace AdventOfCode.Y2023.Day22
 			}
 
 			return disintegrateSum;
-		}
-	}
-
-	static class HashSetExtensions
-	{
-		public static HashSet<T> UnionAll<T>(this IEnumerable<HashSet<T>> sets)
-		{
-			if (!sets.Any())
-				return [];
-			var union = new HashSet<T>(sets.First());
-			foreach (var set in sets.Skip(1))
-				union.UnionWith(set);
-			return union;
 		}
 	}
 }
