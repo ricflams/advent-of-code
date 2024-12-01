@@ -42,16 +42,18 @@ namespace AdventOfCode.Helpers.Puzzles
 				client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "github.com/ricflams/advent-of-code by richard@flamsholt.dk");
 
 				var response = client.GetAsync(apiUrl).Result;
+				Task.Delay(2000).Wait();
+
 				if (!response.IsSuccessStatusCode)
 				{
+					Console.Error.WriteLine($"Error fetching input for day {day}, ${year}: {response.ReasonPhrase}");
 					return [];
 				}
 
 				var content = response.Content.ReadAsStringAsync().Result;
 				Directory.CreateDirectory(cache);
 				File.WriteAllText(filename, content);
-
-				Task.Delay(2000).Wait();
+				Console.WriteLine($"Fetched input for day {day}, ${year}");
 			}
 
 			var input = File.ReadAllLines(filename);
