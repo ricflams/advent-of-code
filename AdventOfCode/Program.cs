@@ -8,7 +8,7 @@ namespace AdventOfCode
 	{
 		static void Main(string[] _)
 		{
-			//AdventOfCode.Helpers.PuzzleDay.GeneratePuzzles.Generate(2023); return;
+			//AdventOfCode.Helpers.PuzzleDay.GeneratePuzzles.Generate(2024); return;
 
 			var runner = new PuzzleRunner();
 
@@ -26,7 +26,9 @@ namespace AdventOfCode
 
 			//|| year == 2018
 			//|| (year, day) == (2023, 16)
-			|| test == "extra" && year == 2020
+			//|| test == "extra" && year == 2020
+
+			|| (year, day) == (2024, 2)
 
 			//				|| !(year == 2019 && day == 18)// || year == 2023 && day == 22)
 
