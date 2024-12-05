@@ -46,14 +46,14 @@ namespace AdventOfCode.Helpers.Puzzles
 
 				if (!response.IsSuccessStatusCode)
 				{
-					Console.Error.WriteLine($"Error fetching input for day {day}, ${year}: {response.ReasonPhrase}");
+					Console.Error.WriteLine($"Error fetching input for day {day}, {year}: {response.ReasonPhrase}");
 					return [];
 				}
 
 				var content = response.Content.ReadAsStringAsync().Result;
 				Directory.CreateDirectory(cache);
 				File.WriteAllText(filename, content);
-				Console.WriteLine($"Fetched input for day {day}, ${year}");
+				Console.WriteLine($"Fetched input for day {day}, {year}");
 			}
 
 			var input = File.ReadAllLines(filename);
