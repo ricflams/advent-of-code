@@ -41,6 +41,15 @@ namespace AdventOfCode.Helpers
 		public static Point operator *(Point p, int n) => Point.From(p.X * n, p.Y * n);
 		public static Point operator *(int n, Point p) => Point.From(p.X * n, p.Y * n);
 
+		public static Point VectN(Point p) => p.N;
+		public static Point VectE(Point p) => p.E;
+		public static Point VectS(Point p) => p.S;
+		public static Point VectW(Point p) => p.W;
+		public static Point VectNE(Point p) => p.NE;
+		public static Point VectNW(Point p) => p.NW;
+		public static Point VectSE(Point p) => p.SE;
+		public static Point VectSW(Point p) => p.SW;
+
 		public Point N => Up;
 		public Point E => Right;
 		public Point S => Down;
@@ -136,6 +145,18 @@ namespace AdventOfCode.Helpers
 			yield return DiagonalDownLeft;
 			yield return Left;
 			yield return DiagonalUpLeft;
+		}
+
+		public static IEnumerable<Func<Point, Point>> VectorDiagonallyAround()
+		{
+			yield return VectN;
+			yield return VectNE;
+			yield return VectE;
+			yield return VectSE;
+			yield return VectS;
+			yield return VectSW;
+			yield return VectW;
+			yield return VectNW;
 		}
 
 		public IEnumerable<Point> SpiralFrom()
