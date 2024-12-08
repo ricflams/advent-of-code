@@ -24,7 +24,7 @@ namespace AdventOfCode.Y2019.Day17
 			var map = CreateMap(input[0]);
 			//map.ConsoleWrite();
 
-			var intersections = map.AllPoints(ch => ch == '#')
+			var intersections = map.AllPointsWhere(ch => ch == '#')
 				.ToList()
 				.Where(IsIntersection)
 				.Sum(x => x.X * x.Y);
@@ -132,7 +132,7 @@ namespace AdventOfCode.Y2019.Day17
 
 		private static string[] CalculatePath(CharMap map)
 		{
-			var pos = map.AllPoints(ch => "^v<>".Contains(ch)).First();
+			var pos = map.AllPointsWhere("^v<>".Contains).First();
 			var vc = map[pos];
 			var direction =
 				vc == '^' ? Direction.Up :

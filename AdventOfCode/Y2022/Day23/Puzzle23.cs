@@ -40,7 +40,7 @@ namespace AdventOfCode.Y2022.Day23
 			var neighbourhood = Point.Origin.LookDiagonallyAround().Select(p => Encode(p) - v0).ToArray();
 
 			var map = CharMap.FromArray(input);
-			var elfs = new HashSet<int>(map.AllPoints(ch => ch == '#').Select(Encode));
+			var elfs = new HashSet<int>(map.AllPointsWhere(ch => ch == '#').Select(Encode));
 
 			// Directions to look in are just numbers that can be added to coordinate
 			var directions = new[]

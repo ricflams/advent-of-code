@@ -46,9 +46,9 @@ namespace AdventOfCode.Y2019.Day15
 			var (map, _) = BuildMapAndFindOxygen(intcode);
 
 			var minutes = 0;
-			while (map.AllPoints(val => val == MapSpace).Count() > 0)
+			while (map.Count(val => val == MapSpace) > 0)
 			{
-				foreach (var p in map.AllPoints(val => val == MapOxygen).ToList())
+				foreach (var p in map.AllPointsWhere(val => val == MapOxygen).ToList())
 				{
 					foreach (var d in AllDirections())
 					{

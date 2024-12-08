@@ -40,7 +40,7 @@ namespace AdventOfCode.Y2023.Day10.Raw
 		protected override long Part1(string[] input)
 		{
 			var map = CharMap.FromArray(input);
-			var p0 = map.AllPoints(ch => ch  == 'S').First();
+			var p0 = map.AllPointsWhere(ch => ch  == 'S').First();
 
 			var steps = 0;
 			var p = FirstStep(p0);
@@ -111,7 +111,7 @@ namespace AdventOfCode.Y2023.Day10.Raw
 		protected override long Part2(string[] input)
 		{
 			var map = CharMap.FromArray(input);
-			var p0 = map.AllPoints(ch => ch  == 'S').First();
+			var p0 = map.AllPointsWhere(ch => ch  == 'S').First();
 
 			var path = new List<Pose>();
 

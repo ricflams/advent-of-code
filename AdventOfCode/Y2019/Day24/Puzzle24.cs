@@ -82,7 +82,7 @@ namespace AdventOfCode.Y2019.Day24
 			var center = Point.From(2, 2);
 			for (var t = 0; t < 200; t++)
 			{
-				if (levels.First().AllPoints(c => c == '#').Any(p => p.X == 0 || p.Y == 0 || p.X == width - 1 || p.Y == height - 1))
+				if (levels.First().AllPointsWhere(c => c == '#').Any(p => p.X == 0 || p.Y == 0 || p.X == width - 1 || p.Y == height - 1))
 				{
 					var outer = new CharMap('.');
 					for (var x = 0; x < width; x++)
@@ -115,9 +115,9 @@ namespace AdventOfCode.Y2019.Day24
 					var outer = i > 0 ? levels[i - 1] : null;
 					var level = levels[i];
 					var inner = i < levels.Count() - 1 ? levels[i + 1] : null;
-					var innerBugs = inner?.AllPoints(c => c == '#').ToArray();
+					var innerBugs = inner?.AllPointsWhere(c => c == '#').ToArray();
 					var nextmap = new CharMap();
-					foreach (var pos in level.AllPoints().Where(p => p != center))
+					foreach (var pos in level.AllPointsWhere(p => p != center))
 					{
 						var n = DirectionExtensions.LookAroundDirection().Select(d => BugsInDirection(outer, level, innerBugs, pos, d)).Sum();
 						var isOnBug = level[pos] == '#';
@@ -131,7 +131,7 @@ namespace AdventOfCode.Y2019.Day24
 			}
 
 
-			var bugs = levels.Sum(l => l.AllPoints(c => c == '#').Count());
+			var bugs = levels.Sum(l => l.AllPointsWhere(c => c == '#').Count());
 			return bugs;
 
 			int BugsInDirection(CharMap outer, CharMap level, Point[] innerBugs, Point pos0, Direction direction)
@@ -172,7 +172,7 @@ namespace AdventOfCode.Y2019.Day24
 			var (min, max) = map.MinMax();
 			var width = max.Y - min.Y + 1;
 			uint val = 0;
-			foreach (var pos in map.AllPoints(c => c == '#'))
+			foreach (var pos in map.AllPointsWhere(c => c == '#'))
 			{
 				var position = pos.Y * width + pos.X;
 				val += 1U << position;

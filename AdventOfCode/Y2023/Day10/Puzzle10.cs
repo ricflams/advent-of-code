@@ -101,7 +101,7 @@ namespace AdventOfCode.Y2023.Day10
 		{
 			public Tiles(string[] input) : base(input)
 			{
-				Start = AllPoints(ch => ch  == 'S').First();
+				Start = AllPointsWhere(ch => ch  == 'S').First();
 			}
 
 			public Point Start { get; private set; }

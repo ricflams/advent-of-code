@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2021.Day05
 				map.WalkLine(x1, y1, x2, y2, p => map[p]++);
 			}
 
-			var overlaps = map.AllValues(v => v > 1).Count();
+			var overlaps = map.Count(v => v > 1);
 			return overlaps;
 		}
 
@@ -46,7 +46,7 @@ namespace AdventOfCode.Y2021.Day05
 				map.WalkLine(x1, y1, x2, y2, p => map[p]++);
 			}
 
-			var overlaps = map.AllValues(v => v > 1).Count();
+			var overlaps = map.Count(v => v > 1);
 			return overlaps;
 		}
 	}

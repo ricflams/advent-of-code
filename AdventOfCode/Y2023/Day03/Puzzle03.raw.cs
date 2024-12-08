@@ -30,7 +30,7 @@ namespace AdventOfCode.Y2023.Day03.Raw
 		protected override long Part1(string[] input)
 		{
 				var map = CharMap.FromArray(input);
-			var digp = map.AllPoints(ch => ch != '.' && !char.IsDigit(ch))
+			var digp = map.AllPointsWhere(ch => ch != '.' && !char.IsDigit(ch))
 				.SelectMany(p => p.LookDiagonallyAround())
 				.Distinct()
 				.Where(p => char.IsDigit(map[p]))
@@ -75,7 +75,7 @@ namespace AdventOfCode.Y2023.Day03.Raw
 		protected override long Part2(string[] input)
 		{
 				var map = CharMap.FromArray(input);
-			var digp = map.AllPoints(ch => ch == '*');
+			var digp = map.AllPointsWhere(ch => ch == '*');
 
 			var gearsum = 0;
 

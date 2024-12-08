@@ -36,9 +36,9 @@ namespace AdventOfCode.Y2016.Day24
 		{
 			var map = CharMap.FromArray(input);
 			var maze = new Maze(map)
-				.WithEntry(map.AllPoints(c => c == '0').Single());
+				.WithEntry(map.AllPointsWhere(c => c == '0').Single());
 			var allNumbers = map
-				.AllPoints(char.IsDigit).ToArray()
+				.AllPointsWhere(char.IsDigit).ToArray()
 				.Aggregate(0U, (mask, p) => mask |= (uint)(1U<<(map[p] - '0')));
 
 			var graph = DuctGraph.BuildUnitGraphFromMaze(maze);

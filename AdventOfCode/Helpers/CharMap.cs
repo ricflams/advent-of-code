@@ -98,7 +98,7 @@ namespace AdventOfCode.Helpers
 		{
 			// Combine all points' neighbourhoods for the total set of points to transform
 			var neighbourhood = new CharMap();
-			var active = AllPoints(ch => ch != _defaultValue);
+			var active = AllPointsWhere(ch => ch != _defaultValue);
 			foreach (var p in active)
 			{
 				neighbourhood[p] = '+';

@@ -31,7 +31,7 @@ namespace AdventOfCode.Y2022.Day23.Raw
 			{
 				var propose = new Dictionary<Point, Point>();
 				var moves = new Dictionary<Point, int>();
-				foreach (var elf in map.AllPoints(ch => ch == '#'))
+				foreach (var elf in map.AllPointsWhere(ch => ch == '#'))
 				{
 					Point move = null;
 					if (elf.LookDiagonallyAround().Count(x => map[x] == '#') == 0)
@@ -93,7 +93,7 @@ namespace AdventOfCode.Y2022.Day23.Raw
 
 			var (minx, maxx, miny, maxy) = (int.MaxValue, int.MinValue, int.MaxValue, int.MinValue);
 			var elfs = 0;
-			foreach (var p in map.AllPoints(ch => ch == '#'))
+			foreach (var p in map.AllPointsWhere(ch => ch == '#'))
 			{
 				minx = Math.Min(minx, p.X);
 				maxx = Math.Max(maxx, p.X);
@@ -120,7 +120,7 @@ namespace AdventOfCode.Y2022.Day23.Raw
 				var propose = new Dictionary<Point, Point>();
 				var moves = new Dictionary<Point, int>();
 				var hasmoved = false;
-				foreach (var elf in map.AllPoints(ch => ch == '#'))
+				foreach (var elf in map.AllPointsWhere(ch => ch == '#'))
 				{
 					Point move = null;
 					if (elf.LookDiagonallyAround().Count(x => map[x] == '#') == 0)

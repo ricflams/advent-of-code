@@ -45,7 +45,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 
 				var seen = new SparseMap<bool>();
 
-				var nines = map.AllPoints(ch => ch > '9').ToArray();
+				var nines = map.AllPointsWhere(ch => ch > '9').ToArray();
 				foreach (var p in nines)
 				{
 					//Flash(p);
@@ -71,7 +71,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 					}
 				}
 
-				foreach (var p in map.AllPoints(ch => ch > '9'))
+				foreach (var p in map.AllPointsWhere(ch => ch > '9'))
 				{
 					map[p] = '0';
 				}
@@ -118,7 +118,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 				var seen = new SparseMap<bool>();
 
 				var flashes0 = flashes;
-				var nines = map.AllPoints(ch => ch > '9').ToArray();
+				var nines = map.AllPointsWhere(ch => ch > '9').ToArray();
 				foreach (var p in nines)
 				{
 					//Flash(p);
@@ -144,7 +144,7 @@ namespace AdventOfCode.Y2021.Day11.Raw
 					}
 				}
 
-				foreach (var p in map.AllPoints(ch => ch > '9'))
+				foreach (var p in map.AllPointsWhere(ch => ch > '9'))
 				{
 					map[p] = '0';
 				}

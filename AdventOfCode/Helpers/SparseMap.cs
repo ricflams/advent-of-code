@@ -14,7 +14,19 @@ namespace AdventOfCode.Helpers
 			_defaultValue = defaultValue;
 		}
 
-		public IEnumerable<(Point, T)> All(Func<T, bool> predicate = null)
+		public IEnumerable<(Point Point, T Value)> All()
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					yield return (Point.From(x, y), column.Row[y]);
+				}
+			}
+		}
+
+		public IEnumerable<(Point Point, T Value)> AllWhere(Func<T, bool> predicate)
 		{
 			foreach (var x in _column.Keys)
 			{
@@ -22,7 +34,7 @@ namespace AdventOfCode.Helpers
 				foreach (var y in column.Row.Keys)
 				{
 					var value = column.Row[y];
-					if (predicate == null || predicate(value))
+					if (predicate(value))
 					{
 						yield return (Point.From(x, y), value);
 					}
@@ -30,22 +42,7 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-		public IEnumerable<Point> AllPoints(Func<T, bool> predicate = null)
-		{
-			foreach (var x in _column.Keys)
-			{
-				var column = _column[x];
-				foreach (var y in column.Row.Keys)
-				{
-					if (predicate == null || predicate(column.Row[y]))
-					{
-						yield return Point.From(x, y);
-					}
-				}
-			}
-		}
-
-		public IEnumerable<T> AllValues(Func<T, bool> predicate = null)
+		public IEnumerable<(Point Point, T Value)> AllWhere(Func<Point, bool> predicate)
 		{
 			foreach (var x in _column.Keys)
 			{
@@ -53,13 +50,180 @@ namespace AdventOfCode.Helpers
 				foreach (var y in column.Row.Keys)
 				{
 					var value = column.Row[y];
-					if (predicate == null || predicate(value))
+					var p = Point.From(x, y);
+					if (predicate(p))
+					{
+						yield return (p, value);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<(Point Point, T Value)> AllWhere(Func<Point, T, bool> predicate)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					var p = Point.From(x, y);
+					if (predicate(p, value))
+					{
+						yield return (p, value);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<Point> AllPoints()
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					yield return Point.From(x, y);
+				}
+			}
+		}
+
+		public IEnumerable<Point> AllPointsWhere(Func<T, bool> predicate)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					if (predicate(column.Row[y]))
+					{
+						yield return Point.From(x, y);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<Point> AllPointsWhere(Func<Point, bool> predicate)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var p = Point.From(x, y);
+					if (predicate(p))
+					{
+						yield return p;
+					}
+				}
+			}
+		}
+
+		public IEnumerable<Point> AllPointsWhere(Func<Point, T, bool> predicate)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var p = Point.From(x, y);
+					if (predicate(p, column.Row[y]))
+					{
+						yield return p;
+					}
+				}
+			}
+		}
+
+		public IEnumerable<T> AllValues()
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					yield return value;
+				}
+			}
+		}
+
+		public IEnumerable<T> AllValuesWhere(Func<T, bool> predicate)
+		{
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					if (predicate(value))
 					{
 						yield return value;
 					}
 				}
 			}
 		}
+
+		// public IEnumerable<T> AllValuesWhere(Func<Point, T, bool> predicate) ...
+		// public IEnumerable<T> AllValuesWhere(Func<Point, bool> predicate) ...
+
+
+		public int Count() => _column.Keys.Sum(key => _column[key].Row.Keys.Count);
+
+		public int Count(Func<T, bool> predicate)
+		{
+			var n = 0;
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];
+					if (predicate(value))
+					{
+						n++;
+					}
+				}
+			}
+			return n;
+		}
+
+		public int Count(Func<Point, bool> predicate)
+		{
+			var n = 0;
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var p = Point.From(x, y);
+					if (predicate(p))
+					{
+						n++;
+					}
+				}
+			}
+			return n;
+		}		
+
+		public int Count(Func<Point, T, bool> predicate)
+		{
+			var n = 0;
+			foreach (var x in _column.Keys)
+			{
+				var column = _column[x];
+				foreach (var y in column.Row.Keys)
+				{
+					var value = column.Row[y];					
+					var p = Point.From(x, y);
+					if (predicate(p, value))
+					{
+						n++;
+					}
+				}
+			}
+			return n;
+		}		
 
 		public IEnumerable<Point> AllArea()
 		{

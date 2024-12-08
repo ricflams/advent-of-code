@@ -58,8 +58,8 @@ namespace AdventOfCode.Y2016.Day22
 			// this will tell us which discs are closest to the empty disc.
 			var distField = new SparseMap<int>();
 			var distq = new Queue<Point>();
-			var bigblocks = new HashSet<Point>(cluster.Disks.All(d => d.Used > 100).Select(x => x.Item1));
-			var empty = cluster.Disks.All(d => d.Used == 0).Single().Item1;
+			var bigblocks = new HashSet<Point>(cluster.Disks.AllPointsWhere(d => d.Used > 100));
+			var empty = cluster.Disks.AllPointsWhere(d => d.Used == 0).Single();
 			distq.Enqueue(empty);
 			while (distq.Any())
 			{

@@ -75,7 +75,7 @@ namespace AdventOfCode.Y2018.Day15
 
 				// Find all units and the size of the map
 				_units = _map
-					.AllPoints(c => c == 'E' || c == 'G')
+					.AllPointsWhere(c => c == 'E' || c == 'G')
 					.Select(p => new Unit(p, _map[p], _map[p] == 'E' ? elfAttack : 3))
 					.ToArray();
 				var (_, max) = _map.MinMax();
