@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2024.Day07
 		{
 			var tests = input.Select(Test.Parse);
 
-			var sum = tests.Where(t => t.IsValid() || t.IsValidWithConcat()).Sum(t => t.Sum);
+			var sum = tests.Where(t => t.IsValidWithConcat()).Sum(t => t.Sum);
 
 			return sum;
 		}
