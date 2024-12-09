@@ -33,7 +33,7 @@ namespace AdventOfCode.Y2020.Day17
 		{
 			var points = CharMap
 				.FromArray(input, '.')
-				.AllPoints(ch => ch == '#');
+				.AllPointsWhere(ch => ch == '#');
 
 			var space = new Space(dimensions);
 			foreach (var p in points)

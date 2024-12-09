@@ -65,7 +65,7 @@ namespace AdventOfCode.Y2015.Day18
 				}
 				lights = nextlights;
 			}
-			var lightsOn = lights.AllPoints(c => c).Count();
+			var lightsOn = lights.Count(c => c);
 			return lightsOn;
 		}
 	}

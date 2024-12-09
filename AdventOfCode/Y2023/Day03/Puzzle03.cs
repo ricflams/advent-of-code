@@ -24,7 +24,7 @@ namespace AdventOfCode.Y2023.Day03
 			var map = CharMap.FromArray(input);
 
 			// Find all unique positions where there's a digit next to a symbol
-			var digits = map.AllPoints(ch => ch != '.' && !char.IsDigit(ch))
+			var digits = map.AllPointsWhere(ch => ch != '.' && !char.IsDigit(ch))
 				.SelectMany(p => p.LookDiagonallyAround())
 				.Where(p => char.IsDigit(map[p]))
 				.Distinct();
@@ -50,7 +50,7 @@ namespace AdventOfCode.Y2023.Day03
 
 			// We're only interested in numbers adjacent to '*'
 			var sum = map
-				.AllPoints(ch => ch == '*')
+				.AllPointsWhere(ch => ch == '*')
 				.Sum(dp =>
 				{
 					var gearDigits = new List<Point>();

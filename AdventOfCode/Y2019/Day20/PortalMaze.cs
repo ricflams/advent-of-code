@@ -22,7 +22,7 @@ namespace AdventOfCode.Y2019.Day20
 		public PortalMaze(CharMap map)
 			: base(map)
 		{
-			var portalinfo = Map.AllPoints(char.IsUpper).OrderBy(p => p.Y).ThenBy(p => p.X);
+			var portalinfo = Map.AllPointsWhere(char.IsUpper).OrderBy(p => p.Y).ThenBy(p => p.X);
 			var portalsByName = new Dictionary<string, List<Tuple<Point, Point>>>();
 
 			// Map all entry-portals

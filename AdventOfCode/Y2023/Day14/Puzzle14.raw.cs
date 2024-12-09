@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 			TiltNorth(map);
 
-			var weight = map.AllPoints(c => c == 'O')
+			var weight = map.AllPointsWhere(c => c == 'O')
 				.Sum(p => input.Length - p.Y);
 
 
@@ -42,7 +42,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 		protected override long Part2(string[] input)
 		{
 			var map0 = CharMap.FromArray(input);
-			var pos0 = map0.AllPoints(c => c == 'O').OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
+			var pos0 = map0.AllPointsWhere(c => c == 'O').OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
 
 			var map = CharMap.FromArray(input);
 
@@ -51,7 +51,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 			while (true)
 			{
 				var hash = HashMap(map);
-				var load = map.AllPoints(c => c == 'O').Sum(p => input.Length - p.Y);
+				var load = map.AllPointsWhere(c => c == 'O').Sum(p => input.Length - p.Y);
 
 				if (loads.TryGetValue(hash, out var seen))
 				{
@@ -82,7 +82,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 		private ulong HashMap(CharMap map)
 		{
-			var rocks = map.AllPoints(c => c == 'O').OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
+			var rocks = map.AllPointsWhere(c => c == 'O').OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
 			var h1 = Hashing.LongHash(rocks.Select(x => x.X*10000+x.Y).ToArray());
 			return h1;
 		}
@@ -98,7 +98,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 		private void TiltNorth(CharMap map)
 		{
-			foreach (var p in map.AllPoints(c => c == 'O').OrderBy(p => p.Y))
+			foreach (var p in map.AllPointsWhere(c => c == 'O').OrderBy(p => p.Y))
 			{
 				var pp = p;
 				while (map[pp.N] == '.')
@@ -112,7 +112,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 		private void TiltSouth(CharMap map)
 		{
-			foreach (var p in map.AllPoints(c => c == 'O').OrderByDescending(p => p.Y))
+			foreach (var p in map.AllPointsWhere(c => c == 'O').OrderByDescending(p => p.Y))
 			{
 				var pp = p;
 				while (map[pp.S] == '.')
@@ -126,7 +126,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 		private void TiltEast(CharMap map)
 		{
-			foreach (var p in map.AllPoints(c => c == 'O').OrderByDescending(p => p.X))
+			foreach (var p in map.AllPointsWhere(c => c == 'O').OrderByDescending(p => p.X))
 			{
 				var pp = p;
 				while (map[pp.E] == '.')
@@ -140,7 +140,7 @@ namespace AdventOfCode.Y2023.Day14.Raw
 
 		private void TiltWest(CharMap map)
 		{
-			foreach (var p in map.AllPoints(c => c == 'O').OrderBy(p => p.X))
+			foreach (var p in map.AllPointsWhere(c => c == 'O').OrderBy(p => p.X))
 			{
 				var pp = p;
 				while (map[pp.W] == '.')

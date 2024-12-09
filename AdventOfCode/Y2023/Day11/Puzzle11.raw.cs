@@ -32,7 +32,7 @@ namespace AdventOfCode.Y2023.Day11.Raw
 		{
 			var map = CharMap.FromArray(input);
 
-			var galaxies = map.AllPoints(c => c == '#').ToArray();
+			var galaxies = map.AllPointsWhere(c => c == '#').ToArray();
 			var (w, h) = map.Size();
 
 			var emptyx = Enumerable.Range(0, w).Where(x => !galaxies.Any(p => p.X == x)).ToArray();
@@ -69,7 +69,7 @@ namespace AdventOfCode.Y2023.Day11.Raw
 		{
 			var map = CharMap.FromArray(input);
 
-			var galaxies = map.AllPoints(c => c == '#').ToArray();
+			var galaxies = map.AllPointsWhere(c => c == '#').ToArray();
 			var (w, h) = map.Size();
 
 			var emptyx = Enumerable.Range(0, w).Where(x => !galaxies.Any(p => p.X == x)).ToArray();

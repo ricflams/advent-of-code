@@ -34,7 +34,7 @@ namespace AdventOfCode.Y2023.Day11
 		{
 			// Find all galaxies
 			var map = CharMap.FromArray(input);
-			var galaxies = map.AllPoints(c => c == '#').ToArray();
+			var galaxies = map.AllPointsWhere(c => c == '#').ToArray();
 
 			// Find x,y coordinates of all galaxies
 			var xCoords = new HashSet<int>(galaxies.Select(g => g.X));

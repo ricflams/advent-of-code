@@ -81,7 +81,7 @@ namespace AdventOfCode.Y2018.Day13
 			var map = CharMap.FromArray(input);
 
 			var cars = map
-				.AllPoints(c => "v^<>".Contains(c))
+				.AllPointsWhere("v^<>".Contains)
 				.Select(p =>
 				{
 					var direction = map[p] switch 

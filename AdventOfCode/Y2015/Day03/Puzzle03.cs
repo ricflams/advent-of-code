@@ -30,7 +30,7 @@ namespace AdventOfCode.Y2015.Day03
 				map[pos]++;
 			}
 
-			var visited = map.AllPoints().Count();
+			var visited = map.Count();
 			return visited;
 		}
 
@@ -51,7 +51,7 @@ namespace AdventOfCode.Y2015.Day03
 				map[deliveries[turn]]++;
 			}
 
-			var visited = map.AllPoints().Count();
+			var visited = map.All().Count();
 			return visited;
 		}
 	}

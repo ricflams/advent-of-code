@@ -41,8 +41,8 @@ namespace AdventOfCode.Y2019.Day18
 			var map = CharMap.FromArray(input);
 			var (w, h) = map.Size();
 
-			var p0 = map.AllPoints(ch => ch == '@').Single();
-			var N = map.AllValues(char.IsLower).Count();
+			var p0 = map.AllPointsWhere(ch => ch == '@').Single();
+			var N = map.Count(char.IsLower);
 			var allkeys = (1u << N) - 1u;
 
 			var queue = Quack<(Point, int, uint)>.Create(QuackType.Queue);
@@ -196,7 +196,7 @@ namespace AdventOfCode.Y2019.Day18
 			public VaultMaze(string[] lines)
 				: base(CharMap.FromArray(lines))
 			{
-				Entry = Map.AllPoints(ch => ch == '@').Single();
+				Entry = Map.AllPointsWhere(ch => ch == '@').Single();
 			}
 		}
 
@@ -396,7 +396,7 @@ namespace AdventOfCode.Y2019.Day18
 
 		private static List<List<Vertex>> BuildFourSplitGraph(CharMap map)
 		{
-			var pos0 = map.AllPoints(ch => ch == '@').First();
+			var pos0 = map.AllPointsWhere(ch => ch == '@').First();
 
 			map[pos0] = '#';
 			foreach (var p in pos0.LookAround())
@@ -420,7 +420,7 @@ namespace AdventOfCode.Y2019.Day18
 		{
 			var walked = new SparseMap<bool>();
 
-			var pos0 = map.AllPoints(ch => ch == '@').First();
+			var pos0 = map.AllPointsWhere(ch => ch == '@').First();
 			var root = new Vertex(pos0, '@');
 			List<Vertex> vertices = new List<Vertex>();
 			vertices.Add(root);

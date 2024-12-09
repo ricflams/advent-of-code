@@ -25,8 +25,8 @@ namespace AdventOfCode.Y2019.Day13
 			var intcode = input[0];
 			var blocks = new Game(intcode)
 				.Run()
-				.Map.AllPoints(value => value == Game.TileBlock)
-				.Count();
+				.Map
+				.Count(value => value == Game.TileBlock);
 			return blocks;
 		}
 
