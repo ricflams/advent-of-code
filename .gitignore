@@ -352,4 +352,4 @@ MigrationBackup/
 
 /AdventOfCode/cache/*
 /AdventOfCode/*.sessioncookie
-# /AdventOfCode/Templates/
+/AdventOfCode/Templates/
