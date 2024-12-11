@@ -120,6 +120,33 @@ namespace AdventOfCode.Helpers
 			/*                    */ 1000000000000000000 * a + b;
 			//          max long is  9223372036854775807		
 
+		public static bool CanSplitInTwo(this long a, out (long S1, long S2) parts)
+		{
+			if (a < 10) return NoSplit(out parts);
+			if (a < 100) return Split(a / 10, a % 10, out parts);
+			if (a < 1000) return NoSplit(out parts);
+			if (a < 10000) return Split(a / 100, a % 100, out parts);
+			if (a < 100000) return NoSplit(out parts);
+			if (a < 1000000) return Split(a / 1000, a % 1000, out parts);
+			if (a < 10000000) return NoSplit(out parts);
+			if (a < 100000000) return Split(a / 10000, a % 10000, out parts);
+			if (a < 1000000000) return NoSplit(out parts);
+			if (a < 10000000000) return Split(a / 100000, a % 100000, out parts);
+			if (a < 100000000000) return NoSplit(out parts);
+			if (a < 1000000000000) return Split(a / 1000000, a % 1000000, out parts);
+			if (a < 10000000000000) return NoSplit(out parts);
+			if (a < 100000000000000) return Split(a / 10000000, a % 10000000, out parts);
+			if (a < 1000000000000000) return NoSplit(out parts);
+			if (a < 10000000000000000) return Split(a / 100000000, a % 100000000, out parts);
+			if (a < 100000000000000000) return NoSplit(out parts);
+			if (a < 1000000000000000000) return Split(a / 1000000000, a % 1000000000, out parts);
+			/* max  9223372036854775807 */
+			return NoSplit(out parts);
+
+			static bool Split(long a, long b, out (long, long) parts) { parts = (a, b); return true; };
+			static bool NoSplit(out (long, long) parts) { parts = (0, 0); return false; };
+		}
+
 		public static BigInteger ModInverse(this BigInteger a, BigInteger m)
 		{
 			if (m == 1) return 0;
