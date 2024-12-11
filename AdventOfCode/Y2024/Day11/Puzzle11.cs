@@ -60,7 +60,7 @@ namespace AdventOfCode.Y2024.Day11
 
 				var n =
 					stone == 0 ? Blink(1, blinks - 1) :
-					stone.CanSplitInTwo(out var nn) ? Blink(nn.S1, blinks - 1) + Blink(nn.S2, blinks - 1) :
+					stone.CanSplitInTwo(out var nn) ? Blink(nn.A, blinks - 1) + Blink(nn.B, blinks - 1) :
 					Blink(stone * 2024, blinks - 1);
 				memo[key] = n;
 				return n;

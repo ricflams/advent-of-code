@@ -120,26 +120,26 @@ namespace AdventOfCode.Helpers
 			/*                    */ 1000000000000000000 * a + b;
 			//          max long is  9223372036854775807		
 
-		public static bool CanSplitInTwo(this long a, out (long S1, long S2) parts)
+		public static bool CanSplitInTwo(this long n, out (long A, long B) parts)
 		{
-			if (a < 10) return NoSplit(out parts);
-			if (a < 100) return Split(a / 10, a % 10, out parts);
-			if (a < 1000) return NoSplit(out parts);
-			if (a < 10000) return Split(a / 100, a % 100, out parts);
-			if (a < 100000) return NoSplit(out parts);
-			if (a < 1000000) return Split(a / 1000, a % 1000, out parts);
-			if (a < 10000000) return NoSplit(out parts);
-			if (a < 100000000) return Split(a / 10000, a % 10000, out parts);
-			if (a < 1000000000) return NoSplit(out parts);
-			if (a < 10000000000) return Split(a / 100000, a % 100000, out parts);
-			if (a < 100000000000) return NoSplit(out parts);
-			if (a < 1000000000000) return Split(a / 1000000, a % 1000000, out parts);
-			if (a < 10000000000000) return NoSplit(out parts);
-			if (a < 100000000000000) return Split(a / 10000000, a % 10000000, out parts);
-			if (a < 1000000000000000) return NoSplit(out parts);
-			if (a < 10000000000000000) return Split(a / 100000000, a % 100000000, out parts);
-			if (a < 100000000000000000) return NoSplit(out parts);
-			if (a < 1000000000000000000) return Split(a / 1000000000, a % 1000000000, out parts);
+			if (n < 10) return NoSplit(out parts);
+			if (n < 100) return Split(n / 10, n % 10, out parts);
+			if (n < 1000) return NoSplit(out parts);
+			if (n < 10000) return Split(n / 100, n % 100, out parts);
+			if (n < 100000) return NoSplit(out parts);
+			if (n < 1000000) return Split(n / 1000, n % 1000, out parts);
+			if (n < 10000000) return NoSplit(out parts);
+			if (n < 100000000) return Split(n / 10000, n % 10000, out parts);
+			if (n < 1000000000) return NoSplit(out parts);
+			if (n < 10000000000) return Split(n / 100000, n % 100000, out parts);
+			if (n < 100000000000) return NoSplit(out parts);
+			if (n < 1000000000000) return Split(n / 1000000, n % 1000000, out parts);
+			if (n < 10000000000000) return NoSplit(out parts);
+			if (n < 100000000000000) return Split(n / 10000000, n % 10000000, out parts);
+			if (n < 1000000000000000) return NoSplit(out parts);
+			if (n < 10000000000000000) return Split(n / 100000000, n % 100000000, out parts);
+			if (n < 100000000000000000) return NoSplit(out parts);
+			if (n < 1000000000000000000) return Split(n / 1000000000, n % 1000000000, out parts);
 			/* max  9223372036854775807 */
 			return NoSplit(out parts);
 
