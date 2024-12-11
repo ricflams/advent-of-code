@@ -25,11 +25,11 @@ namespace AdventOfCode
 
 
 			//|| year == 2018
-			|| (year, day) == (2023, 16)
-			|| (year, day) == (2023, 17)
+			// || (year, day) == (2023, 16)
+			// || (year, day) == (2023, 17)
 			//|| test == "extra" && year == 2020
 
-			//|| (year, day) == (2024, 2)
+			|| (year, day) == (2024, 11)
 
 			//				|| !(year == 2019 && day == 18)// || year == 2023 && day == 22)
 
@@ -46,7 +46,7 @@ namespace AdventOfCode
 			);
 
 //runner.Options.OnlyRunForInputs = true;
-			var iterations = 1;
+			var iterations = 20;
 			//iterations = 1000;
 
 			if (iterations == 1)
