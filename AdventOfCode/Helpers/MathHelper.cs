@@ -190,6 +190,30 @@ namespace AdventOfCode.Helpers
             return sum % prod;
 		}
 
+		public static bool SolveLinearEquation((long X, long Y) a, (long X, long Y) b, (long X, long Y) c, out (long X, long Y) result)
+		{
+			return SolveLinearEquation(a.X, b.X, -c.X, a.Y, b.Y, -c.Y, out result);
+		}
+
+		public static bool SolveLinearEquation(long a1, long b1, long c1, long a2, long b2, long c2, out (long X, long Y) result)
+		{
+			var det = a1*b2 - a2*b1;
+			if (det != 0)
+			{
+				var v1 = b1*c2 - b2*c1;
+				var v2 = c1*a2 - c2*a1;
+				if (v1 % det == 0 && v2 % det == 0)
+				{
+					var a = v1/det;
+					var b = v2/det;
+					result = (a, b);
+					return true;
+				}
+			}
+			result = (0,0);
+			return false;
+		}
+
 		public static IEnumerable<long> Factorize(long n)
 		{
 			var max = (long)Math.Ceiling(Math.Sqrt(n));
