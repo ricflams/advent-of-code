@@ -197,6 +197,7 @@ namespace AdventOfCode.Helpers
 
 		public static bool SolveLinearEquation(long a1, long b1, long c1, long a2, long b2, long c2, out (long X, long Y) result)
 		{
+			// See https://www.cuemath.com/algebra/cross-multiplication-method/
 			var det = a1*b2 - a2*b1;
 			if (det != 0)
 			{
