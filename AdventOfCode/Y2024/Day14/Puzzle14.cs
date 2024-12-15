@@ -27,8 +27,10 @@ namespace AdventOfCode.Y2024.Day14
 			var sec = 100;
 			foreach (var r in robots)
 			{
-				r.X = (((r.X + sec * r.VX)  % width) + width) % width;
-				r.Y = (((r.Y + sec * r.VY)  % height) + height) % height;
+				r.AdjustForSize(width, height);
+				r.X = (r.X + sec * r.VX)  % width;
+				r.Y = (r.Y + sec * r.VY)  % height;
+				
 			}
 
 			var halfw = width / 2;
@@ -51,6 +53,7 @@ namespace AdventOfCode.Y2024.Day14
 			var inRow = new int[height];
 			foreach (var r in robots)
 			{
+				r.AdjustForSize(width, height);
 				map[r.X, r.Y] += 1;
 				inRow[r.Y] += 1;
 			}
@@ -62,8 +65,8 @@ namespace AdventOfCode.Y2024.Day14
 				{
 					map[r.X, r.Y] -= 1;
 					inRow[r.Y] -= 1;
-					r.X = (r.X + r.VX + width) % width;
-					r.Y = (r.Y + r.VY + height) % height;
+					r.X = (r.X + r.VX) % width;
+					r.Y = (r.Y + r.VY) % height;
 					map[r.X, r.Y] += 1;
 					inRow[r.Y] += 1;
 				}
@@ -91,6 +94,13 @@ namespace AdventOfCode.Y2024.Day14
 			public int Y;
 			public int VX;
 			public int VY;
+
+			public void AdjustForSize(int width, int height)
+			{
+				// Modify velocities to be positive for easier modulus
+				VX = (VX + width) % width;
+				VY = (VY + height) % height;
+			}
 
 			public static Robot Parse(string s)
 			{
