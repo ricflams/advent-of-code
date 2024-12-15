@@ -31,6 +31,8 @@ namespace AdventOfCode.Y2024.Day15
 
 			foreach (var m in moves)
 			{
+				// map.ConsoleWrite((p, c) => p == robot ? '@' : c);
+
 				var dir = m.AsDirection();
 				var next = robot + dir;
 
@@ -84,6 +86,8 @@ namespace AdventOfCode.Y2024.Day15
 
 			foreach (var m in moves)
 			{
+				//map.ConsoleWrite((p, c) => p == robot ? '@' : c);
+
 				var dir = m.AsDirection();
 				var next = robot + dir;
 
