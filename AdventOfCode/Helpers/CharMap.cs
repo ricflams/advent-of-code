@@ -30,23 +30,15 @@ namespace AdventOfCode.Helpers
 			return new CharMap(lines, defaultValue);
 		}
 
-		public void ConsoleWrite(bool clear = false, params string[] headers)
+		public new void ConsoleWrite(Func<Point, char, char> rendering = null)
 		{
-			if (clear)
-			{
-				Console.Clear();
-			}
-			foreach (var header in headers)
-			{
-				Console.WriteLine(header);
-			}
-			foreach (var line in Render())
+			foreach (var line in Render(rendering))
 			{
 				Console.WriteLine(line);
 			}
 		}
 
-		public new string[] Render(Func<Point, char, char> rendering = null)
+		public new string[] Render(Func<Point, char, char> rendering)
 		{
 			var (min, max) = MinMax();
 			return Enumerable.Range(min.Y, max.Y- min.Y + 1)
