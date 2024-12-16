@@ -23,6 +23,8 @@ namespace AdventOfCode.Helpers
 		public Point Point { get; private set; }
 		public Direction Direction { get; set; }
 
+		public static bool operator ==(Pose p1, Pose p2) => p1 is null ? p2 is null : p1.Equals(p2);
+		public static bool operator !=(Pose p1, Pose p2) => !(p1 == p2);
 		public override string ToString() => $"{Point}{Direction.AsChar()}";
 		public override int GetHashCode() => Point.GetHashCode() * 397 ^ Direction.GetHashCode();
 		public override bool Equals(object o) => o is Pose p && Point == p.Point && Direction == p.Direction;
