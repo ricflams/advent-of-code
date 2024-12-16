@@ -138,7 +138,7 @@ namespace AdventOfCode.Helpers
 			{
 				foreach (var (n, w) in node.Neighbors)
 				{
-					Console.WriteLine($"  \"{node}\" -> \"{n}\" [label=\"{w}\"]");
+					Console.WriteLine($"  \"{node.Id}\" -> \"{n.Id}\" [label=\"{w}\"]");
 				}
 			}
 			Console.WriteLine("}");
@@ -150,6 +150,39 @@ namespace AdventOfCode.Helpers
 		}
 
 		public int ShortestPathDijkstra(Node start, Node dest)
+		{
+			var visited = new bool[Nodes.Count];
+			var distance = new int[Nodes.Count];
+			Array.Fill(distance, int.MaxValue);
+			distance[start.Index] = 0;
+
+			var node = start;
+			while (node != null)
+			{
+				if (node == dest)
+				{
+					return distance[dest.Index];
+				}
+				foreach (var (n, w) in node.Neighbors)
+				{
+					var dist = distance[node.Index] + w;
+					if (dist < distance[n.Index])
+					{
+						distance[n.Index] = dist;
+					}
+				}
+				visited[node.Index] = true;
+				node = Nodes
+					.Where(n => !visited[n.Index])
+					.OrderBy(n => distance[n.Index])
+					.FirstOrDefault();
+			}
+
+			return Infinite;
+		}
+
+
+		public int ShortestPathDijkstraCountSpots(Node start, Node dest)
 		{
 			var visited = new bool[Nodes.Count];
 			var distance = new int[Nodes.Count];
