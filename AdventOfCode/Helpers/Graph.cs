@@ -67,7 +67,7 @@ namespace AdventOfCode.Helpers
 		}
 
 		public List<Node> Nodes = [];
-		private Dictionary<TId,Node> _nodeMap = [];
+		private Dictionary<TId, Node> _nodeMap = [];
 
 		public Node AddNode(TId id, TData v)
 		{
@@ -181,6 +181,58 @@ namespace AdventOfCode.Helpers
 			return Infinite;
 		}
 
+		public List<Node> AStarPath(Node start, Node goal, Func<Node, Node, int> heuristics)
+		{
+			var frontier = new PriorityQueue<Node, int>();
+			// var start = "startNode"; // Replace with your start node
+			// var goal = "goalNode";   // Replace with your goal node
+			frontier.Enqueue(start, 0);
+
+			var cameFrom = new Dictionary<Node, Node?>();
+			var costSoFar = new Dictionary<Node, int>();
+
+			cameFrom[start] = null;
+			costSoFar[start] = 0;
+
+			//var graph = new Graph(); // Replace with your graph instance
+
+			while (frontier.Count > 0)
+			{
+				var current = frontier.Dequeue();
+
+				if (current == goal)
+				{
+					break;
+				}
+
+				foreach (var (next, cost) in current.Neighbors)
+				{
+					int newCost = costSoFar[current] + cost;
+					if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
+					{
+						costSoFar[next] = newCost;
+						int priority = newCost + heuristics(goal, next);
+						frontier.Enqueue(next, priority);
+						cameFrom[next] = current;
+					}
+				}
+			}
+
+			if (!cameFrom.ContainsKey(goal))
+				return null;
+
+			var path = new List<Node>();
+			var curr = goal;
+			while (curr != start)
+			{
+				path.Add(curr);
+				curr = cameFrom[curr];
+			}
+			path.Add(start);
+
+			return path;
+		}
+
 		public Dictionary<Node, int> ShortestPathToAllDijkstra(Node start)
 		{
 			var visited = new bool[Nodes.Count];
@@ -232,7 +284,7 @@ namespace AdventOfCode.Helpers
 
 			for (var i = 0; i < N; i++)
 				for (var j = 0; j < N; j++)
-					dist[i, j] = int.MaxValue/2;
+					dist[i, j] = int.MaxValue / 2;
 
 			foreach (var node in Nodes)
 			{
