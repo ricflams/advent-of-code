@@ -484,6 +484,43 @@ namespace AdventOfCode.Helpers
 
 
 
+		public static Graph<Point, TData> BuildUnitGraphFromMazeByQueue(Maze maze)
+		{
+			var graph = new Graph<Point, TData>();
+			var root = graph.AddNode(maze.Entry, default);
+			if (maze.Exit != null)
+			{
+				graph.AddNode(maze.Exit, default);
+			}
+
+			var queue = new Queue<Graph<Point, TData>.Node>();
+			queue.Enqueue(root);
+
+			while (queue.Count > 0)
+			{
+				var origin = queue.Dequeue();
+				var routes = origin.Id.LookAround()
+						.Select(maze.Teleport)
+						.Where(maze.IsWalkable)
+						.ToArray();
+
+				foreach (var p in routes)
+				{
+					var v = graph[p];
+					if (v != null)
+					{
+						graph.SetWeight(origin, v, 1);
+					}
+					else
+					{
+						var next = graph.AddNode(p, default);
+						queue.Enqueue(next);
+					}
+				}
+			}
+			return graph;
+		}
+
 
 
 		//public static Graph<Point, TData> FromMaze<Node>(CharMap map, Point start, Func<Point, char, TData> makeNode)
