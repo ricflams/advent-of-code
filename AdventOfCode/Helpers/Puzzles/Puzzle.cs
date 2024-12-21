@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace AdventOfCode.Helpers.Puzzles
 {
-	internal abstract class Puzzle<T1,T2> : RunnablePuzzle
+	internal abstract class Puzzle<T1, T2> : RunnablePuzzle
 	{
 		private static readonly string TimingBar = new('#', 10);
 		private static readonly TimeSpan TimingBarUnit = TimeSpan.FromMilliseconds(100);
@@ -18,11 +19,11 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		internal class Runner
 		{
-			private readonly Puzzle<T1,T2> _puzzle;
+			private readonly Puzzle<T1, T2> _puzzle;
 			private readonly string _testname;
 			private readonly string _filename;
 
-			public Runner(Puzzle<T1,T2> puzzle, string testname, string filename) =>
+			public Runner(Puzzle<T1, T2> puzzle, string testname, string filename) =>
 				(_puzzle, _testname, _filename) = (puzzle, testname, filename);
 
 			public Runner Part1(T1 expectedResult)
@@ -38,7 +39,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			}
 		}
 
-		internal void RunPart<T>(string testname, string filename, int part, Func<string[],T> solution, T expectedResult)
+		internal void RunPart<T>(string testname, string filename, int part, Func<string[], T> solution, T expectedResult)
 		{
 			if (!Options.ShouldRun(this, testname))
 				return;
@@ -46,7 +47,7 @@ namespace AdventOfCode.Helpers.Puzzles
 			var input = FileSystem.Instance.ReadFile(Year, Day, filename);
 			if (input.Length == 0)
 			{
-				Console.Error.WriteLine($"No {testname} for day {Day}, {Year}");				
+				Console.Error.WriteLine($"No {testname} for day {Day}, {Year}");
 				return;
 			}
 
@@ -79,12 +80,24 @@ namespace AdventOfCode.Helpers.Puzzles
 
 		protected static void WriteResult<T>(T result, T expectedResult)
 		{
-			Console.Write(result);
-			if (!expectedResult.Equals(result))
+			var hasResult = !EqualityComparer<T>.Default.Equals(result, default);
+
+			if (!hasResult)
 			{
-		        Console.ForegroundColor = ConsoleColor.Red;
-				Console.Write($"  ****FAIL**** expected {expectedResult}");
-		        Console.ResetColor();
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.Write($"has no result");
+				Console.ResetColor();
+			}
+			else
+			{
+				Console.Write(result);
+			}
+
+			if (hasResult && !expectedResult.Equals(result))
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.Write($" ****FAIL**** expected {expectedResult}");
+				Console.ResetColor();
 			}
 		}
 	}
