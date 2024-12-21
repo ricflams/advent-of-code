@@ -23,6 +23,8 @@ namespace AdventOfCode.Y2024.Day20
 			//Run("test2").Part1(0).Part2(0);
 			//		Run("input").WithParameter((100, 100)).Part1(1395).Part2(0);
 			//Run("extra").Part1(0).Part2(0);
+
+			// TODO: cleanup
 		}
 
 		protected override long Part1(string[] input)
