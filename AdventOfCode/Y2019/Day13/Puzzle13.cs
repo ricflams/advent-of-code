@@ -134,10 +134,7 @@ namespace AdventOfCode.Y2019.Day13
 			{
 				Console.Clear();
 				Console.WriteLine($"Score: {Score}");
-				foreach (var line in Map.Render())
-				{
-					Console.WriteLine(line);
-				}
+				Map.ConsoleWrite();
 			}
 		}
 	}
