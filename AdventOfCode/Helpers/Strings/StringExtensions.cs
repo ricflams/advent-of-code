@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace AdventOfCode.Helpers.String
 {
-    public static class Extensions
-    {
-        public static IEnumerable<string> AllReplacements(this string str, string oldValue, string newValue)
+	public static class Extensions
+	{
+		public static IEnumerable<string> AllReplacements(this string str, string oldValue, string newValue)
 		{
 			// The length of a replaced string is fixed
 			var replacedLength = str.Length - oldValue.Length + newValue.Length;
@@ -43,21 +44,25 @@ namespace AdventOfCode.Helpers.String
 			return temp;
 		}
 
-		private static readonly char[] NumberArraySep = [' ', '\t', ','];
+		private static readonly char[] CommaSep = [' ', '\t', ','];
 
 		public static int[] ToIntArray(this string s) => s
-			.Split(NumberArraySep, StringSplitOptions.RemoveEmptyEntries)
+			.Split(CommaSep, StringSplitOptions.RemoveEmptyEntries)
 			.Select(int.Parse)
 			.ToArray();
 
 		public static long[] ToLongArray(this string s) => s
-			.Split(NumberArraySep, StringSplitOptions.RemoveEmptyEntries)
+			.Split(CommaSep, StringSplitOptions.RemoveEmptyEntries)
 			.Select(long.Parse)
 			.ToArray();
 
-		public static string[] SplitSpace(this string s)
-		{
-			return s.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-		}
-    }
+		public static string[] SplitSpace(this string s) => s
+			.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+
+		public static string[] SplitByComma(this string s) => s
+			.Split(CommaSep, StringSplitOptions.RemoveEmptyEntries);
+
+		public static string[] SplitByAny(this string s, string chars) => s
+			.Split(chars.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+	}
 }
