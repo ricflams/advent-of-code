@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
-    public static class CharMatrix
-    {
-        public static int Width<T>(this T[,] mx) => mx.GetLength(0);
-        public static int Height<T>(this T[,] mx) => mx.GetLength(1);
-        public static (int, int) Dim<T>(this T[,] mx) => (mx.Width(), mx.Height());
+	public static class CharMatrix
+	{
+		public static int Width<T>(this T[,] mx) => mx.GetLength(0);
+		public static int Height<T>(this T[,] mx) => mx.GetLength(1);
+		public static (int, int) Dim<T>(this T[,] mx) => (mx.Width(), mx.Height());
 
 		public static (Point, Point) MinMax(this char[,] mx)
 		{
@@ -66,7 +66,7 @@ namespace AdventOfCode.Helpers
 			var (w, h) = mx.Dim();
 
 			return Enumerable.Range(0, h)
-				.Select(y => new string(Enumerable.Range(0, w).Select(x => mx[x,y]).ToArray()))
+				.Select(y => new string(Enumerable.Range(0, w).Select(x => mx[x, y]).ToArray()))
 				.ToArray();
 		}
 
@@ -150,6 +150,8 @@ namespace AdventOfCode.Helpers
 			}
 			return flipped;
 		}
+
+		public static char[,] FlipXY(this char[,] mx) => mx.RotateClockwise(90).FlipV();
 
 		public static char[,] Transform(this char[,] mx, Func<char, char[], char> transform)
 		{
@@ -239,7 +241,7 @@ namespace AdventOfCode.Helpers
 			n = (n % w + w) % w; // normalized n % w
 			if (n == 0)
 				return;
-			
+
 			var shifted = new char[w];
 			for (var x = 0; x < w; x++)
 			{
@@ -260,7 +262,7 @@ namespace AdventOfCode.Helpers
 			n = (n % h + h) % h; // normalized n % w
 			if (n == 0)
 				return;
-			
+
 			var shifted = new char[h];
 			for (var y = 0; y < h; y++)
 			{
@@ -278,7 +280,7 @@ namespace AdventOfCode.Helpers
 		{
 			var (w, h) = mx.Dim();
 
-			var (w2, h2) = (w + 2*n, h + 2*n);
+			var (w2, h2) = (w + 2 * n, h + 2 * n);
 			var expanded = new char[w2, h2];
 
 			// Fill the expanded area
@@ -415,23 +417,23 @@ namespace AdventOfCode.Helpers
 			Console.Write('\\');
 			for (var x = 0; x < w; x++)
 			{
-				Console.Write(Legend(x+1, '|'));
+				Console.Write(Legend(x + 1, '|'));
 			}
 			Console.WriteLine();
 			for (var y = 0; y < h; y++)
 			{
-				Console.Write(Legend(y+1, '-'));
+				Console.Write(Legend(y + 1, '-'));
 				for (var x = 0; x < w; x++)
 				{
-					Console.Write(mx[x,y]);
+					Console.Write(mx[x, y]);
 				}
 				Console.WriteLine();
 			}
 
 			static char Legend(int x, char fivemark) =>
-				x % 10 == 0 ? (x/10).ToString().Last() :
+				x % 10 == 0 ? (x / 10).ToString().Last() :
 				x % 5 == 0 ? fivemark :
 				' ';
 		}
-    }
+	}
 }
