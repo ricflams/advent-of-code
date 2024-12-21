@@ -67,7 +67,7 @@ namespace AdventOfCode.Helpers
 		}
 
 		public List<Node> Nodes = [];
-		private Dictionary<TId,Node> _nodeMap = [];
+		private Dictionary<TId, Node> _nodeMap = [];
 
 		public Node AddNode(TId id, TData v)
 		{
@@ -242,6 +242,58 @@ namespace AdventOfCode.Helpers
 			return Nodes.ToDictionary(n => n, n => distance[n.Index]);
 		}
 
+		public List<Node> AStarPath(Node start, Node goal, Func<Node, Node, int> heuristics)
+		{
+			var frontier = new PriorityQueue<Node, int>();
+			// var start = "startNode"; // Replace with your start node
+			// var goal = "goalNode";   // Replace with your goal node
+			frontier.Enqueue(start, 0);
+
+			var cameFrom = new Dictionary<Node, Node?>();
+			var costSoFar = new Dictionary<Node, int>();
+
+			cameFrom[start] = null;
+			costSoFar[start] = 0;
+
+			//var graph = new Graph(); // Replace with your graph instance
+
+			while (frontier.Count > 0)
+			{
+				var current = frontier.Dequeue();
+
+				if (current == goal)
+				{
+					break;
+				}
+
+				foreach (var (next, cost) in current.Neighbors)
+				{
+					int newCost = costSoFar[current] + cost;
+					if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
+					{
+						costSoFar[next] = newCost;
+						int priority = newCost + heuristics(goal, next);
+						frontier.Enqueue(next, priority);
+						cameFrom[next] = current;
+					}
+				}
+			}
+
+			if (!cameFrom.ContainsKey(goal))
+				return null;
+
+			var path = new List<Node>();
+			var curr = goal;
+			while (curr != start)
+			{
+				path.Add(curr);
+				curr = cameFrom[curr];
+			}
+			path.Add(start);
+
+			return path;
+		}
+
 		public int[,] FloydWarshallShortestPaths()
 		{
 			// let dist be a NxN array of minimum distances initialized to infinity
@@ -265,7 +317,7 @@ namespace AdventOfCode.Helpers
 
 			for (var i = 0; i < N; i++)
 				for (var j = 0; j < N; j++)
-					dist[i, j] = int.MaxValue/2;
+					dist[i, j] = int.MaxValue / 2;
 
 			foreach (var node in Nodes)
 			{
@@ -354,16 +406,6 @@ namespace AdventOfCode.Helpers
 			return Nodes.Where(n => visited[n.Index]).ToArray();
 		}
 
-
-
-
-
-
-
-
-
-
-
 		public static Graph<Point> BuildWeightedGraphFromMaze(Maze maze)
 		{
 			var graph = new Graph<Point>();
@@ -425,9 +467,6 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-
-
-
 		public static Graph<Point, TData> BuildUnitGraphFromMaze(Maze maze)
 		{
 			var graph = new Graph<Point, TData>();
@@ -463,8 +502,42 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
+		public static Graph<Point, TData> BuildUnitGraphFromMazeByQueue(Maze maze)
+		{
+			var graph = new Graph<Point, TData>();
+			var root = graph.AddNode(maze.Entry, default);
+			if (maze.Exit != null)
+			{
+				graph.AddNode(maze.Exit, default);
+			}
 
+			var queue = new Queue<Graph<Point, TData>.Node>();
+			queue.Enqueue(root);
 
+			while (queue.Count > 0)
+			{
+				var origin = queue.Dequeue();
+				var routes = origin.Id.LookAround()
+						.Select(maze.Teleport)
+						.Where(maze.IsWalkable)
+						.ToArray();
+
+				foreach (var p in routes)
+				{
+					var v = graph[p];
+					if (v != null)
+					{
+						graph.SetWeight(origin, v, 1);
+					}
+					else
+					{
+						var next = graph.AddNode(p, default);
+						queue.Enqueue(next);
+					}
+				}
+			}
+			return graph;
+		}
 
 
 		//public static Graph<Point, TData> FromMaze<Node>(CharMap map, Point start, Func<Point, char, TData> makeNode)
