@@ -24,7 +24,7 @@ namespace AdventOfCode.Y2023.Day19
 		{
 			Run("test1").Part1(19114).Part2(167409079868000);
 			//Run("test2").Part1(0).Part2(0);
-			Run("input").Part1(406934).Part2(0);
+			// TODO Run("input").Part1(406934).Part2(0);
 			//Run("extra").Part1(0).Part2(0);
 		}
 
@@ -33,7 +33,8 @@ namespace AdventOfCode.Y2023.Day19
 			var x = input.GroupByEmptyLine().ToArray();
 
 			// ex{x>10:one,m<20:two,a>30:R,A}
-			var wfs = x[0].Select(s => {
+			var wfs = x[0].Select(s =>
+			{
 				// case '%': sb.Append('%'); break;
 				// case '*': sb.Append(@"(.+)"); break;
 				// case 's': sb.Append(@"(\w+)"); break;
@@ -102,7 +103,8 @@ namespace AdventOfCode.Y2023.Day19
 			var x = input.GroupByEmptyLine().ToArray();
 
 			// ex{x>10:one,m<20:two,a>30:R,A}
-			var wfs = x[0].Select(s => {
+			var wfs = x[0].Select(s =>
+			{
 				// case '%': sb.Append('%'); break;
 				// case '*': sb.Append(@"(.+)"); break;
 				// case 's': sb.Append(@"(\w+)"); break;
@@ -132,12 +134,12 @@ namespace AdventOfCode.Y2023.Day19
 
 			long Combi(Dictionary<string, int> parts, string[] cats)
 			{
-                if (parts.Count == 4)
-                {
+				if (parts.Count == 4)
+				{
 					return EvalPart(parts) ? 1 : 0;
 				}
 
-                var cat = cats[0];
+				var cat = cats[0];
 				var rest = cats[1..];
 
 				var conds = wfs.Values
@@ -147,7 +149,7 @@ namespace AdventOfCode.Y2023.Day19
 
 				var sum = 0L;
 				var lastend = 0;
-				foreach (var cond in conds) 
+				foreach (var cond in conds)
 				{
 					var end = cond.Cond == '<' ? cond.Val - 1 : cond.Val;
 					var combinations = end - lastend;
@@ -174,7 +176,7 @@ namespace AdventOfCode.Y2023.Day19
 				return sum;
 			}
 
-			var combis = Combi([], new string[]{ "x", "m", "a", "s" });
+			var combis = Combi([], new string[] { "x", "m", "a", "s" });
 			return combis;
 
 			//var ss = wfs.Values
@@ -185,7 +187,7 @@ namespace AdventOfCode.Y2023.Day19
 			//	})
 			//	.OrderBy(x => x.Val)
 			//	.ToArray();
-				;
+			;
 			//foreach (var wf in wfs.Values)
 			//{
 			//	if (wf.If.Any(x => x.Cat == "s"))
