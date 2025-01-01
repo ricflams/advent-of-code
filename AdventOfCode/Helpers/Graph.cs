@@ -20,6 +20,7 @@ namespace AdventOfCode.Helpers
 		const int Infinite = 1000000000;
 		protected int NodeIndex = 0;
 
+		[DebuggerDisplay("{ToString()}")]
 		public class Node(TId id, TData data, int index)
 		{
 			public TId Id { get; init; } = id;
@@ -28,7 +29,7 @@ namespace AdventOfCode.Helpers
 
 			public Dictionary<Node, int> Neighbors { get; internal set; } = [];
 
-			public override string ToString() => Data?.ToString() ?? Id.ToString();
+			public override string ToString() => $"{Id} {Data}";
 			public override int GetHashCode() => Id.GetHashCode();
 			public override bool Equals(object obj) => obj is Node n && n.Index == Index;
 
