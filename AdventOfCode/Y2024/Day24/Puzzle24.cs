@@ -72,7 +72,7 @@ namespace AdventOfCode.Y2024.Day24
 			var parts = input.GroupByEmptyLine().ToArray();
 
 			var bits = parts[0].Length / 2;
-			var gates = parts[1].Select(Gate.Parse).ToArray();
+			var gates = parts[1].Select(Gate.Parse).ToList();
 
 			var swaps = new List<string>();
 			void Swap(string a, string b)
@@ -116,7 +116,9 @@ namespace AdventOfCode.Y2024.Day24
 			//   cAND:   C AND, the AND involved in the carry
 			//   cOr:    C OR,  the OR (the only OR) involved in the carry
 
-			var carry = gates.Single(g => g.HasInput("x00", "y00") && g.IsAnd).Out; // is maybe swapped
+			var cOut0 = gates.Single(g => g.HasInput("x00", "y00") && g.IsAnd);
+			var carry = cOut0.Out; // is maybe swapped
+			gates.Remove(cOut0);
 			for (var i = 1; i < bits; i++)
 			{
 				var id = i.ToString("D2");
@@ -190,6 +192,14 @@ namespace AdventOfCode.Y2024.Day24
 
 				// The carry's output may be swapped but we'll deal with that in the next round
 				carry = cOr.Out;
+
+				// To further prove the point that these were the correct gates let's remove them
+				// from the set of gates. This will also make gate-lookups be a tad more efficient.
+				gates.Remove(xyXor);
+				gates.Remove(xyAnd);
+				gates.Remove(zXor);
+				gates.Remove(cAnd);
+				gates.Remove(cOr);
 			}
 
 			var result = string.Join(',', swaps.OrderBy(x => x));
