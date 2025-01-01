@@ -407,6 +407,36 @@ namespace AdventOfCode.Helpers
 			return Nodes.Where(n => visited[n.Index]).ToArray();
 		}
 
+		public HashSet<Node>[] MaximumClique()
+		{
+			return BronKerbosch([], [.. Nodes], []).ToArray();
+
+			static IEnumerable<HashSet<Node>> BronKerbosch(HashSet<Node> r, HashSet<Node> p, HashSet<Node> x)
+			{
+				// See eg https://youtu.be/j_uQChgo72I
+				// r - current clique
+				// p - candidate set
+				// x - exclusion set
+				if (p.Count == 0 && x.Count == 0)
+				{
+					yield return r;
+					yield break;
+				}
+
+				//var pivot = p.Union(x).OrderByDescending(x => x.Neighbors.Count).First();
+				var pivot = p.Union(x).First();
+
+				foreach (var n in p.Except(pivot.Neighbors.Keys))
+				{
+					var neighbors = n.Neighbors.Keys;
+					foreach (var c in BronKerbosch([.. r, n], [.. p.Intersect(neighbors)], [.. x.Intersect(neighbors)]))
+						yield return c;
+					p.Remove(n);
+					x.Add(n);
+				}
+			}
+		}
+
 		public static Graph<Point> BuildWeightedGraphFromMaze(Maze maze)
 		{
 			var graph = new Graph<Point>();
