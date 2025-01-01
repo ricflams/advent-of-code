@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.IO;
-using System.Text;
 using AdventOfCode.Helpers;
 using AdventOfCode.Helpers.Puzzles;
-using AdventOfCode.Helpers.String;
 
 namespace AdventOfCode.Y2024.Day22
 {
@@ -50,12 +44,20 @@ namespace AdventOfCode.Y2024.Day22
 		{
 			var numbers = input.Select(uint.Parse).ToArray();
 
-			var buyers = numbers.Select(n =>
+			// Shift each digit-range [-9..9] into range [0..18] and shift each diff's
+			// 19 values so 4 diffs can be encoded into one single number that can be
+			// used as indexes in a single array (there are about 130K sequences)
+			static int DiffSequence(int[] v, int i) => (v[i - 3] + 9) * 19 * 19 * 19 + (v[i - 2] + 9) * 19 * 19 + (v[i - 1] + 9) * 19 + v[i] + 9;
+			var SeqN = DiffSequence([9, 9, 9, 9], 3);
+
+			var bananas = new int[SeqN];
+
+			foreach (var number in numbers)
 			{
 				var N = 2001;
-				//n = 123;
 
 				var digits = new int[N];
+				var n = number;
 				for (var i = 0; i < N; i++)
 				{
 					digits[i] = (int)(n % 10);
@@ -73,60 +75,21 @@ namespace AdventOfCode.Y2024.Day22
 					diffs[i] = digits[i] - digits[i - 1];
 				}
 
-				var prices = new Dictionary<uint, int>();
-				//var prices = new Dictionary<string, int>();
+				// Only register the first seen price for any given diff-sequence
+				// Add number of bananas for each diff straight into the one single
+				// bananas-total-array.
+				var seen = new bool[SeqN];
 				for (var i = 4; i < diffs.Length; i++)
 				{
-					var id = PriceKey(diffs, i);
-					var val = digits[i];
-					if (prices.ContainsKey(id))
+					var seq = DiffSequence(diffs, i);
+					if (seen[seq])
 						continue;
-					prices[id] = val;
-				}
-
-				return prices;
-			});
-
-			static uint PriceKey(int[] v, int i) => (uint)((v[i - 3] + 10) * 20 * 20 * 20 + (v[i - 2] + 10) * 20 * 20 + (v[i - 1] + 10) * 20 + v[i] + 10);
-
-			var maxBananas = new SafeDictionary<uint, int>();
-			//var maxBananas = new SafeDictionary<string, int>();
-			foreach (var b in buyers)
-			{
-				foreach (var (key, v) in b)
-				{
-					maxBananas[key] += v;
+					bananas[seq] += digits[i];
+					seen[seq] = true;
 				}
 			}
 
-			//var bananas = maxBananas.OrderByDescending(x => x.Value).Take(10).ToArray();
-			return maxBananas.Values.Max();
-
-
-			// var maxBananas = 0;
-			// var pricekey = new int[4];
-			// for (var i1 = 0; i1 < 10; i1++)
-			// {
-			// 	pricekey[0] = i1;
-			// 	for (var i2 = 0; i2 < 10; i2++)
-			// 	{
-			// 		pricekey[1] = i2;
-			// 		for (var i3 = 0; i3 < 10; i3++)
-			// 		{
-			// 			pricekey[2] = i3;
-			// 			for (var i4 = 0; i4 < 10; i4++)
-			// 			{
-			// 				pricekey[3] = i4;
-			// 				var key = PriceKey(pricekey, 0);
-			// 				var bananas = buyers.Sum(b => b.TryGetValue(key, out var v) ? v : 0);
-			// 				if (bananas > maxBananas)
-			// 					maxBananas = bananas;
-			// 			}
-			// 		}
-			// 	}
-			// }
-
-			// return maxBananas;
+			return bananas.Max();
 		}
 	}
 }
