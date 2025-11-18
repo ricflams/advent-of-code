@@ -10,7 +10,7 @@ using AdventOfCode.Helpers.String;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace AdventOfCode.Y2024.Day20
+namespace AdventOfCode.Y2024.Day20.Raw
 {
 	internal class Puzzle : PuzzleWithParameter<(int, int), long, long>
 	{
@@ -29,14 +29,9 @@ namespace AdventOfCode.Y2024.Day20
 
 		protected override long Part1(string[] input)
 		{
-			var minSaveTime = PuzzleParameter.Item1;
-			var map = CharMap.FromArray(input);
-
-			return FindCheats(map, 2, minSaveTime);
-
 			var savedTime = PuzzleParameter.Item1;
 
-			//var map = CharMap.FromArray(input);
+			var map = CharMap.FromArray(input);
 			var (w, h) = map.Size();
 			var start = map.AllPointsWhere(c => c == 'S').Single();
 			var goal = map.AllPointsWhere(c => c == 'E').Single();
@@ -141,75 +136,11 @@ namespace AdventOfCode.Y2024.Day20
 			// return cheats.Count;
 		}
 
-		private int FindCheats(CharMap map, int cheatLength, int minSaveTime)
-		{
-			//var minSaveTime = PuzzleParameter.Item2;
-			var start = map.AllPointsWhere(c => c == 'S').Single();
-			var goal = map.AllPointsWhere(c => c == 'E').Single();
-
-			map[start] = map[goal] = '.';
-
-			//var steps = new Dictionary<Point, int>();
-			var path = new List<Point>();
-
-			for (
-				Point p = start, prev = null;
-				p != goal;
-				(p, prev) = (p.LookAround().Single(x => x != prev && map[x] == '.'), p))
-			{
-				path.Add(p);
-			}
-			path.Add(goal);
-
-			var dist = new Dictionary<Point, int>();
-			for (var i = 0; i < path.Count; i++)
-			{
-				dist[path[i]] = path.Count - i;
-			}
-			dist[goal] = 0;
-
-			var cheats = 0;
-			for (var i = 0; i < path.Count; i++)
-			{
-				var p = path[i];
-
-				for (var j = i + 4; j < path.Count; j++)
-				{
-					var p2 = path[j];
-					var mdist = p.ManhattanDistanceTo(p2);
-					if (mdist <= cheatLength)
-					{
-						var delta = dist[p] - dist[p2];
-						var saved = delta - mdist;
-						if (saved >= minSaveTime)
-							cheats++;
-					}
-				}
-				//var vicinity = dist.Keys.Where(n => n != p && p.ManhattanDistanceTo(n) <= cheatLength).ToArray();
-				// // Console.WriteLine();
-				// // map.ConsoleWrite((p, c) => vicinity.Any(x => x.Id == p) ? 'V' : c);
-
-				// foreach (var v in vicinity)
-				// {
-				// 	var delta = dist[p] - dist[v];
-				// 	if (delta > 0)
-				// 	{
-				// 		var saved = delta - v.ManhattanDistanceTo(p);
-				// 		if (saved >= minSaveTime)
-				// 			cheats++;
-				// 	}
-				// }
-			}
-			return cheats;
-		}
-
 		protected override long Part2(string[] input)
 		{
 			var minSaveTime = PuzzleParameter.Item2;
+
 			var map = CharMap.FromArray(input);
-
-			return FindCheats(map, 20, minSaveTime);
-
 			var (w, h) = map.Size();
 			var start = map.AllPointsWhere(c => c == 'S').Single();
 			var goal = map.AllPointsWhere(c => c == 'E').Single();

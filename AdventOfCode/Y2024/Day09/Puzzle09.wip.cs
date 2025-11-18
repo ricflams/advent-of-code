@@ -10,7 +10,7 @@ using AdventOfCode.Helpers.String;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
-namespace AdventOfCode.Y2024.Day09
+namespace AdventOfCode.Y2024.Day09.Wip
 {
 	internal class Puzzle : Puzzle<long, long>
 	{
@@ -33,6 +33,7 @@ namespace AdventOfCode.Y2024.Day09
 		{
 			public int? Id;
 			public int Length;
+			public bool IsFree => Id == null;
 			public override string ToString()
 			{
 				return Id.HasValue ? $"{Length} '{Id}'" : $"{Length} '.'";
@@ -150,53 +151,72 @@ namespace AdventOfCode.Y2024.Day09
 					blocks.AddLast(new LinkedListNode<Block>(new Block { Id = null, Length = raw[i] }));
 			}
 
+			//			var id = blocks.Count / 2 + 1;
+			var block = blocks.Last;
+			var free = blocks.First;
 
+			// 			foreach (var b in blocks)
+			// 				Console.Write(b.Format);
+			// 			Console.WriteLine();
+			// ;			
 
-			// compact
-			//var freeblock = blocks.First(b => b.Id == null);
-			var id = blocks.Last(b => b.Id.HasValue).Id;
-
-			while (true)
+			for (var id = blocks.Count / 2; id >= 0; id--)
 			{
+				;
+				// Find next block to move and first free spot
+				while (block.Value.Id != id)
+				{
+					block = block.Previous;
+					if (free == block)
+						break;
+				}
+				while (free.Value.Id != null)
+				{
+					free = free.Next;
+					if (free == block)
+						break;
+				}
+
+				// Find first spot with enough space, if any
+				var f = free;
+				while (f != null && f != block && !(f.Value.IsFree && block.Value.Length <= f.Value.Length))
+				{
+					f = f.Next;
+				}
+				if (f == null || f == block) // no free blocks
+					continue;
+
+				var prev = block.Previous;
+				blocks.Remove(block);
+				blocks.AddBefore(f, block);
+
+				var vacancy = f.Value;
+
+				if (block.Value.Length < f.Value.Length)
+				{
+					f.Value.Length -= block.Value.Length;
+				}
+				else
+				{
+					blocks.Remove(f);
+					if (f.Previous?.Value.Id == 0)
+					{
+						f.Value.Length += f.Previous.Value.Length;
+						blocks.Remove(f.Previous);
+					}
+					if (f.Next?.Value.Id == 0)
+					{
+						f.Value.Length += f.Next.Value.Length;
+						blocks.Remove(f.Next);
+					}
+				}
 
 				// foreach (var b in blocks)
 				// 	Console.Write(b.Format);
 				// Console.WriteLine();
 
-
-
-				var blocknode = blocks.FirstNodeOrDefault(b => b.Id == id);
-				if (blocknode == null)
-					break;
-				var block = blocknode.Value;
-				id--;
-
-				var freeblock = blocks.TakeWhile(b => b != block).FirstOrDefault(b => !b.Id.HasValue && block.Length <= b.Length);
-				if (freeblock == null)
-					continue;
-
-				//var last = blocks.LastOrDefault(b => b.Id.HasValue);
-				if (block.Length < freeblock.Length)
-				{
-					var newfreeblock = new Block { Id = null, Length = freeblock.Length - block.Length };
-					blocks.AddAfter(blocks.Find(freeblock), newfreeblock);
-				}
-				freeblock.Id = block.Id;
-				freeblock.Length = block.Length;
-				block.Id = null;
-				var next = blocks.Find(block)?.Next;
-				if (next != null && !next.Value.Id.HasValue)
-				{
-					block.Length += next.Value.Length;
-					blocks.Remove(next);
-				}
-				var prev = blocks.Find(block)?.Previous;
-				if (prev != null && !prev.Value.Id.HasValue)
-				{
-					block.Length += prev.Value.Length;
-					blocks.Remove(prev);
-				}
-				//				blocks.Remove(block);
+				block = prev;
+				;
 			}
 
 			while (true)

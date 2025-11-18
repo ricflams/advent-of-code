@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AdventOfCode.Helpers
+﻿namespace AdventOfCode.Helpers
 {
 	public class Maze(CharMap map)
 	{
@@ -23,13 +21,5 @@ namespace AdventOfCode.Helpers
 		public virtual Point Teleport(Point p) => p;
 		public bool IsWalkable(Point p) => Map[p] != '#';
 		public bool IsFork(Point p) => false;
-	
-		public void ConsoleWrite()
-		{
-			foreach (var line in Map.Render())
-			{
-				Console.WriteLine(line);
-			}
-		}
 	}
 }

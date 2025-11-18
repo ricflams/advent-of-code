@@ -9,7 +9,7 @@ namespace AdventOfCode.Helpers
 	public record Interval(int Start, int End)
 	{
 		public static readonly Interval Empty = new(0, 0);
-		public bool Overlaps(Interval o) => Start < o.End && o.Start < End;
+		public bool Overlaps(Interval o) => Start <= o.End && o.Start <= End;
 		public bool Contains(int v) => Start <= v && v < End;
 		public int Length => End - Start;
 

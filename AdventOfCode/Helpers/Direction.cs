@@ -13,9 +13,23 @@ namespace AdventOfCode.Helpers
 
 	public static class DirectionExtensions
 	{
-		private static char[] DirChars = new [] { '^', '>', 'v', '<' };
+		public static char AsChar(this Direction direction) => direction switch
+		{
+			Direction.Left => '<',
+			Direction.Right => '>',
+			Direction.Up => '^',
+			Direction.Down => 'v',
+			_ => throw new Exception($"Unsupported direction {direction}")
+		};
 
-		public static char AsChar(this Direction direction) => DirChars[(int)direction];
+		public static Direction AsDirection(this char ch) => ch switch
+		{
+			'<' => Direction.Left,
+			'>' => Direction.Right,
+			'^' => Direction.Up,
+			'v' => Direction.Down,
+			_ => throw new Exception($"Unsupported direction {ch}")
+		};
 
 		public static Direction TurnRight(this Direction direction)
 		{

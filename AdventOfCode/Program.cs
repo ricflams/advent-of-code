@@ -29,7 +29,7 @@ namespace AdventOfCode
 			// || (year, day) == (2023, 17)
 			//|| test == "extra" && year == 2020
 
-			|| (year, day) == (2024, 20)
+			|| (year, day) == (2024, 23)
 
 			//				|| !(year == 2019 && day == 18)// || year == 2023 && day == 22)
 

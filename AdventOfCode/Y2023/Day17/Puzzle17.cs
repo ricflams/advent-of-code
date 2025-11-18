@@ -23,6 +23,8 @@ namespace AdventOfCode.Y2023.Day17
 			Run("test1").Part1(102).Part2(94);
 			Run("input").Part1(674).Part2(773);
 			Run("extra").Part1(855).Part2(980);
+
+			// TODO: cleanup
 		}
 
 		protected override long Part1(string[] input)
@@ -36,7 +38,7 @@ namespace AdventOfCode.Y2023.Day17
 			// int Dist(Point p) => p.ManhattanDistanceTo(dest);
 
 
-			queue.Put((start, Direction.Right, 1, 0, new List<Point>(){start}), 2000000);
+			queue.Put((start, Direction.Right, 1, 0, new List<Point>() { start }), 2000000);
 			var minlosses = new Dictionary<string, int>();
 
 			var minLoss = int.MaxValue;
@@ -44,11 +46,11 @@ namespace AdventOfCode.Y2023.Day17
 			while (queue.TryGet(out var item))
 			{
 				var (p, dir, blocks, loss, path) = item;
-//				Console.WriteLine($"p={p} dir={dir} blocks={blocks} loss={loss}");
-						// var map2 = map.Copy();
-						// foreach (var pp in path)
-						// 	map2[pp.X, pp.Y] = '#';
-						//map2.ConsoleWrite();				
+				//				Console.WriteLine($"p={p} dir={dir} blocks={blocks} loss={loss}");
+				// var map2 = map.Copy();
+				// foreach (var pp in path)
+				// 	map2[pp.X, pp.Y] = '#';
+				//map2.ConsoleWrite();				
 
 				if (loss >= minLoss)
 					continue;
@@ -56,7 +58,7 @@ namespace AdventOfCode.Y2023.Day17
 				var key = $"{p}-{dir}-{blocks}";
 				if (minlosses.TryGetValue(key, out var x))
 				{
-					if (x <= loss)					
+					if (x <= loss)
 						continue;
 				}
 				minlosses[key] = loss;
@@ -83,9 +85,9 @@ namespace AdventOfCode.Y2023.Day17
 				MaybeMove(p, dir.TurnRight(), 1, loss, path);
 				if (blocks < 3)
 				{
-					MaybeMove(p, dir, blocks+1, loss, path);
+					MaybeMove(p, dir, blocks + 1, loss, path);
 				}
-			}			
+			}
 
 			void MaybeMove(Point p, Direction d, int blocks, int loss, List<Point> path)
 			{
@@ -116,11 +118,11 @@ namespace AdventOfCode.Y2023.Day17
 			while (queue.TryGet(out var item))
 			{
 				var (p, dir, blocks, loss) = item;
-//				Console.WriteLine($"p={p} dir={dir} blocks={blocks} loss={loss}");
-						// var map2 = map.Copy();
-						// foreach (var pp in path)
-						// 	map2[pp.X, pp.Y] = '#';
-						//map2.ConsoleWrite();				
+				//				Console.WriteLine($"p={p} dir={dir} blocks={blocks} loss={loss}");
+				// var map2 = map.Copy();
+				// foreach (var pp in path)
+				// 	map2[pp.X, pp.Y] = '#';
+				//map2.ConsoleWrite();				
 
 				//if (loss + p.ManhattanDistanceTo(dest) + (map[dest.X, dest.Y] - '0' - 1) > minLoss)
 				if (loss + p.ManhattanDistanceTo(dest) >= minLoss)
@@ -138,7 +140,7 @@ namespace AdventOfCode.Y2023.Day17
 				var key = $"{p}-{dir}-{blocks}";
 				if (minlosses.TryGetValue(key, out var x))
 				{
-					if (x <= loss)					
+					if (x <= loss)
 						continue;
 				}
 				minlosses[key] = loss;
@@ -173,9 +175,9 @@ namespace AdventOfCode.Y2023.Day17
 				}
 				if (blocks < 10)
 				{
-					MaybeMove(p, dir, blocks+1, loss);
+					MaybeMove(p, dir, blocks + 1, loss);
 				}
-			}			
+			}
 
 			void MaybeMove(Point p, Direction d, int blocks, int loss)
 			{

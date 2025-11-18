@@ -138,7 +138,7 @@ namespace AdventOfCode.Helpers
 			{
 				foreach (var (n, w) in node.Neighbors)
 				{
-					Console.WriteLine($"  \"{node}\" -> \"{n}\" [label=\"{w}\"]");
+					Console.WriteLine($"  \"{node.Id}\" -> \"{n.Id}\" [label=\"{w}\"]");
 				}
 			}
 			Console.WriteLine("}");
@@ -179,6 +179,67 @@ namespace AdventOfCode.Helpers
 			}
 
 			return Infinite;
+		}
+
+
+		public int ShortestPathDijkstraCountSpots(Node start, Node dest)
+		{
+			var visited = new bool[Nodes.Count];
+			var distance = new int[Nodes.Count];
+			Array.Fill(distance, int.MaxValue);
+			distance[start.Index] = 0;
+
+			var node = start;
+			while (node != null)
+			{
+				if (node == dest)
+				{
+					return distance[dest.Index];
+				}
+				foreach (var (n, w) in node.Neighbors)
+				{
+					var dist = distance[node.Index] + w;
+					if (dist < distance[n.Index])
+					{
+						distance[n.Index] = dist;
+					}
+				}
+				visited[node.Index] = true;
+				node = Nodes
+					.Where(n => !visited[n.Index])
+					.OrderBy(n => distance[n.Index])
+					.FirstOrDefault();
+			}
+
+			return Infinite;
+		}
+
+		public Dictionary<Node, int> ShortestPathToAllDijkstra(Node start)
+		{
+			var visited = new bool[Nodes.Count];
+			var distance = new int[Nodes.Count];
+			Array.Fill(distance, int.MaxValue);
+			distance[start.Index] = 0;
+
+			var node = start;
+			while (node != null)
+			{
+				foreach (var (n, w) in node.Neighbors)
+				{
+					var dist = distance[node.Index] + w;
+					if (dist < distance[n.Index])
+					{
+						distance[n.Index] = dist;
+					}
+				}
+				visited[node.Index] = true;
+				node = Nodes
+					.Where(n => !visited[n.Index])
+					.OrderBy(n => distance[n.Index])
+					.FirstOrDefault();
+			}
+
+			return Nodes.ToDictionary(n => n, n => distance[n.Index]);
 		}
 
 		public List<Node> AStarPath(Node start, Node goal, Func<Node, Node, int> heuristics)
@@ -231,34 +292,6 @@ namespace AdventOfCode.Helpers
 			path.Add(start);
 
 			return path;
-		}
-
-		public Dictionary<Node, int> ShortestPathToAllDijkstra(Node start)
-		{
-			var visited = new bool[Nodes.Count];
-			var distance = new int[Nodes.Count];
-			Array.Fill(distance, int.MaxValue);
-			distance[start.Index] = 0;
-
-			var node = start;
-			while (node != null)
-			{
-				foreach (var (n, w) in node.Neighbors)
-				{
-					var dist = distance[node.Index] + w;
-					if (dist < distance[n.Index])
-					{
-						distance[n.Index] = dist;
-					}
-				}
-				visited[node.Index] = true;
-				node = Nodes
-					.Where(n => !visited[n.Index])
-					.OrderBy(n => distance[n.Index])
-					.FirstOrDefault();
-			}
-
-			return Nodes.ToDictionary(n => n, n => distance[n.Index]);
 		}
 
 		public int[,] FloydWarshallShortestPaths()
@@ -373,16 +406,6 @@ namespace AdventOfCode.Helpers
 			return Nodes.Where(n => visited[n.Index]).ToArray();
 		}
 
-
-
-
-
-
-
-
-
-
-
 		public static Graph<Point> BuildWeightedGraphFromMaze(Maze maze)
 		{
 			var graph = new Graph<Point>();
@@ -444,9 +467,6 @@ namespace AdventOfCode.Helpers
 			}
 		}
 
-
-
-
 		public static Graph<Point, TData> BuildUnitGraphFromMaze(Maze maze)
 		{
 			var graph = new Graph<Point, TData>();
@@ -481,8 +501,6 @@ namespace AdventOfCode.Helpers
 				}
 			}
 		}
-
-
 
 		public static Graph<Point, TData> BuildUnitGraphFromMazeByQueue(Maze maze)
 		{
@@ -520,7 +538,6 @@ namespace AdventOfCode.Helpers
 			}
 			return graph;
 		}
-
 
 
 		//public static Graph<Point, TData> FromMaze<Node>(CharMap map, Point start, Func<Point, char, TData> makeNode)
