@@ -29,15 +29,16 @@ namespace AdventOfCode.Y2016.Day11
 
 		protected override int Part2(string[] input)
 		{
-			var extra = new []
+			var harder = input.ToArray();
+			var extra = new[]
 			{
 				"An elerium generator.",
 				"An elerium-compatible microchip.",
 				"A dilithium generator.",
 				"A dilithium-compatible microchip."
 			};
-			input[0] += string.Concat(extra);
-			return Solve(input);
+			harder[0] += string.Concat(extra);
+			return Solve(harder);
 		}
 
 		private int Solve(string[] input)
@@ -99,7 +100,7 @@ namespace AdventOfCode.Y2016.Day11
 		private int _elevator;
 
 		public int Steps { get; private set; }
-		public uint Id { get; private set;}
+		public uint Id { get; private set; }
 
 		public Floor(string[] input)
 		{
