@@ -181,6 +181,10 @@ namespace AdventOfCode.Y2024.Day06
 
 			return n;
 
+			// TODO: improve performance
+
+
+
 			// var map = CharMap.FromArray(input);
 			// var (min, max) = map.MinMax();
 
