@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Helpers
 {
@@ -9,6 +10,12 @@ namespace AdventOfCode.Helpers
 		Right,
 		Down,
 		Left
+	}
+
+	public class Directions
+	{
+		public static readonly Direction[] All = [Direction.Up, Direction.Right, Direction.Down, Direction.Left];
+		public static IEnumerable<Direction> AllExcept(Direction skip) => All.Where(d => d != skip);
 	}
 
 	public static class DirectionExtensions
