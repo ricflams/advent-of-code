@@ -96,16 +96,16 @@ namespace AdventOfCode.Y2024.Day12.Raw
 
 			int Price(HashSet<Point> region)
 			{
-				var htop = new SafeDictionary<int, List<Interval>>(() => []);
-				var hbot = new SafeDictionary<int, List<Interval>>(() => []);
-				var vlef = new SafeDictionary<int, List<Interval>>(() => []);
-				var vrig = new SafeDictionary<int, List<Interval>>(() => []);
+				var htop = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var hbot = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var vlef = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var vrig = new SafeDictionary<int, List<Interval<int>>>(() => []);
 				foreach (var p0 in region)
 				{
-					if (!region.Contains(p0.N)) htop[p0.Y].Add(new Interval(p0.X, p0.X + 1));
-					if (!region.Contains(p0.S)) hbot[p0.Y].Add(new Interval(p0.X, p0.X + 1));
-					if (!region.Contains(p0.W)) vlef[p0.X].Add(new Interval(p0.Y, p0.Y + 1));
-					if (!region.Contains(p0.E)) vrig[p0.X].Add(new Interval(p0.Y, p0.Y + 1));
+					if (!region.Contains(p0.N)) htop[p0.Y].Add(new Interval<int>(p0.X, p0.X + 1));
+					if (!region.Contains(p0.S)) hbot[p0.Y].Add(new Interval<int>(p0.X, p0.X + 1));
+					if (!region.Contains(p0.W)) vlef[p0.X].Add(new Interval<int>(p0.Y, p0.Y + 1));
+					if (!region.Contains(p0.E)) vrig[p0.X].Add(new Interval<int>(p0.Y, p0.Y + 1));
 				}
 
 				//var perim = 0;

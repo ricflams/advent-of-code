@@ -1,28 +1,29 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 
 namespace AdventOfCode.Helpers
 {
 	[DebuggerDisplay("{ToString()}")]
-	public record Interval(int Start, int End)
+	public record Interval<T>(T Start, T End)
+        where T : INumber<T>
 	{
-		public static readonly Interval Empty = new(0, 0);
-		public bool Overlaps(Interval o) => Start <= o.End && o.Start <= End;
-		public bool Contains(int v) => Start <= v && v < End;
-		public int Length => End - Start;
+		public static readonly Interval<T> Empty = new(default, default);
+		public bool Overlaps(Interval<T> o) => Start <= o.End && o.Start <= End;
+		public bool Contains(T v) => Start <= v && v < End;
+		public T Length => End - Start;
 
-		public Interval Combine(Interval o)
+		public Interval<T> Combine(Interval<T> o)
 		{
-			return new Interval(Math.Min(Start, o.Start), Math.Max(End, o.End));
+			return new Interval<T>(T.Min(Start, o.Start), T.Max(End, o.End));
 		}
 
-		public Interval Intersect(Interval o)
+		public Interval<T> Intersect(Interval<T> o)
 		{
 			if (o.Start > End || Start > o.End)
 				return Empty;
-			return new Interval(Math.Max(Start, o.Start), Math.Min(End, o.End));
+			return new Interval<T>(T.Max(Start, o.Start), T.Min(End, o.End));
 		}
 
 		public override string ToString() => $"[{Start}-{End}[";
@@ -30,11 +31,11 @@ namespace AdventOfCode.Helpers
 
 	public static class IntervalExtensions
 	{
-		public static Interval[] Reduce(this IEnumerable<Interval> ranges)
-		{
+		public static Interval<T>[] Reduce<T>(this IEnumerable<Interval<T>> ranges) where T : INumber<T>
+        {
 			var rs = ranges.OrderBy(r => r.Start).ToArray();
 
-			var result = new List<Interval>();
+			var result = new List<Interval<T>>();
 			for (var i = 0; i < rs.Length; i++)
 			{
 				var merged = 0;
@@ -50,9 +51,14 @@ namespace AdventOfCode.Helpers
 			return result.ToArray();
 		}
 
-		public static int TotalLength(this IEnumerable<Interval> ranges)
-		{
-			return ranges.Sum(r => r.Length);
+		public static T TotalLength<T>(this IEnumerable<Interval<T>> ranges) where T : INumber<T>
+        {
+            var length = default(T);
+            foreach (var range in ranges)
+            {
+                length += range.Length;
+            }
+			return length;
 		}
 	}
 }
