@@ -33,7 +33,7 @@ namespace AdventOfCode.Helpers
 			var group = new List<string>();
 			foreach (var line in input)
 			{
-				if (line.Length == 0)
+				if (string.IsNullOrWhiteSpace(line))
 				{
 					if (group.Any())
 					{
