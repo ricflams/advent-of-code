@@ -29,7 +29,7 @@ namespace AdventOfCode.Y2016.Day10
 		protected override int Part2(string[] input)
 		{
 			var (_, outputs) = RunInstructions(input);
-			var product = (int)outputs.Where(x => x.Key < 3).Select(x => x.Value.Chip).Prod();
+			var product = outputs.Where(x => x.Key < 3).Select(x => x.Value.Chip).Prod();
 			return product;
 		}
 
