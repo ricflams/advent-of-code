@@ -28,49 +28,9 @@ namespace AdventOfCode.Helpers
 			long Lcm(long a, long b) => (a / GreatestCommonFactor(a, b)) * b;
 		}
 
-		public static long Prod(this long[] values)
+		public static T Prod<T>(this IEnumerable<T> values) where T : INumber<T>
 		{
-			var prod = 1L;
-			foreach (var v in values)
-			{
-				prod *= v;
-			}
-			return prod;
-		}
-
-		public static long Prod(this int[] values)
-		{
-			var prod = 1L;
-			foreach (var v in values)
-			{
-				prod *= v;
-			}
-			return prod;
-		}
-
-		public static long Prod(this IEnumerable<int> values)
-		{
-			var prod = 1L;
-			foreach (var v in values)
-			{
-				prod *= v;
-			}
-			return prod;
-		}
-
-		public static ulong Prod(this uint[] values)
-		{
-			var prod = 1UL;
-			foreach (var v in values)
-			{
-				prod *= v;
-			}
-			return prod;
-		}
-
-		public static ulong Prod(this ulong[] values)
-		{
-			var prod = 1UL;
+			var prod = T.One;
 			foreach (var v in values)
 			{
 				prod *= v;
@@ -179,7 +139,7 @@ namespace AdventOfCode.Helpers
 
 		public static int SolveChineseRemainderTheorem(int[] n, int[] a)
 		{
-            var prod = (int)n.Prod();
+            var prod = n.Prod();
             var sum = 0;
             for (int i = 0; i < n.Length; i++)
             {
