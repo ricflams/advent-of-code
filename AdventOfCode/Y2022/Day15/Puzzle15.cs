@@ -35,7 +35,7 @@ namespace AdventOfCode.Y2022.Day15
 					return (s.P.X, Width: w);
 				})
 				.Where(s => s.Width >= 0)
-				.Select(s => new Interval(s.X - s.Width, s.X + s.Width + 1))
+				.Select(s => new Interval<int>(s.X - s.Width, s.X + s.Width + 1))
 				.Reduce();
 
 			// Beacons can't appear in these spots, not counting spots where a beacon already exists

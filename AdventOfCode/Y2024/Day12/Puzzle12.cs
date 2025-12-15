@@ -48,16 +48,16 @@ namespace AdventOfCode.Y2024.Day12
 
 			static int Price(Region region)
 			{
-				var top = new SafeDictionary<int, List<Interval>>(() => []);
-				var bot = new SafeDictionary<int, List<Interval>>(() => []);
-				var lef = new SafeDictionary<int, List<Interval>>(() => []);
-				var rig = new SafeDictionary<int, List<Interval>>(() => []);
+				var top = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var bot = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var lef = new SafeDictionary<int, List<Interval<int>>>(() => []);
+				var rig = new SafeDictionary<int, List<Interval<int>>>(() => []);
 				foreach (var p in region)
 				{
-					if (!region.Contains(p.N)) top[p.Y].Add(new Interval(p.X, p.X + 1));
-					if (!region.Contains(p.S)) bot[p.Y].Add(new Interval(p.X, p.X + 1));
-					if (!region.Contains(p.W)) lef[p.X].Add(new Interval(p.Y, p.Y + 1));
-					if (!region.Contains(p.E)) rig[p.X].Add(new Interval(p.Y, p.Y + 1));
+					if (!region.Contains(p.N)) top[p.Y].Add(new Interval<int>(p.X, p.X + 1));
+					if (!region.Contains(p.S)) bot[p.Y].Add(new Interval<int>(p.X, p.X + 1));
+					if (!region.Contains(p.W)) lef[p.X].Add(new Interval<int>(p.Y, p.Y + 1));
+					if (!region.Contains(p.E)) rig[p.X].Add(new Interval<int>(p.Y, p.Y + 1));
 				}
 
 				var perimeter =
