@@ -96,12 +96,12 @@ namespace AdventOfCode.Y2025.Day10
 			{
 				var buttons = m.ButtonNumbers;
 				var joltages = m.Joltages;
-				var matrice = new int[joltages.Length, buttons.Length];
-				for (var ji = 0; ji < joltages.Length; ji++)
-				{
-					for (var bi = 0; bi < buttons.Length; bi++)
+				var matrice = new int[buttons.Length, joltages.Length];
+                for (var bi = 0; bi < buttons.Length; bi++)
+                {
+                    for (var ji = 0; ji < joltages.Length; ji++)
 					{
-						matrice[ji, bi] = buttons[bi].Contains(ji) ? 1 : 0;
+						matrice[bi, ji] = buttons[bi].Contains(ji) ? 1 : 0;
 					}
 				}
 
@@ -122,35 +122,94 @@ namespace AdventOfCode.Y2025.Day10
 
 				Console.WriteLine();
 				Console.WriteLine();
-				var (w, h) = (matrice.Width(), matrice.Height());
-				for (var x = 0; x < w; x++)
-				{
-					for (var y = 0; y < h; y++)
-					{
-						Console.Write($"{matrice[x, y],4}");
-					}
-					Console.WriteLine($" = {joltages[x],4}");
-				}
-				Console.WriteLine();
-			}
+                //Print(matrice, joltages);
+				Normalize(matrice, joltages);
+                Print(matrice, joltages);
+            }
 
-			/// (0,1,2,3,4) (1,2,4) (1,2,3) {149,166,166,162,153}
-			///  
-			///      0   1   2   3   4
-			/// a *  1   1   1   1   1
-			/// b *  0   1   1   0   1
-			/// c *  0   1   1   1   0
-			/// =   149 166 166 162 153
-			///
+            /// (0,1,2,3,4) (1,2,4) (1,2,3) {149,166,166,162,153}
+            ///  
+            ///      0   1   2   3   4
+            /// a *  1   1   1   1   1
+            /// b *  0   1   1   0   1
+            /// c *  0   1   1   1   0
+            /// =   149 166 166 162 153
+            ///
 
 
-			var sum = machines.Sum(FewestPushesForJoltages);
+            var sum = machines.Sum(FewestPushesForJoltages);
 
 			return sum;
 		}
 
+		void Normalize(int[,] m, int[] result)
+		{
+            var (w, h) = (m.Width(), m.Height());
+			for (var x = 0; x < w; x++)
+			{
+				for (var y = x; y < h; y++)
+				{
+					if (m[x, y] != 0)
+					{
+						if (y > x)
+						{
+							// swap rows i,j
+							for (var xx = x; xx < w; xx++)
+								(m[xx, x], m[xx, y]) = (m[xx, y], m[xx, x]);
+							(result[x], result[y]) = (result[y], result[x]);
 
-		private static int FewestPushesForJoltages(Machine m)
+                            //Print(m, result);
+
+                            y = x;
+                        }
+						if (m[x, y] < 0)
+						{
+                            for (var xx = x; xx < w; xx++)
+                            {
+                                m[xx, y] *= -1;
+                            }
+							result[y] *= -1;
+                        }
+
+                        for (var yy = 0; yy < h; yy++)
+						{
+							if (yy == y)
+								continue;
+							var sub = m[x, yy];
+							//if (m[x, yy] == 0)
+							//	continue;
+							for (var xx = x; xx < w; xx++)
+							{
+								m[xx, yy] -= m[xx, y] * sub;
+							}
+							result[yy] -= result[y] * sub;
+
+                            //Print(m, result);
+                        }
+                    }
+				}
+
+                //Print(m, result);
+
+            }
+        }
+
+		void Print(int[,] m, int[] result)
+		{
+            var (w, h) = (m.Width(), m.Height());
+            for (var y = 0; y < h; y++)
+            {
+                for (var x = 0; x < w; x++)
+                {
+                    Console.Write($"{m[x, y],4}");
+                }
+                Console.WriteLine($" = {result[y],4}");
+            }
+            Console.WriteLine();
+        }
+
+
+        private static int FewestPushesForJoltages(Machine m)
 		{
 			var seen = new Dictionary<string, int>();
 
